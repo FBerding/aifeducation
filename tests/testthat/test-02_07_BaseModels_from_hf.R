@@ -55,17 +55,19 @@ for (object_class_name in object_class_names) {
     var_override = list(
       sustain_interval = 30,
       sustain_iso_code = "DEU",
+      sustain_log_level="error",
       n_epoch = 2,
       max_sequence_length = 32,
       min_seq_len = 16,
       val_size = 0.25,
-      learning_rate = 3e-3
+      learning_rate = 3e-3,
+      pytorch_trace=0L
     )
   )
 
   # Create and train model
   base_model <- create_object(object_class_name)
-
+  suppressMessages(
   do.call(
     what = base_model$create_from_hf,
     args = list(
@@ -73,11 +75,14 @@ for (object_class_name in object_class_names) {
       tokenizer_dir = paste0(base_to_existing_base_mode, "/", "tokenizer")
     )
   )
+  )
 
+suppressMessages(
   do.call(
     what = base_model$train,
     args = train_args
   )
+)
 
   # Prepare directory
   dir_path_new <- paste0(test_art_tmp_path, "/", generate_id(10))
@@ -181,6 +186,7 @@ for (object_class_name in object_class_names) {
     n_repeat <- 2
     start_values <- nrow(base_model$get_sustainability_data("inference"))
     for (j in 1:n_repeat) {
+      suppressMessages(
       base_model$estimate_sustainability_inference_fill_mask(
         text_dataset = raw_texts_training,
         n = 30,
@@ -188,6 +194,7 @@ for (object_class_name in object_class_names) {
         sustain_region = NULL,
         sustain_interval = 15,
         trace = train_args$trace
+      )
       )
       expect_equal(nrow(base_model$get_sustainability_data("inference")), j + start_values)
     }

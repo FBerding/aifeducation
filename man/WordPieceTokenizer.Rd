@@ -101,6 +101,7 @@ Trains a new object of this class
   sustain_iso_code = NULL,
   sustain_region = NULL,
   sustain_interval = 15L,
+  sustain_log_level = "warning",
   trace = FALSE
 )}\if{html}{\out{</div>}}
 }
@@ -122,6 +123,8 @@ sustainability should be tracked. A list can be found on Wikipedia:
 codecarbon for more information. \url{https://mlco2.github.io/codecarbon/parameters.html} Allowed values: any}
 
 \item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage. Allowed values: \code{1 <= x }}
+
+\item{\code{sustain_log_level}}{\code{string} Level for printing information to the console. Allowed values: 'debug', 'info', 'warning', 'error', 'critical'}
 
 \item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
 }

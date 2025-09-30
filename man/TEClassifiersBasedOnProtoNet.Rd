@@ -108,6 +108,7 @@ is used as the final model.
   sustain_iso_code = NULL,
   sustain_region = NULL,
   sustain_interval = 15L,
+  sustain_log_level = "warning",
   epochs = 40L,
   batch_size = 35L,
   Ns = 5L,
@@ -171,6 +172,8 @@ sustainability should be tracked. A list can be found on Wikipedia:
 codecarbon for more information. \url{https://mlco2.github.io/codecarbon/parameters.html} Allowed values: any}
 
 \item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage. Allowed values: \code{1 <= x }}
+
+\item{\code{sustain_log_level}}{}
 
 \item{\code{epochs}}{\code{int} Number of training epochs. Allowed values: \code{1 <= x }}
 

@@ -22,6 +22,10 @@ editor_options:
   improve code quality. This process is not finished yet. 
 - Added dependency to a new python library 'calflops'. Please install this package to your
   python environment. 
+  
+**Minor Changes**
+
+- Add a parameter for controlling the log level of the codecarbon sustainability tracker.
 
 **TextEmbeddingModels**
 
@@ -36,8 +40,7 @@ editor_options:
 **BaseModels**
 
 - Added an own implementation of the DataCollatorForWholeWordMask that uses the 
-  word_ids of PreTrainedTokenizerFast. This collator can be used with any
-  type of PreTrainedTokenizerFast.
+  word_ids of PreTrainedTokenizerFast. This collator can be used with WordPieceTokenizer.
 
 **Classifiers**
 

@@ -169,7 +169,6 @@ read_loss_log <- function(path_loss) {
   if (!(inherits(loss_data, "try-error"))) {
     loss_data <- t(loss_data)
     if (ncol(loss_data) > 2L) {
-      print(loss_data)
       colnames(loss_data) <- c("train", "validation", "test")
     } else {
       colnames(loss_data) <- c("train", "validation")

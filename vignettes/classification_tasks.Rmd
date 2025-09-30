@@ -1045,8 +1045,8 @@ bert_modeling$configure(
   max_length = 512,
   chunks = 4,
   overlap = 30,
-  emb_layer_min = "Middle",
-  emb_layer_max = "2_3_layer",
+  emb_layer_min = 6,
+  emb_layer_max = 8,
   emb_pool_type = "Average",
   base_model = base_model_bert
 )
@@ -1885,7 +1885,7 @@ classifier_prototype$train(
   Ns = 5,
   Nq = 3,
   loss_alpha = 0.5,
-  loss_margin = 0.05,
+  loss_margin = 0.025,
   sampling_separate = FALSE,
   sampling_shuffle = TRUE,
   trace = TRUE,
@@ -2126,7 +2126,7 @@ feature_extractor$configure(
   text_embeddings = review_embeddings,
   features = 576,
   method = "Dense",
-  noise_factor = 0.2
+  noise_factor = 0.0
 )
 ```
 
@@ -2180,7 +2180,7 @@ feature_extractor$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
-  epochs = 200,
+  epochs = 50,
   batch_size = 32,
   trace = TRUE,
   ml_trace = 0,
@@ -2188,7 +2188,7 @@ feature_extractor$train(
 )
 ```
 
-> In this example we use the same text embeddings as we use to traing the classifier.
+> In this example we use the same text embeddings as we use to train the classifier.
 > It can be beneficial if you use a larger sample of texts for training a `TEFeatureExtractor`
 > to improve performance and/or to allow a broad application of the feature extractor. 
 

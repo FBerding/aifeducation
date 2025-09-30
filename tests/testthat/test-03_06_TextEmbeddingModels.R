@@ -49,7 +49,7 @@ example_data_large_single$add_from_data.frame(example_data_for_large[1, ])
 chunks <- sample(x = c(4, 10), size = 1, replace = FALSE)
 
 base_model_type_list <- BaseModelsIndex
-#base_model_type_list=base_model_type_list[1]
+#base_model_type_list=base_model_type_list[3]
 
 pooling_type_list <- list(
   "CLS", "Average"
@@ -175,7 +175,12 @@ for (base_model_type in base_model_type_list) {
           tr_comp <- text_embedding_model$get_model_config()
           expect_equal(tr_comp$emb_layer_min, min_layer)
           expect_equal(tr_comp$emb_layer_max, max_layer)
-          expect_equal(tr_comp$emb_pool_type, pooling_type)
+          if(base_model_type=="BaseModelFunnel"){
+            expect_equal(tr_comp$emb_pool_type, "CLS")
+          } else {
+            expect_equal(tr_comp$emb_pool_type, pooling_type)
+          }
+
         })
 
         # Method embed--------------------------------------------------------
@@ -398,12 +403,15 @@ for (base_model_type in base_model_type_list) {
 
         # Estimate sustainability inference embed
         test_that(paste(base_model_type, pooling_type, max_layer, min_layer, "decoding"), {
-          text_embedding_model$estimate_sustainability_inference_embed(
+          suppressMessages(
+            text_embedding_model$estimate_sustainability_inference_embed(
             text_dataset = example_data_large,
             batch_size = 4,
             sustain_iso_code = "DEU",
             sustain_interval = 2,
+            sustain_log_level="error",
             trace = TRUE
+          )
           )
 
           expect_equal(nrow(text_embedding_model$get_sustainability_data("inference")), 1)

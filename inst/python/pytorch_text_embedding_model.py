@@ -17,6 +17,18 @@ import transformers
 import tokenizers
 import torch
 
+class IdentityTransformer(torch.nn.Module):
+  def __init__(self,num_layer):
+    super().__init__()
+    self.num_layer=num_layer
+  
+  def forward(self,input_ids,attention_mask,token_type_ids=None):
+    hidden_states_of_layers=()
+    for i in range(self.num_layer+1):
+      hidden_states_of_layers=hidden_states_of_layers+tuple(input_ids)
+    hidden_states={"hidden_states": hidden_states_of_layers}
+    return hidden_states
+
 class TextEmbeddingModel(torch.nn.Module):
   def __init__(self,base_model,chunks, emb_layer_min, emb_layer_max, emb_pool_type, pad_value,sequence_mode):
     super().__init__()
@@ -38,18 +50,21 @@ class TextEmbeddingModel(torch.nn.Module):
     if not token_type_ids is None:
       token_type_ids=torch.index_select(token_type_ids,dim=0,index=index)
     
-    # Apply the model and receive the hidden states for calculating embeddingd    
-    embeddings=self.base_model(input_ids=input_ids,attention_mask=attention_mask,token_type_ids=token_type_ids,output_hidden_states =True)
+    # Apply the model and receive the hidden states for calculating embeddings    
+    if token_type_ids is None:
+      embeddings=self.base_model(input_ids=input_ids,attention_mask=attention_mask,output_hidden_states =True)
+    else:
+      embeddings=self.base_model(input_ids=input_ids,attention_mask=attention_mask,token_type_ids=token_type_ids,output_hidden_states =True)
     
     # differentiate between hidden states which all have the same sequence length
     if self.sequence_mode=="equal":
       #Create a tensor of the hidden states for fast proccessing
-      relevant_embeddings=torch.stack(embeddings.hidden_states[self.emb_layer_min:(self.emb_layer_max+1)],dim=1)
+      
+      relevant_embeddings=torch.stack(embeddings["hidden_states"][self.emb_layer_min:(self.emb_layer_max+1)],dim=1)
       #Continue depending on the chosen pooling method
       if self.emb_pool_type=="Average":
         masked_expanded=torch.unsqueeze(attention_mask,dim=2)
-        masked_expanded=masked_expanded.expand(embeddings.hidden_states[0].size())
-        masked_expanded.size()
+        masked_expanded=masked_expanded.expand(embeddings["hidden_states"][0].size())
         masked_expanded=torch.unsqueeze(masked_expanded,dim=1)
         masked_expanded=masked_expanded.expand(relevant_embeddings.size())
         
@@ -63,10 +78,12 @@ class TextEmbeddingModel(torch.nn.Module):
         final_embeddings=torch.sum(cls_tokens,dim=(1))/self.n_layers
     else:
       if self.emb_pool_type=="CLS":
-        cls_tokens=torch.zeros(embeddings.hidden_states[0].size()).to(embeddings.hidden_states[0].device)
+        cls_tokens=torch.zeros(embeddings["hidden_states"][0].size(0),embeddings["hidden_states"][0].size(2)).to(embeddings["hidden_states"][0].device)
         for i in range(self.emb_layer_min,self.emb_layer_max+1):
-          cls_tokens=cls_tokens+embeddings.hidden_states[i]
-        cls_token=cls_token/self.n_layers
+          tmp_states=torch.squeeze(torch.index_select(embeddings["hidden_states"][i],dim=1,index=torch.zeros(1).to(embeddings["hidden_states"][0].device,torch.int)),dim=1)
+          cls_tokens=cls_tokens+tmp_states
+        cls_tokens=cls_tokens/self.n_layers
+        final_embeddings=cls_tokens
 
     #Add missing rows to ensure embeddings of the same shape
     if n_chunks<self.chunks:

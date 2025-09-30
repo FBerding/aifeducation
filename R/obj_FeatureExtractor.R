@@ -115,6 +115,7 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param sustain_region Region within a country. Only available for USA and Canada See the documentation of
     #'   'codecarbon' for more information. <https://mlco2.github.io/codecarbon/parameters.html>
     #' @param sustain_interval `int` Interval in seconds for measuring power usage.
+    #' @param sustain_log_level `r get_description("sustain_log_level")`
     #' @param epochs `int` Number of training epochs.
     #' @param batch_size `int` Size of batches.
     #' @param log_dir `string` Path to the directory where the log files should be saved. If no logging is desired set
@@ -136,6 +137,7 @@ TEFeatureExtractor <- R6::R6Class(
                      sustain_iso_code = NULL,
                      sustain_region = NULL,
                      sustain_interval = 15L,
+                     sustain_log_level="warning",
                      epochs = 40L,
                      batch_size = 32L,
                      trace = TRUE,

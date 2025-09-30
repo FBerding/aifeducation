@@ -138,6 +138,7 @@ Method for training a neural net.
   sustain_iso_code = NULL,
   sustain_region = NULL,
   sustain_interval = 15L,
+  sustain_log_level = "warning",
   epochs = 40L,
   batch_size = 32L,
   trace = TRUE,
@@ -169,6 +170,8 @@ sustainability should be tracked. A list can be found on Wikipedia:
 'codecarbon' for more information. \url{https://mlco2.github.io/codecarbon/parameters.html}}
 
 \item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage.}
+
+\item{\code{sustain_log_level}}{}
 
 \item{\code{epochs}}{\code{int} Number of training epochs.}
 

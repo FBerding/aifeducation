@@ -117,6 +117,7 @@ BaseModelMPNet <- R6::R6Class(
     #' @param sustain_iso_code `r get_description("sustain_iso_code")`
     #' @param sustain_region `r get_description("sustain_region")`
     #' @param sustain_interval `r get_description("sustain_interval")`
+    #' @param sustain_log_level `r get_description("sustain_log_level")`
     #' @param trace `r get_description("trace")`
     #' @param pytorch_trace `r get_description("pytorch_trace")`
     #' @param log_dir `r get_description("log_dir")`
@@ -137,6 +138,7 @@ BaseModelMPNet <- R6::R6Class(
                      sustain_iso_code = NULL,
                      sustain_region = NULL,
                      sustain_interval = 15L,
+                     sustain_log_level="warning",
                      trace = TRUE,
                      pytorch_trace = 1L,
                      log_dir = NULL,

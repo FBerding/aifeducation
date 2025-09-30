@@ -57,6 +57,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
     #' @param sustain_iso_code `r get_param_doc_desc("sustain_iso_code")`
     #' @param sustain_region `r get_param_doc_desc("sustain_region")`
     #' @param sustain_interval `r get_param_doc_desc("sustain_interval")`
+    #' @param sustain_log_level `r get_description("sustain_log_level")`
     #' @param epochs `r get_param_doc_desc("epochs")`
     #' @param batch_size `r get_param_doc_desc("batch_size")`
     #' @param log_dir `r get_param_doc_desc("log_dir")`
@@ -100,6 +101,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
                      sustain_iso_code = NULL,
                      sustain_region = NULL,
                      sustain_interval = 15L,
+                     sustain_log_level="warning",
                      epochs = 40L,
                      batch_size = 35L,
                      Ns = 5L,

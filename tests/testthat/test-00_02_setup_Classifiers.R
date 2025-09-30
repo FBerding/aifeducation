@@ -52,6 +52,7 @@ test_that("Setup Classifier Data", {
         sustain_iso_code = "DEU",
         sustain_region = NULL,
         sustain_interval = 15,
+        sustain_log_level="error",
         epochs = 75,
         batch_size = 100,
         optimizer = "Adam",

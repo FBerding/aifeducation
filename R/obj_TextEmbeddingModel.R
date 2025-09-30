@@ -629,6 +629,7 @@ TextEmbeddingModel <- R6::R6Class(
     #' @param sustain_iso_code `r get_param_doc_desc("sustain_iso_code")`
     #' @param sustain_region `r get_param_doc_desc("sustain_region")`
     #' @param sustain_interval `r get_param_doc_desc("sustain_interval")`
+    #' @param sustain_log_level `r get_description("sustain_log_level")`
     #' @param trace `r get_param_doc_desc("trace")`
     #' @return Returns nothing. Method saves the statistics internally.
     #' The statistics can be accessed with the method `get_sustainability_data("inference")`
@@ -637,6 +638,7 @@ TextEmbeddingModel <- R6::R6Class(
                                                        sustain_iso_code = NULL,
                                                        sustain_region = NULL,
                                                        sustain_interval = 10L,
+                                                       sustain_log_level="warning",
                                                        trace = TRUE) {
       # Prepare Data
       print_message(
@@ -663,15 +665,13 @@ TextEmbeddingModel <- R6::R6Class(
         emp_seq_length[i] <- tmp_encode$chunks * private$model_config$max_length - (tmp_encode$chunks - 1L) * private$model_config$overlap
       }
 
-
-
-
       # Start Tracking
       private$init_and_start_sustainability_tracker(
         trace = trace,
         country_iso_code = sustain_iso_code,
         region = sustain_region,
-        measure_power_secs = sustain_interval
+        measure_power_secs = sustain_interval,
+        sustain_log_level=sustain_log_level
       )
 
       # Start Task

@@ -120,6 +120,7 @@ Traines a BaseModel
   sustain_iso_code = NULL,
   sustain_region = NULL,
   sustain_interval = 15L,
+  sustain_log_level = "warning",
   trace = TRUE,
   pytorch_trace = 1L,
   log_dir = NULL,
@@ -157,6 +158,8 @@ Traines a BaseModel
 \item{\code{sustain_region}}{}
 
 \item{\code{sustain_interval}}{}
+
+\item{\code{sustain_log_level}}{}
 
 \item{\code{trace}}{}
 
@@ -401,6 +404,7 @@ Calculates the energy consumption for inference of the given task.
   sustain_iso_code = NULL,
   sustain_region = NULL,
   sustain_interval = 15L,
+  sustain_log_level = "warning",
   trace = TRUE
 )}\if{html}{\out{</div>}}
 }
@@ -417,6 +421,8 @@ Calculates the energy consumption for inference of the given task.
 \item{\code{sustain_region}}{}
 
 \item{\code{sustain_interval}}{}
+
+\item{\code{sustain_log_level}}{}
 
 \item{\code{trace}}{}
 }

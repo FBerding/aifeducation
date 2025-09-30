@@ -26,10 +26,7 @@ raw_texts <- LargeDataSetForText$new(example_data)
 #Genereate Tokenizer
 raw_texts_training <- LargeDataSetForText$new(example_data[1:50, ])
 
-tok_type <- sample(
-  x = setdiff(x = unlist(TokenizerIndex), y = "HuggingFaceTokenizer"),
-  size = 1
-)
+tok_type ="WordPieceTokenizer"
 Tokenizer <- create_object(tok_type)
 Tokenizer$configure(
   vocab_size = 2000,
@@ -42,6 +39,7 @@ Tokenizer$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
+  sustain_log_level="error",
   trace = FALSE
 )
 

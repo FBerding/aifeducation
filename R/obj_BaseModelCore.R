@@ -23,7 +23,7 @@ BaseModelCore <- R6::R6Class(
   private = list(
     model_type = NULL,
     adjust_max_sequence_length = 0L,
-    return_token_type_ids = TRUE,
+    return_token_type_ids = FALSE,
     sequence_mode="equal",
     model_info = list(),
     flops_estimates = data.frame(),
@@ -160,6 +160,15 @@ BaseModelCore <- R6::R6Class(
         tokenized_texts_raw <- tokenized_texts_raw$select(as.integer(relevant_indices - 1L))
       }
 
+      relevant_columns=c("input_ids","attention_mask","labels")
+      if(private$return_token_type_ids){
+        relevant_columns=append(relevant_columns,"token_type_ids")
+      }
+      if(self$last_training$config$whole_word){
+        relevant_columns=append(relevant_columns,"word_ids")
+      }
+      tokenized_texts_raw=tokenized_texts_raw$select_columns(relevant_columns)
+
       tokenized_texts_raw$set_format(type = "torch")
       tokenized_texts_raw <- tokenized_texts_raw$train_test_split(
         test_size = self$last_training$config$val_size
@@ -180,7 +189,8 @@ BaseModelCore <- R6::R6Class(
       if (self$last_training$config$whole_word) {
         tmp_data_collator <- py$DataCollatorForWholeWordMask(
           tokenizer = self$Tokenizer$get_tokenizer(),
-          mlm_probability = self$last_training$config$p_mask
+          mlm_probability = self$last_training$config$p_mask,
+          pad_input=FALSE
         )
       } else {
         tmp_data_collator <- transformers$DataCollatorForLanguageModeling(
@@ -237,7 +247,8 @@ BaseModelCore <- R6::R6Class(
           report_to = "none",
           log_level = "error",
           disable_tqdm = !self$last_training$config$pytorch_trace,
-          dataloader_pin_memory = torch$cuda$is_available()
+          dataloader_pin_memory = torch$cuda$is_available(),
+          remove_unused_columns=FALSE
         )
       } else {
         training_args <- transformers$TrainingArguments(
@@ -257,7 +268,8 @@ BaseModelCore <- R6::R6Class(
           auto_find_batch_size = FALSE,
           report_to = "none",
           log_level = "error",
-          disable_tqdm = !self$last_training$config$pytorch_trace
+          disable_tqdm = !self$last_training$config$pytorch_trace,
+          remove_unused_columns=FALSE
         )
       }
 
@@ -378,6 +390,15 @@ BaseModelCore <- R6::R6Class(
 
       # Save args
       private$save_all_args(args = args, group = "training")
+
+      #Check arg combinations
+      if(!inherits(self$Tokenizer,"WordPieceTokenizer") & self$last_training$config$whole_word){
+        print_message(
+          msg = "Whole word masking is only available for WordPieceTokenizer. Set whole_word to 'FALSE'.",
+          trace = TRUE
+        )
+        self$last_training$config$whole_word=FALSE
+      }
 
       # Load or reload python scripts
       private$load_reload_python_scripts()
@@ -508,6 +529,7 @@ BaseModelCore <- R6::R6Class(
     #' @param sustain_iso_code `r get_description("sustain_iso_code")`
     #' @param sustain_region `r get_description("sustain_region")`
     #' @param sustain_interval `r get_description("sustain_interval")`
+    #' @param sustain_log_level `r get_description("sustain_log_level")`
     #' @param trace `r get_description("trace")`
     #' @param pytorch_trace `r get_description("pytorch_trace")`
     #' @param log_dir `r get_description("log_dir")`
@@ -527,6 +549,7 @@ BaseModelCore <- R6::R6Class(
                      sustain_iso_code = NULL,
                      sustain_region = NULL,
                      sustain_interval = 15L,
+                     sustain_log_level="warning",
                      trace = TRUE,
                      pytorch_trace = 1L,
                      log_dir = NULL,
@@ -834,6 +857,7 @@ BaseModelCore <- R6::R6Class(
     #' @param sustain_iso_code `r get_description("sustain_iso_code")`
     #' @param sustain_region `r get_description("sustain_region")`
     #' @param sustain_interval `r get_description("sustain_interval")`
+    #' @param sustain_log_level `r get_description("sustain_log_level")`
     #' @param trace `r get_description("trace")`
     #' @return Returns nothing. Method saves the statistics internally.
     #' The statistics can be accessed with the method `get_sustainability_data("inference")`
@@ -842,6 +866,7 @@ BaseModelCore <- R6::R6Class(
                                                            sustain_iso_code = NULL,
                                                            sustain_region = NULL,
                                                            sustain_interval = 15L,
+                                                           sustain_log_level="warning",
                                                            trace = TRUE) {
       # Prepare Data
       print_message(
@@ -873,7 +898,8 @@ BaseModelCore <- R6::R6Class(
         trace = trace,
         country_iso_code = sustain_iso_code,
         region = sustain_region,
-        measure_power_secs = sustain_interval
+        measure_power_secs = sustain_interval,
+        sustain_log_level=sustain_log_level
       )
 
       for (i in 1L:sample_size) {

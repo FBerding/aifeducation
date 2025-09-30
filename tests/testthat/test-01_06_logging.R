@@ -21,14 +21,14 @@ test_that("logging in R - state log", {
     value_bottom = 6L, total_bottom = 7L, message_bottom = 8,
     last_log = NULL, write_interval = 0L
   )
-  write_log <- rbind(
+  write_log_file <- rbind(
     c(0L, 1L, 2),
     c(3L, 4L, 5),
     c(6L, 7L, 8)
   )
-  colnames(write_log) <- c("value", "total", "message")
+  colnames(write_log_file) <- c("value", "total", "message")
   log <- read_log(log_file)
-  expect_equal(as.matrix(log), write_log)
+  expect_equal(as.matrix(log), write_log_file)
 })
 
 test_that("logging in R - loss log", {

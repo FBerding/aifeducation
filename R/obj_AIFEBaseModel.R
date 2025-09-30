@@ -405,7 +405,8 @@ AIFEMaster <- R6::R6Class(
     init_and_start_sustainability_tracker = function(trace,
                                                      country_iso_code,
                                                      region,
-                                                     measure_power_secs) {
+                                                     measure_power_secs,
+                                                     sustain_log_level) {
       # Trace
       print_message(
         msg = "Start Sustainability Tracking",
@@ -423,7 +424,7 @@ AIFEMaster <- R6::R6Class(
         country_iso_code = country_iso_code,
         region = region,
         tracking_mode = "machine",
-        log_level = "warning",
+        log_level = sustain_log_level,
         measure_power_secs = measure_power_secs,
         save_to_file = FALSE,
         save_to_api = FALSE,
@@ -456,7 +457,8 @@ AIFEMaster <- R6::R6Class(
           trace = self$last_training$config$trace,
           country_iso_code = self$last_training$config$sustain_iso_code,
           region = self$last_training$config$sustain_region,
-          measure_power_secs = self$last_training$config$sustain_interval
+          measure_power_secs = self$last_training$config$sustain_interval,
+          sustain_log_level= self$last_training$config$sustain_log_level
         )
       }
     },

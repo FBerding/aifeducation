@@ -7,39 +7,49 @@ import random
 class DataCollatorForWholeWordMask:
   def __init__(self, 
                tokenizer: PreTrainedTokenizerFast,
-               mlm_probability: float = 0.15):
+               mlm_probability: float = 0.15,
+               pad_input=True):
     if not isinstance(tokenizer, PreTrainedTokenizerFast):
       raise ValueError("Tokenizer must be PreTrainedTokenizerFast")
     
     self.tokenizer = tokenizer
     self.mlm_probability = mlm_probability
+    self.pad_input=pad_input
 
   def __call__(self, examples: List[Union[List[int], Any, dict[str, Any]]]) -> Dict[str, torch.Tensor]:
-    # Gathering in one batch and padding by max sequence length
-    batch = self.tokenizer.pad(
-      examples,
-      return_tensors = "pt",
-    )
-
-    input_ids = batch["input_ids"]
-    labels = input_ids.clone()
-
     # Gather word_ids for each example
     word_ids_list = []
-
     for e in examples:
       if hasattr(e, "word_ids"):  # e.g. BatchEncoding
         word_ids_list.append(e.word_ids())
       elif "word_ids" in e: 
         word_ids_list.append(e["word_ids"])
+        e.pop("word_ids")
       else:
         raise ValueError("There is no information about word_ids!")
+
+    #Remove word ids which are not part of the training
+    if "word_ids" in examples:
+      examples.pop("word_ids")
+    
+    # Gathering in one batch and padding by max sequence length
+    batch = self.tokenizer.pad(
+      examples,
+      return_tensors = "pt",
+      padding=self.pad_input
+    )
+    
+    input_ids = batch["input_ids"]
+    labels = input_ids.clone()
+
+
 
     # Apply whole word masking
     input_ids, labels = self.mask_whole_words(input_ids, labels, word_ids_list)
 
     batch["input_ids"] = input_ids
     batch["labels"] = labels
+
     return batch
 
   def mask_whole_words(self, input_ids, labels, word_ids_list):

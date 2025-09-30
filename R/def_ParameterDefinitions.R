@@ -485,7 +485,7 @@ get_param_dict <- function() {
     min = NULL,
     max = NULL,
     allowed_values = NULL,
-    desc = "* `TRUE`: whole word masking should be applied.
+    desc = "* `TRUE`: whole word masking should be applied. Only relevant if a `WordPieceTokenizer` is used.
   * `FALSE`: token masking is used. ",
     gui_box = "Training Settings",
     gui_label = "Whole Word Masking",
@@ -947,6 +947,17 @@ get_param_dict <- function() {
     gui_box = NULL,
     default_value = 15L
   )
+  param$sustain_log_level <- list(
+    type = "string",
+    allow_null = FALSE,
+    allowed_values=c("debug", "info","warning", "error","critical"),
+    min = NULL,
+    max = NULL,
+    desc = "Level for printing information to the console.",
+    gui_box = NULL,
+    default_value = "warning"
+  )
+
 
   # Training related------------------------------------------------------------
   param$loss_cls_fct_name <- list(

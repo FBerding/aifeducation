@@ -412,6 +412,7 @@ WordPieceTokenizer <- R6::R6Class(
     #' @param sustain_iso_code `r get_param_doc_desc("sustain_iso_code")`
     #' @param sustain_region `r get_param_doc_desc("sustain_region")`
     #' @param sustain_interval `r get_param_doc_desc("sustain_interval")`
+    #' @param sustain_log_level `r get_param_doc_desc("sustain_log_level")`
     #' @param trace `r get_param_doc_desc("trace")`
     #' @return `r get_description("return_nothing")`
     train = function(text_dataset,
@@ -420,6 +421,7 @@ WordPieceTokenizer <- R6::R6Class(
                      sustain_iso_code = NULL,
                      sustain_region = NULL,
                      sustain_interval = 15L,
+                     sustain_log_level="warning",
                      trace = FALSE) {
       private$check_config_for_TRUE()
       private$check_for_untrained()
@@ -570,6 +572,7 @@ BPETokenizer <- R6::R6Class(
     #' @param sustain_iso_code `r get_param_doc_desc("sustain_iso_code")`
     #' @param sustain_region `r get_param_doc_desc("sustain_region")`
     #' @param sustain_interval `r get_param_doc_desc("sustain_interval")`
+    #' @param sustain_log_level `r get_description("sustain_log_level")`
     #' @param trace `r get_param_doc_desc("trace")`
     #' @return `r get_description("return_nothing")`
     train = function(text_dataset,
@@ -578,6 +581,7 @@ BPETokenizer <- R6::R6Class(
                      sustain_iso_code = NULL,
                      sustain_region = NULL,
                      sustain_interval = 15L,
+                     sustain_log_level="warning",
                      trace = FALSE) {
       private$check_config_for_TRUE()
       private$check_for_untrained()

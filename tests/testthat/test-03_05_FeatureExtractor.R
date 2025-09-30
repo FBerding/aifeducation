@@ -52,6 +52,7 @@ for (framework in ml_frameworks) {
       # Train-----------------------------------------------------------------
       test_that(paste(framework, method, data_type, "train without log"), {
         expect_no_error(
+          suppressMessages(
           extractor$train(
             data_embeddings = dataset_list[[data_type]],
             data_val_size = 0.25,
@@ -59,12 +60,14 @@ for (framework in ml_frameworks) {
             sustain_iso_code = "DEU",
             sustain_region = NULL,
             sustain_interval = 15,
+            sustain_log_level="error",
             epochs = 2,
             batch_size = 100,
             optimizer = "Adam",
             trace = random_bool_on_CI(),
             ml_trace = 0
           )
+        )
         )
 
         # Check if sustainability data has been tracked
@@ -76,6 +79,7 @@ for (framework in ml_frameworks) {
         train_path <- paste0(root_path_results, "/", "train_", generate_id())
         create_dir(train_path, FALSE)
         expect_no_error(
+          suppressMessages(
           extractor$train(
             data_embeddings = dataset_list[[data_type]],
             data_val_size = 0.25,
@@ -83,12 +87,14 @@ for (framework in ml_frameworks) {
             sustain_iso_code = "DEU",
             sustain_region = NULL,
             sustain_interval = 15,
+            sustain_log_level="error",
             epochs = 2,
             batch_size = 100,
             log_dir = train_path,
             trace = random_bool_on_CI(),
             ml_trace = 0
           )
+        )
         )
 
         state_log_exists <- file.exists(paste0(train_path, "/aifeducation_state.log"))
