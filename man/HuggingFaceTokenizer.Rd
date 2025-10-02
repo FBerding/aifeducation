@@ -11,7 +11,6 @@ Abstract class for all tokenizers used with the 'transformers' library.
 }
 \seealso{
 Other Tokenizer: 
-\code{\link{BPETokenizer}},
 \code{\link{WordPieceTokenizer}}
 }
 \concept{Tokenizer}

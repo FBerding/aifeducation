@@ -5,7 +5,7 @@
 \alias{TokenizerIndex}
 \title{List of all available Tokenizers}
 \format{
-An object of class \code{list} of length 3.
+An object of class \code{list} of length 2.
 }
 \usage{
 TokenizerIndex

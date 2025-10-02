@@ -55,7 +55,7 @@
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>Does return a new object of this class.</p>
-<p>Returns a <code>data.frame</code> containg the estimates.</p>
+<p>Returns a <code>data.frame</code> containing the estimates.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -64,6 +64,7 @@
 <code><a href="AIFEMaster.html">AIFEMaster</a></code>,
 <code><a href="BaseModelCore.html">BaseModelCore</a></code>,
 <code><a href="ClassifiersBasedOnTextEmbeddings.html">ClassifiersBasedOnTextEmbeddings</a></code>,
+<code><a href="DataManagerClassifier.html">DataManagerClassifier</a></code>,
 <code><a href="LargeDataSetBase.html">LargeDataSetBase</a></code>,
 <code><a href="ModelsBasedOnTextEmbeddings.html">ModelsBasedOnTextEmbeddings</a></code>,
 <code><a href="TEClassifiersBasedOnProtoNet.html">TEClassifiersBasedOnProtoNet</a></code>,
@@ -181,9 +182,9 @@ and updates the object to the current version of the package.</p><div class="sec
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TokenizerBase</span><span class="op">$</span><span class="fu">encode</span><span class="op">(</span></span>
 <span>  <span class="va">raw_text</span>,</span>
-<span>  token_overlap <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  max_token_sequence_length <span class="op">=</span> <span class="fl">512</span>,</span>
-<span>  n_chunks <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  token_overlap <span class="op">=</span> <span class="fl">0L</span>,</span>
+<span>  max_token_sequence_length <span class="op">=</span> <span class="fl">512L</span>,</span>
+<span>  n_chunks <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  token_encodings_only <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  token_to_int <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  return_token_type_ids <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -295,7 +296,8 @@ and their type, token, and id in the columns.</p>
 Kaya and Tantuğ (2024).</p>
 <p>Kaya, Y. B., &amp; Tantuğ, A. C. (2024). Effect of tokenization granularity
 for Turkish large language models. Intelligent Systems with
-Applications, 21, 200335. <a href="https://doi.org/10.1016/j.iswa.2024.200335" class="external-link">https://doi.org/10.1016/j.iswa.2024.200335</a></p><div class="section">
+Applications, 21, 200335.
+&lt;https://doi.org/10.1016/j.iswa.2024.200335&gt;</p><div class="section">
 <h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TokenizerBase</span><span class="op">$</span><span class="fu">calculate_statistics</span><span class="op">(</span></span>
 <span>  <span class="va">text_dataset</span>,</span>
@@ -307,11 +309,11 @@ Applications, 21, 200335. <a href="https://doi.org/10.1016/j.iswa.2024.200335" c
 <div class="section">
 <h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>text_dataset</code></dt>
-<dd></dd>
+<dd><p><code>LargeDataSetForText</code> <a href="LargeDataSetForText.html">LargeDataSetForText</a> Object storing textual data.</p></dd>
 
 
 <dt><code>statistics_max_tokens_length</code></dt>
-<dd></dd>
+<dd><p><code>int</code> Maximum sequence length for calculating the statistics. Allowed values: <code>20 &lt;= x &lt;= 8192</code></p></dd>
 
 
 <dt><code>step</code></dt>

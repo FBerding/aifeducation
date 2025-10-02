@@ -62,6 +62,7 @@
 <code><a href="AIFEBaseModel.html">AIFEBaseModel</a></code>,
 <code><a href="AIFEMaster.html">AIFEMaster</a></code>,
 <code><a href="ClassifiersBasedOnTextEmbeddings.html">ClassifiersBasedOnTextEmbeddings</a></code>,
+<code><a href="DataManagerClassifier.html">DataManagerClassifier</a></code>,
 <code><a href="LargeDataSetBase.html">LargeDataSetBase</a></code>,
 <code><a href="ModelsBasedOnTextEmbeddings.html">ModelsBasedOnTextEmbeddings</a></code>,
 <code><a href="TEClassifiersBasedOnProtoNet.html">TEClassifiersBasedOnProtoNet</a></code>,
@@ -75,8 +76,8 @@
     <div class="section level2">
     <h2 id="public-fields">Public fields<a class="anchor" aria-label="anchor" href="#public-fields"></a></h2>
     <p></p><div class="r6-fields"><dl><dt><code>Tokenizer</code></dt>
-<dd><p><br>
-Objects of class <a href="WordPieceTokenizer.html">WordPieceTokenizer</a>, <a href="BPETokenizer.html">BPETokenizer</a>, <a href="HuggingFaceTokenizer.html">HuggingFaceTokenizer</a>.</p></dd>
+<dd><p>('TokenizerBase')<br>
+Objects of class <code>TokenizerBase</code>.</p></dd>
 
 
 </dl><p></p></div>
@@ -153,20 +154,21 @@ Objects of class <a href="WordPieceTokenizer.html">WordPieceTokenizer</a>, <a hr
 <span>  p_mask <span class="op">=</span> <span class="fl">0.15</span>,</span>
 <span>  whole_word <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  val_size <span class="op">=</span> <span class="fl">0.1</span>,</span>
-<span>  n_epoch <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  batch_size <span class="op">=</span> <span class="fl">12</span>,</span>
-<span>  max_sequence_length <span class="op">=</span> <span class="fl">250</span>,</span>
+<span>  n_epoch <span class="op">=</span> <span class="fl">1L</span>,</span>
+<span>  batch_size <span class="op">=</span> <span class="fl">12L</span>,</span>
+<span>  max_sequence_length <span class="op">=</span> <span class="fl">250L</span>,</span>
 <span>  full_sequences_only <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  min_seq_len <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  min_seq_len <span class="op">=</span> <span class="fl">50L</span>,</span>
 <span>  learning_rate <span class="op">=</span> <span class="fl">0.003</span>,</span>
 <span>  sustain_track <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  sustain_iso_code <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sustain_region <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  sustain_interval <span class="op">=</span> <span class="fl">15</span>,</span>
+<span>  sustain_interval <span class="op">=</span> <span class="fl">15L</span>,</span>
+<span>  sustain_log_level <span class="op">=</span> <span class="st">"warning"</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  pytorch_trace <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  pytorch_trace <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  log_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  log_write_interval <span class="op">=</span> <span class="fl">2</span></span>
+<span>  log_write_interval <span class="op">=</span> <span class="fl">2L</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -228,6 +230,10 @@ Objects of class <a href="WordPieceTokenizer.html">WordPieceTokenizer</a>, <a hr
 <dd></dd>
 
 
+<dt><code>sustain_log_level</code></dt>
+<dd></dd>
+
+
 <dt><code>trace</code></dt>
 <dd></dd>
 
@@ -268,7 +274,11 @@ Objects of class <a href="WordPieceTokenizer.html">WordPieceTokenizer</a>, <a hr
 <p>Method for requesting a plot of the training history.
 This method requires the <em>R</em> package 'ggplot2' to work.</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BaseModelCore</span><span class="op">$</span><span class="fu">plot_training_history</span><span class="op">(</span>y_min <span class="op">=</span> <span class="cn">NULL</span>, y_max <span class="op">=</span> <span class="cn">NULL</span>, text_size <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BaseModelCore</span><span class="op">$</span><span class="fu">plot_training_history</span><span class="op">(</span></span>
+<span>  y_min <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  y_max <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  text_size <span class="op">=</span> <span class="fl">10L</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -321,7 +331,7 @@ and their type, token, and id in the columns.</p>
 <h3 id="method-fill-mask-">Method <code>fill_mask()</code><a class="anchor" aria-label="anchor" href="#method-fill-mask-"></a></h3>
 <p>Method for calculating tokens behind mask tokens.</p><div class="section">
 <h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BaseModelCore</span><span class="op">$</span><span class="fu">fill_mask</span><span class="op">(</span><span class="va">masked_text</span>, n_solutions <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BaseModelCore</span><span class="op">$</span><span class="fu">fill_mask</span><span class="op">(</span><span class="va">masked_text</span>, n_solutions <span class="op">=</span> <span class="fl">5L</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -480,7 +490,8 @@ members for publication information of the model.</p>
 <span>  n <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sustain_iso_code <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sustain_region <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  sustain_interval <span class="op">=</span> <span class="fl">15</span>,</span>
+<span>  sustain_interval <span class="op">=</span> <span class="fl">15L</span>,</span>
+<span>  sustain_log_level <span class="op">=</span> <span class="st">"warning"</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
@@ -504,6 +515,10 @@ members for publication information of the model.</p>
 
 
 <dt><code>sustain_interval</code></dt>
+<dd></dd>
+
+
+<dt><code>sustain_log_level</code></dt>
 <dd></dd>
 
 

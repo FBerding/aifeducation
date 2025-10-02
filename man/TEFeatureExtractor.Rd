@@ -154,43 +154,42 @@ Method for training a neural net.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{data_embeddings}}{Object of class \link{EmbeddedText} or \link{LargeDataSetForTextEmbeddings}.}
+\item{\code{data_embeddings}}{\verb{EmbeddedText, LargeDataSetForTextEmbeddings} Object of class \link{EmbeddedText} or \link{LargeDataSetForTextEmbeddings}.}
 
-\item{\code{data_val_size}}{\code{double} between 0 and 1, indicating the proportion of cases which should be used for the
-validation sample.}
+\item{\code{data_val_size}}{\code{double} between 0 and 1, indicating the proportion of cases which should be
+used for the validation sample during the estimation of the model.
+The remaining cases are part of the training data. Allowed values: \verb{0 < x < 1}}
 
-\item{\code{sustain_track}}{\code{bool} If \code{TRUE} energy consumption is tracked during training via the python library
-'codecarbon'.}
+\item{\code{sustain_track}}{\code{bool} If \code{TRUE} energy consumption is tracked during training via the python library 'codecarbon'.}
 
 \item{\code{sustain_iso_code}}{\code{string} ISO code (Alpha-3-Code) for the country. This variable must be set if
 sustainability should be tracked. A list can be found on Wikipedia:
-\url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}.}
+\url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}. Allowed values: any}
 
-\item{\code{sustain_region}}{Region within a country. Only available for USA and Canada See the documentation of
-'codecarbon' for more information. \url{https://mlco2.github.io/codecarbon/parameters.html}}
+\item{\code{sustain_region}}{\code{string} Region within a country. Only available for USA and Canada See the documentation of
+codecarbon for more information. \url{https://mlco2.github.io/codecarbon/parameters.html} Allowed values: any}
 
-\item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage.}
+\item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage. Allowed values: \code{1 <= x }}
 
-\item{\code{sustain_log_level}}{}
+\item{\code{sustain_log_level}}{\code{string} Level for printing information to the console. Allowed values: 'debug', 'info', 'warning', 'error', 'critical'}
 
-\item{\code{epochs}}{\code{int} Number of training epochs.}
+\item{\code{epochs}}{\code{int} Number of training epochs. Allowed values: \code{1 <= x }}
 
-\item{\code{batch_size}}{\code{int} Size of batches.}
+\item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \code{1 <= x }}
 
-\item{\code{trace}}{\code{bool} \code{TRUE}, if information about the estimation phase should be printed to the console.}
+\item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
 
-\item{\code{ml_trace}}{\code{int} \code{ml_trace=0} does not print any information about the training process from pytorch on
-the console. \code{ml_trace=1} prints a progress bar.}
+\item{\code{ml_trace}}{\code{int} \code{ml_trace=0} does not print any information about the training process from pytorch on the console. Allowed values: \verb{0 <= x <= 1}}
 
-\item{\code{log_dir}}{\code{string} Path to the directory where the log files should be saved. If no logging is desired set
-this argument to \code{NULL}.}
+\item{\code{log_dir}}{\code{string} Path to the directory where the log files should be saved.
+If no logging is desired set this argument to \code{NULL}. Allowed values: any}
 
 \item{\code{log_write_interval}}{\code{int} Time in seconds determining the interval in which the logger should try to update
-the log files. Only relevant if \code{log_dir} is not \code{NULL}.}
+the log files. Only relevant if \code{log_dir} is not \code{NULL}. Allowed values: \code{1 <= x }}
 
-\item{\code{lr_rate}}{\code{double} Initial learning rate for the training.}
+\item{\code{lr_rate}}{\code{double} Initial learning rate for the training. Allowed values: \verb{0 < x <= 1}}
 
-\item{\code{lr_warm_up_ratio}}{\code{double} Number of epochs used for warm up.}
+\item{\code{lr_warm_up_ratio}}{\code{double} Number of epochs used for warm up. Allowed values: \verb{0 < x < 0.5}}
 
 \item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values: 'Adam', 'RMSprop', 'AdamW', 'SGD'}
 }

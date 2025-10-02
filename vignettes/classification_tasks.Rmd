@@ -729,7 +729,7 @@ If you would like to analyse the ecological impact of training the tokenizer you
 can  get an estimation of energy consumption and CO2-emission.
 
 ```{r, include = TRUE, eval = TRUE}
-tokenizer$get_sustainability_data("training")$track_log
+tokenizer$get_sustainability_data("training")
 ```
 
 Since tokenizers can be trained very efficient these values will be very low in most cases.
@@ -915,7 +915,7 @@ To explore the ecological impact of the training and fine-tuning of a model you 
 call `get_sustainability_data("training")`.
 
 ```{r, include = TRUE, eval = TRUE}
-base_model$get_sustainability_data("training")$track_log
+base_model$get_sustainability_data("training")
 ```
 
 The resulting table provides you detailed information on every single training run with
@@ -1572,7 +1572,7 @@ running_num_figures <- running_num_figures + 1
 ```
 
 For this method it is important to decide which performance measure you would like to
-plot. For classifiers loss (`"loss"`), accuracy (`"accuracy"`), and 
+plot. Classifier's loss (`"loss"`), accuracy (`"accuracy"`), and 
 balanced accuracy(`"balanced_accuracy"`) are possible. If you would like to see only the 
 development of the last training phase set `final_training=TRUE`. If this parameter
 is `FALSE` the plot uses the data generated during the performance estimation phase.
@@ -1885,7 +1885,7 @@ classifier_prototype$train(
   Ns = 5,
   Nq = 3,
   loss_alpha = 0.5,
-  loss_margin = 0.025,
+  loss_margin = 0.05,
   sampling_separate = FALSE,
   sampling_shuffle = TRUE,
   trace = TRUE,
@@ -1939,6 +1939,23 @@ result in better performing classifiers.
 > During training the model generates prototpyes based on all available data
 > and classes of the training data set (sample and query). These classes and prototypes are used
 > for the case that no sample data is provided.
+
+First we plot the training history.
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Prototypes"),fig.align="center"}
+classifier_prototype$plot_training_history(
+  final_training = FALSE,
+  pl_step = NULL,
+  measure = "loss",
+  y_min = NULL,
+  y_max = NULL,
+  add_min_max = TRUE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
 
 After training we can request a visualization of the data again. We
 first omit all unlabeled cases by setting `inc_unlabeled=FALSE` in order

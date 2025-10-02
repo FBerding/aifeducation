@@ -149,7 +149,7 @@ this condition is not met the pad value is switched before training.</p>
 <span>  name <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  label <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  text_embeddings <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  features <span class="op">=</span> <span class="fl">128</span>,</span>
+<span>  features <span class="op">=</span> <span class="fl">128L</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"dense"</span>,</span>
 <span>  orthogonal_method <span class="op">=</span> <span class="st">"matrix_exp"</span>,</span>
 <span>  noise_factor <span class="op">=</span> <span class="fl">0.2</span></span>
@@ -206,13 +206,14 @@ be added to the input during training. Allowed values: <code>0 &lt;= x &lt;= 1</
 <span>  sustain_track <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  sustain_iso_code <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sustain_region <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  sustain_interval <span class="op">=</span> <span class="fl">15</span>,</span>
-<span>  epochs <span class="op">=</span> <span class="fl">40</span>,</span>
-<span>  batch_size <span class="op">=</span> <span class="fl">32</span>,</span>
+<span>  sustain_interval <span class="op">=</span> <span class="fl">15L</span>,</span>
+<span>  sustain_log_level <span class="op">=</span> <span class="st">"warning"</span>,</span>
+<span>  epochs <span class="op">=</span> <span class="fl">40L</span>,</span>
+<span>  batch_size <span class="op">=</span> <span class="fl">32L</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  ml_trace <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  ml_trace <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  log_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  log_write_interval <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  log_write_interval <span class="op">=</span> <span class="fl">10L</span>,</span>
 <span>  lr_rate <span class="op">=</span> <span class="fl">0.001</span>,</span>
 <span>  lr_warm_up_ratio <span class="op">=</span> <span class="fl">0.02</span>,</span>
 <span>  optimizer <span class="op">=</span> <span class="st">"AdamW"</span></span>
@@ -222,67 +223,70 @@ be added to the input during training. Allowed values: <code>0 &lt;= x &lt;= 1</
 <div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>data_embeddings</code></dt>
-<dd><p>Object of class <a href="EmbeddedText.html">EmbeddedText</a> or <a href="LargeDataSetForTextEmbeddings.html">LargeDataSetForTextEmbeddings</a>.</p></dd>
+<dd><p><code>EmbeddedText, LargeDataSetForTextEmbeddings</code> Object of class <a href="EmbeddedText.html">EmbeddedText</a> or <a href="LargeDataSetForTextEmbeddings.html">LargeDataSetForTextEmbeddings</a>.</p></dd>
 
 
 <dt><code>data_val_size</code></dt>
-<dd><p><code>double</code> between 0 and 1, indicating the proportion of cases which should be used for the
-validation sample.</p></dd>
+<dd><p><code>double</code> between 0 and 1, indicating the proportion of cases which should be
+used for the validation sample during the estimation of the model.
+The remaining cases are part of the training data. Allowed values: <code>0 &lt; x &lt; 1</code></p></dd>
 
 
 <dt><code>sustain_track</code></dt>
-<dd><p><code>bool</code> If <code>TRUE</code> energy consumption is tracked during training via the python library
-'codecarbon'.</p></dd>
+<dd><p><code>bool</code> If <code>TRUE</code> energy consumption is tracked during training via the python library 'codecarbon'.</p></dd>
 
 
 <dt><code>sustain_iso_code</code></dt>
 <dd><p><code>string</code> ISO code (Alpha-3-Code) for the country. This variable must be set if
 sustainability should be tracked. A list can be found on Wikipedia:
-<a href="https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes" class="external-link">https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes</a>.</p></dd>
+<a href="https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes" class="external-link">https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes</a>. Allowed values: any</p></dd>
 
 
 <dt><code>sustain_region</code></dt>
-<dd><p>Region within a country. Only available for USA and Canada See the documentation of
-'codecarbon' for more information. <a href="https://mlco2.github.io/codecarbon/parameters.html" class="external-link">https://mlco2.github.io/codecarbon/parameters.html</a></p></dd>
+<dd><p><code>string</code> Region within a country. Only available for USA and Canada See the documentation of
+codecarbon for more information. <a href="https://mlco2.github.io/codecarbon/parameters.html" class="external-link">https://mlco2.github.io/codecarbon/parameters.html</a> Allowed values: any</p></dd>
 
 
 <dt><code>sustain_interval</code></dt>
-<dd><p><code>int</code> Interval in seconds for measuring power usage.</p></dd>
+<dd><p><code>int</code> Interval in seconds for measuring power usage. Allowed values: <code>1 &lt;= x </code></p></dd>
+
+
+<dt><code>sustain_log_level</code></dt>
+<dd><p><code>string</code> Level for printing information to the console. Allowed values: 'debug', 'info', 'warning', 'error', 'critical'</p></dd>
 
 
 <dt><code>epochs</code></dt>
-<dd><p><code>int</code> Number of training epochs.</p></dd>
+<dd><p><code>int</code> Number of training epochs. Allowed values: <code>1 &lt;= x </code></p></dd>
 
 
 <dt><code>batch_size</code></dt>
-<dd><p><code>int</code> Size of batches.</p></dd>
+<dd><p><code>int</code> Size of the batches for training. Allowed values: <code>1 &lt;= x </code></p></dd>
 
 
 <dt><code>trace</code></dt>
-<dd><p><code>bool</code> <code>TRUE</code>, if information about the estimation phase should be printed to the console.</p></dd>
+<dd><p><code>bool</code> <code>TRUE</code> if information about the estimation phase should be printed to the console.</p></dd>
 
 
 <dt><code>ml_trace</code></dt>
-<dd><p><code>int</code> <code>ml_trace=0</code> does not print any information about the training process from pytorch on
-the console. <code>ml_trace=1</code> prints a progress bar.</p></dd>
+<dd><p><code>int</code> <code>ml_trace=0</code> does not print any information about the training process from pytorch on the console. Allowed values: <code>0 &lt;= x &lt;= 1</code></p></dd>
 
 
 <dt><code>log_dir</code></dt>
-<dd><p><code>string</code> Path to the directory where the log files should be saved. If no logging is desired set
-this argument to <code>NULL</code>.</p></dd>
+<dd><p><code>string</code> Path to the directory where the log files should be saved.
+If no logging is desired set this argument to <code>NULL</code>. Allowed values: any</p></dd>
 
 
 <dt><code>log_write_interval</code></dt>
 <dd><p><code>int</code> Time in seconds determining the interval in which the logger should try to update
-the log files. Only relevant if <code>log_dir</code> is not <code>NULL</code>.</p></dd>
+the log files. Only relevant if <code>log_dir</code> is not <code>NULL</code>. Allowed values: <code>1 &lt;= x </code></p></dd>
 
 
 <dt><code>lr_rate</code></dt>
-<dd><p><code>double</code> Initial learning rate for the training.</p></dd>
+<dd><p><code>double</code> Initial learning rate for the training. Allowed values: <code>0 &lt; x &lt;= 1</code></p></dd>
 
 
 <dt><code>lr_warm_up_ratio</code></dt>
-<dd><p><code>double</code> Number of epochs used for warm up.</p></dd>
+<dd><p><code>double</code> Number of epochs used for warm up. Allowed values: <code>0 &lt; x &lt; 0.5</code></p></dd>
 
 
 <dt><code>optimizer</code></dt>
@@ -367,7 +371,7 @@ This method requires the <em>R</em> package 'ggplot2' to work.</p><div class="se
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEFeatureExtractor</span><span class="op">$</span><span class="fu">plot_training_history</span><span class="op">(</span></span>
 <span>  y_min <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  y_max <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  text_size <span class="op">=</span> <span class="fl">10</span></span>
+<span>  text_size <span class="op">=</span> <span class="fl">10L</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 

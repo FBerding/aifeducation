@@ -69,6 +69,7 @@ This class is not designed for a direct application and should only be used by d
 <code><a href="AIFEMaster.html">AIFEMaster</a></code>,
 <code><a href="BaseModelCore.html">BaseModelCore</a></code>,
 <code><a href="ClassifiersBasedOnTextEmbeddings.html">ClassifiersBasedOnTextEmbeddings</a></code>,
+<code><a href="DataManagerClassifier.html">DataManagerClassifier</a></code>,
 <code><a href="LargeDataSetBase.html">LargeDataSetBase</a></code>,
 <code><a href="ModelsBasedOnTextEmbeddings.html">ModelsBasedOnTextEmbeddings</a></code>,
 <code><a href="TEClassifiersBasedOnProtoNet.html">TEClassifiersBasedOnProtoNet</a></code>,
@@ -126,30 +127,31 @@ is used as the final model.</p><div class="section">
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifiersBasedOnRegular</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span></span>
 <span>  data_embeddings <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  data_targets <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  data_folds <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  data_folds <span class="op">=</span> <span class="fl">5L</span>,</span>
 <span>  data_val_size <span class="op">=</span> <span class="fl">0.25</span>,</span>
 <span>  loss_balance_class_weights <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  loss_balance_sequence_length <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  loss_cls_fct_name <span class="op">=</span> <span class="st">"FocalLoss"</span>,</span>
 <span>  use_sc <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  sc_method <span class="op">=</span> <span class="st">"knnor"</span>,</span>
-<span>  sc_min_k <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  sc_max_k <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  sc_min_k <span class="op">=</span> <span class="fl">1L</span>,</span>
+<span>  sc_max_k <span class="op">=</span> <span class="fl">10L</span>,</span>
 <span>  use_pl <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  pl_max_steps <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  pl_max_steps <span class="op">=</span> <span class="fl">3L</span>,</span>
 <span>  pl_max <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  pl_anchor <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  pl_min <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  sustain_track <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  sustain_iso_code <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sustain_region <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  sustain_interval <span class="op">=</span> <span class="fl">15</span>,</span>
-<span>  epochs <span class="op">=</span> <span class="fl">40</span>,</span>
-<span>  batch_size <span class="op">=</span> <span class="fl">32</span>,</span>
+<span>  sustain_interval <span class="op">=</span> <span class="fl">15L</span>,</span>
+<span>  sustain_log_level <span class="op">=</span> <span class="st">"warning"</span>,</span>
+<span>  epochs <span class="op">=</span> <span class="fl">40L</span>,</span>
+<span>  batch_size <span class="op">=</span> <span class="fl">32L</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  ml_trace <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  ml_trace <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  log_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  log_write_interval <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  log_write_interval <span class="op">=</span> <span class="fl">10L</span>,</span>
 <span>  n_cores <span class="op">=</span> <span class="fu"><a href="../reference/auto_n_cores.html">auto_n_cores</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  lr_rate <span class="op">=</span> <span class="fl">0.001</span>,</span>
 <span>  lr_warm_up_ratio <span class="op">=</span> <span class="fl">0.02</span>,</span>
@@ -246,6 +248,10 @@ codecarbon for more information. <a href="https://mlco2.github.io/codecarbon/par
 
 <dt><code>sustain_interval</code></dt>
 <dd><p><code>int</code> Interval in seconds for measuring power usage. Allowed values: <code>1 &lt;= x </code></p></dd>
+
+
+<dt><code>sustain_log_level</code></dt>
+<dd></dd>
 
 
 <dt><code>epochs</code></dt>

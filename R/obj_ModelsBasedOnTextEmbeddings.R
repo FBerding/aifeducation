@@ -455,7 +455,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       }
 
       if (need_update) {
-        if (is.null_or_na(private$text_embedding_model["pad_value"])) {
+        if (is.null_or_na(private$text_embedding_model[["pad_value"]])) {
           private$text_embedding_model["pad_value"] <- 0L
         }
       }

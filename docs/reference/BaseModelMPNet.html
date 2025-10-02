@@ -65,6 +65,8 @@ Language Understanding. <a href="https://doi.org/10.48550/arXiv.2004.09297" clas
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other Base Model:
 <code><a href="BaseModelBert.html">BaseModelBert</a></code>,
+<code><a href="BaseModelDebertaV2.html">BaseModelDebertaV2</a></code>,
+<code><a href="BaseModelFunnel.html">BaseModelFunnel</a></code>,
 <code><a href="BaseModelModernBert.html">BaseModelModernBert</a></code>,
 <code><a href="BaseModelRoberta.html">BaseModelRoberta</a></code></p></div>
     </div>
@@ -118,11 +120,11 @@ Language Understanding. <a href="https://doi.org/10.48550/arXiv.2004.09297" clas
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BaseModelMPNet</span><span class="op">$</span><span class="fu">configure</span><span class="op">(</span></span>
 <span>  <span class="va">tokenizer</span>,</span>
-<span>  max_position_embeddings <span class="op">=</span> <span class="fl">512</span>,</span>
-<span>  hidden_size <span class="op">=</span> <span class="fl">768</span>,</span>
-<span>  num_hidden_layers <span class="op">=</span> <span class="fl">12</span>,</span>
-<span>  num_attention_heads <span class="op">=</span> <span class="fl">12</span>,</span>
-<span>  intermediate_size <span class="op">=</span> <span class="fl">3072</span>,</span>
+<span>  max_position_embeddings <span class="op">=</span> <span class="fl">512L</span>,</span>
+<span>  hidden_size <span class="op">=</span> <span class="fl">768L</span>,</span>
+<span>  num_hidden_layers <span class="op">=</span> <span class="fl">12L</span>,</span>
+<span>  num_attention_heads <span class="op">=</span> <span class="fl">12L</span>,</span>
+<span>  intermediate_size <span class="op">=</span> <span class="fl">3072L</span>,</span>
 <span>  hidden_act <span class="op">=</span> <span class="st">"GELU"</span>,</span>
 <span>  hidden_dropout_prob <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  attention_probs_dropout_prob <span class="op">=</span> <span class="fl">0.1</span></span>
@@ -132,7 +134,7 @@ Language Understanding. <a href="https://doi.org/10.48550/arXiv.2004.09297" clas
 <div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>tokenizer</code></dt>
-<dd><p><code>WordPieceTokenizer, BPETokenizer, HuggingFaceTokenizer</code> Object of class <a href="WordPieceTokenizer.html">WordPieceTokenizer</a>, <a href="BPETokenizer.html">BPETokenizer</a>, <a href="HuggingFaceTokenizer.html">HuggingFaceTokenizer</a> . This objects prepares raw text for the model.</p></dd>
+<dd><p><code>TokenizerBase</code> Tokenizer for the model.</p></dd>
 
 
 <dt><code>max_position_embeddings</code></dt>
@@ -186,20 +188,21 @@ embedding. Allowed values: <code>1 &lt;= x &lt;= 2048</code></p></dd>
 <span>  p_perm <span class="op">=</span> <span class="fl">0.15</span>,</span>
 <span>  whole_word <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  val_size <span class="op">=</span> <span class="fl">0.1</span>,</span>
-<span>  n_epoch <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  batch_size <span class="op">=</span> <span class="fl">12</span>,</span>
-<span>  max_sequence_length <span class="op">=</span> <span class="fl">250</span>,</span>
+<span>  n_epoch <span class="op">=</span> <span class="fl">1L</span>,</span>
+<span>  batch_size <span class="op">=</span> <span class="fl">12L</span>,</span>
+<span>  max_sequence_length <span class="op">=</span> <span class="fl">250L</span>,</span>
 <span>  full_sequences_only <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  min_seq_len <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  min_seq_len <span class="op">=</span> <span class="fl">50L</span>,</span>
 <span>  learning_rate <span class="op">=</span> <span class="fl">0.003</span>,</span>
 <span>  sustain_track <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  sustain_iso_code <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sustain_region <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  sustain_interval <span class="op">=</span> <span class="fl">15</span>,</span>
+<span>  sustain_interval <span class="op">=</span> <span class="fl">15L</span>,</span>
+<span>  sustain_log_level <span class="op">=</span> <span class="st">"warning"</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  pytorch_trace <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  pytorch_trace <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  log_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  log_write_interval <span class="op">=</span> <span class="fl">2</span></span>
+<span>  log_write_interval <span class="op">=</span> <span class="fl">2L</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -262,6 +265,10 @@ embedding. Allowed values: <code>1 &lt;= x &lt;= 2048</code></p></dd>
 
 
 <dt><code>sustain_interval</code></dt>
+<dd></dd>
+
+
+<dt><code>sustain_log_level</code></dt>
 <dd></dd>
 
 

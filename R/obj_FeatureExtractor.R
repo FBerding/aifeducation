@@ -104,29 +104,21 @@ TEFeatureExtractor <- R6::R6Class(
 
     #-------------------------------------------------------------------------
     #' @description Method for training a neural net.
-    #' @param data_embeddings Object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings].
-    #' @param data_val_size `double` between 0 and 1, indicating the proportion of cases which should be used for the
-    #'   validation sample.
-    #' @param sustain_track `bool` If `TRUE` energy consumption is tracked during training via the python library
-    #'   'codecarbon'.
-    #' @param sustain_iso_code `string` ISO code (Alpha-3-Code) for the country. This variable must be set if
-    #'   sustainability should be tracked. A list can be found on Wikipedia:
-    #'   <https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes>.
-    #' @param sustain_region Region within a country. Only available for USA and Canada See the documentation of
-    #'   'codecarbon' for more information. <https://mlco2.github.io/codecarbon/parameters.html>
-    #' @param sustain_interval `int` Interval in seconds for measuring power usage.
-    #' @param sustain_log_level `r get_description("sustain_log_level")`
-    #' @param epochs `int` Number of training epochs.
-    #' @param batch_size `int` Size of batches.
-    #' @param log_dir `string` Path to the directory where the log files should be saved. If no logging is desired set
-    #'   this argument to `NULL`.
-    #' @param log_write_interval `int` Time in seconds determining the interval in which the logger should try to update
-    #'   the log files. Only relevant if `log_dir` is not `NULL`.
-    #' @param trace `bool` `TRUE`, if information about the estimation phase should be printed to the console.
-    #' @param ml_trace `int` \code{ml_trace=0} does not print any information about the training process from pytorch on
-    #'   the console. \code{ml_trace=1} prints a progress bar.
-    #' @param lr_rate `double` Initial learning rate for the training.
-    #' @param lr_warm_up_ratio `double` Number of epochs used for warm up.
+    #' @param data_embeddings `r get_param_doc_desc("data_embeddings")`
+    #' @param data_val_size `r get_param_doc_desc("data_val_size")`
+    #' @param sustain_track `r get_param_doc_desc("sustain_track")`
+    #' @param sustain_iso_code `r get_param_doc_desc("sustain_iso_code")`
+    #' @param sustain_region `r get_param_doc_desc("sustain_region")`
+    #' @param sustain_interval `r get_param_doc_desc("sustain_interval")`
+    #' @param sustain_log_level `r get_param_doc_desc("sustain_log_level")`
+    #' @param epochs `r get_param_doc_desc("epochs")`
+    #' @param batch_size `r get_param_doc_desc("batch_size")`
+    #' @param trace `r get_param_doc_desc("trace")`
+    #' @param ml_trace `r get_param_doc_desc("ml_trace")`
+    #' @param log_dir `r get_param_doc_desc("log_dir")`
+    #' @param log_write_interval `r get_param_doc_desc("log_write_interval")`
+    #' @param lr_rate `r get_param_doc_desc("lr_rate")`
+    #' @param lr_warm_up_ratio `r get_param_doc_desc("lr_warm_up_ratio")`
     #' @param optimizer `r get_param_doc_desc("optimizer")`
     #' @note This model requires that the underlying [TextEmbeddingModel] uses `pad_value=0`. If
     #' this condition is not met the pad value is switched before training.

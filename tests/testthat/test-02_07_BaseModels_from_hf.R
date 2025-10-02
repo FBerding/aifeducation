@@ -193,7 +193,8 @@ suppressMessages(
         sustain_iso_code = "DEU",
         sustain_region = NULL,
         sustain_interval = 15,
-        trace = train_args$trace
+        trace = train_args$trace,
+        sustain_log_level="error"
       )
       )
       expect_equal(nrow(base_model$get_sustainability_data("inference")), j + start_values)

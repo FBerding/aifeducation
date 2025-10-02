@@ -68,6 +68,7 @@ This class is not designed for a direct application and should only be used by d
 <code><a href="AIFEBaseModel.html">AIFEBaseModel</a></code>,
 <code><a href="AIFEMaster.html">AIFEMaster</a></code>,
 <code><a href="BaseModelCore.html">BaseModelCore</a></code>,
+<code><a href="DataManagerClassifier.html">DataManagerClassifier</a></code>,
 <code><a href="LargeDataSetBase.html">LargeDataSetBase</a></code>,
 <code><a href="ModelsBasedOnTextEmbeddings.html">ModelsBasedOnTextEmbeddings</a></code>,
 <code><a href="TEClassifiersBasedOnProtoNet.html">TEClassifiersBasedOnProtoNet</a></code>,
@@ -154,8 +155,8 @@ recall, and f1 for every fold.</p></li>
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ClassifiersBasedOnTextEmbeddings</span><span class="op">$</span><span class="fu">predict</span><span class="op">(</span></span>
 <span>  <span class="va">newdata</span>,</span>
-<span>  batch_size <span class="op">=</span> <span class="fl">32</span>,</span>
-<span>  ml_trace <span class="op">=</span> <span class="fl">1</span></span>
+<span>  batch_size <span class="op">=</span> <span class="fl">32L</span>,</span>
+<span>  ml_trace <span class="op">=</span> <span class="fl">1L</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -338,7 +339,7 @@ This method requires the <em>R</em> package 'ggplot2' to work.</p><div class="se
 <span>  y_min <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  y_max <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  add_min_max <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  text_size <span class="op">=</span> <span class="fl">10</span></span>
+<span>  text_size <span class="op">=</span> <span class="fl">10L</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -394,9 +395,9 @@ assigned to a the available classes/categories. The visualization
 is helpful for analyzing the consequences of coding errors.</p><div class="section">
 <h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ClassifiersBasedOnTextEmbeddings</span><span class="op">$</span><span class="fu">plot_coding_stream</span><span class="op">(</span></span>
-<span>  label_categories_size <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  label_categories_size <span class="op">=</span> <span class="fl">3L</span>,</span>
 <span>  key_size <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>  text_size <span class="op">=</span> <span class="fl">10</span></span>
+<span>  text_size <span class="op">=</span> <span class="fl">10L</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 

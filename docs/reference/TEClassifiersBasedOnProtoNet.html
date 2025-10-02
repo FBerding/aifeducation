@@ -72,6 +72,7 @@ which use the architecture of Protonets and its corresponding training technique
 <code><a href="AIFEMaster.html">AIFEMaster</a></code>,
 <code><a href="BaseModelCore.html">BaseModelCore</a></code>,
 <code><a href="ClassifiersBasedOnTextEmbeddings.html">ClassifiersBasedOnTextEmbeddings</a></code>,
+<code><a href="DataManagerClassifier.html">DataManagerClassifier</a></code>,
 <code><a href="LargeDataSetBase.html">LargeDataSetBase</a></code>,
 <code><a href="ModelsBasedOnTextEmbeddings.html">ModelsBasedOnTextEmbeddings</a></code>,
 <code><a href="TEClassifiersBasedOnRegular.html">TEClassifiersBasedOnRegular</a></code>,
@@ -133,34 +134,35 @@ is used as the final model.</p><div class="section">
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifiersBasedOnProtoNet</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span></span>
 <span>  data_embeddings <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  data_targets <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  data_folds <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  data_folds <span class="op">=</span> <span class="fl">5L</span>,</span>
 <span>  data_val_size <span class="op">=</span> <span class="fl">0.25</span>,</span>
 <span>  loss_pt_fct_name <span class="op">=</span> <span class="st">"MultiWayContrastiveLoss"</span>,</span>
 <span>  use_sc <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  sc_method <span class="op">=</span> <span class="st">"knnor"</span>,</span>
-<span>  sc_min_k <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  sc_max_k <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  sc_min_k <span class="op">=</span> <span class="fl">1L</span>,</span>
+<span>  sc_max_k <span class="op">=</span> <span class="fl">10L</span>,</span>
 <span>  use_pl <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  pl_max_steps <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  pl_max_steps <span class="op">=</span> <span class="fl">3L</span>,</span>
 <span>  pl_max <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  pl_anchor <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  pl_min <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  sustain_track <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  sustain_iso_code <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sustain_region <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  sustain_interval <span class="op">=</span> <span class="fl">15</span>,</span>
-<span>  epochs <span class="op">=</span> <span class="fl">40</span>,</span>
-<span>  batch_size <span class="op">=</span> <span class="fl">35</span>,</span>
-<span>  Ns <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>  Nq <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  sustain_interval <span class="op">=</span> <span class="fl">15L</span>,</span>
+<span>  sustain_log_level <span class="op">=</span> <span class="st">"warning"</span>,</span>
+<span>  epochs <span class="op">=</span> <span class="fl">40L</span>,</span>
+<span>  batch_size <span class="op">=</span> <span class="fl">35L</span>,</span>
+<span>  Ns <span class="op">=</span> <span class="fl">5L</span>,</span>
+<span>  Nq <span class="op">=</span> <span class="fl">3L</span>,</span>
 <span>  loss_alpha <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  loss_margin <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  sampling_separate <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  sampling_shuffle <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  ml_trace <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  ml_trace <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  log_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  log_write_interval <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  log_write_interval <span class="op">=</span> <span class="fl">10L</span>,</span>
 <span>  n_cores <span class="op">=</span> <span class="fu"><a href="../reference/auto_n_cores.html">auto_n_cores</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  lr_rate <span class="op">=</span> <span class="fl">0.001</span>,</span>
 <span>  lr_warm_up_ratio <span class="op">=</span> <span class="fl">0.02</span>,</span>
@@ -246,6 +248,10 @@ codecarbon for more information. <a href="https://mlco2.github.io/codecarbon/par
 
 <dt><code>sustain_interval</code></dt>
 <dd><p><code>int</code> Interval in seconds for measuring power usage. Allowed values: <code>1 &lt;= x </code></p></dd>
+
+
+<dt><code>sustain_log_level</code></dt>
+<dd></dd>
 
 
 <dt><code>epochs</code></dt>
@@ -357,8 +363,8 @@ this aim, the distance from the anchor is calculated and all cases are arranged 
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifiersBasedOnProtoNet</span><span class="op">$</span><span class="fu">predict_with_samples</span><span class="op">(</span></span>
 <span>  <span class="va">newdata</span>,</span>
-<span>  batch_size <span class="op">=</span> <span class="fl">32</span>,</span>
-<span>  ml_trace <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  batch_size <span class="op">=</span> <span class="fl">32L</span>,</span>
+<span>  ml_trace <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  embeddings_s <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  classes_s <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
@@ -406,8 +412,8 @@ similarity to specific classes.</p><div class="section">
 <span>  embeddings_q <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  embeddings_s <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  classes_s <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  batch_size <span class="op">=</span> <span class="fl">32</span>,</span>
-<span>  ml_trace <span class="op">=</span> <span class="fl">1</span></span>
+<span>  batch_size <span class="op">=</span> <span class="fl">32L</span>,</span>
+<span>  ml_trace <span class="op">=</span> <span class="fl">1L</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -467,10 +473,10 @@ center for the different classes.</p></li>
 <span>  classes_q <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  embeddings_s <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  classes_s <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  batch_size <span class="op">=</span> <span class="fl">12</span>,</span>
+<span>  batch_size <span class="op">=</span> <span class="fl">12L</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>  size_points <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>  size_points_prototypes <span class="op">=</span> <span class="fl">8</span>,</span>
+<span>  size_points <span class="op">=</span> <span class="fl">3L</span>,</span>
+<span>  size_points_prototypes <span class="op">=</span> <span class="fl">8L</span>,</span>
 <span>  inc_unlabeled <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  inc_margin <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>

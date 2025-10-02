@@ -305,15 +305,15 @@ a saved classifier.</p>
 <span>  cls_pooling_features <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  cls_pooling_type <span class="op">=</span> <span class="st">"MinMax"</span>,</span>
 <span>  feat_act_fct <span class="op">=</span> <span class="st">"ELU"</span>,</span>
-<span>  feat_size <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  feat_size <span class="op">=</span> <span class="fl">50L</span>,</span>
 <span>  feat_bias <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  feat_dropout <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  feat_parametrizations <span class="op">=</span> <span class="st">"None"</span>,</span>
 <span>  feat_normalization_type <span class="op">=</span> <span class="st">"LayerNorm"</span>,</span>
 <span>  ng_conv_act_fct <span class="op">=</span> <span class="st">"ELU"</span>,</span>
-<span>  ng_conv_n_layers <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  ng_conv_ks_min <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  ng_conv_ks_max <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>  ng_conv_n_layers <span class="op">=</span> <span class="fl">1L</span>,</span>
+<span>  ng_conv_ks_min <span class="op">=</span> <span class="fl">2L</span>,</span>
+<span>  ng_conv_ks_max <span class="op">=</span> <span class="fl">4L</span>,</span>
 <span>  ng_conv_bias <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  ng_conv_dropout <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  ng_conv_parametrizations <span class="op">=</span> <span class="st">"None"</span>,</span>
@@ -327,7 +327,7 @@ a saved classifier.</p>
 <span>  dense_normalization_type <span class="op">=</span> <span class="st">"LayerNorm"</span>,</span>
 <span>  dense_residual_type <span class="op">=</span> <span class="st">"ResidualGate"</span>,</span>
 <span>  rec_act_fct <span class="op">=</span> <span class="st">"Tanh"</span>,</span>
-<span>  rec_n_layers <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  rec_n_layers <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  rec_type <span class="op">=</span> <span class="st">"GRU"</span>,</span>
 <span>  rec_bidirectional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  rec_dropout <span class="op">=</span> <span class="fl">0.2</span>,</span>
@@ -336,8 +336,8 @@ a saved classifier.</p>
 <span>  rec_normalization_type <span class="op">=</span> <span class="st">"LayerNorm"</span>,</span>
 <span>  rec_residual_type <span class="op">=</span> <span class="st">"ResidualGate"</span>,</span>
 <span>  tf_act_fct <span class="op">=</span> <span class="st">"ELU"</span>,</span>
-<span>  tf_dense_dim <span class="op">=</span> <span class="fl">50</span>,</span>
-<span>  tf_n_layers <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  tf_dense_dim <span class="op">=</span> <span class="fl">50L</span>,</span>
+<span>  tf_n_layers <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  tf_dropout_rate_1 <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  tf_dropout_rate_2 <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  tf_attention_type <span class="op">=</span> <span class="st">"MultiHead"</span>,</span>
@@ -538,7 +538,7 @@ indicating a higher category/class. For nominal data the order does not matter.<
 
 
 <dt><code>tf_positional_type</code></dt>
-<dd><p><code>string</code> Type of processing positional information. Allowed values: 'absolute'</p></dd>
+<dd><p><code>string</code> Type of processing positional information. Allowed values: 'None', 'absolute'</p></dd>
 
 
 <dt><code>tf_num_heads</code></dt>

@@ -529,12 +529,12 @@ build_layer_stack_documentation_for_vignette <- function() {
 #' @keywords internal
 build_aife_site <- function(clear_docs = FALSE) {
   requireNamespace("pkgdown")
+  pkgdown::clean_cache()
   if (clear_docs) {
     pkgdown::clean_site()
   }
   pkgdown::init_site()
   pkgdown::build_home()
-  pkgdown::build_redirects()
 
   # build site for articles
   articles <- list.files(
@@ -552,6 +552,7 @@ build_aife_site <- function(clear_docs = FALSE) {
   }
 
   pkgdown::build_news()
+  pkgdown::build_reference()
   pkgdown::build_redirects()
 
   pkgdown::preview_site()

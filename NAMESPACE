@@ -2,7 +2,6 @@
 
 export(AIFEBaseModel)
 export(AIFEMaster)
-export(BPETokenizer)
 export(BaseModelBert)
 export(BaseModelCore)
 export(BaseModelDebertaV2)

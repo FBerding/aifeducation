@@ -332,7 +332,7 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{tf_attention_type}}{\code{string} Choose the attention type. Allowed values: 'Fourier', 'MultiHead'}
 
-\item{\code{tf_positional_type}}{\code{string} Type of processing positional information. Allowed values: 'absolute'}
+\item{\code{tf_positional_type}}{\code{string} Type of processing positional information. Allowed values: 'None', 'absolute'}
 
 \item{\code{tf_num_heads}}{\code{int} determining the number of attention heads for a self-attention layer. Only relevant if \code{attention_type='multihead'} Allowed values: \code{0 <= x }}
 

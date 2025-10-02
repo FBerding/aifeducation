@@ -117,6 +117,7 @@ in the columns.</p></dd>
 <p>Creates a new object representing text embeddings.</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EmbeddedText</span><span class="op">$</span><span class="fu">configure</span><span class="op">(</span></span>
+<span>  <span class="va">embeddings</span>,</span>
 <span>  model_name <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  model_label <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  model_date <span class="op">=</span> <span class="cn">NA</span>,</span>
@@ -131,14 +132,17 @@ in the columns.</p></dd>
 <span>  param_emb_layer_max <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  param_emb_pool_type <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  param_aggregation <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  param_pad_value <span class="op">=</span> <span class="op">-</span><span class="fl">100</span>,</span>
-<span>  <span class="va">embeddings</span></span>
+<span>  param_pad_value <span class="op">=</span> <span class="op">-</span><span class="fl">100L</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>model_name</code></dt>
+<p></p><div class="arguments"><dl><dt><code>embeddings</code></dt>
+<dd><p><code>data.frame</code> containing the text embeddings.</p></dd>
+
+
+<dt><code>model_name</code></dt>
 <dd><p><code>string</code> Name of the model that generates this embedding.</p></dd>
 
 
@@ -202,10 +206,6 @@ compatibility.</p></dd>
 <dd><p><code>int</code> Value indicating padding. This value should no be in the range of
 regluar values for computations. Thus it is not recommended to chance this value.
 Default is <code>-100</code>. Allowed values: <code> x &lt;= -100</code></p></dd>
-
-
-<dt><code>embeddings</code></dt>
-<dd><p><code>data.frame</code> containing the text embeddings.</p></dd>
 
 
 </dl><p></p></div>

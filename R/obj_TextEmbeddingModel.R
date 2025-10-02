@@ -145,7 +145,7 @@ TextEmbeddingModel <- R6::R6Class(
     check_and_set_pooling_type = function(emb_pool_type) {
       if (self$BaseModel$get_model_type() == "funnel" & emb_pool_type != "CLS") {
         message("Text embedding based on a funnel transformer allows only 'CLS' as pooling type and not ",
-                emb_pool_type,". Chaneging method to 'CLS'")
+                emb_pool_type,". Changing method to 'CLS'")
         emb_pool_type="CLS"
       }
       private$model_config$emb_pool_type <- emb_pool_type

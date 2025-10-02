@@ -15,9 +15,12 @@ trainer_output
 Trial
 ^README\.Rmd$
 materials
+
 test_model
 tests/testthat/test_artefacts
 tests/testthat/test_data_tmp
+tests/testthat/test_data/OldModels
+
 .h5
 .git
 .gitignore

@@ -49,7 +49,7 @@ example_data_large_single$add_from_data.frame(example_data_for_large[1, ])
 chunks <- sample(x = c(4, 10), size = 1, replace = FALSE)
 
 base_model_type_list <- BaseModelsIndex
-#base_model_type_list=base_model_type_list[3]
+# base_model_type_list=base_model_type_list[3]
 
 pooling_type_list <- list(
   "CLS", "Average"
@@ -79,17 +79,19 @@ for (base_model_type in base_model_type_list) {
         test_that(paste(base_model_type, pooling_type, max_layer, min_layer, "Max layer greater as the number of layers"), {
           text_embedding_model <- TextEmbeddingModel$new()
           expect_error(
-            text_embedding_model$configure(
-              model_name = paste0(base_model_type, "_embedding"),
-              model_label = paste0("Text Embedding via", base_model_type),
-              model_language = "english",
-              max_length = 20,
-              chunks = chunks,
-              overlap = 10,
-              emb_layer_min = min_layer,
-              emb_layer_max = 50,
-              emb_pool_type = pooling_type,
-              base_model = base_model,
+            suppressMessages(
+              text_embedding_model$configure(
+                model_name = paste0(base_model_type, "_embedding"),
+                model_label = paste0("Text Embedding via", base_model_type),
+                model_language = "english",
+                max_length = 20,
+                chunks = chunks,
+                overlap = 10,
+                emb_layer_min = min_layer,
+                emb_layer_max = 50,
+                emb_pool_type = pooling_type,
+                base_model = base_model,
+              )
             )
           )
         })
@@ -97,36 +99,26 @@ for (base_model_type in base_model_type_list) {
         test_that(paste(base_model_type, pooling_type, max_layer, min_layer, "Error Checking: min layer is smaller 1"), {
           text_embedding_model <- TextEmbeddingModel$new()
           expect_error(
-            text_embedding_model$configure(
-              model_name = paste0(base_model_type, "_embedding"),
-              model_label = paste0("Text Embedding via", base_model_type),
-              model_language = "english",
-              max_length = 20,
-              chunks = chunks,
-              overlap = 10,
-              emb_layer_min = -1,
-              emb_layer_max = max_layer,
-              emb_pool_type = pooling_type,
-              base_model = base_model
+            suppressMessages(
+              text_embedding_model$configure(
+                model_name = paste0(base_model_type, "_embedding"),
+                model_label = paste0("Text Embedding via", base_model_type),
+                model_language = "english",
+                max_length = 20,
+                chunks = chunks,
+                overlap = 10,
+                emb_layer_min = -1,
+                emb_layer_max = max_layer,
+                emb_pool_type = pooling_type,
+                base_model = base_model
+              )
             )
           )
         })
         # Error Checking: Configuration already set
         test_that(paste(base_model_type, pooling_type, max_layer, min_layer, "Error Checking: Configuration already set"), {
           text_embedding_model <- TextEmbeddingModel$new()
-          text_embedding_model$configure(
-            model_name = paste0(base_model_type, "_embedding"),
-            model_label = paste0("Text Embedding via", base_model_type),
-            model_language = "english",
-            max_length = 100,
-            chunks = chunks,
-            overlap = 10,
-            emb_layer_min = min_layer,
-            emb_layer_max = max_layer,
-            emb_pool_type = pooling_type,
-            base_model = base_model
-          )
-          expect_error(
+          suppressMessages(
             text_embedding_model$configure(
               model_name = paste0(base_model_type, "_embedding"),
               model_label = paste0("Text Embedding via", base_model_type),
@@ -140,23 +132,41 @@ for (base_model_type in base_model_type_list) {
               base_model = base_model
             )
           )
+          expect_error(
+            suppressMessages(
+              text_embedding_model$configure(
+                model_name = paste0(base_model_type, "_embedding"),
+                model_label = paste0("Text Embedding via", base_model_type),
+                model_language = "english",
+                max_length = 100,
+                chunks = chunks,
+                overlap = 10,
+                emb_layer_min = min_layer,
+                emb_layer_max = max_layer,
+                emb_pool_type = pooling_type,
+                base_model = base_model
+              )
+            )
+          )
         })
 
         #---------------------------------------------------------------------
         # Create Model
         text_embedding_model <- TextEmbeddingModel$new()
-        text_embedding_model$configure(
-          model_name = paste0(base_model_type, "_embedding"),
-          model_label = paste0("Text Embedding via", base_model_type),
-          model_language = "english",
-          max_length = 400,
-          chunks = chunks,
-          overlap = 50,
-          emb_layer_min = min_layer,
-          emb_layer_max = max_layer,
-          emb_pool_type = pooling_type,
-          base_model = base_model,
-          pad_value = random_padding_value
+        suppressMessages(
+          text_embedding_model$configure(
+            model_name = paste0(base_model_type, "_embedding"),
+            model_label = paste0("Text Embedding via", base_model_type),
+            model_language = "english",
+            max_length = 400,
+            chunks = chunks,
+            overlap = 50,
+            emb_layer_min = min_layer,
+            emb_layer_max = max_layer,
+            emb_pool_type = pooling_type,
+            base_model = base_model,
+            pad_value = random_padding_value
+          )
         )
 
         # Central methods--------------------------------------------------------
@@ -175,12 +185,11 @@ for (base_model_type in base_model_type_list) {
           tr_comp <- text_embedding_model$get_model_config()
           expect_equal(tr_comp$emb_layer_min, min_layer)
           expect_equal(tr_comp$emb_layer_max, max_layer)
-          if(base_model_type=="BaseModelFunnel"){
+          if (base_model_type == "BaseModelFunnel") {
             expect_equal(tr_comp$emb_pool_type, "CLS")
           } else {
             expect_equal(tr_comp$emb_pool_type, pooling_type)
           }
-
         })
 
         # Method embed--------------------------------------------------------
@@ -405,13 +414,13 @@ for (base_model_type in base_model_type_list) {
         test_that(paste(base_model_type, pooling_type, max_layer, min_layer, "decoding"), {
           suppressMessages(
             text_embedding_model$estimate_sustainability_inference_embed(
-            text_dataset = example_data_large,
-            batch_size = 4,
-            sustain_iso_code = "DEU",
-            sustain_interval = 2,
-            sustain_log_level="error",
-            trace = TRUE
-          )
+              text_dataset = example_data_large,
+              batch_size = 4,
+              sustain_iso_code = "DEU",
+              sustain_interval = 2,
+              sustain_log_level = "error",
+              trace = TRUE
+            )
           )
 
           expect_equal(nrow(text_embedding_model$get_sustainability_data("inference")), 1)

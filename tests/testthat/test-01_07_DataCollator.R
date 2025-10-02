@@ -5,6 +5,14 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
+# Config transformer library
+transformers$utils$logging$set_verbosity_error()
+os$environ$setdefault("TOKENIZERS_PARALLELISM", "false")
+
+# Disable tqdm progressbar
+transformers$logging$disable_progress_bar()
+datasets$disable_progress_bars()
+
 # Load python scripts
 load_all_py_scripts()
 run_py_file("data_collator.py")

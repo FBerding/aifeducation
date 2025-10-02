@@ -133,7 +133,7 @@ EmbeddedText <- R6::R6Class(
         }
       }
 
-      if (need_update) {
+       if (need_update) {
         param_dict <- get_param_dict()
         if (is.function(self$configure)) {
           param_names_new <- rlang::fn_fmls_names(self$configure)

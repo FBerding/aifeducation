@@ -73,8 +73,8 @@ of integers, and to decode sequences of integers back to tokens.</p>
     <div class="section level2">
     <h2 id="public-fields">Public fields<a class="anchor" aria-label="anchor" href="#public-fields"></a></h2>
     <p></p><div class="r6-fields"><dl><dt><code>BaseModel</code></dt>
-<dd><p><br>
-Object of class <a href="BaseModelBert.html">BaseModelBert</a>, <a href="BaseModelMPNet.html">BaseModelMPNet</a>, <a href="BaseModelModernBert.html">BaseModelModernBert</a>, <a href="BaseModelRoberta.html">BaseModelRoberta</a>.</p></dd>
+<dd><p>('BaseModelCore')<br>
+Object of class <code>BaseModelCore</code>.</p></dd>
 
 
 </dl><p></p></div>
@@ -122,13 +122,13 @@ Object of class <a href="BaseModelBert.html">BaseModelBert</a>, <a href="BaseMod
 <span>  model_name <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  model_label <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  model_language <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  max_length <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  chunks <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  overlap <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  emb_layer_min <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  emb_layer_max <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  max_length <span class="op">=</span> <span class="fl">0L</span>,</span>
+<span>  chunks <span class="op">=</span> <span class="fl">2L</span>,</span>
+<span>  overlap <span class="op">=</span> <span class="fl">0L</span>,</span>
+<span>  emb_layer_min <span class="op">=</span> <span class="fl">1L</span>,</span>
+<span>  emb_layer_max <span class="op">=</span> <span class="fl">2L</span>,</span>
 <span>  emb_pool_type <span class="op">=</span> <span class="st">"Average"</span>,</span>
-<span>  pad_value <span class="op">=</span> <span class="op">-</span><span class="fl">100</span>,</span>
+<span>  pad_value <span class="op">=</span> <span class="op">-</span><span class="fl">100L</span>,</span>
 <span>  base_model <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
@@ -173,8 +173,8 @@ as the maximal postional embeddings for the model. Allowed values: <code>20 &lt;
 <dt><code>emb_pool_type</code></dt>
 <dd><p><code>string</code> Method to summarize the embedding of single tokens into a text embedding.
 In the case of <code>'CLS'</code> all cls-tokens between <code>emb_layer_min</code> and <code>emb_layer_max</code> are averaged.
-In the case of <code>'Average'</code> the embeddings of all tokens are averaged.,
-default_value = NULL Allowed values: 'CLS', 'Average'</p></dd>
+In the case of <code>'Average'</code> the embeddings of all tokens are averaged.
+Please note that BaseModelFunnel allows only 'CLS'. Allowed values: 'CLS', 'Average'</p></dd>
 
 
 <dt><code>pad_value</code></dt>
@@ -184,7 +184,7 @@ Default is <code>-100</code>. Allowed values: <code> x &lt;= -100</code></p></dd
 
 
 <dt><code>base_model</code></dt>
-<dd><p><code>BaseModelBert, BaseModelMPNet, BaseModelModernBert, BaseModelRoberta</code> Object of class <a href="BaseModelBert.html">BaseModelBert</a>, <a href="BaseModelMPNet.html">BaseModelMPNet</a>, <a href="BaseModelModernBert.html">BaseModelModernBert</a>, <a href="BaseModelRoberta.html">BaseModelRoberta</a> . This objects prepares raw text for the model.</p></dd>
+<dd><p><code>BaseModelCore</code> BaseModels for processing raw texts.</p></dd>
 
 
 <dt><code>trace</code></dt>
@@ -321,7 +321,7 @@ into text embeddings. For a large number of texts please use the method <code>em
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">embed</span><span class="op">(</span></span>
 <span>  raw_text <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  doc_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  batch_size <span class="op">=</span> <span class="fl">8</span>,</span>
+<span>  batch_size <span class="op">=</span> <span class="fl">8L</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  return_large_dataset <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
@@ -346,7 +346,7 @@ into text embeddings. For a large number of texts please use the method <code>em
 
 
 <dt><code>return_large_dataset</code></dt>
-<dd><p><code>bool</code> If <code>TRUE</code> a LargeDataSetForEmbedding is returned. If <code>FALSE</code> an object if class <a href="EmbeddedText.html">EmbeddedText</a> is returned.</p></dd>
+<dd><p><code>bool</code> If <code>TRUE</code> a <a href="LargeDataSetForTextEmbeddings.html">LargeDataSetForTextEmbeddings</a> is returned. If <code>FALSE</code> an object if class <a href="EmbeddedText.html">EmbeddedText</a> is returned.</p></dd>
 
 
 </dl><p></p></div>
@@ -364,10 +364,10 @@ model creating the embeddings.</p>
 <h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">embed_large</span><span class="op">(</span></span>
 <span>  <span class="va">text_dataset</span>,</span>
-<span>  batch_size <span class="op">=</span> <span class="fl">32</span>,</span>
+<span>  batch_size <span class="op">=</span> <span class="fl">32L</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  log_file <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  log_write_interval <span class="op">=</span> <span class="fl">2</span></span>
+<span>  log_write_interval <span class="op">=</span> <span class="fl">2L</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -489,10 +489,11 @@ tracker used, and technical information on the training infrastructure.</p>
 <h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TextEmbeddingModel</span><span class="op">$</span><span class="fu">estimate_sustainability_inference_embed</span><span class="op">(</span></span>
 <span>  text_dataset <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  batch_size <span class="op">=</span> <span class="fl">32</span>,</span>
+<span>  batch_size <span class="op">=</span> <span class="fl">32L</span>,</span>
 <span>  sustain_iso_code <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sustain_region <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  sustain_interval <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  sustain_interval <span class="op">=</span> <span class="fl">10L</span>,</span>
+<span>  sustain_log_level <span class="op">=</span> <span class="st">"warning"</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
@@ -520,6 +521,10 @@ codecarbon for more information. <a href="https://mlco2.github.io/codecarbon/par
 
 <dt><code>sustain_interval</code></dt>
 <dd><p><code>int</code> Interval in seconds for measuring power usage. Allowed values: <code>1 &lt;= x </code></p></dd>
+
+
+<dt><code>sustain_log_level</code></dt>
+<dd></dd>
 
 
 <dt><code>trace</code></dt>

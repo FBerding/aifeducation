@@ -25,7 +25,7 @@
 #' @export
 get_recommended_py_versions <- function() {
   py_versions <- list(
-    transformers = c("4.56.0", "4.56.1"),
+    transformers = c("4.56.0", "4.56.2"),
     tokenizers = c("0.22.0", "0.22.0"),
     pandas = c("2.3.2", "2.3.2"),
     datasets = c("3.6.0", "3.6.0"),

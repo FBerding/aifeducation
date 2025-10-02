@@ -107,6 +107,7 @@ for (object_class_name in object_class_names) {
       var_override = list(
         sustain_interval = 30,
         sustain_iso_code = "DEU",
+        sustain_log_level="error",
         n_epoch = 2,
         max_sequence_length = 32,
         pytorch_trace=0L,
@@ -243,7 +244,8 @@ for (object_class_name in object_class_names) {
           sustain_iso_code = "DEU",
           sustain_region = NULL,
           sustain_interval = 15,
-          trace = train_args$trace
+          trace = train_args$trace,
+          sustain_log_level="error"
         )
         )
         expect_equal(nrow(base_model$get_sustainability_data("inference")), j)

@@ -47,7 +47,6 @@ BaseModelModernBert <- R6::R6Class(
         attention_dropout = args$attention_dropout,
         deterministic_flash_attn = TRUE
       )
-
       private$model <- transformers$ModernBertForMaskedLM(configuration)
     },
     load_BaseModel = function(dir_path) {

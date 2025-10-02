@@ -19,7 +19,6 @@ Bridging the Gap between Human and Machine Translation.
 }
 \seealso{
 Other Tokenizer: 
-\code{\link{BPETokenizer}},
 \code{\link{HuggingFaceTokenizer}}
 }
 \concept{Tokenizer}

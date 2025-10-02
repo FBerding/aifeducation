@@ -66,6 +66,8 @@ Conference of the North (pp. 4171–4186). Association for Computational Linguis
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other Base Model:
 <code><a href="BaseModelBert.html">BaseModelBert</a></code>,
+<code><a href="BaseModelDebertaV2.html">BaseModelDebertaV2</a></code>,
+<code><a href="BaseModelFunnel.html">BaseModelFunnel</a></code>,
 <code><a href="BaseModelMPNet.html">BaseModelMPNet</a></code>,
 <code><a href="BaseModelRoberta.html">BaseModelRoberta</a></code></p></div>
     </div>
@@ -119,11 +121,12 @@ Conference of the North (pp. 4171–4186). Association for Computational Linguis
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BaseModelModernBert</span><span class="op">$</span><span class="fu">configure</span><span class="op">(</span></span>
 <span>  <span class="va">tokenizer</span>,</span>
-<span>  max_position_embeddings <span class="op">=</span> <span class="fl">512</span>,</span>
-<span>  hidden_size <span class="op">=</span> <span class="fl">768</span>,</span>
-<span>  num_hidden_layers <span class="op">=</span> <span class="fl">12</span>,</span>
-<span>  num_attention_heads <span class="op">=</span> <span class="fl">12</span>,</span>
-<span>  intermediate_size <span class="op">=</span> <span class="fl">3072</span>,</span>
+<span>  max_position_embeddings <span class="op">=</span> <span class="fl">512L</span>,</span>
+<span>  hidden_size <span class="op">=</span> <span class="fl">768L</span>,</span>
+<span>  num_hidden_layers <span class="op">=</span> <span class="fl">12L</span>,</span>
+<span>  num_attention_heads <span class="op">=</span> <span class="fl">12L</span>,</span>
+<span>  global_attn_every_n_layers <span class="op">=</span> <span class="fl">3L</span>,</span>
+<span>  intermediate_size <span class="op">=</span> <span class="fl">3072L</span>,</span>
 <span>  hidden_activation <span class="op">=</span> <span class="st">"GELU"</span>,</span>
 <span>  embedding_dropout <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  mlp_dropout <span class="op">=</span> <span class="fl">0.1</span>,</span>
@@ -134,7 +137,7 @@ Conference of the North (pp. 4171–4186). Association for Computational Linguis
 <div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>tokenizer</code></dt>
-<dd><p><code>WordPieceTokenizer, BPETokenizer, HuggingFaceTokenizer</code> Object of class <a href="WordPieceTokenizer.html">WordPieceTokenizer</a>, <a href="BPETokenizer.html">BPETokenizer</a>, <a href="HuggingFaceTokenizer.html">HuggingFaceTokenizer</a> . This objects prepares raw text for the model.</p></dd>
+<dd><p><code>TokenizerBase</code> Tokenizer for the model.</p></dd>
 
 
 <dt><code>max_position_embeddings</code></dt>
@@ -155,6 +158,10 @@ embedding. Allowed values: <code>1 &lt;= x &lt;= 2048</code></p></dd>
 <dd><p><code>int</code> determining the number of attention heads for a self-attention layer. Only relevant if <code>attention_type='multihead'</code> Allowed values: <code>0 &lt;= x </code></p></dd>
 
 
+<dt><code>global_attn_every_n_layers</code></dt>
+<dd><p><code>int</code> Number determining to use a global attention every x-th layer. Allowed values: <code>2 &lt;= x &lt;= 36</code></p></dd>
+
+
 <dt><code>intermediate_size</code></dt>
 <dd><p><code>int</code> determining the size of the projection layer within a each transformer encoder. Allowed values: <code>1 &lt;= x </code></p></dd>
 
@@ -164,11 +171,11 @@ embedding. Allowed values: <code>1 &lt;= x &lt;= 2048</code></p></dd>
 
 
 <dt><code>embedding_dropout</code></dt>
-<dd><p><code>double</code> Ratio of dropout. Allowed values: <code>0 &lt;= x &lt;= 0.6</code></p></dd>
+<dd><p><code>double</code> Dropout chance for the embeddings. Allowed values: <code>0 &lt;= x &lt;= 0.6</code></p></dd>
 
 
 <dt><code>mlp_dropout</code></dt>
-<dd><p><code>double</code> Ratio of dropout. Allowed values: <code>0 &lt;= x &lt;= 0.6</code></p></dd>
+<dd><p><code>double</code> Dropout rate for the mlp layer. Allowed values: <code>0 &lt;= x &lt;= 0.6</code></p></dd>
 
 
 <dt><code>attention_dropout</code></dt>

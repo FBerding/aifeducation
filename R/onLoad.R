@@ -32,7 +32,8 @@ calflops <- NULL
 
 
 # Message on load of the package
-# packageStartupMessage(
-#  "This is version 1.1.1 of aifeducation.",
-#  appendLF = TRUE
-# )
+ packageStartupMessage(
+  "This is version 1.1.2 of aifeducation. The package now requires the python library 'calflops'.
+  Call aifeducation::update_aifeducation() to update your python libraries.",
+  appendLF = TRUE
+ )

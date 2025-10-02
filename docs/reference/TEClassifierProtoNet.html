@@ -168,21 +168,21 @@ https://doi.org/10.1007/978-3-030-16145-3_24</p>
 <span>  text_embeddings <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  feature_extractor <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  target_levels <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  dense_size <span class="op">=</span> <span class="fl">4</span>,</span>
-<span>  dense_layers <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  rec_size <span class="op">=</span> <span class="fl">4</span>,</span>
-<span>  rec_layers <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  dense_size <span class="op">=</span> <span class="fl">4L</span>,</span>
+<span>  dense_layers <span class="op">=</span> <span class="fl">0L</span>,</span>
+<span>  rec_size <span class="op">=</span> <span class="fl">4L</span>,</span>
+<span>  rec_layers <span class="op">=</span> <span class="fl">2L</span>,</span>
 <span>  rec_type <span class="op">=</span> <span class="st">"GRU"</span>,</span>
 <span>  rec_bidirectional <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  embedding_dim <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  self_attention_heads <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  embedding_dim <span class="op">=</span> <span class="fl">2L</span>,</span>
+<span>  self_attention_heads <span class="op">=</span> <span class="fl">0L</span>,</span>
 <span>  intermediate_size <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  attention_type <span class="op">=</span> <span class="st">"Fourier"</span>,</span>
 <span>  add_pos_embedding <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  act_fct <span class="op">=</span> <span class="st">"ELU"</span>,</span>
 <span>  parametrizations <span class="op">=</span> <span class="st">"None"</span>,</span>
 <span>  rec_dropout <span class="op">=</span> <span class="fl">0.1</span>,</span>
-<span>  repeat_encoder <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  repeat_encoder <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  dense_dropout <span class="op">=</span> <span class="fl">0.4</span>,</span>
 <span>  encoder_dropout <span class="op">=</span> <span class="fl">0.1</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
@@ -296,7 +296,7 @@ indicating a higher category/class. For nominal data the order does not matter.<
 texts created by an object of class <a href="TextEmbeddingModel.html">TextEmbeddingModel</a>. These embeddings embed documents according to their
 similarity to specific classes.</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifierProtoNet</span><span class="op">$</span><span class="fu">embed</span><span class="op">(</span>embeddings_q <span class="op">=</span> <span class="cn">NULL</span>, batch_size <span class="op">=</span> <span class="fl">32</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifierProtoNet</span><span class="op">$</span><span class="fu">embed</span><span class="op">(</span>embeddings_q <span class="op">=</span> <span class="cn">NULL</span>, batch_size <span class="op">=</span> <span class="fl">32L</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -326,10 +326,10 @@ center for the different classes.</p></li>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEClassifierProtoNet</span><span class="op">$</span><span class="fu">plot_embeddings</span><span class="op">(</span></span>
 <span>  <span class="va">embeddings_q</span>,</span>
 <span>  classes_q <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  batch_size <span class="op">=</span> <span class="fl">12</span>,</span>
+<span>  batch_size <span class="op">=</span> <span class="fl">12L</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>  size_points <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>  size_points_prototypes <span class="op">=</span> <span class="fl">8</span>,</span>
+<span>  size_points <span class="op">=</span> <span class="fl">3L</span>,</span>
+<span>  size_points_prototypes <span class="op">=</span> <span class="fl">8L</span>,</span>
 <span>  inc_unlabeled <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>

@@ -48,7 +48,7 @@ jobs:
 
          envname<-"r-reticulate"
 
-         transformer_version = "<=4.56.0"
+         transformer_version = "<=4.56.2"
          tokenizers_version = "<=0.22.0"
          pandas_version = "<=2.3.2"
          datasets_version = "<=3.6.0"
@@ -100,6 +100,7 @@ jobs:
       - name: Test coverage
         run: |
           gui_functions<-c(
+            ".onLoad",
             "start_aifeducation_studio",
             "Studio_Home_UI",
             "DataManagement_DataSetEditorUI",

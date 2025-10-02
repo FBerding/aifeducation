@@ -10,7 +10,7 @@ object_class_names <- get_TEClassifiers_class_names(super_class = "ClassifiersBa
 # object_class_names=c("TEClassifierSequential")
 # object_class_names="TEClassifierParallel"
 # object_class_names="TEClassifierSequentialPrototype"
-#object_class_names <- "TEClassifierRegular"
+# object_class_names <- "TEClassifierRegular"
 
 max_samples <- 20
 max_samples_CI <- 5
@@ -96,7 +96,7 @@ for (object_class_name in object_class_names) {
             name = NULL,
             label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
             sustain_interval = 30,
-            sustain_log_level="error",
+            sustain_log_level = "error",
             act_fct = "ELU",
             feat_size = 64,
             intermediate_features = 10,
@@ -120,7 +120,7 @@ for (object_class_name in object_class_names) {
             pl_min = 0,
             sustain_track = TRUE,
             sustain_iso_code = "DEU",
-            sustain_log_level="error",
+            sustain_log_level = "error",
             data_val_size = 0.25,
             lr_rate = 1e-3,
             dense_size = 5,
@@ -150,10 +150,12 @@ for (object_class_name in object_class_names) {
 
 
         test_that(paste("Number of Predictions", object_class_name, get_current_args_for_print(test_combination)), {
-          predictions <- classifier$predict(
-            newdata = test_embeddings_reduced,
-            batch_size = 2,
-            ml_trace = 0
+          suppressMessages(
+            predictions <- classifier$predict(
+              newdata = test_embeddings_reduced,
+              batch_size = 2,
+              ml_trace = 0
+            )
           )
           expect_equal(
             object = length(predictions$expected_category),
@@ -162,20 +164,24 @@ for (object_class_name in object_class_names) {
         })
 
         test_that(paste("predict - single case", object_class_name), {
-          prediction <- classifier$predict(
-            newdata = test_embeddings_single_case,
-            batch_size = 2,
-            ml_trace = 0
+          suppressMessages(
+            prediction <- classifier$predict(
+              newdata = test_embeddings_single_case,
+              batch_size = 2,
+              ml_trace = 0
+            )
           )
           expect_equal(
             object = nrow(prediction),
             expected = 1
           )
 
-          prediction_LD <- classifier$predict(
-            newdata = test_embeddings_single_case_LD,
-            batch_size = 2,
-            ml_trace = 0
+          suppressMessages(
+            prediction_LD <- classifier$predict(
+              newdata = test_embeddings_single_case_LD,
+              batch_size = 2,
+              ml_trace = 0
+            )
           )
           expect_equal(
             object = nrow(prediction_LD),
@@ -187,15 +193,19 @@ for (object_class_name in object_class_names) {
           # EmbeddedText
           predictions <- NULL
           predictions_2 <- NULL
-          predictions <- classifier$predict(
-            newdata = test_embeddings_reduced,
-            batch_size = 2,
-            ml_trace = 0
+          suppressMessages(
+            predictions <- classifier$predict(
+              newdata = test_embeddings_reduced,
+              batch_size = 2,
+              ml_trace = 0
+            )
           )
-          predictions_2 <- classifier$predict(
-            newdata = test_embeddings_reduced,
-            batch_size = 2,
-            ml_trace = 0
+          suppressMessages(
+            predictions_2 <- classifier$predict(
+              newdata = test_embeddings_reduced,
+              batch_size = 2,
+              ml_trace = 0
+            )
           )
           expect_equal(predictions[, 1:(ncol(predictions) - 1)], predictions_2[, 1:(ncol(predictions_2) - 1)],
             tolerance = 1e-6
@@ -204,15 +214,19 @@ for (object_class_name in object_class_names) {
           # LargeDataSetForTextEmbeddings
           predictions <- NULL
           predictions_2 <- NULL
-          predictions <- classifier$predict(
-            newdata = test_embeddings_reduced_LD,
-            batch_size = 2,
-            ml_trace = 0
+          suppressMessages(
+            predictions <- classifier$predict(
+              newdata = test_embeddings_reduced_LD,
+              batch_size = 2,
+              ml_trace = 0
+            )
           )
-          predictions_2 <- classifier$predict(
-            newdata = test_embeddings_reduced_LD,
-            batch_size = 2,
-            ml_trace = 0
+          suppressMessages(
+            predictions_2 <- classifier$predict(
+              newdata = test_embeddings_reduced_LD,
+              batch_size = 2,
+              ml_trace = 0
+            )
           )
           expect_equal(predictions[, 1:(ncol(predictions) - 1)], predictions_2[, 1:(ncol(predictions_2) - 1)],
             tolerance = 1e-6
@@ -231,15 +245,19 @@ for (object_class_name in object_class_names) {
               # EmbeddedText
               predictions <- NULL
               predictions_Perm <- NULL
-              predictions <- classifier$predict(
-                newdata = test_embeddings_reduced,
-                batch_size = 50,
-                ml_trace = 0
+              suppressMessages(
+                predictions <- classifier$predict(
+                  newdata = test_embeddings_reduced,
+                  batch_size = 50,
+                  ml_trace = 0
+                )
               )
-              predictions_Perm <- classifier$predict(
-                newdata = embeddings_ET_perm,
-                batch_size = 50,
-                ml_trace = 0
+              suppressMessages(
+                predictions_Perm <- classifier$predict(
+                  newdata = embeddings_ET_perm,
+                  batch_size = 50,
+                  ml_trace = 0
+                )
               )
 
               expect_equal(
@@ -251,16 +269,20 @@ for (object_class_name in object_class_names) {
               # LargeDataSetForTextEmbeddings
               predictions <- NULL
               predictions_Perm <- NULL
-              predictions <- classifier$predict(
-                newdata = test_embeddings_reduced_LD,
-                batch_size = 50,
-                ml_trace = 0
+              suppressMessages(
+                predictions <- classifier$predict(
+                  newdata = test_embeddings_reduced_LD,
+                  batch_size = 50,
+                  ml_trace = 0
+                )
               )
 
-              predictions_Perm <- classifier$predict(
-                newdata = embeddings_ET_perm$convert_to_LargeDataSetForTextEmbeddings(),
-                batch_size = 50,
-                ml_trace = 0
+              suppressMessages(
+                predictions_Perm <- classifier$predict(
+                  newdata = embeddings_ET_perm$convert_to_LargeDataSetForTextEmbeddings(),
+                  batch_size = 50,
+                  ml_trace = 0
+                )
               )
 
               expect_equal(
@@ -274,15 +296,19 @@ for (object_class_name in object_class_names) {
 
 
         test_that(paste("predict - data source invariance", object_class_name, get_current_args_for_print(test_combination)), {
-          predictions_ET <- classifier$predict(
-            newdata = test_embeddings_reduced,
-            batch_size = 2,
-            ml_trace = 0
+          suppressMessages(
+            predictions_ET <- classifier$predict(
+              newdata = test_embeddings_reduced,
+              batch_size = 2,
+              ml_trace = 0
+            )
           )
-          predictions_LD <- classifier$predict(
-            newdata = test_embeddings_reduced_LD,
-            batch_size = 2,
-            ml_trace = 0
+          suppressMessages(
+            predictions_LD <- classifier$predict(
+              newdata = test_embeddings_reduced_LD,
+              batch_size = 2,
+              ml_trace = 0
+            )
           )
           expect_equal(predictions_ET[, 1:(ncol(predictions_ET) - 1)], predictions_LD[, 1:(ncol(predictions_LD) - 1)],
             tolerance = 1e-6
@@ -311,7 +337,7 @@ for (object_class_name in object_class_names) {
             name = NULL,
             label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
             sustain_interval = 30,
-            sustain_log_level="error",
+            sustain_log_level = "error",
             act_fct = "ELU",
             feat_size = 64,
             intermediate_features = 10,
@@ -335,7 +361,7 @@ for (object_class_name in object_class_names) {
             pl_min = 0,
             sustain_track = TRUE,
             sustain_iso_code = "DEU",
-            sustain_log_level="error",
+            sustain_log_level = "error",
             data_val_size = 0.25,
             lr_rate = 1e-3,
             dense_size = 5,
@@ -359,10 +385,12 @@ for (object_class_name in object_class_names) {
         )
 
         # Predictions before saving and loading
-        predictions <- classifier$predict(
-          newdata = test_embeddings_reduced,
-          batch_size = 2,
-          ml_trace = 0
+        suppressMessages(
+          predictions <- classifier$predict(
+            newdata = test_embeddings_reduced,
+            batch_size = 2,
+            ml_trace = 0
+          )
         )
 
         # Save and load
@@ -383,10 +411,12 @@ for (object_class_name in object_class_names) {
         )
 
         # Predict after loading
-        predictions_2 <- classifier2$predict(
-          newdata = test_embeddings_reduced,
-          batch_size = 2,
-          ml_trace = 0
+        suppressMessages(
+          predictions_2 <- classifier2$predict(
+            newdata = test_embeddings_reduced,
+            batch_size = 2,
+            ml_trace = 0
+          )
         )
 
         # Compare predictions
@@ -423,7 +453,7 @@ for (object_class_name in object_class_names) {
             name = NULL,
             label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
             sustain_interval = 30,
-            sustain_log_level="error",
+            sustain_log_level = "error",
             act_fct = "ELU",
             feat_size = 64,
             intermediate_features = 10,
@@ -447,7 +477,7 @@ for (object_class_name in object_class_names) {
             pl_min = 0,
             sustain_track = TRUE,
             sustain_iso_code = "DEU",
-            sustain_log_level="error",
+            sustain_log_level = "error",
             data_val_size = 0.25,
             lr_rate = 1e-3,
             dense_size = 5,
@@ -570,7 +600,7 @@ for (object_class_name in object_class_names) {
             name = NULL,
             label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
             sustain_interval = 30,
-            sustain_log_level="error",
+            sustain_log_level = "error",
             act_fct = "ELU",
             feat_size = 32,
             intermediate_features = 10,
@@ -594,7 +624,7 @@ for (object_class_name in object_class_names) {
             pl_min = 0,
             sustain_track = TRUE,
             sustain_iso_code = "DEU",
-            sustain_log_level="error",
+            sustain_log_level = "error",
             data_val_size = 0.25,
             lr_rate = 1e-3,
             dense_size = 5,
@@ -638,7 +668,7 @@ for (object_class_name in object_class_names) {
             name = NULL,
             label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
             sustain_interval = 30,
-            sustain_log_level="error",
+            sustain_log_level = "error",
             act_fct = "ELU",
             rec_dropout = 0.1,
             dense_dropout = 0.1,
@@ -659,7 +689,7 @@ for (object_class_name in object_class_names) {
             sc_max_k = 2,
             sustain_track = TRUE,
             sustain_iso_code = "DEU",
-            sustain_log_level="error",
+            sustain_log_level = "error",
             data_val_size = 0.25,
             lr_rate = 1e-3,
             dense_size = 5,
@@ -686,9 +716,11 @@ for (object_class_name in object_class_names) {
           get_current_args_for_print(train_args_combinations)
         ), {
           expect_no_error(
-            do.call(
-              what = classifier$train,
-              args = train_args_combinations
+            suppressMessages(
+              do.call(
+                what = classifier$train,
+                args = train_args_combinations
+              )
             )
           )
 
