@@ -138,7 +138,7 @@ BaseModelMPNet <- R6::R6Class(
                      sustain_iso_code = NULL,
                      sustain_region = NULL,
                      sustain_interval = 15L,
-                     sustain_log_level="warning",
+                     sustain_log_level = "warning",
                      trace = TRUE,
                      pytorch_trace = 1L,
                      log_dir = NULL,

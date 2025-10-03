@@ -144,9 +144,11 @@ TextEmbeddingModel <- R6::R6Class(
     # Method for checking and setting pooling type
     check_and_set_pooling_type = function(emb_pool_type) {
       if (self$BaseModel$get_model_type() == "funnel" & emb_pool_type != "CLS") {
-        message("Text embedding based on a funnel transformer allows only 'CLS' as pooling type and not ",
-                emb_pool_type,". Changing method to 'CLS'")
-        emb_pool_type="CLS"
+        message(
+          "Text embedding based on a funnel transformer allows only 'CLS' as pooling type and not ",
+          emb_pool_type, ". Changing method to 'CLS'"
+        )
+        emb_pool_type <- "CLS"
       }
       private$model_config$emb_pool_type <- emb_pool_type
     },
@@ -157,9 +159,9 @@ TextEmbeddingModel <- R6::R6Class(
         message(
           "max_length is ", max_length, ". This value is not allowed to exceed ",
           self$BaseModel$get_model()$config$max_position_embeddings,
-          "Set value to ",self$BaseModel$get_model()$config$max_position_embeddings,"."
+          "Set value to ", self$BaseModel$get_model()$config$max_position_embeddings, "."
         )
-        private$model_config$max_length<- as.integer(self$BaseModel$get_model()$config$max_position_embeddings)
+        private$model_config$max_length <- as.integer(self$BaseModel$get_model()$config$max_position_embeddings)
       } else {
         private$model_config$max_length <- as.integer(max_length)
       }
@@ -638,7 +640,7 @@ TextEmbeddingModel <- R6::R6Class(
                                                        sustain_iso_code = NULL,
                                                        sustain_region = NULL,
                                                        sustain_interval = 10L,
-                                                       sustain_log_level="warning",
+                                                       sustain_log_level = "warning",
                                                        trace = TRUE) {
       # Prepare Data
       print_message(
@@ -671,7 +673,7 @@ TextEmbeddingModel <- R6::R6Class(
         country_iso_code = sustain_iso_code,
         region = sustain_region,
         measure_power_secs = sustain_interval,
-        sustain_log_level=sustain_log_level
+        sustain_log_level = sustain_log_level
       )
 
       # Start Task

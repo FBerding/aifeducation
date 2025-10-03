@@ -57,7 +57,7 @@ for (object_class_name in object_class_names) {
       var_override = list(
         sustain_interval = 30,
         sustain_iso_code = "DEU",
-        sustain_log_level="error"
+        sustain_log_level = "error"
       )
     )
 
@@ -65,17 +65,17 @@ for (object_class_name in object_class_names) {
     test_that(paste(object_class_name, get_current_args_for_print(config_args), get_current_args_for_print(training_args)), {
       tokenizer <- create_object(object_class_name)
       suppressMessages(
-      do.call(
-        what = tokenizer$configure,
-        args = config_args
-      )
+        do.call(
+          what = tokenizer$configure,
+          args = config_args
+        )
       )
 
       suppressMessages(
-      do.call(
-        what = tokenizer$train,
-        args = training_args
-      )
+        do.call(
+          what = tokenizer$train,
+          args = training_args
+        )
       )
 
       # tokenizer statistics

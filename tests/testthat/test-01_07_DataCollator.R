@@ -31,10 +31,10 @@ test_tmp_data_base_model_path <- paste0(test_tmp_data_path, "/", "TEM")
 example_data <- imdb_movie_reviews
 raw_texts <- LargeDataSetForText$new(example_data)
 
-#Genereate Tokenizer
+# Genereate Tokenizer
 raw_texts_training <- LargeDataSetForText$new(example_data[1:50, ])
 
-tok_type ="WordPieceTokenizer"
+tok_type <- "WordPieceTokenizer"
 Tokenizer <- create_object(tok_type)
 Tokenizer$configure(
   vocab_size = 2000,
@@ -47,11 +47,11 @@ Tokenizer$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
-  sustain_log_level="error",
+  sustain_log_level = "error",
   trace = FALSE
 )
 
-#Config Test
+# Config Test
 mlm_prob <- 0.5
 
 tokenizer <- Tokenizer$get_tokenizer()
@@ -65,7 +65,7 @@ lines <- list(
 
 max_length <- 20L
 tokenized_lines <- lapply(lines, function(line) {
-  tokenizer(line, truncation = TRUE, max_length = as.integer(max_length), return_special_tokens_mask = TRUE,return_attention_mask = TRUE)
+  tokenizer(line, truncation = TRUE, max_length = as.integer(max_length), return_special_tokens_mask = TRUE, return_attention_mask = TRUE)
 })
 
 # --- Applying DataCollator ---
@@ -93,7 +93,7 @@ test_that("Batch dims are correct", {
 
 test_that("Padding and attention mask are correct", {
   for (i in seq_along(lines)) {
-    seq_len <- sum(mask_np[i,] != 0)
+    seq_len <- sum(mask_np[i, ] != 0)
     if (seq_len < ncol(input_ids_np)) {
       expect_true(all(input_ids_np[i, (seq_len + 1):ncol(input_ids_np)] == pad_id))
     }
@@ -102,7 +102,7 @@ test_that("Padding and attention mask are correct", {
 
 test_that("Whole Word Masking is correct", {
   for (i in seq_along(lines)) {
-    masked_positions <- which(labels_np[i,] != -100)
+    masked_positions <- which(labels_np[i, ] != -100)
     if (length(masked_positions) > 0) {
       expect_true(all(input_ids_np[i, masked_positions] == mask_id))
     }
@@ -119,7 +119,7 @@ test_that("Number of words to mask is about mlm_probability", {
     total_words <- length(unique_words)
 
     # Get masked positions and words
-    masked_positions <- which(labels_np[i,] != -100)
+    masked_positions <- which(labels_np[i, ] != -100)
     masked_word_ids <- unique(word_ids[masked_positions])
     masked_word_ids <- Filter(Negate(is.null), masked_word_ids)
     masked_words <- length(unique(masked_word_ids))
@@ -128,23 +128,26 @@ test_that("Number of words to mask is about mlm_probability", {
     expected_words <- max(1, round(total_words * mlm_prob))
 
     expect_true(abs(masked_words - expected_words) <= 1,
-                info = paste("Found", masked_words,
-                             "expected about", expected_words))
+      info = paste(
+        "Found", masked_words,
+        "expected about", expected_words
+      )
+    )
   }
 })
 
 test_that("Special tokens [CLS] and [SEP] are not masked", {
   for (i in seq_along(lines)) {
-    expect_equal(input_ids_np[i,1], cls_id)
-    last_real <- sum(mask_np[i,] != 0)
+    expect_equal(input_ids_np[i, 1], cls_id)
+    last_real <- sum(mask_np[i, ] != 0)
     expect_equal(input_ids_np[i, last_real], sep_id)
   }
 })
 
-#test_that("Compatibility with a model BERT", {
+# test_that("Compatibility with a model BERT", {
 #  model <- transformers$BertForMaskedLM$from_pretrained("bert-base-uncased")
 #  expect_silent({
 #    out <- model(input_ids = input_ids, labels = labels)
 #  })
 #  expect_true(!is.null(out$loss))
-#})
+# })

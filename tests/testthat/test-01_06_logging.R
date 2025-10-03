@@ -39,7 +39,7 @@ test_that("logging in R - loss log", {
 
   expect_no_error(reset_loss_log(log_file))
 
-  res=read_loss_log(log_file)
-  expect_equal(colnames(res),c("train","validation","test","epoch"))
-  expect_equal(unname(as.matrix(res)[1,1:3]),c(-100,-100,-100))
+  res <- read_loss_log(log_file)
+  expect_equal(colnames(res), c("train", "validation", "test", "epoch"))
+  expect_equal(unname(as.matrix(res)[1, 1:3]), c(-100, -100, -100))
 })

@@ -421,7 +421,7 @@ WordPieceTokenizer <- R6::R6Class(
                      sustain_iso_code = NULL,
                      sustain_region = NULL,
                      sustain_interval = 15L,
-                     sustain_log_level="warning",
+                     sustain_log_level = "warning",
                      trace = FALSE) {
       private$check_config_for_TRUE()
       private$check_for_untrained()

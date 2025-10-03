@@ -284,7 +284,7 @@ is_valid_and_exportable_param <- function(arg_name, param_dict) {
 
   if (!is.null(param_dict_entry$type)) {
     if (max(param_dict_entry$type %in% c("bool", "int", "double", "(double", "double)", "(double)", "string", "vector", "list")) &&
-      !arg_name %in% c("log_dir", "log_write_interval","name","label")) {
+      !arg_name %in% c("log_dir", "log_write_interval", "name", "label")) {
       return(TRUE)
     } else {
       return(FALSE)

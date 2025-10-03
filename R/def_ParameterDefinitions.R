@@ -950,7 +950,7 @@ get_param_dict <- function() {
   param$sustain_log_level <- list(
     type = "string",
     allow_null = FALSE,
-    allowed_values=c("debug", "info","warning", "error","critical"),
+    allowed_values = c("debug", "info", "warning", "error", "critical"),
     min = NULL,
     max = NULL,
     desc = "Level for printing information to the console.",
@@ -1653,17 +1653,17 @@ get_param_dict <- function() {
     allow_null = FALSE,
     min = NULL,
     max = NULL,
-    allowed_values = c("None","absolute"),
+    allowed_values = c("None", "absolute"),
     values_desc = list(
       absolute = "Adds positional information by using an embedding matrix as described by Chollet, Kalinowski, and Allaire (2022, pp. 378-379).
                   This implementation is different to the original work by [Vaswani et al. (2017)](https://doi.org/10.48550/arXiv.1706.03762).",
-      None="No absolute positional information is added."
+      None = "No absolute positional information is added."
     ),
     desc = "Type of processing positional information.",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Positional Information",
     default_value = "absolute",
-    default_historic= "None"
+    default_historic = "None"
   )
 
   param$repeat_encoder <- list(

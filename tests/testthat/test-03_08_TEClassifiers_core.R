@@ -140,10 +140,10 @@ for (object_class_name in object_class_names) {
         # Create test object with a given combination of args
         classifier <- create_object(object_class_name)
         suppressMessages(
-        do.call(
-          what = classifier$configure,
-          args = test_combination
-        )
+          do.call(
+            what = classifier$configure,
+            args = test_combination
+          )
         )
 
         test_that(paste("count parameter", object_class_name, get_current_args_for_print(test_combination)), {
@@ -382,10 +382,10 @@ for (object_class_name in object_class_names) {
         # Create test object with a given combination of args
         classifier <- create_object(object_class_name)
         suppressMessages(
-        do.call(
-          what = classifier$configure,
-          args = test_combination
-        )
+          do.call(
+            what = classifier$configure,
+            args = test_combination
+          )
         )
 
         # Predictions before saving and loading
@@ -499,10 +499,10 @@ for (object_class_name in object_class_names) {
         # Create test object with a given combination of args
         classifier <- create_object(object_class_name)
         suppressMessages(
-        do.call(
-          what = classifier$configure,
-          args = test_combination
-        )
+          do.call(
+            what = classifier$configure,
+            args = test_combination
+          )
         )
 
         classifier$set_model_description(
@@ -712,10 +712,10 @@ for (object_class_name in object_class_names) {
         gc()
         classifier <- create_object(object_class_name)
         suppressMessages(
-        do.call(
-          what = classifier$configure,
-          args = test_combination
-        )
+          do.call(
+            what = classifier$configure,
+            args = test_combination
+          )
         )
 
         test_that(paste(

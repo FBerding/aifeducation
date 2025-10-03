@@ -45,7 +45,7 @@ generate_args_for_tests <- function(object_name,
                                       pl_min = 0L,
                                       sustain_track = TRUE,
                                       sustain_iso_code = "DEU",
-                                      sustain_log_level="error",
+                                      sustain_log_level = "error",
                                       data_val_size = 0.25,
                                       lr_rate = 1e-3,
                                       lr_warm_up_ratio = 0.01

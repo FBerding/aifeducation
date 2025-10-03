@@ -26,28 +26,26 @@ test_that("is_venv ", {
 
 test_that("get_py_env_type ", {
   if (Sys.getenv("CI") == "true") {
-    expect_equal(get_py_env_type(),"conda")
+    expect_equal(get_py_env_type(), "conda")
   } else {
-    expect_equal(get_py_env_type(),"venv")
+    expect_equal(get_py_env_type(), "venv")
   }
 })
 
 test_that("get_py_env_type ", {
   if (Sys.getenv("CI") == "true") {
-    expect_equal(get_py_env_name(),"r-reticulate")
+    expect_equal(get_py_env_name(), "r-reticulate")
   } else {
-    expect_equal(get_py_env_name(),"aifeducation")
+    expect_equal(get_py_env_name(), "aifeducation")
   }
 })
 
 test_that("get_current_conda_env and get_current_venv", {
   if (Sys.getenv("CI") == "true") {
-    expect_equal(get_current_conda_env (),"r-reticulate")
-    expect_error(get_current_venv ())
+    expect_equal(get_current_conda_env(), "r-reticulate")
+    expect_error(get_current_venv())
   } else {
-    expect_equal(get_current_venv (),"aifeducation")
-    expect_error(get_current_conda_env ())
+    expect_equal(get_current_venv(), "aifeducation")
+    expect_error(get_current_conda_env())
   }
 })
-
-

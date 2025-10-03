@@ -458,7 +458,7 @@ AIFEMaster <- R6::R6Class(
           country_iso_code = self$last_training$config$sustain_iso_code,
           region = self$last_training$config$sustain_region,
           measure_power_secs = self$last_training$config$sustain_interval,
-          sustain_log_level= self$last_training$config$sustain_log_level
+          sustain_log_level = self$last_training$config$sustain_log_level
         )
       }
     },

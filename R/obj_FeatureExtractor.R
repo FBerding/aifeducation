@@ -129,7 +129,7 @@ TEFeatureExtractor <- R6::R6Class(
                      sustain_iso_code = NULL,
                      sustain_region = NULL,
                      sustain_interval = 15L,
-                     sustain_log_level="warning",
+                     sustain_log_level = "warning",
                      epochs = 40L,
                      batch_size = 32L,
                      trace = TRUE,

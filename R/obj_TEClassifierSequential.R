@@ -195,12 +195,12 @@ TEClassifierSequential <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     check_param_combinations_configuration = function() {
-      if(private$model_config$rec_n_layers==1L && private$model_config$rec_dropout>0.0){
+      if (private$model_config$rec_n_layers == 1L && private$model_config$rec_dropout > 0.0) {
         print_message(
           msg = "Dropout for recurrent requires at least two layers. Setting rec_dropout to 0.0.",
           trace = TRUE
         )
-        private$model_config$rec_dropout=0.0
+        private$model_config$rec_dropout <- 0.0
       }
     },
     #--------------------------------------------------------------------------

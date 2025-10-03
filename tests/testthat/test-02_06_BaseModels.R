@@ -71,7 +71,7 @@ for (object_class_name in object_class_names) {
       sustain_iso_code = "DEU",
       sustain_region = NULL,
       sustain_interval = 15,
-      sustain_log_level="error",
+      sustain_log_level = "error",
       trace = FALSE
     )
 
@@ -107,10 +107,10 @@ for (object_class_name in object_class_names) {
       var_override = list(
         sustain_interval = 30,
         sustain_iso_code = "DEU",
-        sustain_log_level="error",
+        sustain_log_level = "error",
         n_epoch = 2,
         max_sequence_length = 32,
-        pytorch_trace=0L,
+        pytorch_trace = 0L,
         min_seq_len = 16,
         val_size = 0.25,
         learning_rate = 3e-3
@@ -120,16 +120,16 @@ for (object_class_name in object_class_names) {
     # Create and train model
     base_model <- create_object(object_class_name)
     suppressMessages(
-    do.call(
-      what = base_model$configure,
-      args = config_args
-    )
+      do.call(
+        what = base_model$configure,
+        args = config_args
+      )
     )
     suppressMessages(
-    do.call(
-      what = base_model$train,
-      args = train_args
-    )
+      do.call(
+        what = base_model$train,
+        args = train_args
+      )
     )
 
     # Prepare directory
@@ -238,15 +238,15 @@ for (object_class_name in object_class_names) {
       n_repeat <- 2
       for (j in 1:n_repeat) {
         suppressMessages(
-        base_model$estimate_sustainability_inference_fill_mask(
-          text_dataset = raw_texts_training,
-          n = 30,
-          sustain_iso_code = "DEU",
-          sustain_region = NULL,
-          sustain_interval = 15,
-          trace = train_args$trace,
-          sustain_log_level="error"
-        )
+          base_model$estimate_sustainability_inference_fill_mask(
+            text_dataset = raw_texts_training,
+            n = 30,
+            sustain_iso_code = "DEU",
+            sustain_region = NULL,
+            sustain_interval = 15,
+            trace = train_args$trace,
+            sustain_log_level = "error"
+          )
         )
         expect_equal(nrow(base_model$get_sustainability_data("inference")), j)
       }
