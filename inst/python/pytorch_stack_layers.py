@@ -196,8 +196,9 @@ class stack_tf_encoder_layer(torch.nn.Module):
     if self.positional_embedding=="absolute":
        self.positional_embedding_layer=layer_abs_positional_embedding(sequence_length=self.times,embedding_dim=self.features)
     elif self.positional_embedding=="None":
-      self.positional_embedding_layer=identity_layer(pad_value=self.pad_value,apply_masking=True)
-    
+      #self.positional_embedding_layer=identity_layer(pad_value=self.pad_value,apply_masking=True)
+      self.positional_embedding_layer=torch.nn.Identity()
+
     for r in range(self.n_layers):
       self.layer_list.append(
         layer_tf_encoder(
