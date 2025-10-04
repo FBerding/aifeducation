@@ -46,9 +46,6 @@
     <li><a class="dropdown-item" href="../articles/model_configuration.html">04 Model configuration</a></li>
     <li><a class="dropdown-item" href="../articles/sharing_and_publishing.html">05 Sharing and Using Trained AI/Models</a></li>
     <li><a class="dropdown-item" href="../articles/a01_layers_stacks.html">Appendix 01 Layers and Stacks</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>For developers</h6></li>
-    <li><a class="dropdown-item" href="../articles/transformers.html">01 Transformers</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -228,7 +225,15 @@ install this package manually with
 <p>Using the function above will install the newest and recommended
 version of the core python packages in order to use this package. In the
 case you would like to install the packages manually we recommend the
-following version.</p>
+following versions.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">aifeducation</span><span class="fu">::</span><span class="fu"><a href="../reference/get_recommended_py_versions.html">get_recommended_py_versions</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     transformers tokenizers pandas datasets codecarbon safetensors torcheval</span></span>
+<span><span class="co">#&gt; min       4.56.0     0.22.0  2.3.2    3.6.0      3.0.0       0.6.2     0.0.7</span></span>
+<span><span class="co">#&gt; max       4.56.2     0.22.0  2.3.2    3.6.0      3.0.4       0.6.2     0.0.7</span></span>
+<span><span class="co">#&gt;     accelerate calflops</span></span>
+<span><span class="co">#&gt; min     1.10.1    0.3.2</span></span>
+<span><span class="co">#&gt; max     1.10.1    0.3.2</span></span></code></pre></div>
 <p>We have tested the package with these versions ensuring that
 <em>aifeducation</em> works correctly.</p>
 </div>

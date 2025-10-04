@@ -26,9 +26,6 @@
     <li><a class="dropdown-item" href="../articles/model_configuration.html">04 Model configuration</a></li>
     <li><a class="dropdown-item" href="../articles/sharing_and_publishing.html">05 Sharing and Using Trained AI/Models</a></li>
     <li><a class="dropdown-item" href="../articles/a01_layers_stacks.html">Appendix 01 Layers and Stacks</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>For developers</h6></li>
-    <li><a class="dropdown-item" href="../articles/transformers.html">01 Transformers</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -49,14 +46,14 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.1.2" id="aifeducation-112">aifeducation 1.1.2<a class="anchor" aria-label="anchor" href="#aifeducation-112"></a></h2>
 <p><strong>Major Changes</strong></p>
-<ul><li>Introduction of two new classes: one for tokenizers and one for base models. This allows us a more specialized implementation of new methods (e.g. for estimation FLOPS) and a unified handling for all classes in this packages (e.g. saving and loading).</li>
+<ul><li>Introduction of two new classes: one for tokenizers and one for base models. This allows us a more specialized implementation of new methods (e.g. for estimating FLOPS) and a unified handling for all classes in this packages (e.g. saving and loading).</li>
 <li>Re-implement DeBERTa version 2.</li>
 <li>Temporally removed support for Longformer since it causes some cuda errors.</li>
-<li>Intensive re-factoring of all remaining classes. Now the R6 classes uses the capabilities of R6 more stringent. The structure of all classes was unified and is now more in line with object orientated programming styles. Old models are updated during loading automatically to the new structure. The position of some method changed. Please refer to the documentation or vignettes for more details.</li>
+<li>Intensive re-factoring of all remaining classes. Now the R6 classes uses the capabilities of R6 more stringent. The structure of all classes was unified and is now more in line with object orientated programming styles. Old models are updated during loading automatically to the new structure. The position of some methods changed. Please refer to the documentation or vignettes for more details.</li>
 <li>Added analyses for lints and started to apply more rigorous lint analyzers to improve code quality. This process is not finished yet.</li>
 <li>Added dependency to a new python library ‘calflops’. Please install this package to your python environment.</li>
 </ul><p><strong>Minor Changes</strong></p>
-<ul><li>Add a parameter for controlling the log level of the codecarbon sustainability tracker.</li>
+<ul><li>Add a parameter for controlling the log level of the ‘codecarbon’ sustainability tracker.</li>
 </ul><p><strong>TextEmbeddingModels</strong></p>
 <ul><li>Re-implemented algorithm to embed texts. The new version has a better numerical stability and is faster.</li>
 </ul><p><strong>Ai for Education Studio</strong></p>

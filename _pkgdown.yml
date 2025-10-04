@@ -23,10 +23,7 @@ navbar:
         href: "articles/sharing_and_publishing.html"
       - text: "Appendix 01 Layers and Stacks"
         href: "articles/a01_layers_stacks.html"
-      - text: -------
-      - text: "For developers"
-      - text: "01 Transformers"
-        href: "articles/transformers.html"
+
 
 reference:
 - title: For Users
