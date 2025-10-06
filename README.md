@@ -44,7 +44,7 @@ special conditions of the educational and social sciences.
 - Uses safetensors for saving models in ‘PyTorch’.
 - Supports pre-trained language models from Hugging Face.
 - Supports ModernBERT, MPNet, BERT, RoBERTa, DeBERTa, and Funnel
-  Transformer for creating context-sensitive text embedding.
+  Transformer for creating context-sensitive text embeddings.
 - Makes sharing pre-trained models very easy.
 - Integrates sustainability tracking for training and inference.
 - Integrates an approach to calculate FLOPS based on model’s

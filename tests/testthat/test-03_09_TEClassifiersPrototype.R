@@ -109,9 +109,11 @@ for (object_class_name in object_class_names) {
 
       # Create test object with a given combination of args
       classifier <- create_object(object_class_name)
-      do.call(
-        what = classifier$configure,
-        args = test_combination
+      suppressMessages(
+        do.call(
+          what = classifier$configure,
+          args = test_combination
+        )
       )
       # Predict with sample cases-------------------------------------------------
       test_that(paste("Number of Predictions", object_class_name, get_current_args_for_print(test_combination)), {
@@ -314,9 +316,11 @@ for (object_class_name in object_class_names) {
       test_that(paste("plot without sample cases", object_class_name, get_current_args_for_print(test_combination)), {
         # plot
         classifier <- create_object(object_class_name)
-        do.call(
-          what = classifier$configure,
-          args = test_combination
+        suppressMessages(
+          do.call(
+            what = classifier$configure,
+            args = test_combination
+          )
         )
         plot <- classifier$plot_embeddings(
           embeddings_q = test_embeddings_reduced,

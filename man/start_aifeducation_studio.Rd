@@ -4,7 +4,10 @@
 \alias{start_aifeducation_studio}
 \title{Aifeducation Studio}
 \usage{
-start_aifeducation_studio()
+start_aifeducation_studio(launch_browser = TRUE)
+}
+\arguments{
+\item{launch_browser}{\code{bool} If \code{TRUE} the system's default web browser is used for displaying the app.}
 }
 \value{
 This function does nothing return. It is used to start a shiny app.
