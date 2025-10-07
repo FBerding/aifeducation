@@ -143,6 +143,7 @@ BaseModelMPNet <- R6::R6Class(
                      pytorch_trace = 1L,
                      log_dir = NULL,
                      log_write_interval = 2L) {
+      run_py_file("data_collator.py")
       private$do_training(args = get_called_args(n = 1L))
     }
   )

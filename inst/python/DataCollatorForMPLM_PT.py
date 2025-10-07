@@ -13,8 +13,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 
-from transformers import DataCollatorForLanguageModeling, \
-                         DataCollatorForWholeWordMask
+from transformers import DataCollatorForLanguageModeling
 
 from math import ceil
 # ======================================================================================
