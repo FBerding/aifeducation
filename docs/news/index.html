@@ -63,6 +63,7 @@
 <ul><li>Added an own implementation of the DataCollatorForWholeWordMask that uses the word_ids of PreTrainedTokenizerFast. This collator can be used with WordPieceTokenizer.</li>
 </ul><p><strong>Classifiers</strong></p>
 <ul><li>Fixed a bug in TEClassifierRegular and TEClassifierParallelPrototype that could occur during the preparation of the training history. Error caused the training to abort.</li>
+<li>Fixed a bug that did not allow to load trained models based on prototypes.</li>
 </ul><p><strong>Documentation</strong></p>
 <ul><li>The documentation was updated to the new structure and objects.</li>
 </ul></div>
