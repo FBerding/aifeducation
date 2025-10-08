@@ -519,11 +519,11 @@ layer.</p></li>
 passed to dense layers. It performs two types of pooling. First, it
 extractes features across the time dimension selecting the maximal
 and/or minimal features. Second, it performs pooling over the remaining
-features selecting a speficifc number of the heighest and/or lowest
+features selecting a specific number of the heighest and/or lowest
 features.</p>
 <p>In the case of selecting the minmal <em>and</em> maximal features at
 the same time the minmal features are concatenated to the tensor of the
-maximal features resulting the in the shape
+maximal features resulting in the shape
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mi>B</mi><mi>a</mi><mi>t</mi><mi>c</mi><mi>h</mi><mo>,</mo><mi>T</mi><mi>i</mi><mi>m</mi><mi>e</mi><mi>s</mi><mo>,</mo><mn>2</mn><mo>*</mo><mi>F</mi><mi>e</mi><mi>a</mi><mi>t</mi><mi>u</mi><mi>r</mi><mi>e</mi><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(Batch, Times, 2*Features)</annotation></semantics></math>
 at the end of the first step. In the second step the number of requested
 features is halved. The first half is used for the maximal features and

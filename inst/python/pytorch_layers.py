@@ -435,7 +435,7 @@ class layer_mutiple_n_gram_convolution(torch.nn.Module):
       self.dropout=layer_dropout_with_mask(p=self.dropout,pad_value=self.pad_value)
     else:
       self.dropout=identity_layer(pad_value=self.pad_value,apply_masking=True)
-    
+      
     self.residual_connection=layer_residual_connection(residual_type,self.pad_value) 
       
   def forward(self, x,seq_len,mask_times,mask_features):

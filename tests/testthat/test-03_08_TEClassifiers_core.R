@@ -133,7 +133,6 @@ for (object_class_name in object_class_names) {
           )
         )
 
-
         classifier <- NULL
         gc()
 

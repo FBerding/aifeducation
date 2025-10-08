@@ -2199,6 +2199,7 @@ feature_extractor$train(
   sustain_interval = 15,
   epochs = 50,
   batch_size = 32,
+  lr_rate = 1e-3,
   trace = TRUE,
   ml_trace = 0,
   optimizer = "AdamW"

@@ -97,10 +97,10 @@ get_layer_dict <- function(layer) {
     title = "Classifiction Pooling Layer",
     desc = "Layer transforms sequences into a lower dimensional space that can be passed to dense layers. It
     performs two types of pooling. First, it extractes features across the time dimension selecting the maximal
-    and/or minimal features. Second, it performs pooling over the remaining features selecting a speficifc number of
+    and/or minimal features. Second, it performs pooling over the remaining features selecting a specific number of
     the heighest and/or lowest features.
     \n In the case of selecting the minmal *and* maximal features at the same time the minmal
-    features are concatenated to the tensor of the maximal features resulting the in the shape $(Batch, Times, 2*Features)$ at the end of the first step.
+    features are concatenated to the tensor of the maximal features resulting in the shape $(Batch, Times, 2*Features)$ at the end of the first step.
     In the second step the
     number of requested features is halved. The first half is used for the maximal features and the second for the minimal
     features.",
@@ -528,6 +528,9 @@ build_layer_stack_documentation_for_vignette <- function() {
 #' @noRd
 #' @keywords internal
 build_aife_site <- function(clear_docs = FALSE) {
+
+  build_layer_stack_documentation_for_vignette()
+
   requireNamespace("pkgdown")
   pkgdown::clean_cache()
   if (clear_docs) {
