@@ -37,7 +37,10 @@ class CollatorMaker_PT:
 
         class DataCollatorForMPLM(base_class):
             def __init__(self, tokenizer, mlm, mlm_probability, plm_probability):
-                super().__init__(tokenizer = tokenizer, mlm = mlm, mlm_probability = mlm_probability)
+                if isinstance(base_class, DataCollatorForLanguageModeling):
+                  super().__init__(tokenizer = tokenizer, mlm = mlm, mlm_probability = mlm_probability)
+                else:
+                  super().__init__(tokenizer = tokenizer,  mlm_probability = mlm_probability)
                 self.tokenizer = tokenizer
                 self.plm_probability = plm_probability
 

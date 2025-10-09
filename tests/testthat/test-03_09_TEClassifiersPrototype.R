@@ -228,7 +228,7 @@ for (object_class_name in object_class_names) {
             expect_equal(
               predictions[ids, 1:(ncol(predictions) - 1)],
               predictions_Perm[ids, 1:(ncol(predictions_Perm) - 1)],
-              tolerance = prob_precision
+              tolerance = 1e-6
             )
 
             # LargeDataSetForTextEmbeddings
@@ -253,7 +253,7 @@ for (object_class_name in object_class_names) {
               predictions_Perm[ids, 1:(ncol(predictions_Perm) - 1)],
               embeddings_s = test_embeddings_reduced,
               classes_s = target_data[[n_classes]][rownames(test_embeddings_reduced$embeddings)],
-              tolerance = prob_precision
+              tolerance = 1e-6
             )
           })
         #}
