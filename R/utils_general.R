@@ -54,7 +54,7 @@ to_categorical_c <- function(class_vector, n_classes) {
 }
 
 #' @title Check if NULL or NA
-#' @description Function for checking if an object is `NULL` or .
+#' @description Function for checking if an object is `NULL` or `NA`.
 #'
 #' @param object An object to test.
 #' @return Returns `FALSE` if the object is not `NULL` and not `NA`. Returns `TRUE` in all other cases.
