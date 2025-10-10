@@ -47,6 +47,7 @@ editor_options:
 - Fixed a bug in TEClassifierRegular and TEClassifierParallelPrototype that could occur
   during the preparation of the training history. Error caused the training to abort.
 - Fixed a bug that did not allow to load trained models based on prototypes.
+- Fixed a bug in calculating the mean values for precision, recall, and f1.
 
 **Documentation**
 

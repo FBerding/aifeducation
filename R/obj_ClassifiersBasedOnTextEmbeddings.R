@@ -583,17 +583,53 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
 
       # Finalize standard measures
       standard_measures <- self$reliability$standard_measures_mean
-      for (i in 1L:self$last_training$config$n_folds) {
-        for (tmp_cat in private$model_config$target_levels) {
-          standard_measures[tmp_cat, "precision"] <- standard_measures[tmp_cat, "precision"] +
-            self$reliability$standard_measures_end[[i]][tmp_cat, "precision"]
-          standard_measures[tmp_cat, "recall"] <- standard_measures[tmp_cat, "recall"] +
-            self$reliability$standard_measures_end[[i]][tmp_cat, "recall"]
-          standard_measures[tmp_cat, "f1"] <- standard_measures[tmp_cat, "f1"] +
-            self$reliability$standard_measures_end[[i]][tmp_cat, "f1"]
+
+      for (tmp_cat in private$model_config$target_levels) {
+        counter_precision <- 0
+        counter_recall <- 0
+        counter_f1 <- 0
+        for (i in 1L:self$last_training$config$n_folds) {
+          val_precision <- self$reliability$standard_measures_end[[i]][as.character(tmp_cat), "precision"]
+          val_recall <- self$reliability$standard_measures_end[[i]][as.character(tmp_cat), "recall"]
+          val_f1 <- self$reliability$standard_measures_end[[i]][as.character(tmp_cat), "f1"]
+
+          if (!is.nan(val_precision) && !is.na(val_precision)) {
+            standard_measures[as.character(tmp_cat), "precision"] <- standard_measures[as.character(tmp_cat), "precision"] +
+              val_precision
+            counter_precision <- counter_precision + 1
+          }
+
+          if (!is.nan(counter_recall) && !is.na(counter_recall)) {
+            standard_measures[as.character(tmp_cat), "recall"] <- standard_measures[as.character(tmp_cat), "recall"] +
+              val_recall
+            counter_recall <- counter_recall + 1
+          }
+
+          if (!is.nan(val_f1) && !is.na(val_f1)) {
+            standard_measures[as.character(tmp_cat), "f1"] <- standard_measures[as.character(tmp_cat), "f1"] +
+              val_f1
+            counter_f1 <- counter_f1 + 1
+          }
+        }
+        if (counter_precision == 0) {
+          standard_measures[as.character(tmp_cat), "precision"] <- NA
+        } else {
+          standard_measures[as.character(tmp_cat), "precision"] <- standard_measures[as.character(tmp_cat), "precision"] / counter_precision
+        }
+
+        if (counter_recall == 0) {
+          standard_measures[as.character(tmp_cat), "recall"] <- NA
+        } else {
+          standard_measures[as.character(tmp_cat), "recall"] <- standard_measures[as.character(tmp_cat), "recall"] / counter_recall
+        }
+
+        if (counter_f1 == 0) {
+          standard_measures[as.character(tmp_cat), "f1"] <- NA
+        } else {
+          standard_measures[as.character(tmp_cat), "f1"] <- standard_measures[as.character(tmp_cat), "f1"] / counter_f1
         }
       }
-      self$reliability$standard_measures_mean <- standard_measures / self$last_training$config$n_folds
+      self$reliability$standard_measures_mean=standard_measures
     },
     #--------------------------------------------------------------------------
     train_standard = function(iteration = NULL,
