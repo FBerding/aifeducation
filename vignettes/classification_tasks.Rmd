@@ -1675,7 +1675,7 @@ used to train your classifier (see section 4). In the case of our
 example classifier, we use our BERT model.
 
 ```{r, include = TRUE, eval = TRUE}
-# If our mode is not loaded
+# If our model is not loaded
 bert_modeling <- load_from_disk("examples/bert_te_model")
 
 # Create a numerical representation of the text

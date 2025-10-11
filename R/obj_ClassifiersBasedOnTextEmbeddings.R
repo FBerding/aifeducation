@@ -629,7 +629,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
           standard_measures[as.character(tmp_cat), "f1"] <- standard_measures[as.character(tmp_cat), "f1"] / counter_f1
         }
       }
-      self$reliability$standard_measures_mean=standard_measures
+      self$reliability$standard_measures_mean <- standard_measures
     },
     #--------------------------------------------------------------------------
     train_standard = function(iteration = NULL,

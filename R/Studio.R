@@ -22,7 +22,7 @@
 #' @family Graphical User Interface
 #'
 #' @export
-start_aifeducation_studio <- function(launch_browser=TRUE) {
+start_aifeducation_studio <- function(launch_browser = TRUE) {
   # Prepare for studio
   check_and_prepare_for_studio(env_type = "auto")
 
@@ -31,9 +31,9 @@ start_aifeducation_studio <- function(launch_browser=TRUE) {
 
   # Create App------------------------------------------------------------------
   shiny::shinyAppDir(
-    appDir = system.file("studio_app",package = "aifeducation"),
-    options=list(
-      launch.browser=launch_browser
+    appDir = system.file("studio_app", package = "aifeducation"),
+    options = list(
+      launch.browser = launch_browser
     )
   )
 }

@@ -100,10 +100,10 @@ for (object_class_name in object_class_names) {
 
       classifier <- create_object(object_class_name)
       suppressMessages(
-      do.call(
-        what = classifier$configure,
-        args = test_combinations
-      )
+        do.call(
+          what = classifier$configure,
+          args = test_combinations
+        )
       )
 
       if (test_combinations$attention_type != "Fourier") {
