@@ -780,6 +780,12 @@ class layer_protonet_metric(torch.nn.Module):
         x2=prototypes,
         p=2.0
       )
+    elif self.metric_type=="CosineDistance":
+      distance_matrix=CosineDistance(
+        x=x,
+        y=prototypes,
+        eps=1e-8
+      )
     return self.get_scaling_factor()*distance_matrix
   def get_scaling_factor(self):
     return torch.sqrt(torch.square(self.alpha+1e-8))

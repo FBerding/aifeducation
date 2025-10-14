@@ -338,8 +338,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
             shape = type,
             size = type,
             alpha = type
-          ) # ,
-          # position = ggplot2::position_jitter(h = 0.1, w = 0.1)
+          )
         ) +
         ggplot2::scale_size_manual(values = c(
           prototype = size_points_prototypes,

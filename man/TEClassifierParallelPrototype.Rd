@@ -254,7 +254,7 @@ the number of dimensions of the text embeddings. If no feature extractor should 
 note that order matters. For ordinal data please ensure that the levels are sorted correctly with later levels
 indicating a higher category/class. For nominal data the order does not matter.}
 
-\item{\code{metric_type}}{\code{string} Type of metric used for calculating the distance. Allowed values: 'Euclidean'}
+\item{\code{metric_type}}{\code{string} Type of metric used for calculating the distance. Allowed values: 'Euclidean', 'CosineDistance'}
 
 \item{\code{shared_feat_layer}}{\code{bool} If \code{TRUE} all streams use the same feature layer. If \code{FALSE} all streams use their own feature layer.}
 

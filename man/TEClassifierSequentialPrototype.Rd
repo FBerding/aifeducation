@@ -78,11 +78,11 @@ PyTorchs implementation. All parameters with the prefix \emph{rec_} can be used 
 
 Layer transforms sequences into a lower dimensional space that can be passed to dense layers. It
 performs two types of pooling. First, it extractes features across the time dimension selecting the maximal
-and/or minimal features. Second, it performs pooling over the remaining features selecting a speficifc number of
+and/or minimal features. Second, it performs pooling over the remaining features selecting a specific number of
 the heighest and/or lowest features.
 
 In the case of selecting the minmal \emph{and} maximal features at the same time the minmal
-features are concatenated to the tensor of the maximal features resulting the in the shape $(Batch, Times, 2*Features)$ at the end of the first step.
+features are concatenated to the tensor of the maximal features resulting in the shape $(Batch, Times, 2*Features)$ at the end of the first step.
 In the second step the
 number of requested features is halved. The first half is used for the maximal features and the second for the minimal
 features. All parameters with the prefix \emph{cls_pooling_} can be used to configure this layer.
@@ -261,7 +261,7 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{cls_pooling_type}}{\code{string} Type of extracting intermediate features. Allowed values: 'Max', 'Min', 'MinMax'}
 
-\item{\code{metric_type}}{\code{string} Type of metric used for calculating the distance. Allowed values: 'Euclidean'}
+\item{\code{metric_type}}{\code{string} Type of metric used for calculating the distance. Allowed values: 'Euclidean', 'CosineDistance'}
 
 \item{\code{feat_act_fct}}{\code{string} Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
 

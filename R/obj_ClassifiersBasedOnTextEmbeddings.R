@@ -1309,6 +1309,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     load_reload_python_scripts = function() {
       load_py_scripts(c(
         "pytorch_act_fct.py",
+        "pytorch_distance_fun.py",
         "pytorch_loss_fct.py",
         "pytorch_layers.py",
         "pytorch_layers_normalization.py",

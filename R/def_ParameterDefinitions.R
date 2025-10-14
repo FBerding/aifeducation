@@ -1740,7 +1740,7 @@ get_param_dict <- function() {
     allow_null = FALSE,
     min = NULL,
     max = NULL,
-    allowed_values = "Euclidean",
+    allowed_values = c("Euclidean","CosineDistance"),
     desc = "Type of metric used for calculating the distance.",
     gui_box = "Loss",
     gui_label = "Metric Type",
