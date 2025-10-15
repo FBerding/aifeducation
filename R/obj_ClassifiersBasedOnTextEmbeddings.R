@@ -353,15 +353,13 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     #---------------------------------------------------------------------------
     #' @description Method for requesting a plot of the training history.
     #' This method requires the *R* package 'ggplot2' to work.
-    #' @param final_training `bool` If `FALSE` the values of the performance estimation are used. If `TRUE` only
-    #' the epochs of the final training are used.
-    #' @param add_min_max `bool` If `TRUE` the minimal and maximal values during performance estimation are port of the plot.
-    #' If `FALSE` only the mean values are shown. Parameter is ignored if `final_training=TRUE`.
+    #' @param final_training `r get_param_doc_desc("final_training")`
+    #' @param add_min_max `r get_param_doc_desc("add_min_max")`
     #' @param pl_step `int` Number of the step during pseudo labeling to plot. Only relevant if the model was trained
     #' with active pseudo labeling.
-    #' @param y_min Minimal value for the y-axis. Set to `NULL` for an automatic adjustment.
-    #' @param y_max Maximal value for the y-axis. Set to `NULL` for an automatic adjustment.
-    #' @param text_size Size of the text.
+    #' @param y_min `r get_param_doc_desc("y_min")`
+    #' @param y_max `r get_param_doc_desc("y_max")`
+    #' @param text_size `r get_param_doc_desc("text_size")`
     #' @param measure `string` Measure to plot. Allowed values:
     #' * `"avg_iota"` = Average Iota
     #' * `"loss"` = Loss

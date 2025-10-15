@@ -515,25 +515,25 @@ BaseModelCore <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     #' @description Traines a BaseModel
-    #' @param text_dataset `r get_description("text_dataset")`
-    #' @param p_mask `r get_description("p_mask")`
-    #' @param whole_word `r get_description("whole_word")`
-    #' @param val_size `r get_description("val_size")`
-    #' @param n_epoch `r get_description("n_epoch")`
-    #' @param batch_size `r get_description("batch_size")`
-    #' @param max_sequence_length `r get_description("max_sequence_length")`
-    #' @param full_sequences_only `r get_description("full_sequences_only")`
-    #' @param min_seq_len `r get_description("min_seq_len")`
-    #' @param learning_rate `r get_description("learning_rate")`
-    #' @param sustain_track `r get_description("sustain_track")`
-    #' @param sustain_iso_code `r get_description("sustain_iso_code")`
-    #' @param sustain_region `r get_description("sustain_region")`
-    #' @param sustain_interval `r get_description("sustain_interval")`
-    #' @param sustain_log_level `r get_description("sustain_log_level")`
-    #' @param trace `r get_description("trace")`
-    #' @param pytorch_trace `r get_description("pytorch_trace")`
-    #' @param log_dir `r get_description("log_dir")`
-    #' @param log_write_interval `r get_description("log_write_interval")`
+    #' @param text_dataset `r get_param_doc_desc("text_dataset")`
+    #' @param p_mask `r get_param_doc_desc("p_mask")`
+    #' @param whole_word `r get_param_doc_desc("whole_word")`
+    #' @param val_size `r get_param_doc_desc("val_size")`
+    #' @param n_epoch `r get_param_doc_desc("n_epoch")`
+    #' @param batch_size `r get_param_doc_desc("batch_size")`
+    #' @param max_sequence_length `r get_param_doc_desc("max_sequence_length")`
+    #' @param full_sequences_only `r get_param_doc_desc("full_sequences_only")`
+    #' @param min_seq_len `r get_param_doc_desc("min_seq_len")`
+    #' @param learning_rate `r get_param_doc_desc("learning_rate")`
+    #' @param sustain_track `r get_param_doc_desc("sustain_track")`
+    #' @param sustain_iso_code `r get_param_doc_desc("sustain_iso_code")`
+    #' @param sustain_region `r get_param_doc_desc("sustain_region")`
+    #' @param sustain_interval `r get_param_doc_desc("sustain_interval")`
+    #' @param sustain_log_level `r get_param_doc_desc("sustain_log_level")`
+    #' @param trace `r get_param_doc_desc("trace")`
+    #' @param pytorch_trace `r get_param_doc_desc("pytorch_trace")`
+    #' @param log_dir `r get_param_doc_desc("log_dir")`
+    #' @param log_write_interval `r get_param_doc_desc("log_write_interval")`
     #' @return `r get_description("return_nothing")`
     train = function(text_dataset,
                      p_mask = 0.15,
@@ -578,9 +578,9 @@ BaseModelCore <- R6::R6Class(
     #--------------------------------------------------------------------------
     #' @description Method for requesting a plot of the training history.
     #' This method requires the *R* package 'ggplot2' to work.
-    #' @param y_min `r get_description("y_min")`
-    #' @param y_max `r get_description("y_max")`
-    #' @param text_size `r get_description("y_max")`
+    #' @param y_min `r get_param_doc_desc("y_min")`
+    #' @param y_max `r get_param_doc_desc("y_max")`
+    #' @param text_size `r get_param_doc_desc("y_max")`
     #' @return Returns a plot of class `ggplot` visualizing the training process.
     plot_training_history = function(y_min = NULL, y_max = NULL, text_size = 10L) {
       requireNamespace("ggplot2")
@@ -643,8 +643,8 @@ BaseModelCore <- R6::R6Class(
     },
     # Fill Mask------------------------------------------------------------------
     #' @description Method for calculating tokens behind mask tokens.
-    #' @param masked_text `r get_description("masked_text")`
-    #' @param n_solutions `r get_description("n_solutions")`
+    #' @param masked_text `r get_param_doc_desc("masked_text")`
+    #' @param n_solutions `r get_param_doc_desc("n_solutions")`
     #' @return Returns a `list` containing a `data.frame` for every
     #' mask. The `data.frame` contains the solutions in the rows and reports
     #' the score, token id, and token string in the columns.
@@ -852,17 +852,17 @@ BaseModelCore <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     #' @description Calculates the energy consumption for inference of the given task.
-    #' @param text_dataset `r get_description("text_dataset")`
-    #' @param n `r get_description("n")`
-    #' @param sustain_iso_code `r get_description("sustain_iso_code")`
-    #' @param sustain_region `r get_description("sustain_region")`
-    #' @param sustain_interval `r get_description("sustain_interval")`
-    #' @param sustain_log_level `r get_description("sustain_log_level")`
-    #' @param trace `r get_description("trace")`
+    #' @param text_dataset `r get_param_doc_desc("text_dataset")`
+    #' @param n_samples `r get_param_doc_desc("n_samples")`
+    #' @param sustain_iso_code `r get_param_doc_desc("sustain_iso_code")`
+    #' @param sustain_region `r get_param_doc_desc("sustain_region")`
+    #' @param sustain_interval `r get_param_doc_desc("sustain_interval")`
+    #' @param sustain_log_level `r get_param_doc_desc("sustain_log_level")`
+    #' @param trace `r get_param_doc_desc("trace")`
     #' @return Returns nothing. Method saves the statistics internally.
     #' The statistics can be accessed with the method `get_sustainability_data("inference")`
     estimate_sustainability_inference_fill_mask = function(text_dataset = NULL,
-                                                           n = NULL,
+                                                           n_samples = NULL,
                                                            sustain_iso_code = NULL,
                                                            sustain_region = NULL,
                                                            sustain_interval = 15L,
@@ -932,11 +932,11 @@ BaseModelCore <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     #' @description Calculates FLOPS based on model's architecture.
-    #' @param batch_size `r get_description("batch_size")`
-    #' @param n_batches `r get_description("n_batches")`
-    #' @param n_epochs `r get_description("n_epochs")`
+    #' @param batch_size `r get_param_doc_desc("batch_size")`
+    #' @param n_batches `r get_param_doc_desc("n_batches")`
+    #' @param n_epoch `r get_param_doc_desc("n_epoch")`
     #' @return Returns a `data.frame` storing the estimates.
-    calc_flops_architecture_based = function(batch_size, n_batches, n_epochs) {
+    calc_flops_architecture_based = function(batch_size, n_batches, n_epoch) {
       tokenizer <- self$Tokenizer$get_tokenizer()
       max_seq_len <- self$get_model_config()$max_position_embeddings
 
@@ -995,12 +995,12 @@ BaseModelCore <- R6::R6Class(
 
         results[1L, "n_parameter"] <- est_flops[[3L]]
         results[1L, "batch_size"] <- batch_size
-        results[1L, paste0("flops_bp_", bp_factor)] <- est_flops[[1L]] * n_batches * n_epochs
+        results[1L, paste0("flops_bp_", bp_factor)] <- est_flops[[1L]] * n_batches * n_epoch
       }
       results[1L, "approach"] <- "architecture-based"
 
       results[1L, "n_batches"] <- n_batches
-      results[1L, "n_epochs"] <- n_epochs
+      results[1L, "n_epochs"] <- n_epoch
 
       results[1L, "package"] <- "calflops"
       results[1L, "version"] <- get_py_package_version("calflops")

@@ -55,7 +55,7 @@ TEClassifiersBasedOnRegular <- R6::R6Class(
     #' @param sustain_iso_code `r get_param_doc_desc("sustain_iso_code")`
     #' @param sustain_region `r get_param_doc_desc("sustain_region")`
     #' @param sustain_interval `r get_param_doc_desc("sustain_interval")`
-    #' @param sustain_log_level `r get_description("sustain_log_level")`
+    #' @param sustain_log_level `r get_param_doc_desc("sustain_log_level")`
     #' @param epochs `r get_param_doc_desc("epochs")`
     #' @param batch_size `r get_param_doc_desc("batch_size")`
     #' @param log_dir `r get_param_doc_desc("log_dir")`

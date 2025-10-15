@@ -1101,6 +1101,19 @@ get_param_dict <- function() {
     default_value = 32L,
     test_values = 2L
   )
+
+  param$n_batches<- list(
+    type = "int",
+    allow_null = FALSE,
+    min = 1L,
+    max = Inf,
+    desc = "Number of batches.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = 2L,
+    test_values = 2L
+  )
+
   param$lr_rate <- list(
     type = "(double",
     allow_null = FALSE,
@@ -1880,6 +1893,113 @@ get_param_dict <- function() {
     default_value = "Euclidean",
     test_values = NULL
   )
+
+  #Relevant for plot functions and methods
+  param$y_min <- list(
+    type = "int",
+    min = -Inf,
+    max = Inf,
+    allow_null = TRUE,
+    allowed_values = NULL,
+    desc = "Minimal value for y-axis. Set to `NULL` for an automatic adjustment.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL,
+    default_historic = NULL,
+    test_values = NULL
+  )
+  param$y_max <- list(
+    type = "int",
+    min = -Inf,
+    max = Inf,
+    allow_null = TRUE,
+    allowed_values = NULL,
+    desc = "Maximal value for y-axis. Set to `NULL` for an automatic adjustment.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL,
+    default_historic = NULL,
+    test_values = NULL
+  )
+  param$text_size <- list(
+    type = "int",
+    min = 1,
+    max = Inf,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "Size of text elements.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL,
+    default_historic = NULL,
+    test_values = NULL
+  )
+  param$add_min_max <- list(
+    type = "bool",
+    min = NULL,
+    max = NULL,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "If `TRUE` the minimal and maximal values during performance estimation are port of the plot. If `FALSE` only the mean values are shown. Parameter is ignored if `final_training=TRUE`.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL,
+    default_historic = NULL,
+    test_values = NULL
+  )
+  param$final_training <- list(
+    type = "bool",
+    min = NULL,
+    max = NULL,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "If `FALSE` the values of the performance estimation are used. If `TRUE` only the epochs of the final training are used.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL,
+    default_historic = NULL,
+    test_values = NULL
+  )
+  param$masked_text<- list(
+    type = "string",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = NULL,
+    desc = "Text with mask tokens.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL,
+    test_values = NULL
+  )
+  param$n_solutions <- list(
+    type = "int",
+    min = 1,
+    max = Inf,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "Number of solutions the model should predict.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL,
+    default_historic = NULL,
+    test_values = NULL
+  )
+
+  param$n_samples <- list(
+    type = "int",
+    min = 1,
+    max = Inf,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "Number of samples.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL,
+    default_historic = NULL,
+    test_values = NULL
+  )
+
 
   # ============================================================================
   return(param)
