@@ -1788,7 +1788,7 @@ classifier_prototype$configure(
   skip_connection_type = "ResidualGate",
   cls_pooling_features = 50,
   cls_pooling_type = "MinMax",
-  metric_type = "Euclidean",
+  metric_type = "CosineDistance",
   feat_act_fct = "ELU",
   feat_size = 256,
   feat_bias = TRUE,

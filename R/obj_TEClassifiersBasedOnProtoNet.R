@@ -386,7 +386,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
                 theta <- -acos(current_proto$x / radius_r)
               }
 
-              # Find margin points
+              # Find new theta
               # Margin of 2 correspondents to radian pi
               # Margin of 1 correspondents to radian pi/2
               # Margin of 0 correspondents to radian 0
