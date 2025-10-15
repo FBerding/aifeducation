@@ -65,8 +65,6 @@ class layer_dropout_with_mask(torch.nn.Module):
     y=self.dropout_layer(x)
     y_padded=torch.where(condition=mask_features,input=self.pad_value,other=y)
     return y_padded,seq_len,mask_times,mask_features
-      
-      
 
 
 #Residual Connection layer----------------------------------------------------
