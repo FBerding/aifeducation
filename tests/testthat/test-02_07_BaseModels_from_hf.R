@@ -51,17 +51,6 @@ for (object_class_name in object_class_names) {
     var_objects = list(),
     necessary_objects = list(
       text_dataset = raw_texts_training
-    ),
-    var_override = list(
-      sustain_interval = 30,
-      sustain_iso_code = "DEU",
-      sustain_log_level = "error",
-      n_epoch = 2,
-      max_sequence_length = 32,
-      min_seq_len = 16,
-      val_size = 0.25,
-      learning_rate = 3e-3,
-      pytorch_trace = 0L
     )
   )
 

@@ -41,10 +41,6 @@ for (object_class_name in object_class_names) {
       var_objects = list(),
       necessary_objects = list(
         text_dataset = raw_texts
-      ),
-      var_override = list(
-        sustain_interval = 30,
-        sustain_iso_code = "DEU"
       )
     )
     training_args <- generate_args_for_tests(
@@ -53,11 +49,6 @@ for (object_class_name in object_class_names) {
       var_objects = list(),
       necessary_objects = list(
         text_dataset = raw_texts
-      ),
-      var_override = list(
-        sustain_interval = 30,
-        sustain_iso_code = "DEU",
-        sustain_log_level = "error"
       )
     )
 

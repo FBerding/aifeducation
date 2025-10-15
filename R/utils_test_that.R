@@ -31,25 +31,8 @@ generate_args_for_tests <- function(object_name,
                                     method,
                                     var_objects = list(),
                                     necessary_objects = list(),
-                                    var_override = list(
-                                      sustain_interval = 30L,
-                                      trace = FALSE,
-                                      epochs = 50L,
-                                      batch_size = 20L,
-                                      ml_trace = 0L,
-                                      n_cores = 2L,
-                                      data_folds = 2L,
-                                      pl_max_steps = 2L,
-                                      pl_max = 1L,
-                                      pl_anchor = 1L,
-                                      pl_min = 0L,
-                                      sustain_track = TRUE,
-                                      sustain_iso_code = "DEU",
-                                      sustain_log_level = "error",
-                                      data_val_size = 0.25,
-                                      lr_rate = 1e-3,
-                                      lr_warm_up_ratio = 0.01
-                                    )) {
+                                    var_override = list()
+                                    ) {
   object <- create_object(object_name)
   arg_list <- rlang::fn_fmls(object[[method]])
   arg_names <- names(arg_list)
@@ -60,36 +43,49 @@ generate_args_for_tests <- function(object_name,
   for (param in arg_names) {
     current_entry <- param_dict[[param]]
     if (is_valid_and_exportable_param(param, param_dict) && !(param %in% c(names(var_override), names(necessary_objects)))) {
-      if (current_entry$type == "string") {
-        if (!is.null(current_entry$allowed_values)) {
-          arg_value_list[param] <- list(current_entry$allowed_values)
+      if (is.null(param$test_values)) {
+        # Choose a value that is determined by chance
+        if (current_entry$type == "string") {
+          if (!is.null(current_entry$allowed_values)) {
+            arg_value_list[param] <- list(current_entry$allowed_values)
+          }
+        } else if (current_entry$type == "bool") {
+          arg_value_list[param] <- list(c(FALSE, TRUE))
+        } else {
+          if (current_entry$min == -Inf) {
+            tmp_min <- -1L
+          } else {
+            tmp_min <- current_entry$min
+          }
+
+          if (current_entry$max == Inf) {
+            tmp_max <- 3L
+          } else {
+            tmp_max <- current_entry$max
+          }
         }
-      } else if (current_entry$type == "bool") {
-        arg_value_list[param] <- list(c(FALSE, TRUE))
+
+        if (current_entry$type == "int") {
+          arg_value_list[param] <- list(seq(from = tmp_min, to = tmp_max, by = 1L))
+        } else if (current_entry$type == "double") {
+          arg_value_list[param] <- list(c(tmp_min, tmp_max, 0.5 * tmp_min + 0.5 * tmp_max))
+        } else if (current_entry$type == "(double") {
+          arg_value_list[param] <- list(c(0.99 * tmp_min, tmp_max, 0.5 * tmp_min + 0.5 * tmp_max))
+        } else if (current_entry$type == "double)") {
+          arg_value_list[param] <- list(c(tmp_min, 0.99 * tmp_max, 0.5 * tmp_min + 0.5 * tmp_max))
+        } else if (current_entry$type == "(double)") {
+          arg_value_list[param] <- list(c(0.99 * tmp_min, 0.99 * tmp_max, 0.5 * tmp_min + 0.5 * tmp_max))
+        }
       } else {
-        if (current_entry$min == -Inf) {
-          tmp_min <- -1L
-        } else {
-          tmp_min <- current_entry$min
-        }
-
-        if (current_entry$max == Inf) {
-          tmp_max <- 3L
-        } else {
-          tmp_max <- current_entry$max
-        }
-      }
-
-      if (current_entry$type == "int") {
-        arg_value_list[param] <- list(seq(from = tmp_min, to = tmp_max, by = 1L))
-      } else if (current_entry$type == "double") {
-        arg_value_list[param] <- list(c(tmp_min, tmp_max, 0.5 * tmp_min + 0.5 * tmp_max))
-      } else if (current_entry$type == "(double") {
-        arg_value_list[param] <- list(c(0.99 * tmp_min, tmp_max, 0.5 * tmp_min + 0.5 * tmp_max))
-      } else if (current_entry$type == "double)") {
-        arg_value_list[param] <- list(c(tmp_min, 0.99 * tmp_max, 0.5 * tmp_min + 0.5 * tmp_max))
-      } else if (current_entry$type == "(double)") {
-        arg_value_list[param] <- list(c(0.99 * tmp_min, 0.99 * tmp_max, 0.5 * tmp_min + 0.5 * tmp_max))
+        # Choose a value from the explicitly determined test values for that param
+        random_index <- sample(
+          x = seq.int(from = 1L, to = length(current_entry$test_values)),
+          size = 1L,
+          replace = FALSE
+        )
+        arg_value_list[param] <- list(
+          current_entry$test_values[random_index]
+        )
       }
     }
   }
@@ -137,8 +133,9 @@ generate_args_for_tests <- function(object_name,
 #' @return Returns an `int` depending on the test environment.
 #' @family Utils TestThat Developers
 check_adjust_n_samples_on_CI <- function(
-    n_samples_requested,
-    n_CI = 50L) {
+  n_samples_requested,
+  n_CI = 50L
+) {
   # If on github use only a small random sample
   if (Sys.getenv("CI") != "true") {
     return(min(n_samples_requested, n_CI))
@@ -169,7 +166,6 @@ get_test_data_for_classifiers <- function(class_range = c(2L, 3L),
   test_embeddings_single_case <- test_embeddings$clone(deep = TRUE)
   test_embeddings_single_case$embeddings <- test_embeddings_single_case$embeddings[1L, , , drop = FALSE]
   test_embeddings_single_case_LD <- test_embeddings_single_case$convert_to_LargeDataSetForTextEmbeddings()
-
 
 
   # Prepare data for different classification types---------------------------

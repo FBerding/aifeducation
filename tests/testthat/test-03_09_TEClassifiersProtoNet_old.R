@@ -67,34 +67,7 @@ for (object_class_name in object_class_names) {
         var_override = list(
           name = NULL,
           label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
-          sustain_interval = 30,
-          sustain_log_level = "error",
-          act_fct = "ELU",
-          rec_dropout = 0.1,
-          dense_dropout = 0.1,
-          encoder_dropout = 0.1,
-          trace = FALSE,
-          epochs = 50,
-          batch_size = 20,
-          ml_trace = 0,
-          n_cores = 2,
-          data_folds = 2,
-          pl_max_steps = 2,
-          pl_max = 1,
-          pl_anchor = 1,
-          pl_min = 0,
-          embedding_dim = 2,
-          sustain_track = TRUE,
-          sustain_iso_code = "DEU",
-          sustain_log_level = "error",
-          data_val_size = 0.25,
-          lr_rate = 1e-3,
-          optimizer = "AdamW",
-          dense_size = 5,
-          rec_size = 5,
-          self_attention_heads = 2,
-          intermediate_size = 6,
-          lr_warm_up_ratio = 0.01
+          trace = random_bool_on_CI()
         )
       )
 
