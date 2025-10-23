@@ -350,6 +350,8 @@ test_that("DenseLayer with Mask", {
 test_that("layer_tf_encoder", {
   device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
   attention_types <- c("MultiHead", "Fourier")
+  normalization_types=c("None","LayerNorm")
+  normalization_positions<-c("post","pre")
 
   pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
@@ -372,6 +374,8 @@ test_that("layer_tf_encoder", {
   )
 
   for (attention_type in attention_types) {
+    for(normalization_type in normalization_types){
+    for(normalization_position in normalization_positions){
     # Create layer
     layer <- py$layer_tf_encoder(
       dense_dim = 38L,
@@ -379,7 +383,8 @@ test_that("layer_tf_encoder", {
       pad_value = as.integer(pad_value),
       attention_type = attention_type,
       features = as.integer(features),
-      normalization_type = "LayerNorm",
+      normalization_type = normalization_type,
+      normalization_position=normalization_position,
       residual_type = "ResidualGate",
       num_heads = as.integer(2),
       act_fct = "ELU",
@@ -422,6 +427,8 @@ test_that("layer_tf_encoder", {
       mask_features = values[[4]]
     )
     expect_equal(tensor_to_numpy(y_1[[1]]), tensor_to_numpy(y_2[[1]]))
+    }
+    }
   }
 })
 

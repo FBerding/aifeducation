@@ -530,7 +530,7 @@ class layer_abs_positional_embedding(torch.nn.Module):
 
 #layer tf_encoder
 class layer_tf_encoder(torch.nn.Module):
-  def __init__(self, dense_dim,times, features,pad_value, dropout_rate_1,dropout_rate_2,attention_type="MultiHead",num_heads=2,act_fct="ELU",bias=True,parametrizations="None",normalization_type="LayerNorm",device=None, dtype=None,residual_type="None"):
+  def __init__(self, dense_dim,times, features,pad_value, dropout_rate_1,dropout_rate_2,attention_type="MultiHead",num_heads=2,act_fct="ELU",bias=True,parametrizations="None",normalization_type="LayerNorm",normalization_position="pre",device=None, dtype=None,residual_type="None"):
     super().__init__()
     
     self.dense_dim=dense_dim
@@ -568,6 +568,7 @@ class layer_tf_encoder(torch.nn.Module):
     self.dropout_2=torch.nn.Dropout(p=self.dropout_rate_2)
     
     #Normalization Layer
+    self.normalization_position=normalization_position
     self.normalization_1=get_layer_normalization(
       name=self.normalization_type,
       times=self.times,
@@ -614,30 +615,58 @@ class layer_tf_encoder(torch.nn.Module):
     self.residual_connection_2=layer_residual_connection(residual_type,self.pad_value)
 
   def forward(self,x,seq_len,mask_times,mask_features):
-    #Sub-Layer 1
-    if self.attention_type=="Fourier":
-      y=self.attention(x*(~mask_features))
-    elif self.attention_type=="MultiHead":
-      y=self.attention(
-        query=x,
-        key=x,
-        value=x,
-        key_padding_mask=mask_times)[0]
-    y=self.dropout_1(y)
-    y=torch.where(mask_features,input=self.pad_value,other=y)
-    y=self.residual_connection_1(x=x,y=y,seq_len=seq_len,mask_times=mask_times,mask_features=mask_features)
-    y=self.normalization_1(y[0],y[1],y[2],y[3])
-
-    #Sub Layer 2    
-    proj_output=self.dense_1(y[0],y[1],y[2],y[3])
-    #Actvation function is part of dense_1. This it does not need a layer
-    proj_output=self.dense_2(proj_output[0],proj_output[1],proj_output[2],proj_output[3])
-    proj_dropout=self.dropout_2(proj_output[0])
-    proj_dropout=torch.where(mask_features,input=self.pad_value,other=proj_dropout)
+    #Post Layer Normalization
+    if self.normalization_position=="post":
+      #Sub-Layer 1
+      if self.attention_type=="Fourier":
+        y=self.attention(x*(~mask_features))
+      elif self.attention_type=="MultiHead":
+        y=self.attention(
+          query=x,
+          key=x,
+          value=x,
+          key_padding_mask=mask_times)[0]
+      y=self.dropout_1(y)
+      y=torch.where(mask_features,input=self.pad_value,other=y)
+      y=self.residual_connection_1(x=x,y=y,seq_len=seq_len,mask_times=mask_times,mask_features=mask_features)
+      y=self.normalization_1(y[0],y[1],y[2],y[3])
+  
+      #Sub Layer 2    
+      proj_output=self.dense_1(y[0],y[1],y[2],y[3])
+      #Actvation function is part of dense_1. This it does not need a layer
+      proj_output=self.dense_2(proj_output[0],proj_output[1],proj_output[2],proj_output[3])
+      proj_dropout=self.dropout_2(proj_output[0])
+      proj_dropout=torch.where(mask_features,input=self.pad_value,other=proj_dropout)
+      
+      output=self.residual_connection_2(x=y[0],y=proj_dropout,seq_len=seq_len,mask_times=mask_times,mask_features=mask_features)
+      output=self.normalization_2(output[0],output[1],output[2],output[3])
     
-    output=self.residual_connection_2(x=y[0],y=proj_dropout,seq_len=seq_len,mask_times=mask_times,mask_features=mask_features)
-    output=self.normalization_2(output[0],output[1],output[2],output[3])
-    
+    #Pre-Layer-Normalization
+    if self.normalization_position=="pre":
+      #Sub-Layer 1
+      xn=self.normalization_1(x,seq_len,mask_times,mask_features)[0]
+      if self.attention_type=="Fourier":
+        y=self.attention(xn*(~mask_features))
+      elif self.attention_type=="MultiHead":
+        y=self.attention(
+          query=xn,
+          key=xn,
+          value=xn,
+          key_padding_mask=mask_times)[0]
+      y=self.dropout_1(y)
+      y=torch.where(mask_features,input=self.pad_value,other=y)
+      y=self.residual_connection_1(x=x,y=y,seq_len=seq_len,mask_times=mask_times,mask_features=mask_features)
+  
+      #Sub Layer 2
+      yn=self.normalization_2(y[0],y[1],y[2],y[3]) 
+      proj_output=self.dense_1(yn[0],yn[1],yn[2],yn[3])
+      #Actvation function is part of dense_1. This it does not need a layer
+      proj_output=self.dense_2(proj_output[0],proj_output[1],proj_output[2],proj_output[3])
+      proj_dropout=self.dropout_2(proj_output[0])
+      proj_dropout=torch.where(mask_features,input=self.pad_value,other=proj_dropout)
+      
+      output=self.residual_connection_2(x=y[0],y=proj_dropout,seq_len=seq_len,mask_times=mask_times,mask_features=mask_features)
+           
     return output[0],output[1],output[2],output[3]
   
 
