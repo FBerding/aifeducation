@@ -13,7 +13,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 
-
 #' @title Base class for models using neural nets
 #' @description Abstract class for all models that do not rely on the python library 'transformers'.
 #' All models of this class require text embeddings as input. These are provided as
@@ -132,19 +131,33 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     #' @param pl_step `int` Number of the step during pseudo labeling to plot. Only relevant if the model was trained
     #' with active pseudo labeling.
     #' @param measure Measure to plot.
-    #' @param y_min Minimal value for the y-axis. Set to `NULL` for an automatic adjustment.
-    #' @param y_max Maximal value for the y-axis. Set to `NULL` for an automatic adjustment.
-    #' @param text_size Size of the text.
+    #' @param x_min `r get_param_doc_desc("x_min")`
+    #' @param x_max `r get_param_doc_desc("x_max")`
+    #' @param y_min `r get_param_doc_desc("y_min")`
+    #' @param y_max `r get_param_doc_desc("y_max")`
+    #' @param ind_best_model `r get_param_doc_desc("ind_best_model")`
+    #' @param ind_selected_model `r get_param_doc_desc("ind_selected_model")`
+    #' @param text_size `r get_param_doc_desc("text_size")`
     #' @return Returns a plot of class `ggplot` visualizing the training process.
-    plot_training_history = function(final_training = FALSE, pl_step = NULL, measure = "loss", y_min = NULL, y_max = NULL, add_min_max = TRUE, text_size = 10L) {
+    plot_training_history = function(final_training = FALSE,
+                                     pl_step = NULL,
+                                     measure = "loss",
+                                     ind_best_model = TRUE,
+                                     ind_selected_model = TRUE,
+                                     x_min = NULL,
+                                     x_max = NULL,
+                                     y_min = NULL,
+                                     y_max = NULL,
+                                     add_min_max = TRUE,
+                                     text_size = 10L) {
       requireNamespace("ggplot2")
-      plot_data <- private$prepare_training_history(
+      data_prepared <- private$prepare_training_history(
         final = final_training,
         pl_step = pl_step
       )
-
+      plot_data_all <- data_prepared$aggregated
       # Select the performance measure to display
-      plot_data <- plot_data[[measure]]
+      plot_data <- plot_data_all[[measure]]
 
       # Create Plot
       if (measure == "loss") {
@@ -155,6 +168,25 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         y_label <- "Balanced Accuracy"
       } else if (measure == "avg_iota") {
         y_label <- "Average Iota"
+      }
+
+      # set x_min and x_max if they are NULL
+      if (is.null(x_min)) {
+        x_min <- 1L
+      }
+      if (is.null(x_max)) {
+        x_max <- nrow(plot_data)
+      }
+      plot_data <- plot_data[x_min:x_max, ]
+
+      # Set y_min and y_max if they are NULL
+      data_colnames <- setdiff(x = colnames(plot_data), y = "epoch")
+      if (is.null(y_min)) {
+        y_min <- min(plot_data[, data_colnames])
+      }
+
+      if (is.null(y_max)) {
+        y_max <- max(plot_data[, data_colnames])
       }
 
       tmp_plot <- ggplot2::ggplot(data = plot_data) +
@@ -220,6 +252,86 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
           text = ggplot2::element_text(size = text_size),
           legend.position = "bottom"
         )
+
+
+      if (final_training) {
+        if (ind_best_model) {
+          best_state_point <- get_best_state_point(
+            plot_data = plot_data,
+            measure = measure
+          )
+          tmp_plot <- add_point(
+            plot_object = tmp_plot,
+            x = best_state_point$epoch,
+            y = best_state_point$value,
+            type = "segment",
+            appearance = 1L
+          )
+        } else {
+          best_state_point <- list(
+            epoch = NULL,
+            value = NULL
+          )
+        }
+
+        if (ind_selected_model) {
+          selected_state_point <- get_used_state_point(
+            plot_data = plot_data_all,
+            measure = measure
+          )
+          tmp_plot <- add_point(
+            plot_object = tmp_plot,
+            x = selected_state_point$epoch,
+            y = selected_state_point$value,
+            type = "segment",
+            appearance = 3L
+          )
+        } else {
+          selected_state_point <- list(
+            epoch = NULL,
+            value = NULL
+          )
+        }
+
+        if (final_training || ind_selected_model) {
+          tmp_plot <- add_breaks(
+            plot_object = tmp_plot,
+            x_min = x_min,
+            x_max = x_max,
+            y_min = y_min,
+            y_max = y_max,
+            special_x = c(selected_state_point$epoch, best_state_point$epoch),
+            special_y = c(selected_state_point$value, best_state_point$value)
+          )
+        }
+      } else {
+        if(ind_best_model){
+          best_states=get_best_states_from_folds(
+            data_folds=data_prepared$folds,
+            measure=measure
+          )
+            tmp_plot <- add_point(
+              plot_object = tmp_plot,
+              x = best_states$epochs,
+              y = best_states$values,
+              type = "point",
+              appearance = 16L
+            )
+        }
+        if (ind_selected_model) {
+          selected_states=get_selected_states_from_folds(
+            data_folds=data_prepared$folds,
+            measure=measure
+          )
+          tmp_plot <- add_point(
+            plot_object = tmp_plot,
+            x = selected_states$epochs,
+            y = selected_states$values,
+            type = "point",
+            appearance = 15L
+          )
+        }
+      }
       return(tmp_plot)
     }
   ),
@@ -487,10 +599,6 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         plot_data[[1L]] <- list(loss = plot_data[[1L]])
       }
 
-      # if ("TEFeatureExtractor" %in% class(model)) {
-      #  plot_data[[1]] <- list(loss = plot_data[[1]])
-      # }
-
       if (is.null_or_na(final)) {
         final <- FALSE
       }
@@ -543,6 +651,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
 
       # Create array for saving the data-------------------------------------------
       result_list <- NULL
+      results_folds<-NULL
       for (j in seq_along(measures)) {
         measure <- measures[j]
         measure_array <- array(
@@ -571,6 +680,20 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
           )
         )
         final_data_measure[, "epoch"] <- seq.int(from = 1L, to = n_epochs)
+
+        if (!final) {
+          n_matrix_folds=n_folds
+        } else {
+          n_matrix_folds=1L
+        }
+
+        fold_values_train <- matrix(
+          data = NA,
+          nrow = n_epochs,
+          ncol = n_matrix_folds
+        )
+        fold_values_val <- fold_values_train
+        fold_values_test <- fold_values_train
 
         if (!final) {
           for (i in 1L:n_folds) {
@@ -602,13 +725,38 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
             final_data_measure[i, "test_mean"] <- mean(measure_array[, "test", i])
             final_data_measure[i, "test_max"] <- max(measure_array[, "test", i])
           }
+          if (!final) {
+            for (k in 1L:n_folds) {
+              fold_values_train[i, k] <- measure_array[k, "train", i]
+              fold_values_val[i, k] <-  measure_array[k, "validation", i]
+              if (n_sample_type == 3L) {
+                fold_values_test[i, k] <-  measure_array[k, "test", i]
+              }
+            }
+          } else {
+            fold_values_train[i, 1L] <- measure_array[, "train", i]
+            fold_values_val[i, 1L] <- measure_array[, "validation", i]
+          }
         }
+
         result_list[j] <- list(final_data_measure)
+        results_folds[j]<-list(
+          list(
+            folds_train = fold_values_train,
+            folds_val = fold_values_val,
+            folds_test = fold_values_test
+          )
+        )
       }
 
       # Finalize data---------------------------------------------------------------
       names(result_list) <- measures
-      return(result_list)
+      names(results_folds) <- measures
+      return(
+        list(
+        aggregated=result_list,
+        folds=results_folds)
+      )
     },
     #---------------------------------------------------------------------------
     save_pytorch_model = function(dir_path, folder_name) {

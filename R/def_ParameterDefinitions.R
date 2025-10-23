@@ -1450,6 +1450,24 @@ get_param_dict <- function() {
   param$merge_normalization_type <- param$normalization_type
   param$merge_normalization_type$gui_box <- "Merge Layer"
 
+  param$tf_normalization_position <- list(
+    type = "string",
+    min = NULL,
+    max = NULL,
+    allow_null = FALSE,
+    allowed_values = c("pre", "post"),
+    values_desc = list(
+      pre = "Applies normalization before the layers as described by [Xiong et al. (2020)](https://doi.org/10.48550/arXiv.2002.04745).",
+      post = "Applies normalization after the layers as described in the original transformer model."
+    ),
+    desc = "Position where the normalization should be applied.",
+    gui_box = "General Settings",
+    gui_label = "Normalization Position",
+    default_value = "pre",
+    default_historic = "post",
+    test_values = NULL
+  )
+
   # Intermediate Feature--------------------------------------------------------
   param$cls_pooling_features <- list(
     type = "int",
@@ -1921,6 +1939,32 @@ get_param_dict <- function() {
     default_historic = NULL,
     test_values = NULL
   )
+  param$x_min <- list(
+    type = "int",
+    min = -Inf,
+    max = Inf,
+    allow_null = TRUE,
+    allowed_values = NULL,
+    desc = "Minimal value for x-axis. Set to `NULL` for an automatic adjustment.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL,
+    default_historic = NULL,
+    test_values = NULL
+  )
+  param$x_max <- list(
+    type = "int",
+    min = -Inf,
+    max = Inf,
+    allow_null = TRUE,
+    allowed_values = NULL,
+    desc = "Maximal value for x-axis. Set to `NULL` for an automatic adjustment.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL,
+    default_historic = NULL,
+    test_values = NULL
+  )
   param$text_size <- list(
     type = "int",
     min = 1,
@@ -1947,6 +1991,33 @@ get_param_dict <- function() {
     default_historic = NULL,
     test_values = NULL
   )
+  param$ind_selected_model <- list(
+    type = "bool",
+    min = NULL,
+    max = NULL,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "If `TRUE` the plot indicates the states of the model which are used after training. These are the final states of the fold or the final state of the last training loop.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL,
+    default_historic = NULL,
+    test_values = NULL
+  )
+  param$ind_best_model <- list(
+    type = "bool",
+    min = NULL,
+    max = NULL,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "If `TRUE` the plot indicates the best states of the model according to the chosen measure.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL,
+    default_historic = NULL,
+    test_values = NULL
+  )
+
   param$final_training <- list(
     type = "bool",
     min = NULL,
@@ -2018,6 +2089,22 @@ get_param_def <- function(param_name) {
   return(get_param_dict()[[param_name]])
 }
 
+#' @title Create rd formula
+#' @description Function returns the syntax for displaying a formula depending on
+#' the output format.
+#' @param string_formula `string` Formula expression without specific format.
+#' @returns Returns a `string` which can be used in rd files to display a formula for
+#' different output types.
+#' @family Parameter Dictionary
+#' @keywords internal
+doc_formula=function(string_formula){
+  return(
+    paste0(
+      "\\ifelse{latex}{$",string_formula,"$}{\\ifelse{html}{",string_formula,"}{`",string_formula,"`}}"
+    )
+  )
+}
+
 #' @title Description of an argument
 #' @description Function provides the description of an argument in markdown.
 #' Its aim is to be used for documenting the parameter of functions.
@@ -2070,7 +2157,7 @@ get_param_doc_desc <- function(param_name) {
       } else {
         border_max <- NULL
       }
-      allowed_values <- paste0("`", border_min, " x ", border_max, "`")
+      allowed_values <- doc_formula(paste0(border_min, " x ", border_max))
     } else if (param_def$type == "int") {
       if (param_def$min != -Inf) {
         border_min <- paste(param_def$min, "<=")
@@ -2082,7 +2169,7 @@ get_param_doc_desc <- function(param_name) {
       } else {
         border_max <- NULL
       }
-      allowed_values <- paste0("`", border_min, " x ", border_max, "`")
+      allowed_values <- doc_formula(paste0(border_min, " x ", border_max))
     } else {
       allowed_values <- NULL
     }

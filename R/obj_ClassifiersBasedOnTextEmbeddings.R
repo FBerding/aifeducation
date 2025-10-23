@@ -357,8 +357,12 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     #' @param add_min_max `r get_param_doc_desc("add_min_max")`
     #' @param pl_step `int` Number of the step during pseudo labeling to plot. Only relevant if the model was trained
     #' with active pseudo labeling.
+    #' @param x_min `r get_param_doc_desc("x_min")`
+    #' @param x_max `r get_param_doc_desc("x_max")`
     #' @param y_min `r get_param_doc_desc("y_min")`
     #' @param y_max `r get_param_doc_desc("y_max")`
+    #' @param ind_best_model `r get_param_doc_desc("ind_best_model")`
+    #' @param ind_selected_model `r get_param_doc_desc("ind_selected_model")`
     #' @param text_size `r get_param_doc_desc("text_size")`
     #' @param measure `string` Measure to plot. Allowed values:
     #' * `"avg_iota"` = Average Iota
@@ -366,11 +370,25 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     #' * `"accuracy"` = Accuracy
     #' * `"balanced_accuracy"` = Balanced Accuracy
     #' @return Returns a plot of class `ggplot` visualizing the training process.
-    plot_training_history = function(final_training = FALSE, pl_step = NULL, measure = "loss", y_min = NULL, y_max = NULL, add_min_max = TRUE, text_size = 10L) {
+    plot_training_history = function(final_training = FALSE,
+                                     pl_step = NULL,
+                                     measure = "loss",
+                                     ind_best_model = TRUE,
+                                     ind_selected_model = TRUE,
+                                     x_min = NULL,
+                                     x_max = NULL,
+                                     y_min = NULL,
+                                     y_max = NULL,
+                                     add_min_max = TRUE,
+                                     text_size = 10L) {
       tmp_plot <- super$plot_training_history(
         final_training = final_training,
         pl_step = pl_step,
         measure = measure,
+        ind_best_model = ind_best_model,
+        ind_selected_model = ind_selected_model,
+        x_min=x_min,
+        x_max=x_max,
         y_min = y_min,
         y_max = y_max,
         add_min_max = add_min_max,

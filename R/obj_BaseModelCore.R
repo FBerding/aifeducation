@@ -93,9 +93,7 @@ BaseModelCore <- R6::R6Class(
       self$Tokenizer <- load_from_disk(load_location)
     },
     #--------------------------------------------------------------------------
-    load_BaseModel = function(dir_path) {
-
-    },
+    load_BaseModel = function(dir_path) {},
     #--------------------------------------------------------------------------
     set_model_config_from_hf = function() {
       tmp_args <- rlang::fn_fmls_names(self$configure)
@@ -465,7 +463,6 @@ BaseModelCore <- R6::R6Class(
     }
   ),
   public = list(
-
     #' @field Tokenizer ('TokenizerBase')\cr
     #' Objects of class `TokenizerBase`.
     Tokenizer = NULL,
@@ -578,36 +575,39 @@ BaseModelCore <- R6::R6Class(
     #--------------------------------------------------------------------------
     #' @description Method for requesting a plot of the training history.
     #' This method requires the *R* package 'ggplot2' to work.
+    #' @param x_min `r get_param_doc_desc("x_min")`
+    #' @param x_max `r get_param_doc_desc("x_max")`
     #' @param y_min `r get_param_doc_desc("y_min")`
     #' @param y_max `r get_param_doc_desc("y_max")`
-    #' @param text_size `r get_param_doc_desc("y_max")`
+    #' @param ind_best_model `r get_param_doc_desc("ind_best_model")`
+    #' @param text_size `r get_param_doc_desc("text_size")`
     #' @return Returns a plot of class `ggplot` visualizing the training process.
-    plot_training_history = function(y_min = NULL, y_max = NULL, text_size = 10L) {
+    plot_training_history = function(x_min=NULL,x_max=NULL,y_min = NULL, y_max = NULL,ind_best_model=TRUE, text_size = 10L) {
       requireNamespace("ggplot2")
       plot_data <- self$last_training$history
 
-      if (is.null(y_min)) {
-        y_min <- min(self$last_training$history[, c("loss", "val_loss")])
+      if (is.null(x_min)) {
+        x_min <- 1L
       }
+      if (is.null(x_max)) {
+        x_max <- nrow(plot_data)
+      }
+      plot_data=plot_data[x_min:x_max,]
 
+      if (is.null(y_min)) {
+        y_min <- min(plot_data[, c("loss", "val_loss")])
+      }
       if (is.null(y_max)) {
-        y_max <- max(self$last_training$history[, c("loss", "val_loss")])
+        y_max <- max(plot_data[, c("loss", "val_loss")])
       }
 
       tmp_colnames <- c("epoch", "val_loss", "loss")
       cols_exist <- sum(tmp_colnames %in% colnames(plot_data)) == length(tmp_colnames)
 
       if (cols_exist) {
-        val_loss_min <- min(plot_data$val_loss)
-        best_model_epoch <- which(x = (plot_data$val_loss) == val_loss_min)
-
         tmp_plot <- ggplot2::ggplot(data = plot_data) +
           ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$loss, color = "train")) +
-          ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$val_loss, color = "validation")) +
-          ggplot2::geom_vline(
-            xintercept = best_model_epoch,
-            linetype = "dashed"
-          )
+          ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$val_loss, color = "validation"))
 
         tmp_plot <- tmp_plot + ggplot2::theme_classic() +
           ggplot2::ylab("value") +
@@ -622,6 +622,20 @@ BaseModelCore <- R6::R6Class(
             text = ggplot2::element_text(size = text_size),
             legend.position = "bottom"
           )
+
+        if(ind_best_model){
+          best_state_point <- get_best_state_point(
+            plot_data = plot_data,
+            measure = measure
+          )
+          tmp_plot <- add_point(
+            plot_object = tmp_plot,
+            x = best_state_point$epoch,
+            y = best_state_point$value,
+            type = "segment",
+            appearance = 1L
+          )
+        }
         return(tmp_plot)
       } else {
         warning("Data for the training history is not available.")
