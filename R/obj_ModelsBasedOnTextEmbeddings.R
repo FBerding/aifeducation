@@ -126,8 +126,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     #' This method requires the *R* package 'ggplot2' to work.
     #' @param final_training `bool` If `FALSE` the values of the performance estimation are used. If `TRUE` only
     #' the epochs of the final training are used.
-    #' @param add_min_max `bool` If `TRUE` the minimal and maximal values during performance estimation are port of the plot.
-    #' If `FALSE` only the mean values are shown. Parameter is ignored if `final_training=TRUE`.
+    #' @param add_min_max `r get_param_doc_desc("add_min_max")`
     #' @param pl_step `int` Number of the step during pseudo labeling to plot. Only relevant if the model was trained
     #' with active pseudo labeling.
     #' @param measure Measure to plot.
