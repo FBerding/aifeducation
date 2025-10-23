@@ -122,7 +122,7 @@ compatibility.}
 
 \item{\code{param_pad_value}}{\code{int} Value indicating padding. This value should no be in the range of
 regluar values for computations. Thus it is not recommended to chance this value.
-Default is \code{-100}. Allowed values: \code{ x <= -100}}
+Default is \code{-100}. Allowed values: \ifelse{latex}{$ x <= -100$}{\ifelse{html}{ x <= -100}{` x <= -100`}}}
 }
 \if{html}{\out{</div>}}
 }
