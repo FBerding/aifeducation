@@ -4,6 +4,24 @@ editor_options:
     wrap: 72
 ---
 
+# aifeducation 1.1.3
+
+**BaseModels**
+
+- Fixed the not displayed documentation for BaseModelsCore and MPNet.
+- Added new options for plotting training history.
+
+**Classifiers**
+
+- Add the possibility to apply Pre-Layer-Normalization as described by
+  [Xiong et al. (2020)](https://doi.org/10.48550/arXiv.2002.04745) for
+  transformer encoder layers.
+- Added new options for plotting training history.
+
+**FeatureExtractor**
+
+- Added new options for plotting training history.
+
 # aifeducation 1.1.2
 
 **Major Changes**
@@ -52,6 +70,10 @@ editor_options:
 **Documentation**
 
 - The documentation was updated to the new structure and objects. 
+
+# aifeducation 1.1.1
+
+- Fixed a problem with the function that converts classes to one hot encoding.
 
 # aifeducation 1.1.0
 
