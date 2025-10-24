@@ -34,12 +34,12 @@ def CosineDistance(x,y,eps=1e-8):
   similarity=torch.index_select(
     input=similarity,
     dim=0,
-    index=torch.arange(start=0,end=x.size(0))
+    index=torch.arange(start=0,end=x.size(0)).to(similarity.get_device())
   )
   similarity=torch.index_select(
     input=similarity,
     dim=1,
-    index=torch.arange(start=x.size(0),end=(similarity.size(1)))
+    index=torch.arange(start=x.size(0),end=(similarity.size(1))).to(similarity.get_device())
   )
   
   distance=1-similarity
