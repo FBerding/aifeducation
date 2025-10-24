@@ -133,7 +133,7 @@ Traines a BaseModel
 \describe{
 \item{\code{text_dataset}}{\code{LargeDataSetForText} \link{LargeDataSetForText} Object storing textual data.}
 
-\item{\code{p_mask}}{\code{double} Ratio that determines the number of tokens used for masking. Allowed values: \ifelse{latex}{$0.05 < x < 0.6$}{\ifelse{html}{0.05 < x < 0.6}{`0.05 < x < 0.6`}}}
+\item{\code{p_mask}}{\code{double} Ratio that determines the number of tokens used for masking. Allowed values: \ifelse{latex}{$0.05 <= x <= 0.6$}{\ifelse{html}{0.05 <= x <= 0.6}{`0.05 <= x <= 0.6`}}}
 
 \item{\code{whole_word}}{\code{bool} * \code{TRUE}: whole word masking should be applied. Only relevant if a \code{WordPieceTokenizer} is used.
 \itemize{
