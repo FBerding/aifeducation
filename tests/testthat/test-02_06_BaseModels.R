@@ -216,7 +216,7 @@ for (object_class_name in object_class_names) {
         suppressMessages(
           base_model$estimate_sustainability_inference_fill_mask(
             text_dataset = raw_texts_training,
-            n = 30,
+            n_samples = 30,
             sustain_iso_code = "DEU",
             sustain_region = NULL,
             sustain_interval = 15,

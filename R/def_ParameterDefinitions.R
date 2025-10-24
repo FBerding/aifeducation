@@ -583,7 +583,7 @@ get_param_dict <- function() {
     gui_box = "Transformer Encoder Layers",
     gui_label = "Hidden Size",
     default_value = 768L,
-    test_values = c(5L, 20L)
+    test_values = c(6L, 20L)
   )
   param$d_model <- param$hidden_size
 
@@ -611,7 +611,7 @@ get_param_dict <- function() {
     gui_box = "Transformer Encoder Layers",
     gui_label = "Number of Hidden Layers",
     default_value = 7L,
-    test_values = c(0L, 1L, 2L)
+    test_values = c(2L,3L)
   )
   param$num_hidden_layer <- param$num_hidden_layers
 
@@ -625,7 +625,7 @@ get_param_dict <- function() {
     gui_box = "Decoder Layers",
     gui_label = "Number of Decoding Layers",
     default_value = 7L,
-    test_values = c(0L, 1L, 2L)
+    test_values = c(1L, 2L)
   )
 
   param$target_hidden_size <- list(
@@ -692,7 +692,7 @@ get_param_dict <- function() {
   param$attention_dropout <- param$attention_probs_dropout_prob
 
   param$p_mask <- list(
-    type = "(double)",
+    type = "double",
     allow_null = FALSE,
     min = 0.05,
     max = 0.60,

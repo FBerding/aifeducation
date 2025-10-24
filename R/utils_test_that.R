@@ -43,14 +43,14 @@ generate_args_for_tests <- function(object_name,
   for (param in arg_names) {
     current_entry <- param_dict[[param]]
     if (is_valid_and_exportable_param(param, param_dict) && !(param %in% c(names(var_override), names(necessary_objects)))) {
-      if (is.null(param$test_values)) {
+      if (is.null(current_entry$test_values)) {
         # Choose a value that is determined by chance
         if (current_entry$type == "string") {
           if (!is.null(current_entry$allowed_values)) {
-            arg_value_list[param] <- list(current_entry$allowed_values)
+            arg_value_list[param] <- list(sample(x=current_entry$allowed_values,size=1L))
           }
         } else if (current_entry$type == "bool") {
-          arg_value_list[param] <- list(c(FALSE, TRUE))
+          arg_value_list[param] <- list(sample(x=c(FALSE, TRUE),size=1L))
         } else {
           if (current_entry$min == -Inf) {
             tmp_min <- -1L
@@ -66,15 +66,15 @@ generate_args_for_tests <- function(object_name,
         }
 
         if (current_entry$type == "int") {
-          arg_value_list[param] <- list(seq(from = tmp_min, to = tmp_max, by = 1L))
+          arg_value_list[param] <- list(sample(x=seq(from = tmp_min, to = tmp_max, by = 1L),size=1L))
         } else if (current_entry$type == "double") {
-          arg_value_list[param] <- list(c(tmp_min, tmp_max, 0.5 * tmp_min + 0.5 * tmp_max))
+          arg_value_list[param] <- list(sample(x=c(tmp_min, tmp_max, 0.5 * tmp_min + 0.5 * tmp_max),size=1L))
         } else if (current_entry$type == "(double") {
-          arg_value_list[param] <- list(c(0.99 * tmp_min, tmp_max, 0.5 * tmp_min + 0.5 * tmp_max))
+          arg_value_list[param] <- list(sample(x=c(0.99 * tmp_min, tmp_max, 0.5 * tmp_min + 0.5 * tmp_max),size=1L))
         } else if (current_entry$type == "double)") {
-          arg_value_list[param] <- list(c(tmp_min, 0.99 * tmp_max, 0.5 * tmp_min + 0.5 * tmp_max))
+          arg_value_list[param] <- list(sample(x=c(tmp_min, 0.99 * tmp_max, 0.5 * tmp_min + 0.5 * tmp_max),size=1L))
         } else if (current_entry$type == "(double)") {
-          arg_value_list[param] <- list(c(0.99 * tmp_min, 0.99 * tmp_max, 0.5 * tmp_min + 0.5 * tmp_max))
+          arg_value_list[param] <- list(sample(x=c(0.99 * tmp_min, 0.99 * tmp_max, 0.5 * tmp_min + 0.5 * tmp_max),size=1L))
         }
       } else {
         # Choose a value from the explicitly determined test values for that param
@@ -83,24 +83,22 @@ generate_args_for_tests <- function(object_name,
           size = 1L,
           replace = FALSE
         )
-        arg_value_list[param] <- list(
-          current_entry$test_values[random_index]
-        )
+        if(is.list(current_entry$test_values)){
+          arg_value_list[param] <- list(
+            current_entry$test_values[[random_index]]
+          )
+        } else {
+          arg_value_list[param] <- list(
+            current_entry$test_values[random_index]
+          )
+        }
       }
     }
   }
 
   # Add var objects
   for (var_object in names(var_objects)) {
-    arg_value_list[var_object] <- list(c(FALSE, TRUE))
-  }
-
-  # create a combination
-  arg_comb <- list()
-  for (i in seq_along(arg_value_list)) {
-    arg_comb[names(arg_value_list)[i]] <- list(sample(
-      x = arg_value_list[[i]], size = 1L
-    ))
+    arg_value_list[var_object] <- sample(x=c(FALSE, TRUE),size=1L)
   }
 
   # Convert combinations to list and add override parameters and add necessary parameters
@@ -108,7 +106,7 @@ generate_args_for_tests <- function(object_name,
   override_subset <- intersect(arg_names, names(var_override))
   necessary_subset <- intersect(arg_names, names(necessary_objects))
 
-  arg_comb_list <- append(x = arg_comb, values = var_override[override_subset])
+  arg_comb_list <- append(x = arg_value_list, values = var_override[override_subset])
   arg_comb_list <- append(x = arg_comb_list, values = necessary_objects[necessary_subset])
 
   # add var objects
