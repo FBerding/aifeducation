@@ -104,6 +104,7 @@ for (object_class_name in object_class_names) {
 
         # Create test object with a given combination of args
         classifier <- create_object(object_class_name)
+        #print(test_combination)
         suppressMessages(
           do.call(
             what = classifier$configure,

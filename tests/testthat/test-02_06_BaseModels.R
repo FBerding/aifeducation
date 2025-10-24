@@ -41,7 +41,7 @@ object_class_names <- BaseModelsIndex
 #  "BaseModelMPNet"
 # )
 
-max_samples <- 1
+max_samples <- 4
 max_samples_CI <- 1
 
 

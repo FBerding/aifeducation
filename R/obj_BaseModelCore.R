@@ -313,7 +313,7 @@ BaseModelCore <- R6::R6Class(
       results <- self$calc_flops_architecture_based(
         batch_size = batch_size,
         n_batches = n_batches,
-        n_epochs = n_epochs
+        n_epoch = n_epochs
       )
 
       private$flops_estimates <- rbind(
@@ -626,7 +626,7 @@ BaseModelCore <- R6::R6Class(
         if(ind_best_model){
           best_state_point <- get_best_state_point(
             plot_data = plot_data,
-            measure = measure
+            measure = "loss"
           )
           tmp_plot <- add_point(
             plot_object = tmp_plot,
@@ -889,7 +889,7 @@ BaseModelCore <- R6::R6Class(
       )
 
       n_cases <- text_dataset$n_rows()
-      sample_size <- min(n_cases, n)
+      sample_size <- min(n_cases, n_samples)
       random_sample <- sample(
         x = seq.int(from = 1L, to = n_cases),
         size = sample_size,
