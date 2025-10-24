@@ -31,12 +31,18 @@ get_best_state_point <- function(plot_data, measure) {
     optim <- "max"
   }
 
-  if (optim == "min") {
-    best_val_measure <- min(plot_data[, "validation_mean"])
-    best_model_epoch <- which(x = (plot_data[, "validation_mean"] == best_val_measure))[1]
+  if("val_loss"%in%colnames(plot_data)){
+    selected_column="val_loss"
   } else {
-    best_val_measure <- max(plot_data[, "validation_mean"])
-    best_model_epoch <- which(x = (plot_data[, "validation_mean"] == best_val_measure))[1]
+    selected_column="validation_mean"
+  }
+
+  if (optim == "min") {
+    best_val_measure <- min(plot_data[, selected_column])
+    best_model_epoch <- which(x = (plot_data[, selected_column] == best_val_measure))[1]
+  } else {
+    best_val_measure <- max(plot_data[, selected_column])
+    best_model_epoch <- which(x = (plot_data[, selected_column] == best_val_measure))[1]
   }
 
   return(
