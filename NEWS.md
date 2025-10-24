@@ -10,6 +10,7 @@ editor_options:
 
 - Fixed the not displayed documentation for BaseModelsCore and MPNet.
 - Added new options for plotting training history.
+- Added improved error messages for BaseModelModernBert.
 
 **Classifiers**
 
