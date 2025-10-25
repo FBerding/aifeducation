@@ -17,6 +17,12 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 running_num_figures <- 1
+
+#Clean examples folder
+example_folders=setdiff(x=list.dirs(path="examples"),
+                        y=c("examples","examples/bert_uncased"))
+unlink(x=example_folders,recursive = TRUE)
+
 ```
 
 # 1 Introduction and Overview
@@ -1894,7 +1900,7 @@ classifier_prototype$train(
   Ns = 5,
   Nq = 3,
   loss_alpha = 0.5,
-  loss_margin = 0.05,
+  loss_margin = 1.00,
   sampling_separate = FALSE,
   sampling_shuffle = TRUE,
   trace = TRUE,
