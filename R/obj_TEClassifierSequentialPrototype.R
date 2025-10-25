@@ -214,6 +214,11 @@ TEClassifierSequentialPrototype <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     check_param_combinations_configuration = function() {
+      if(private$model_config$feat_size<private$model_config$cls_pooling_features){
+        warning("cls_pooling_features must be equal or lower as feat_size. Set cls_pooling_features=feat_size.")
+        private$model_config$cls_pooling_features=private$model_config$feat_size
+      }
+
       if (private$model_config$rec_n_layers == 1L && private$model_config$rec_dropout > 0.0) {
         print_message(
           msg = "Dropout for recurrent requires at least two layers. Setting rec_dropout to 0.0.",

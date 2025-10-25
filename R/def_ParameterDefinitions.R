@@ -1678,7 +1678,7 @@ get_param_dict <- function() {
     gui_box = "Dense Layers",
     gui_label = "Size",
     default_value = 32L,
-    test_values = c(6L, 10L)
+    test_values = c(10L,16L)
   )
 
   param$dense_layers <- list(
