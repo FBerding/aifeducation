@@ -8,6 +8,7 @@ testthat::skip_if_not(
 load_all_py_scripts()
 
 test_that("CosineDistance", {
+  device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
   base_tensor <- torch$from_numpy(
     reticulate::np_array(
       matrix(
@@ -26,12 +27,12 @@ test_that("CosineDistance", {
 
   distance <- tensor_to_numpy(
     py$CosineDistance(
-      x = base_tensor,
-      y = base_tensor
+      x = base_tensor$to(device),
+      y = base_tensor$to(device)
     )
   )
   expect_equal(
-    distance,
+    tensor_to_numpy(distance),
     matrix(
       data = c(
         0, 1, 2, 1,
