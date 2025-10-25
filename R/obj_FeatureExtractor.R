@@ -421,9 +421,9 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param ind_best_model `r get_param_doc_desc("ind_best_model")`
     #' @param text_size `r get_param_doc_desc("text_size")`
     #' @return Returns a plot of class `ggplot` visualizing the training process.
-    plot_training_history = function(y_min = NULL, y_max = NULL,ind_best_model = TRUE, text_size = 10L) {
+    plot_training_history = function(x_min=NULL,x_max=NULL,y_min = NULL, y_max = NULL,ind_best_model = TRUE, text_size = 10L) {
       tmp_plot <- super$plot_training_history(
-        final_training = FALSE,
+        final_training = TRUE,
         pl_step = NULL,
         measure = "loss",
         ind_best_model = ind_best_model,
