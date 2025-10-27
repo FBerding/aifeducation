@@ -111,8 +111,8 @@ get_used_state_point <- function(plot_data, measure) {
 #' @noRd
 get_best_states_from_folds <- function(data_folds, measure) {
   selected_data <- data_folds[[measure]]$folds_val
-  x_values <- vector(length = ncol(selected_data) - 1L)
-  y_values <- vector(length = ncol(selected_data) - 1L)
+  x_values <- vector(length = ncol(selected_data))
+  y_values <- vector(length = ncol(selected_data))
   if (measure == "loss") {
     optim <- "min"
   } else {
@@ -120,13 +120,13 @@ get_best_states_from_folds <- function(data_folds, measure) {
   }
   for (fold in seq_along(x_values)) {
     if (optim == "min") {
-      y_value <- min(selected_data[, 1L + fold])
-      x_value <- which(selected_data[, 1L + fold] == y_value)
+      y_value <- min(selected_data[, fold])
+      x_value <- which(selected_data[,  fold] == y_value)[1]
       x_values[fold] <- x_value
       y_values[fold] <- y_value
     } else {
-      y_value <- max(selected_data[, 1L + fold])
-      x_value <- which(selected_data[, 1L + fold] == y_value)[1]
+      y_value <- max(selected_data[, fold])
+      x_value <- which(selected_data[, fold] == y_value)[1]
       x_values[fold] <- x_value
       y_values[fold] <- y_value
     }
@@ -159,17 +159,17 @@ get_best_states_from_folds <- function(data_folds, measure) {
 #' @keywords internal
 #' @noRd
 get_selected_states_from_folds <- function(data_folds, measure) {
-  n_folds <- ncol(data_folds[[measure]]$folds_val) - 1L
+  n_folds <- ncol(data_folds[[measure]]$folds_val)
   x_values <- vector(length = n_folds)
   y_values <- vector(length = n_folds)
 
   values_epoch <- seq.int(from = 1L,to=nrow(data_folds[["loss"]]$folds_val),by=1L)
 
   for (i in seq_along(x_values)) {
-    values_avg_iota <- data_folds[["avg_iota"]]$folds_val[, i + 1L]
-    values_bbc <- data_folds[["balanced_accuracy"]]$folds_val[, i + 1L]
-    values_loss <- data_folds[["loss"]]$folds_val[, i + 1L]
-    values_acc <- data_folds[["accuracy"]]$folds_val[, i + 1L]
+    values_avg_iota <- data_folds[["avg_iota"]]$folds_val[, i ]
+    values_bbc <- data_folds[["balanced_accuracy"]]$folds_val[, i ]
+    values_loss <- data_folds[["loss"]]$folds_val[, i ]
+    values_acc <- data_folds[["accuracy"]]$folds_val[, i ]
 
     complete_values <- cbind(values_epoch, values_avg_iota, values_bbc, values_loss, values_acc)
     colnames(complete_values) <- c("epoch", "avg_iota", "balanced_accuracy", "loss", "accuracy")
@@ -258,14 +258,20 @@ add_point <- function(plot_object, x, y, type = "segment", appearance = 1L) {
 #' @keywords internal
 #' @noRd
 add_breaks <- function(plot_object, x_min, x_max, y_min, y_max, special_x = NULL, special_y = NULL) {
+  if((x_max - x_min - 1)<x_max && (x_max - x_min - 1)>0){
+    x_seq=seq.int(from = x_min - 1, to = x_max, by = ceiling((x_max - x_min - 1) / 10))
+  } else {
+    x_seq=NULL
+  }
   breaks_x <- setdiff(
     x = c(
       x_min,
-      seq.int(from = x_min - 1, to = x_max, by = ceiling((x_max - x_min - 1) / 10)),
+      x_seq,
       x_max
     ),
     y = 0L
   )
+
   breaks_y <- c(
     seq(from = y_min, to = y_max, by = ((y_max - y_min) / 5)),
     y_max
