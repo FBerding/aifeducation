@@ -61,6 +61,10 @@ BaseModelDebertaV2 <- R6::R6Class(
   public = list(
     #---------------------------------------------------------------------------
     #' @description Configures a new object of this class.
+    #' Please ensure that your chosen configuration comply with the following
+    #' guidelines:
+    #' * hidden_size is a multiple of num_attention_heads.
+    #'
     #' @param tokenizer `r get_param_doc_desc("tokenizer")`
     #' @param max_position_embeddings `r get_param_doc_desc("max_position_embeddings")`
     #' @param hidden_size `r get_param_doc_desc("hidden_size")`
