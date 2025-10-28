@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,14 +26,11 @@
     <li><a class="dropdown-item" href="../articles/model_configuration.html">04 Model configuration</a></li>
     <li><a class="dropdown-item" href="../articles/sharing_and_publishing.html">05 Sharing and Using Trained AI/Models</a></li>
     <li><a class="dropdown-item" href="../articles/a01_layers_stacks.html">Appendix 01 Layers and Stacks</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>For developers</h6></li>
-    <li><a class="dropdown-item" href="../articles/transformers.html">01 Transformers</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/cran/aifeducation/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/FBerding/aifeducation/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -43,7 +40,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Base class for tokenizers</h1>
-      <small class="dont-index">Source: <a href="https://github.com/cran/aifeducation/blob/HEAD/R/obj_Tokenizer.R" class="external-link"><code>R/obj_Tokenizer.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/FBerding/aifeducation/blob/HEAD/R/obj_Tokenizer.R" class="external-link"><code>R/obj_Tokenizer.R</code></a></small>
       <div class="d-none name"><code>TokenizerBase.Rd</code></div>
     </div>
 
@@ -199,15 +196,15 @@ and updates the object to the current version of the package.</p><div class="sec
 
 
 <dt><code>token_overlap</code></dt>
-<dd><p><code>int</code> Number of tokens from the previous chunk that should be added at the beginng of the next chunk. Allowed values: <code>0 &lt;= x </code></p></dd>
+<dd><p><code>int</code> Number of tokens from the previous chunk that should be added at the beginng of the next chunk. Allowed values: $0 &lt;= x $</p></dd>
 
 
 <dt><code>max_token_sequence_length</code></dt>
-<dd><p><code>int</code> Maximal number of tokens per chunk. Allowed values: <code>20 &lt;= x </code></p></dd>
+<dd><p><code>int</code> Maximal number of tokens per chunk. Allowed values: $20 &lt;= x $</p></dd>
 
 
 <dt><code>n_chunks</code></dt>
-<dd><p><code>int</code> Maximal number chunks. Allowed values: <code>1 &lt;= x </code></p></dd>
+<dd><p><code>int</code> Maximal number chunks. Allowed values: $1 &lt;= x $</p></dd>
 
 
 <dt><code>token_encodings_only</code></dt>
@@ -313,7 +310,7 @@ Applications, 21, 200335.
 
 
 <dt><code>statistics_max_tokens_length</code></dt>
-<dd><p><code>int</code> Maximum sequence length for calculating the statistics. Allowed values: <code>20 &lt;= x &lt;= 8192</code></p></dd>
+<dd><p><code>int</code> Maximum sequence length for calculating the statistics. Allowed values: $20 &lt;= x &lt;= 8192$</p></dd>
 
 
 <dt><code>step</code></dt>

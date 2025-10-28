@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,14 +26,11 @@
     <li><a class="dropdown-item" href="../articles/model_configuration.html">04 Model configuration</a></li>
     <li><a class="dropdown-item" href="../articles/sharing_and_publishing.html">05 Sharing and Using Trained AI/Models</a></li>
     <li><a class="dropdown-item" href="../articles/a01_layers_stacks.html">Appendix 01 Layers and Stacks</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>For developers</h6></li>
-    <li><a class="dropdown-item" href="../articles/transformers.html">01 Transformers</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/cran/aifeducation/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/FBerding/aifeducation/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -43,7 +40,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Funnel transformer</h1>
-      <small class="dont-index">Source: <a href="https://github.com/cran/aifeducation/blob/HEAD/R/obj_BaseModelFunnel.R" class="external-link"><code>R/obj_BaseModelFunnel.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/FBerding/aifeducation/blob/HEAD/R/obj_BaseModelFunnel.R" class="external-link"><code>R/obj_BaseModelFunnel.R</code></a></small>
       <div class="d-none name"><code>BaseModelFunnel.Rd</code></div>
     </div>
 
@@ -81,6 +78,7 @@ for Efficient Language Processing. <a href="https://doi.org/10.48550/arXiv.2006.
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
 
 <ul><li><p><a href="#method-BaseModelFunnel-configure"><code>BaseModelFunnel$configure()</code></a></p></li>
+<li><p><a href="#method-BaseModelFunnel-get_n_layers"><code>BaseModelFunnel$get_n_layers()</code></a></p></li>
 <li><p><a href="#method-BaseModelFunnel-clone"><code>BaseModelFunnel$clone()</code></a></p></li>
 </ul></div><p><details><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="get_all_fields"><a href="../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-get_all_fields"><code>aifeducation::AIFEMaster$get_all_fields()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="get_documentation_license"><a href="../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-get_documentation_license"><code>aifeducation::AIFEMaster$get_documentation_license()</code></a></span></li>
@@ -116,7 +114,10 @@ for Efficient Language Processing. <a href="https://doi.org/10.48550/arXiv.2006.
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="train"><a href="../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-train"><code>aifeducation::BaseModelCore$train()</code></a></span></li>
 </ul></details></p><hr><a id="method-BaseModelFunnel-configure"></a><div class="section">
 <h3 id="method-configure-">Method <code>configure()</code><a class="anchor" aria-label="anchor" href="#method-configure-"></a></h3>
-<p>Configures a new object of this class.</p><div class="section">
+<p>Configures a new object of this class.
+Please ensure that your chosen configuration comply with the following
+guidelines:</p><ul><li><p>hidden_size is a multiple of num_attention_heads.</p></li>
+</ul><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BaseModelFunnel</span><span class="op">$</span><span class="fu">configure</span><span class="op">(</span></span>
 <span>  <span class="va">tokenizer</span>,</span>
@@ -143,12 +144,12 @@ for Efficient Language Processing. <a href="https://doi.org/10.48550/arXiv.2006.
 
 <dt><code>max_position_embeddings</code></dt>
 <dd><p><code>int</code> Number of maximum position embeddings. This parameter also determines the maximum length of a sequence which
-can be processed with the model. Allowed values: <code>10 &lt;= x &lt;= 4048</code></p></dd>
+can be processed with the model. Allowed values: $10 &lt;= x &lt;= 4048$</p></dd>
 
 
 <dt><code>hidden_size</code></dt>
 <dd><p><code>int</code> Number of neurons in each layer. This parameter determines the dimensionality of the resulting text
-embedding. Allowed values: <code>1 &lt;= x &lt;= 2048</code></p></dd>
+embedding. Allowed values: $1 &lt;= x &lt;= 2048$</p></dd>
 
 
 <dt><code>block_sizes</code></dt>
@@ -156,19 +157,19 @@ embedding. Allowed values: <code>1 &lt;= x &lt;= 2048</code></p></dd>
 
 
 <dt><code>num_attention_heads</code></dt>
-<dd><p><code>int</code> determining the number of attention heads for a self-attention layer. Only relevant if <code>attention_type='multihead'</code> Allowed values: <code>0 &lt;= x </code></p></dd>
+<dd><p><code>int</code> determining the number of attention heads for a self-attention layer. Only relevant if <code>attention_type='multihead'</code> Allowed values: $0 &lt;= x $</p></dd>
 
 
 <dt><code>intermediate_size</code></dt>
-<dd><p><code>int</code> determining the size of the projection layer within a each transformer encoder. Allowed values: <code>1 &lt;= x </code></p></dd>
+<dd><p><code>int</code> determining the size of the projection layer within a each transformer encoder. Allowed values: $1 &lt;= x $</p></dd>
 
 
 <dt><code>num_decoder_layers</code></dt>
-<dd><p><code>int</code> Number of decoding layers. Allowed values: <code>1 &lt;= x </code></p></dd>
+<dd><p><code>int</code> Number of decoding layers. Allowed values: $1 &lt;= x $</p></dd>
 
 
 <dt><code>d_head</code></dt>
-<dd><p><code>int</code> Number of neurons of the final layer. Allowed values: <code>1 &lt;= x </code></p></dd>
+<dd><p><code>int</code> Number of neurons of the final layer. Allowed values: $1 &lt;= x $</p></dd>
 
 
 <dt><code>funnel_pooling_type</code></dt>
@@ -180,19 +181,19 @@ embedding. Allowed values: <code>1 &lt;= x &lt;= 2048</code></p></dd>
 
 
 <dt><code>hidden_dropout_prob</code></dt>
-<dd><p><code>double</code> Ratio of dropout. Allowed values: <code>0 &lt;= x &lt;= 0.6</code></p></dd>
+<dd><p><code>double</code> Ratio of dropout. Allowed values: $0 &lt;= x &lt;= 0.6$</p></dd>
 
 
 <dt><code>attention_probs_dropout_prob</code></dt>
-<dd><p><code>double</code> Ratio of dropout for attention probabilities. Allowed values: <code>0 &lt;= x &lt;= 0.6</code></p></dd>
+<dd><p><code>double</code> Ratio of dropout for attention probabilities. Allowed values: $0 &lt;= x &lt;= 0.6$</p></dd>
 
 
 <dt><code>activation_dropout</code></dt>
-<dd><p><code>double</code> Dropout probability between the layers of the feed-forward blocks. Allowed values: <code>0 &lt;= x &lt;= 0.6</code></p></dd>
+<dd><p><code>double</code> Dropout probability between the layers of the feed-forward blocks. Allowed values: $0 &lt;= x &lt;= 0.6$</p></dd>
 
 
 <dt><code>num_hidden_layers</code></dt>
-<dd><p><code>int</code> Number of hidden layers. Allowed values: <code>1 &lt;= x </code></p></dd>
+<dd><p><code>int</code> Number of hidden layers. Allowed values: $1 &lt;= x $</p></dd>
 
 
 </dl><p></p></div>
@@ -202,10 +203,23 @@ embedding. Allowed values: <code>1 &lt;= x &lt;= 2048</code></p></dd>
 <p>Does nothing return.</p>
 </div>
 
+</div><p></p><hr><a id="method-BaseModelFunnel-get_n_layers"></a><div class="section">
+<h3 id="method-get-n-layers-">Method <code>get_n_layers()</code><a class="anchor" aria-label="anchor" href="#method-get-n-layers-"></a></h3>
+<p>Number of layers.</p><div class="section">
+<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BaseModelFunnel</span><span class="op">$</span><span class="fu">get_n_layers</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="returns-1">Returns<a class="anchor" aria-label="anchor" href="#returns-1"></a></h4>
+<p>Returns an <code>int</code> describing the number of layers available for
+embedding.</p>
+</div>
+
 </div><p></p><hr><a id="method-BaseModelFunnel-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
+<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BaseModelFunnel</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 

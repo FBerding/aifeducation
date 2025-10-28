@@ -15,7 +15,7 @@ This class is not designed for a direct application and should only be used by d
 
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,14 +34,11 @@ This class is not designed for a direct application and should only be used by d
     <li><a class="dropdown-item" href="../articles/model_configuration.html">04 Model configuration</a></li>
     <li><a class="dropdown-item" href="../articles/sharing_and_publishing.html">05 Sharing and Using Trained AI/Models</a></li>
     <li><a class="dropdown-item" href="../articles/a01_layers_stacks.html">Appendix 01 Layers and Stacks</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>For developers</h6></li>
-    <li><a class="dropdown-item" href="../articles/transformers.html">01 Transformers</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/cran/aifeducation/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/FBerding/aifeducation/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -51,7 +48,7 @@ This class is not designed for a direct application and should only be used by d
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Base class for models using neural nets</h1>
-      <small class="dont-index">Source: <a href="https://github.com/cran/aifeducation/blob/HEAD/R/obj_ModelsBasedOnTextEmbeddings.R" class="external-link"><code>R/obj_ModelsBasedOnTextEmbeddings.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/FBerding/aifeducation/blob/HEAD/R/obj_ModelsBasedOnTextEmbeddings.R" class="external-link"><code>R/obj_ModelsBasedOnTextEmbeddings.R</code></a></small>
       <div class="d-none name"><code>ModelsBasedOnTextEmbeddings.Rd</code></div>
     </div>
 
@@ -214,6 +211,10 @@ This method requires the <em>R</em> package 'ggplot2' to work.</p><div class="se
 <span>  final_training <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  pl_step <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  measure <span class="op">=</span> <span class="st">"loss"</span>,</span>
+<span>  ind_best_model <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  ind_selected_model <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  x_min <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  x_max <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  y_min <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  y_max <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  add_min_max <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -237,21 +238,36 @@ with active pseudo labeling.</p></dd>
 <dd><p>Measure to plot.</p></dd>
 
 
+<dt><code>ind_best_model</code></dt>
+<dd><p><code>bool</code> If <code>TRUE</code> the plot indicates the best states of the model according to the chosen measure.</p></dd>
+
+
+<dt><code>ind_selected_model</code></dt>
+<dd><p><code>bool</code> If <code>TRUE</code> the plot indicates the states of the model which are used after training. These are the final states of the fold or the final state of the last training loop.</p></dd>
+
+
+<dt><code>x_min</code></dt>
+<dd><p><code>int</code> Minimal value for x-axis. Set to <code>NULL</code> for an automatic adjustment. Allowed values: $ x $</p></dd>
+
+
+<dt><code>x_max</code></dt>
+<dd><p><code>int</code> Maximal value for x-axis. Set to <code>NULL</code> for an automatic adjustment. Allowed values: $ x $</p></dd>
+
+
 <dt><code>y_min</code></dt>
-<dd><p>Minimal value for the y-axis. Set to <code>NULL</code> for an automatic adjustment.</p></dd>
+<dd><p><code>int</code> Minimal value for y-axis. Set to <code>NULL</code> for an automatic adjustment. Allowed values: $ x $</p></dd>
 
 
 <dt><code>y_max</code></dt>
-<dd><p>Maximal value for the y-axis. Set to <code>NULL</code> for an automatic adjustment.</p></dd>
+<dd><p><code>int</code> Maximal value for y-axis. Set to <code>NULL</code> for an automatic adjustment. Allowed values: $ x $</p></dd>
 
 
 <dt><code>add_min_max</code></dt>
-<dd><p><code>bool</code> If <code>TRUE</code> the minimal and maximal values during performance estimation are port of the plot.
-If <code>FALSE</code> only the mean values are shown. Parameter is ignored if <code>final_training=TRUE</code>.</p></dd>
+<dd><p><code>bool</code> If <code>TRUE</code> the minimal and maximal values during performance estimation are port of the plot. If <code>FALSE</code> only the mean values are shown. Parameter is ignored if <code>final_training=TRUE</code>.</p></dd>
 
 
 <dt><code>text_size</code></dt>
-<dd><p>Size of the text.</p></dd>
+<dd><p><code>int</code> Size of text elements. Allowed values: $1 &lt;= x $</p></dd>
 
 
 </dl><p></p></div>

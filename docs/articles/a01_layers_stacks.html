@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,7 +54,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/cran/aifeducation/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/FBerding/aifeducation/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -74,7 +74,7 @@ Berding, Yuliia Tykhonova, Julia Pargmann, Andreas Slopinski, Elisabeth
 Riebenbauer, Karin Rebmann</h4>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cran/aifeducation/blob/HEAD/vignettes/a01_layers_stacks.Rmd" class="external-link"><code>vignettes/a01_layers_stacks.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/FBerding/aifeducation/blob/HEAD/vignettes/a01_layers_stacks.Rmd" class="external-link"><code>vignettes/a01_layers_stacks.Rmd</code></a></small>
       <div class="d-none name"><code>a01_layers_stacks.Rmd</code></div>
     </div>
 
@@ -127,6 +127,19 @@ all layers and stack layers. Allowed values:</p>
 (2016)</a>.</li>
 <li>
 <code>'None'</code>: Applies no normalization.</li>
+</ul>
+</li>
+<li>
+<p><em>tf_normalization_position</em>: Position where the
+normalization should be applied. Allowed values:</p>
+<ul>
+<li>
+<code>'pre'</code>: Applies normalization before the layers as
+described by <a href="https://doi.org/10.48550/arXiv.2002.04745" class="external-link">Xiong
+et al. (2020)</a>.</li>
+<li>
+<code>'post'</code>: Applies normalization after the layers as
+described in the original transformer model.</li>
 </ul>
 </li>
 <li>

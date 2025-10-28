@@ -226,6 +226,7 @@ Creating a new instance of this class.
   tf_bias = FALSE,
   tf_parametrizations = "None",
   tf_normalization_type = "LayerNorm",
+  tf_normalization_position = "pre",
   tf_residual_type = "ResidualGate",
   merge_attention_type = "multi_head",
   merge_num_heads = 1L,
@@ -260,11 +261,11 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{feat_act_fct}}{\code{string} Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
 
-\item{\code{feat_size}}{\code{int} Number of neurons for each dense layer. Allowed values: \ifelse{latex}{$2 <= x $}{\ifelse{html}{2 <= x }{`2 <= x `}}}
+\item{\code{feat_size}}{\code{int} Number of neurons for each dense layer. Allowed values: \ifelse{latex}{$2 <= x $}{\ifelse{html}{$2 <= x $}{`2 <= x `}}}
 
 \item{\code{feat_bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
 
-\item{\code{feat_dropout}}{\code{double} determining the dropout for the dense projection of the feature layer. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{0 <= x <= 0.6}{`0 <= x <= 0.6`}}}
+\item{\code{feat_dropout}}{\code{double} determining the dropout for the dense projection of the feature layer. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{$0 <= x <= 0.6$}{`0 <= x <= 0.6`}}}
 
 \item{\code{feat_parametrizations}}{\code{string} Re-Parametrizations of the weights of layers. Allowed values: 'None', 'OrthogonalWeights', 'WeightNorm', 'SpectralNorm'}
 
@@ -272,15 +273,15 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{ng_conv_act_fct}}{\code{string} Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
 
-\item{\code{ng_conv_n_layers}}{\code{int} determining how many times the n-gram layers should be added to the network. Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{0 <= x }{`0 <= x `}}}
+\item{\code{ng_conv_n_layers}}{\code{int} determining how many times the n-gram layers should be added to the network. Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{$0 <= x $}{`0 <= x `}}}
 
-\item{\code{ng_conv_ks_min}}{\code{int} determining the minimal window size for n-grams. Allowed values: \ifelse{latex}{$2 <= x $}{\ifelse{html}{2 <= x }{`2 <= x `}}}
+\item{\code{ng_conv_ks_min}}{\code{int} determining the minimal window size for n-grams. Allowed values: \ifelse{latex}{$2 <= x $}{\ifelse{html}{$2 <= x $}{`2 <= x `}}}
 
-\item{\code{ng_conv_ks_max}}{\code{int} determining the maximal window size for n-grams. Allowed values: \ifelse{latex}{$2 <= x $}{\ifelse{html}{2 <= x }{`2 <= x `}}}
+\item{\code{ng_conv_ks_max}}{\code{int} determining the maximal window size for n-grams. Allowed values: \ifelse{latex}{$2 <= x $}{\ifelse{html}{$2 <= x $}{`2 <= x `}}}
 
 \item{\code{ng_conv_bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
 
-\item{\code{ng_conv_dropout}}{\code{double} determining the dropout for n-gram convolution layers. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{0 <= x <= 0.6}{`0 <= x <= 0.6`}}}
+\item{\code{ng_conv_dropout}}{\code{double} determining the dropout for n-gram convolution layers. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{$0 <= x <= 0.6$}{`0 <= x <= 0.6`}}}
 
 \item{\code{ng_conv_parametrizations}}{\code{string} Re-Parametrizations of the weights of layers. Allowed values: 'None', 'OrthogonalWeights', 'WeightNorm', 'SpectralNorm'}
 
@@ -290,9 +291,9 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{dense_act_fct}}{\code{string} Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
 
-\item{\code{dense_n_layers}}{\code{int} Number of dense layers. Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{0 <= x }{`0 <= x `}}}
+\item{\code{dense_n_layers}}{\code{int} Number of dense layers. Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{$0 <= x $}{`0 <= x `}}}
 
-\item{\code{dense_dropout}}{\code{double} determining the dropout between dense layers. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{0 <= x <= 0.6}{`0 <= x <= 0.6`}}}
+\item{\code{dense_dropout}}{\code{double} determining the dropout between dense layers. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{$0 <= x <= 0.6$}{`0 <= x <= 0.6`}}}
 
 \item{\code{dense_bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
 
@@ -304,13 +305,13 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{rec_act_fct}}{\code{string} Activation function for all layers. Allowed values: 'Tanh'}
 
-\item{\code{rec_n_layers}}{\code{int} Number of recurrent layers. Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{0 <= x }{`0 <= x `}}}
+\item{\code{rec_n_layers}}{\code{int} Number of recurrent layers. Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{$0 <= x $}{`0 <= x `}}}
 
 \item{\code{rec_type}}{\code{string} Type of the recurrent layers. \code{rec_type='GRU'} for Gated Recurrent Unit and \code{rec_type='LSTM'} for Long Short-Term Memory. Allowed values: 'GRU', 'LSTM'}
 
 \item{\code{rec_bidirectional}}{\code{bool} If \code{TRUE} a bidirectional version of the recurrent layers is used.}
 
-\item{\code{rec_dropout}}{\code{double} determining the dropout between recurrent layers. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{0 <= x <= 0.6}{`0 <= x <= 0.6`}}}
+\item{\code{rec_dropout}}{\code{double} determining the dropout between recurrent layers. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{$0 <= x <= 0.6$}{`0 <= x <= 0.6`}}}
 
 \item{\code{rec_bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
 
@@ -322,19 +323,19 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{tf_act_fct}}{\code{string} Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
 
-\item{\code{tf_dense_dim}}{\code{int} determining the size of the projection layer within a each transformer encoder. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{1 <= x }{`1 <= x `}}}
+\item{\code{tf_dense_dim}}{\code{int} determining the size of the projection layer within a each transformer encoder. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{$1 <= x $}{`1 <= x `}}}
 
-\item{\code{tf_n_layers}}{\code{int} determining how many times the encoder should be added to the network. Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{0 <= x }{`0 <= x `}}}
+\item{\code{tf_n_layers}}{\code{int} determining how many times the encoder should be added to the network. Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{$0 <= x $}{`0 <= x `}}}
 
-\item{\code{tf_dropout_rate_1}}{\code{double} determining the dropout after the attention mechanism within the transformer encoder layers. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{0 <= x <= 0.6}{`0 <= x <= 0.6`}}}
+\item{\code{tf_dropout_rate_1}}{\code{double} determining the dropout after the attention mechanism within the transformer encoder layers. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{$0 <= x <= 0.6$}{`0 <= x <= 0.6`}}}
 
-\item{\code{tf_dropout_rate_2}}{\code{double} determining the dropout for the dense projection within the transformer encoder layers. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{0 <= x <= 0.6}{`0 <= x <= 0.6`}}}
+\item{\code{tf_dropout_rate_2}}{\code{double} determining the dropout for the dense projection within the transformer encoder layers. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{$0 <= x <= 0.6$}{`0 <= x <= 0.6`}}}
 
 \item{\code{tf_attention_type}}{\code{string} Choose the attention type. Allowed values: 'Fourier', 'MultiHead'}
 
 \item{\code{tf_positional_type}}{\code{string} Type of processing positional information. Allowed values: 'None', 'absolute'}
 
-\item{\code{tf_num_heads}}{\code{int} determining the number of attention heads for a self-attention layer. Only relevant if \code{attention_type='multihead'} Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{0 <= x }{`0 <= x `}}}
+\item{\code{tf_num_heads}}{\code{int} determining the number of attention heads for a self-attention layer. Only relevant if \code{attention_type='multihead'} Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{$0 <= x $}{`0 <= x `}}}
 
 \item{\code{tf_bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
 
@@ -342,19 +343,21 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{tf_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values: 'LayerNorm', 'None'}
 
+\item{\code{tf_normalization_position}}{\code{string} Position where the normalization should be applied. Allowed values: 'pre', 'post'}
+
 \item{\code{tf_residual_type}}{\code{string} Type of residual connenction for all layers and stack of layers. Allowed values: 'ResidualGate', 'Addition', 'None'}
 
 \item{\code{merge_attention_type}}{\code{string} Choose the attention type. Allowed values: 'Fourier', 'MultiHead'}
 
-\item{\code{merge_num_heads}}{\code{int} determining the number of attention heads for a self-attention layer. Only relevant if \code{attention_type='multihead'} Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{0 <= x }{`0 <= x `}}}
+\item{\code{merge_num_heads}}{\code{int} determining the number of attention heads for a self-attention layer. Only relevant if \code{attention_type='multihead'} Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{$0 <= x $}{`0 <= x `}}}
 
 \item{\code{merge_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values: 'LayerNorm', 'None'}
 
-\item{\code{merge_pooling_features}}{\code{int} Number of features to be extracted at the end of the model. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{1 <= x }{`1 <= x `}}}
+\item{\code{merge_pooling_features}}{\code{int} Number of features to be extracted at the end of the model. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{$1 <= x $}{`1 <= x `}}}
 
 \item{\code{merge_pooling_type}}{\code{string} Type of extracting intermediate features. Allowed values: 'Max', 'Min', 'MinMax'}
 
-\item{\code{embedding_dim}}{\code{int}  determining the number of dimensions for the embedding. Allowed values: \ifelse{latex}{$2 <= x $}{\ifelse{html}{2 <= x }{`2 <= x `}}}
+\item{\code{embedding_dim}}{\code{int}  determining the number of dimensions for the embedding. Allowed values: \ifelse{latex}{$2 <= x $}{\ifelse{html}{$2 <= x $}{`2 <= x `}}}
 }
 \if{html}{\out{</div>}}
 }

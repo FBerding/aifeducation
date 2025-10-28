@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,7 +54,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/cran/aifeducation/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/FBerding/aifeducation/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -71,7 +71,7 @@
       <h1>01 Get started</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cran/aifeducation/blob/HEAD/vignettes/aifeducation.Rmd" class="external-link"><code>vignettes/aifeducation.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/FBerding/aifeducation/blob/HEAD/vignettes/aifeducation.Rmd" class="external-link"><code>vignettes/aifeducation.Rmd</code></a></small>
       <div class="d-none name"><code>aifeducation.Rmd</code></div>
     </div>
 
@@ -227,13 +227,17 @@ version of the core python packages in order to use this package. In the
 case you would like to install the packages manually we recommend the
 following versions.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">aifeducation</span><span class="fu">::</span><span class="fu"><a href="../reference/get_recommended_py_versions.html">get_recommended_py_versions</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt;     transformers tokenizers pandas datasets codecarbon safetensors torcheval</span></span>
-<span><span class="co">#&gt; min       4.56.0     0.22.0  2.3.2    3.6.0      3.0.0       0.6.2     0.0.7</span></span>
-<span><span class="co">#&gt; max       4.56.2     0.22.0  2.3.2    3.6.0      3.0.4       0.6.2     0.0.7</span></span>
-<span><span class="co">#&gt;     accelerate calflops</span></span>
-<span><span class="co">#&gt; min     1.10.1    0.3.2</span></span>
-<span><span class="co">#&gt; max     1.10.1    0.3.2</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu">aifeducation</span><span class="fu">::</span><span class="fu"><a href="../reference/get_recommended_py_versions.html">get_recommended_py_versions</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;              min      max     </span></span>
+<span><span class="co">#&gt; transformers "4.56.0" "4.57.1"</span></span>
+<span><span class="co">#&gt; tokenizers   "0.22.0" "0.22.1"</span></span>
+<span><span class="co">#&gt; pandas       "2.3.2"  "2.3.3" </span></span>
+<span><span class="co">#&gt; datasets     "3.6.0"  "3.6.0" </span></span>
+<span><span class="co">#&gt; codecarbon   "3.0.0"  "3.0.7" </span></span>
+<span><span class="co">#&gt; safetensors  "0.6.2"  "0.6.2" </span></span>
+<span><span class="co">#&gt; torcheval    "0.0.7"  "0.0.7" </span></span>
+<span><span class="co">#&gt; accelerate   "1.10.1" "1.11.0"</span></span>
+<span><span class="co">#&gt; calflops     "0.3.2"  "0.3.2"</span></span></code></pre></div>
 <p>We have tested the package with these versions ensuring that
 <em>aifeducation</em> works correctly.</p>
 </div>

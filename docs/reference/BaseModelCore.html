@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,14 +26,11 @@
     <li><a class="dropdown-item" href="../articles/model_configuration.html">04 Model configuration</a></li>
     <li><a class="dropdown-item" href="../articles/sharing_and_publishing.html">05 Sharing and Using Trained AI/Models</a></li>
     <li><a class="dropdown-item" href="../articles/a01_layers_stacks.html">Appendix 01 Layers and Stacks</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>For developers</h6></li>
-    <li><a class="dropdown-item" href="../articles/transformers.html">01 Transformers</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/cran/aifeducation/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/FBerding/aifeducation/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -43,7 +40,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Abstract class for all BaseModels</h1>
-      <small class="dont-index">Source: <a href="https://github.com/cran/aifeducation/blob/HEAD/R/obj_BaseModelCore.R" class="external-link"><code>R/obj_BaseModelCore.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/FBerding/aifeducation/blob/HEAD/R/obj_BaseModelCore.R" class="external-link"><code>R/obj_BaseModelCore.R</code></a></small>
       <div class="d-none name"><code>BaseModelCore.Rd</code></div>
     </div>
 
@@ -100,6 +97,7 @@ Objects of class <code>TokenizerBase</code>.</p></dd>
 <li><p><a href="#method-BaseModelCore-get_model"><code>BaseModelCore$get_model()</code></a></p></li>
 <li><p><a href="#method-BaseModelCore-get_model_type"><code>BaseModelCore$get_model_type()</code></a></p></li>
 <li><p><a href="#method-BaseModelCore-get_final_size"><code>BaseModelCore$get_final_size()</code></a></p></li>
+<li><p><a href="#method-BaseModelCore-get_n_layers"><code>BaseModelCore$get_n_layers()</code></a></p></li>
 <li><p><a href="#method-BaseModelCore-get_flops_estimates"><code>BaseModelCore$get_flops_estimates()</code></a></p></li>
 <li><p><a href="#method-BaseModelCore-set_publication_info"><code>BaseModelCore$set_publication_info()</code></a></p></li>
 <li><p><a href="#method-BaseModelCore-estimate_sustainability_inference_fill_mask"><code>BaseModelCore$estimate_sustainability_inference_fill_mask()</code></a></p></li>
@@ -131,7 +129,7 @@ Objects of class <code>TokenizerBase</code>.</p></dd>
 <div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>model_dir</code></dt>
-<dd></dd>
+<dd><p>Path where the model is stored.</p></dd>
 
 
 <dt><code>tokenizer_dir</code></dt>
@@ -175,79 +173,88 @@ Objects of class <code>TokenizerBase</code>.</p></dd>
 <div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>text_dataset</code></dt>
-<dd></dd>
+<dd><p><code>LargeDataSetForText</code> <a href="LargeDataSetForText.html">LargeDataSetForText</a> Object storing textual data.</p></dd>
 
 
 <dt><code>p_mask</code></dt>
-<dd></dd>
+<dd><p><code>double</code> Ratio that determines the number of tokens used for masking. Allowed values: $0.05 &lt;= x &lt;= 0.6$</p></dd>
 
 
 <dt><code>whole_word</code></dt>
-<dd></dd>
+<dd><p><code>bool</code> * <code>TRUE</code>: whole word masking should be applied. Only relevant if a <code>WordPieceTokenizer</code> is used.</p><ul><li><p><code>FALSE</code>: token masking is used.</p></li>
+</ul></dd>
 
 
 <dt><code>val_size</code></dt>
-<dd></dd>
+<dd><p><code>double</code> between 0 and 1, indicating the proportion of cases which should be
+used for the validation sample during the estimation of the model.
+The remaining cases are part of the training data. Allowed values: $0 &lt; x &lt; 1$</p></dd>
 
 
 <dt><code>n_epoch</code></dt>
-<dd></dd>
+<dd><p><code>int</code> Number of training epochs. Allowed values: $1 &lt;= x $</p></dd>
 
 
 <dt><code>batch_size</code></dt>
-<dd></dd>
+<dd><p><code>int</code> Size of the batches for training. Allowed values: $1 &lt;= x $</p></dd>
 
 
 <dt><code>max_sequence_length</code></dt>
-<dd></dd>
+<dd><p><code>int</code> Maximal number of tokens for every sequence. Allowed values: $20 &lt;= x $</p></dd>
 
 
 <dt><code>full_sequences_only</code></dt>
-<dd></dd>
+<dd><p><code>bool</code> <code>TRUE</code> for using only chunks with a sequence length equal to <code>chunk_size</code>.</p></dd>
 
 
 <dt><code>min_seq_len</code></dt>
-<dd></dd>
+<dd><p><code>int</code> Only relevant if <code>full_sequences_only = FALSE</code>. Value determines the minimal sequence length included in
+training process.  Allowed values: $10 &lt;= x $</p></dd>
 
 
 <dt><code>learning_rate</code></dt>
-<dd></dd>
+<dd><p><code>double</code> Initial learning rate for the training. Allowed values: $0 &lt; x &lt;= 1$</p></dd>
 
 
 <dt><code>sustain_track</code></dt>
-<dd></dd>
+<dd><p><code>bool</code> If <code>TRUE</code> energy consumption is tracked during training via the python library 'codecarbon'.</p></dd>
 
 
 <dt><code>sustain_iso_code</code></dt>
-<dd></dd>
+<dd><p><code>string</code> ISO code (Alpha-3-Code) for the country. This variable must be set if
+sustainability should be tracked. A list can be found on Wikipedia:
+<a href="https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes" class="external-link">https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes</a>. Allowed values: any</p></dd>
 
 
 <dt><code>sustain_region</code></dt>
-<dd></dd>
+<dd><p><code>string</code> Region within a country. Only available for USA and Canada See the documentation of
+codecarbon for more information. <a href="https://mlco2.github.io/codecarbon/parameters.html" class="external-link">https://mlco2.github.io/codecarbon/parameters.html</a> Allowed values: any</p></dd>
 
 
 <dt><code>sustain_interval</code></dt>
-<dd></dd>
+<dd><p><code>int</code> Interval in seconds for measuring power usage. Allowed values: $1 &lt;= x $</p></dd>
 
 
 <dt><code>sustain_log_level</code></dt>
-<dd></dd>
+<dd><p><code>string</code> Level for printing information to the console. Allowed values: 'debug', 'info', 'warning', 'error', 'critical'</p></dd>
 
 
 <dt><code>trace</code></dt>
-<dd></dd>
+<dd><p><code>bool</code> <code>TRUE</code> if information about the estimation phase should be printed to the console.</p></dd>
 
 
 <dt><code>pytorch_trace</code></dt>
-<dd></dd>
+<dd><p><code>int</code> <code>ml_trace=0</code> does not print any information about the training process from pytorch on the console. Allowed values: $0 &lt;= x &lt;= 1$</p></dd>
 
 
 <dt><code>log_dir</code></dt>
-<dd></dd>
+<dd><p><code>string</code> Path to the directory where the log files should be saved.
+If no logging is desired set this argument to <code>NULL</code>. Allowed values: any</p></dd>
 
 
 <dt><code>log_write_interval</code></dt>
-<dd></dd>
+<dd><p><code>int</code> Time in seconds determining the interval in which the logger should try to update
+the log files. Only relevant if <code>log_dir</code> is not <code>NULL</code>. Allowed values: $1 &lt;= x $</p></dd>
 
 
 </dl><p></p></div>
@@ -275,24 +282,39 @@ Objects of class <code>TokenizerBase</code>.</p></dd>
 This method requires the <em>R</em> package 'ggplot2' to work.</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BaseModelCore</span><span class="op">$</span><span class="fu">plot_training_history</span><span class="op">(</span></span>
+<span>  x_min <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  x_max <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  y_min <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  y_max <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ind_best_model <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  text_size <span class="op">=</span> <span class="fl">10L</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>y_min</code></dt>
-<dd></dd>
+<p></p><div class="arguments"><dl><dt><code>x_min</code></dt>
+<dd><p><code>int</code> Minimal value for x-axis. Set to <code>NULL</code> for an automatic adjustment. Allowed values: $ x $</p></dd>
+
+
+<dt><code>x_max</code></dt>
+<dd><p><code>int</code> Maximal value for x-axis. Set to <code>NULL</code> for an automatic adjustment. Allowed values: $ x $</p></dd>
+
+
+<dt><code>y_min</code></dt>
+<dd><p><code>int</code> Minimal value for y-axis. Set to <code>NULL</code> for an automatic adjustment. Allowed values: $ x $</p></dd>
 
 
 <dt><code>y_max</code></dt>
-<dd></dd>
+<dd><p><code>int</code> Maximal value for y-axis. Set to <code>NULL</code> for an automatic adjustment. Allowed values: $ x $</p></dd>
+
+
+<dt><code>ind_best_model</code></dt>
+<dd><p><code>bool</code> If <code>TRUE</code> the plot indicates the best states of the model according to the chosen measure.</p></dd>
 
 
 <dt><code>text_size</code></dt>
-<dd></dd>
+<dd><p><code>int</code> Size of text elements. Allowed values: $1 &lt;= x $</p></dd>
 
 
 </dl><p></p></div>
@@ -337,11 +359,11 @@ and their type, token, and id in the columns.</p>
 <div class="section">
 <h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>masked_text</code></dt>
-<dd></dd>
+<dd><p><code>string</code> Text with mask tokens. Allowed values: any</p></dd>
 
 
 <dt><code>n_solutions</code></dt>
-<dd></dd>
+<dd><p><code>int</code> Number of solutions the model should predict. Allowed values: $1 &lt;= x $</p></dd>
 
 
 </dl><p></p></div>
@@ -435,22 +457,35 @@ and updates the object to the current version of the package.</p><div class="sec
 hidden layer.</p>
 </div>
 
-</div><p></p><hr><a id="method-BaseModelCore-get_flops_estimates"></a><div class="section">
-<h3 id="method-get-flops-estimates-">Method <code>get_flops_estimates()</code><a class="anchor" aria-label="anchor" href="#method-get-flops-estimates-"></a></h3>
-<p>Flop estimates</p><div class="section">
+</div><p></p><hr><a id="method-BaseModelCore-get_n_layers"></a><div class="section">
+<h3 id="method-get-n-layers-">Method <code>get_n_layers()</code><a class="anchor" aria-label="anchor" href="#method-get-n-layers-"></a></h3>
+<p>Number of layers.</p><div class="section">
 <h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BaseModelCore</span><span class="op">$</span><span class="fu">get_flops_estimates</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BaseModelCore</span><span class="op">$</span><span class="fu">get_n_layers</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="returns-12">Returns<a class="anchor" aria-label="anchor" href="#returns-12"></a></h4>
+<p>Returns an <code>int</code> describing the number of layers available for
+embedding.</p>
+</div>
+
+</div><p></p><hr><a id="method-BaseModelCore-get_flops_estimates"></a><div class="section">
+<h3 id="method-get-flops-estimates-">Method <code>get_flops_estimates()</code><a class="anchor" aria-label="anchor" href="#method-get-flops-estimates-"></a></h3>
+<p>Flop estimates</p><div class="section">
+<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BaseModelCore</span><span class="op">$</span><span class="fu">get_flops_estimates</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="returns-13">Returns<a class="anchor" aria-label="anchor" href="#returns-13"></a></h4>
 <p>Returns a <code>data.frame</code> containing statistics about the flops.</p>
 </div>
 
 </div><p></p><hr><a id="method-BaseModelCore-set_publication_info"></a><div class="section">
 <h3 id="method-set-publication-info-">Method <code>set_publication_info()</code><a class="anchor" aria-label="anchor" href="#method-set-publication-info-"></a></h3>
 <p>Method for setting the bibliographic information of the model.</p><div class="section">
-<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
+<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BaseModelCore</span><span class="op">$</span><span class="fu">set_publication_info</span><span class="op">(</span><span class="va">type</span>, <span class="va">authors</span>, <span class="va">citation</span>, url <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -476,7 +511,7 @@ hidden layer.</p>
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="returns-13">Returns<a class="anchor" aria-label="anchor" href="#returns-13"></a></h4>
+<h4 id="returns-14">Returns<a class="anchor" aria-label="anchor" href="#returns-14"></a></h4>
 <p>Function does not return a value. It is used to set the private
 members for publication information of the model.</p>
 </div>
@@ -484,10 +519,10 @@ members for publication information of the model.</p>
 </div><p></p><hr><a id="method-BaseModelCore-estimate_sustainability_inference_fill_mask"></a><div class="section">
 <h3 id="method-estimate-sustainability-inference-fill-mask-">Method <code>estimate_sustainability_inference_fill_mask()</code><a class="anchor" aria-label="anchor" href="#method-estimate-sustainability-inference-fill-mask-"></a></h3>
 <p>Calculates the energy consumption for inference of the given task.</p><div class="section">
-<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
+<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BaseModelCore</span><span class="op">$</span><span class="fu">estimate_sustainability_inference_fill_mask</span><span class="op">(</span></span>
 <span>  text_dataset <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  n <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  n_samples <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sustain_iso_code <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sustain_region <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sustain_interval <span class="op">=</span> <span class="fl">15L</span>,</span>
@@ -499,37 +534,40 @@ members for publication information of the model.</p>
 <div class="section">
 <h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>text_dataset</code></dt>
-<dd></dd>
+<dd><p><code>LargeDataSetForText</code> <a href="LargeDataSetForText.html">LargeDataSetForText</a> Object storing textual data.</p></dd>
 
 
-<dt><code>n</code></dt>
-<dd></dd>
+<dt><code>n_samples</code></dt>
+<dd><p><code>int</code> Number of samples. Allowed values: $1 &lt;= x $</p></dd>
 
 
 <dt><code>sustain_iso_code</code></dt>
-<dd></dd>
+<dd><p><code>string</code> ISO code (Alpha-3-Code) for the country. This variable must be set if
+sustainability should be tracked. A list can be found on Wikipedia:
+<a href="https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes" class="external-link">https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes</a>. Allowed values: any</p></dd>
 
 
 <dt><code>sustain_region</code></dt>
-<dd></dd>
+<dd><p><code>string</code> Region within a country. Only available for USA and Canada See the documentation of
+codecarbon for more information. <a href="https://mlco2.github.io/codecarbon/parameters.html" class="external-link">https://mlco2.github.io/codecarbon/parameters.html</a> Allowed values: any</p></dd>
 
 
 <dt><code>sustain_interval</code></dt>
-<dd></dd>
+<dd><p><code>int</code> Interval in seconds for measuring power usage. Allowed values: $1 &lt;= x $</p></dd>
 
 
 <dt><code>sustain_log_level</code></dt>
-<dd></dd>
+<dd><p><code>string</code> Level for printing information to the console. Allowed values: 'debug', 'info', 'warning', 'error', 'critical'</p></dd>
 
 
 <dt><code>trace</code></dt>
-<dd></dd>
+<dd><p><code>bool</code> <code>TRUE</code> if information about the estimation phase should be printed to the console.</p></dd>
 
 
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="returns-14">Returns<a class="anchor" aria-label="anchor" href="#returns-14"></a></h4>
+<h4 id="returns-15">Returns<a class="anchor" aria-label="anchor" href="#returns-15"></a></h4>
 <p>Returns nothing. Method saves the statistics internally.
 The statistics can be accessed with the method <code>get_sustainability_data("inference")</code></p>
 </div>
@@ -537,35 +575,35 @@ The statistics can be accessed with the method <code>get_sustainability_data("in
 </div><p></p><hr><a id="method-BaseModelCore-calc_flops_architecture_based"></a><div class="section">
 <h3 id="method-calc-flops-architecture-based-">Method <code>calc_flops_architecture_based()</code><a class="anchor" aria-label="anchor" href="#method-calc-flops-architecture-based-"></a></h3>
 <p>Calculates FLOPS based on model's architecture.</p><div class="section">
-<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BaseModelCore</span><span class="op">$</span><span class="fu">calc_flops_architecture_based</span><span class="op">(</span><span class="va">batch_size</span>, <span class="va">n_batches</span>, <span class="va">n_epochs</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BaseModelCore</span><span class="op">$</span><span class="fu">calc_flops_architecture_based</span><span class="op">(</span><span class="va">batch_size</span>, <span class="va">n_batches</span>, <span class="va">n_epoch</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>batch_size</code></dt>
-<dd></dd>
+<dd><p><code>int</code> Size of the batches for training. Allowed values: $1 &lt;= x $</p></dd>
 
 
 <dt><code>n_batches</code></dt>
-<dd></dd>
+<dd><p><code>int</code> Number of batches. Allowed values: $1 &lt;= x $</p></dd>
 
 
-<dt><code>n_epochs</code></dt>
-<dd></dd>
+<dt><code>n_epoch</code></dt>
+<dd><p><code>int</code> Number of training epochs. Allowed values: $1 &lt;= x $</p></dd>
 
 
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="returns-15">Returns<a class="anchor" aria-label="anchor" href="#returns-15"></a></h4>
+<h4 id="returns-16">Returns<a class="anchor" aria-label="anchor" href="#returns-16"></a></h4>
 <p>Returns a <code>data.frame</code> storing the estimates.</p>
 </div>
 
 </div><p></p><hr><a id="method-BaseModelCore-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
+<h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BaseModelCore</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
