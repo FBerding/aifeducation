@@ -215,7 +215,7 @@ get_param_dict <- function() {
     gui_label = NULL,
     default_value = 3L,
     default_historic = 3L,
-    test_values = c(2L)
+    test_values = c(2L,3L)
   )
 
   param$statistics_max_tokens_length <- list(

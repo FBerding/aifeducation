@@ -65,7 +65,7 @@ BaseModelModernBert <- R6::R6Class(
         stop("(hidden_size/num_attention_heads) must be a multiple of 2.")
       }
 
-      if (args$global_attn_every_n_layers <= args$num_hidden_layers) {
+      if (args$global_attn_every_n_layers > args$num_hidden_layers) {
         stop("global_attn_every_n_layers must be equal or smaller num_hidden_layers.")
       }
     }
