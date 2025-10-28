@@ -638,7 +638,7 @@ BaseModelCore <- R6::R6Class(
             legend.position = "bottom"
           )
 
-        if (ind_best_model || ind_selected_model) {
+        if (ind_best_model) {
           tmp_plot <- tmp_plot + ggplot2::scale_linetype_manual(
             values = c(Best = 1, Final = 3L)
           )
