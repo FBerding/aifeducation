@@ -170,21 +170,21 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       }
 
       # set x_min and x_max if they are NULL
-      if (is.null(x_min)) {
+      if (is.null_or_na(x_min)) {
         x_min <- 1L
       }
-      if (is.null(x_max)) {
+      if (is.null_or_na(x_max)) {
         x_max <- nrow(plot_data)
       }
       plot_data <- plot_data[x_min:x_max, ]
 
       # Set y_min and y_max if they are NULL
       data_colnames <- setdiff(x = colnames(plot_data), y = "epoch")
-      if (is.null(y_min)) {
+      if (is.null_or_na(y_min)) {
         y_min <- min(plot_data[, data_colnames])
       }
 
-      if (is.null(y_max)) {
+      if (is.null_or_na(y_max)) {
         y_max <- max(plot_data[, data_colnames])
       }
 
@@ -238,21 +238,6 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         }
       }
 
-      tmp_plot <- tmp_plot + ggplot2::theme_classic() +
-        ggplot2::ylab(y_label) +
-        ggplot2::coord_cartesian(ylim = c(y_min, y_max)) +
-        ggplot2::xlab("epoch") +
-        ggplot2::scale_color_manual(values = c(
-          train = "red",
-          validation = "blue",
-          test = "darkgreen"
-        )) +
-        ggplot2::theme(
-          text = ggplot2::element_text(size = text_size),
-          legend.position = "bottom"
-        )
-
-
       if (final_training) {
         if (ind_best_model) {
           best_state_point <- get_best_state_point(
@@ -264,7 +249,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
             x = best_state_point$epoch,
             y = best_state_point$value,
             type = "segment",
-            appearance = 1L
+            state = "Best"
           )
         } else {
           best_state_point <- list(
@@ -283,7 +268,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
             x = selected_state_point$epoch,
             y = selected_state_point$value,
             type = "segment",
-            appearance = 3L
+            state = "Final"
           )
         } else {
           selected_state_point <- list(
@@ -304,33 +289,61 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
           )
         }
       } else {
-        if(ind_best_model){
-          best_states=get_best_states_from_folds(
-            data_folds=data_prepared$folds,
-            measure=measure
+        if (ind_best_model) {
+          best_states <- get_best_states_from_folds(
+            data_folds = data_prepared$folds,
+            measure = measure
           )
-            tmp_plot <- add_point(
-              plot_object = tmp_plot,
-              x = best_states$epochs,
-              y = best_states$values,
-              type = "point",
-              appearance = 16L
-            )
+          tmp_plot <- add_point(
+            plot_object = tmp_plot,
+            x = best_states$epochs,
+            y = best_states$values,
+            type = "point",
+            state = "Best"
+          )
         }
         if (ind_selected_model) {
-          selected_states=get_selected_states_from_folds(
-            data_folds=data_prepared$folds,
-            measure=measure
+          selected_states <- get_selected_states_from_folds(
+            data_folds = data_prepared$folds,
+            measure = measure
           )
           tmp_plot <- add_point(
             plot_object = tmp_plot,
             x = selected_states$epochs,
             y = selected_states$values,
             type = "point",
-            appearance = 15L
+            state = "Final"
           )
         }
       }
+
+      tmp_plot <- tmp_plot + ggplot2::theme_classic() +
+        ggplot2::ylab(y_label) +
+        ggplot2::xlab("epoch") +
+        ggplot2::coord_cartesian(ylim = c(y_min, y_max), xlim = c(x_min, x_max)) +
+        ggplot2::scale_color_manual(
+          values = c(
+            train = "red",
+            validation = "blue",
+            test = "darkgreen"
+          )
+        ) + ggplot2::theme(
+          text = ggplot2::element_text(size = text_size),
+          legend.position = "bottom"
+        )
+
+      if (ind_best_model || ind_selected_model) {
+        if (final_training) {
+          tmp_plot <- tmp_plot + ggplot2::scale_linetype_manual(
+            values = c(Best = 1, Final = 3L)
+          )
+        } else {
+          tmp_plot <- tmp_plot + ggplot2::scale_shape_manual(
+            values = c(Best = 16L, Final = 15L)
+          )
+        }
+      }
+
       return(tmp_plot)
     }
   ),
@@ -650,7 +663,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
 
       # Create array for saving the data-------------------------------------------
       result_list <- NULL
-      results_folds<-NULL
+      results_folds <- NULL
       for (j in seq_along(measures)) {
         measure <- measures[j]
         measure_array <- array(
@@ -681,9 +694,9 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         final_data_measure[, "epoch"] <- seq.int(from = 1L, to = n_epochs)
 
         if (!final) {
-          n_matrix_folds=n_folds
+          n_matrix_folds <- n_folds
         } else {
-          n_matrix_folds=1L
+          n_matrix_folds <- 1L
         }
 
         fold_values_train <- matrix(
@@ -727,9 +740,9 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
           if (!final) {
             for (k in 1L:n_folds) {
               fold_values_train[i, k] <- measure_array[k, "train", i]
-              fold_values_val[i, k] <-  measure_array[k, "validation", i]
+              fold_values_val[i, k] <- measure_array[k, "validation", i]
               if (n_sample_type == 3L) {
-                fold_values_test[i, k] <-  measure_array[k, "test", i]
+                fold_values_test[i, k] <- measure_array[k, "test", i]
               }
             }
           } else {
@@ -739,7 +752,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         }
 
         result_list[j] <- list(final_data_measure)
-        results_folds[j]<-list(
+        results_folds[j] <- list(
           list(
             folds_train = fold_values_train,
             folds_val = fold_values_val,
@@ -753,8 +766,9 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       names(results_folds) <- measures
       return(
         list(
-        aggregated=result_list,
-        folds=results_folds)
+          aggregated = result_list,
+          folds = results_folds
+        )
       )
     },
     #---------------------------------------------------------------------------

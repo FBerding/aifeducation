@@ -31,8 +31,7 @@ generate_args_for_tests <- function(object_name,
                                     method,
                                     var_objects = list(),
                                     necessary_objects = list(),
-                                    var_override = list()
-                                    ) {
+                                    var_override = list()) {
   object <- create_object(object_name)
   arg_list <- rlang::fn_fmls(object[[method]])
   arg_names <- names(arg_list)
@@ -47,10 +46,10 @@ generate_args_for_tests <- function(object_name,
         # Choose a value that is determined by chance
         if (current_entry$type == "string") {
           if (!is.null(current_entry$allowed_values)) {
-            arg_value_list[param] <- list(sample(x=current_entry$allowed_values,size=1L))
+            arg_value_list[param] <- list(sample(x = current_entry$allowed_values, size = 1L))
           }
         } else if (current_entry$type == "bool") {
-          arg_value_list[param] <- list(sample(x=c(FALSE, TRUE),size=1L))
+          arg_value_list[param] <- list(sample(x = c(FALSE, TRUE), size = 1L))
         } else {
           if (current_entry$min == -Inf) {
             tmp_min <- -1L
@@ -66,15 +65,15 @@ generate_args_for_tests <- function(object_name,
         }
 
         if (current_entry$type == "int") {
-          arg_value_list[param] <- list(sample(x=seq(from = tmp_min, to = tmp_max, by = 1L),size=1L))
+          arg_value_list[param] <- list(sample(x = seq(from = tmp_min, to = tmp_max, by = 1L), size = 1L))
         } else if (current_entry$type == "double") {
-          arg_value_list[param] <- list(sample(x=c(tmp_min, tmp_max, 0.5 * tmp_min + 0.5 * tmp_max),size=1L))
+          arg_value_list[param] <- list(sample(x = c(tmp_min, tmp_max, 0.5 * tmp_min + 0.5 * tmp_max), size = 1L))
         } else if (current_entry$type == "(double") {
-          arg_value_list[param] <- list(sample(x=c(0.99 * tmp_min, tmp_max, 0.5 * tmp_min + 0.5 * tmp_max),size=1L))
+          arg_value_list[param] <- list(sample(x = c(0.99 * tmp_min, tmp_max, 0.5 * tmp_min + 0.5 * tmp_max), size = 1L))
         } else if (current_entry$type == "double)") {
-          arg_value_list[param] <- list(sample(x=c(tmp_min, 0.99 * tmp_max, 0.5 * tmp_min + 0.5 * tmp_max),size=1L))
+          arg_value_list[param] <- list(sample(x = c(tmp_min, 0.99 * tmp_max, 0.5 * tmp_min + 0.5 * tmp_max), size = 1L))
         } else if (current_entry$type == "(double)") {
-          arg_value_list[param] <- list(sample(x=c(0.99 * tmp_min, 0.99 * tmp_max, 0.5 * tmp_min + 0.5 * tmp_max),size=1L))
+          arg_value_list[param] <- list(sample(x = c(0.99 * tmp_min, 0.99 * tmp_max, 0.5 * tmp_min + 0.5 * tmp_max), size = 1L))
         }
       } else {
         # Choose a value from the explicitly determined test values for that param
@@ -83,7 +82,7 @@ generate_args_for_tests <- function(object_name,
           size = 1L,
           replace = FALSE
         )
-        if(is.list(current_entry$test_values)){
+        if (is.list(current_entry$test_values)) {
           arg_value_list[param] <- list(
             current_entry$test_values[[random_index]]
           )
@@ -98,7 +97,7 @@ generate_args_for_tests <- function(object_name,
 
   # Add var objects
   for (var_object in names(var_objects)) {
-    arg_value_list[var_object] <- sample(x=c(FALSE, TRUE),size=1L)
+    arg_value_list[var_object] <- sample(x = c(FALSE, TRUE), size = 1L)
   }
 
   # Convert combinations to list and add override parameters and add necessary parameters
@@ -131,9 +130,8 @@ generate_args_for_tests <- function(object_name,
 #' @return Returns an `int` depending on the test environment.
 #' @family Utils TestThat Developers
 check_adjust_n_samples_on_CI <- function(
-  n_samples_requested,
-  n_CI = 50L
-) {
+    n_samples_requested,
+    n_CI = 50L) {
   # If on github use only a small random sample
   if (Sys.getenv("CI") != "true") {
     return(min(n_samples_requested, n_CI))

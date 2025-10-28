@@ -125,12 +125,12 @@ get_param_dict <- function() {
   as the maximal postional embeddings for the model."
 
   param$max_sequence_length <- param$max_token_sequence_length
-  param$max_sequence_length$desc= "Maximal number of tokens for every sequence."
-  param$max_sequence_length$gui_box= "Sequence Modeling"
-  param$max_sequence_length$gui_label= "Max Sequence Length"
-  param$max_sequence_length$default_value=250L
-  param$max_sequence_length$default_historic=250L
-  param$max_sequence_length$test_values=c(150L,250L)
+  param$max_sequence_length$desc <- "Maximal number of tokens for every sequence."
+  param$max_sequence_length$gui_box <- "Sequence Modeling"
+  param$max_sequence_length$gui_label <- "Max Sequence Length"
+  param$max_sequence_length$default_value <- 250L
+  param$max_sequence_length$default_historic <- 250L
+  param$max_sequence_length$test_values <- c(150L, 250L)
 
   param$n_chunks <- list(
     type = "int",
@@ -569,7 +569,7 @@ get_param_dict <- function() {
     gui_box = "Sequence Modeling",
     gui_label = "Attention Window",
     default_value = 512L,
-    test_values = c(4L,50L)
+    test_values = c(4L, 50L)
   )
 
   param$hidden_size <- list(
@@ -611,7 +611,7 @@ get_param_dict <- function() {
     gui_box = "Transformer Encoder Layers",
     gui_label = "Number of Hidden Layers",
     default_value = 7L,
-    test_values = c(2L,4L)
+    test_values = c(2L, 4L)
   )
   param$num_hidden_layer <- param$num_hidden_layers
 
@@ -949,7 +949,7 @@ get_param_dict <- function() {
     gui_box = "Pseudo Labeling",
     gui_label = "Number of Steps",
     default_value = 5L,
-    test_values = 2L
+    test_values = 3L
   )
   param$pl_anchor <- list(
     type = "double",
@@ -1102,7 +1102,7 @@ get_param_dict <- function() {
     test_values = 2L
   )
 
-  param$n_batches<- list(
+  param$n_batches <- list(
     type = "int",
     allow_null = FALSE,
     min = 1L,
@@ -1678,7 +1678,7 @@ get_param_dict <- function() {
     gui_box = "Dense Layers",
     gui_label = "Size",
     default_value = 32L,
-    test_values = c(10L,16L)
+    test_values = c(10L, 16L)
   )
 
   param$dense_layers <- list(
@@ -1912,7 +1912,7 @@ get_param_dict <- function() {
     test_values = NULL
   )
 
-  #Relevant for plot functions and methods
+  # Relevant for plot functions and methods
   param$y_min <- list(
     type = "int",
     min = -Inf,
@@ -2031,7 +2031,7 @@ get_param_dict <- function() {
     default_historic = NULL,
     test_values = NULL
   )
-  param$masked_text<- list(
+  param$masked_text <- list(
     type = "string",
     allow_null = FALSE,
     min = NULL,
@@ -2097,10 +2097,10 @@ get_param_def <- function(param_name) {
 #' different output types.
 #' @family Parameter Dictionary
 #' @keywords internal
-doc_formula=function(string_formula){
+doc_formula <- function(string_formula) {
   return(
     paste0(
-      "\\ifelse{latex}{$",string_formula,"$}{\\ifelse{html}{",string_formula,"}{`",string_formula,"`}}"
+      "\\ifelse{latex}{$", string_formula, "$}{\\ifelse{html}{", string_formula, "}{`", string_formula, "`}}"
     )
   )
 }

@@ -31,10 +31,10 @@ get_best_state_point <- function(plot_data, measure) {
     optim <- "max"
   }
 
-  if("val_loss"%in%colnames(plot_data)){
-    selected_column="val_loss"
+  if ("val_loss" %in% colnames(plot_data)) {
+    selected_column <- "val_loss"
   } else {
-    selected_column="validation_mean"
+    selected_column <- "validation_mean"
   }
 
   if (optim == "min") {
@@ -121,7 +121,7 @@ get_best_states_from_folds <- function(data_folds, measure) {
   for (fold in seq_along(x_values)) {
     if (optim == "min") {
       y_value <- min(selected_data[, fold])
-      x_value <- which(selected_data[,  fold] == y_value)[1]
+      x_value <- which(selected_data[, fold] == y_value)[1]
       x_values[fold] <- x_value
       y_values[fold] <- y_value
     } else {
@@ -163,13 +163,13 @@ get_selected_states_from_folds <- function(data_folds, measure) {
   x_values <- vector(length = n_folds)
   y_values <- vector(length = n_folds)
 
-  values_epoch <- seq.int(from = 1L,to=nrow(data_folds[["loss"]]$folds_val),by=1L)
+  values_epoch <- seq.int(from = 1L, to = nrow(data_folds[["loss"]]$folds_val), by = 1L)
 
   for (i in seq_along(x_values)) {
-    values_avg_iota <- data_folds[["avg_iota"]]$folds_val[, i ]
-    values_bbc <- data_folds[["balanced_accuracy"]]$folds_val[, i ]
-    values_loss <- data_folds[["loss"]]$folds_val[, i ]
-    values_acc <- data_folds[["accuracy"]]$folds_val[, i ]
+    values_avg_iota <- data_folds[["avg_iota"]]$folds_val[, i]
+    values_bbc <- data_folds[["balanced_accuracy"]]$folds_val[, i]
+    values_loss <- data_folds[["loss"]]$folds_val[, i]
+    values_acc <- data_folds[["accuracy"]]$folds_val[, i]
 
     complete_values <- cbind(values_epoch, values_avg_iota, values_bbc, values_loss, values_acc)
     colnames(complete_values) <- c("epoch", "avg_iota", "balanced_accuracy", "loss", "accuracy")
@@ -200,41 +200,44 @@ get_selected_states_from_folds <- function(data_folds, measure) {
 #' @param y `float` or `vector` of number representing the y coordinates of the points.
 #' @param type `string` Type of point. `type="segment"` for `ggplot2::geom_segment` or
 #' `type="point"` for `ggplot2::geom_point`.
-#' @param appearance `int` For `type="segment"` the `linetype`. For `type="point"` the `shape`.
+#' @param state `string` For `type="segment"` the `linetype`. For `type="point"` the `shape`.
+#' Allowed values are `"Best"` for the best state according to a metric and `"Final"` for the
+#' final state of the model.
 #' @returns Returns the plot with the point added.
 #' @note In the case of `type="segment"` `x` and `y` must be single numbers. In the case
 #' of `type="point"` `x` and `y` can be `vector`s of numbers with the same length.
 #' @family Utils Plots Developers
 #' @keywords internal
 #' @noRd
-add_point <- function(plot_object, x, y, type = "segment", appearance = 1L) {
+add_point <- function(plot_object, x, y, type = "segment", state = "Best") {
   if (type == "segment") {
     plot_object <- plot_object + ggplot2::geom_segment(
       ggplot2::aes(
         x = .data$segment_x,
         xend = .data$segment_x_end,
         y = .data$segment_y,
-        yend = .data$segment_y_end
+        yend = .data$segment_y_end,
+        linetype = state
       ),
       data = data.frame(
         segment_x = c(0L, as.numeric(x)),
         segment_x_end = c(as.numeric(x), as.numeric(x)),
         segment_y = c(as.numeric(y), 0.0),
         segment_y_end = c(as.numeric(y), as.numeric(y))
-      ),
-      linetype = appearance
+      )
     )
   } else {
     plot_object <- plot_object + ggplot2::geom_point(
       ggplot2::aes(
         x = .data$segment_x,
-        y = .data$segment_y
+        y = .data$segment_y,
+        shape = state
       ),
       data = data.frame(
         segment_x = as.numeric(x),
         segment_y = as.numeric(y)
       ),
-      shape = appearance,
+      # shape = state,
       size = 3L
     )
   }
@@ -258,10 +261,10 @@ add_point <- function(plot_object, x, y, type = "segment", appearance = 1L) {
 #' @keywords internal
 #' @noRd
 add_breaks <- function(plot_object, x_min, x_max, y_min, y_max, special_x = NULL, special_y = NULL) {
-  if((x_max - x_min - 1)<x_max && (x_max - x_min - 1)>0){
-    x_seq=seq.int(from = x_min - 1, to = x_max, by = ceiling((x_max - x_min - 1) / 10))
+  if ((x_max - x_min - 1) < x_max && (x_max - x_min - 1) > 0) {
+    x_seq <- seq.int(from = x_min - 1, to = x_max, by = ceiling((x_max - x_min - 1) / 10))
   } else {
-    x_seq=NULL
+    x_seq <- NULL
   }
   breaks_x <- setdiff(
     x = c(

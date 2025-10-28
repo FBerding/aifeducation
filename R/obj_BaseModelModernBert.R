@@ -53,7 +53,7 @@ BaseModelModernBert <- R6::R6Class(
       private$model <- transformers$ModernBertForMaskedLM$from_pretrained(dir_path)
     },
     check_arg_combinations = function(args) {
-      if(args$num_hidden_layers%%2!=0L){
+      if (args$num_hidden_layers %% 2 != 0L) {
         stop("num_hidden_layers must be a multiple of 2.")
       }
 
@@ -61,7 +61,7 @@ BaseModelModernBert <- R6::R6Class(
         stop("hidden_size must be a multiple auf num_attention_heads.")
       }
 
-      if((args$hidden_size/args$num_attention_heads)%%2!=0){
+      if ((args$hidden_size / args$num_attention_heads) %% 2 != 0) {
         stop("(hidden_size/num_attention_heads) must be a multiple of 2.")
       }
 

@@ -577,7 +577,7 @@ get_description <- function(type) {
     return("Path to the directory where to save the object.")
   } else if (type == "load_dir") {
     return("Path where the object set is stored.")
-  }else if (type == "model_dir") {
+  } else if (type == "model_dir") {
     return("Path where the model is stored.")
   } else {
     stop("Type ist not implemented.")
