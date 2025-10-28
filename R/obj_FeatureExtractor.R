@@ -402,12 +402,10 @@ TEFeatureExtractor <- R6::R6Class(
           # Add new data
           embedded_texts_large$add_embeddings_from_EmbeddedText(embeddings)
         }
-        if (trace) {
-          cat(paste(
-            get_time_stamp(),
-            "Compress Embeddings - Batch", i, "/", total_number_of_bachtes, "done", "\n"
-          ))
-        }
+        print_message(
+          msg = paste("Compress Embeddings - Batch", i, "/", total_number_of_bachtes, "done"),
+          trace = trace
+        )
         gc()
       }
       return(embedded_texts_large)

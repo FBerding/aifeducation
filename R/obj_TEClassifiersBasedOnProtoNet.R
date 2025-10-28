@@ -372,7 +372,6 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
                 geom = "point",
                 x = current_proto$x + margin * cos(seq(from = 0L, to = 2L * base::pi, length.out = 1000L)),
                 y = current_proto$y + margin * sin(seq(from = 0L, to = 2L * base::pi, length.out = 1000L)),
-                color = prototypes$class[i]
               )
             }
           } else if (private$model_config$metric_type == "CosineDistance") {
@@ -406,8 +405,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
                 x = c(0.0, 0.0),
                 y = c(0.0, 0.0),
                 xend = c(x_upper, x_lower),
-                yend = c(y_upper, y_lower),
-                color = prototypes$class[i]
+                yend = c(y_upper, y_lower)
               )
             }
           } else {
