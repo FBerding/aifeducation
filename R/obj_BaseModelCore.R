@@ -582,22 +582,21 @@ BaseModelCore <- R6::R6Class(
     #' @param ind_best_model `r get_param_doc_desc("ind_best_model")`
     #' @param text_size `r get_param_doc_desc("text_size")`
     #' @return Returns a plot of class `ggplot` visualizing the training process.
-    plot_training_history = function(x_min=NULL,x_max=NULL,y_min = NULL, y_max = NULL,ind_best_model=TRUE, text_size = 10L) {
+    plot_training_history = function(x_min = NULL, x_max = NULL, y_min = NULL, y_max = NULL, ind_best_model = TRUE, text_size = 10L) {
       requireNamespace("ggplot2")
       plot_data <- self$last_training$history
 
-      if (is.null(x_min)) {
+      if (is.null_or_na(x_min)) {
         x_min <- 1L
       }
-      if (is.null(x_max)) {
+      if (is.null_or_na(x_max)) {
         x_max <- nrow(plot_data)
       }
-      plot_data=plot_data[x_min:x_max,]
 
-      if (is.null(y_min)) {
+      if (is.null_or_na(y_min)) {
         y_min <- min(plot_data[, c("loss", "val_loss")])
       }
-      if (is.null(y_max)) {
+      if (is.null_or_na(y_max)) {
         y_max <- max(plot_data[, c("loss", "val_loss")])
       }
 
@@ -609,21 +608,7 @@ BaseModelCore <- R6::R6Class(
           ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$loss, color = "train")) +
           ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$val_loss, color = "validation"))
 
-        tmp_plot <- tmp_plot + ggplot2::theme_classic() +
-          ggplot2::ylab("value") +
-          ggplot2::coord_cartesian(ylim = c(y_min, y_max)) +
-          ggplot2::xlab("epoch") +
-          ggplot2::scale_color_manual(values = c(
-            train = "red",
-            validation = "blue",
-            test = "darkgreen"
-          )) +
-          ggplot2::theme(
-            text = ggplot2::element_text(size = text_size),
-            legend.position = "bottom"
-          )
-
-        if(ind_best_model){
+        if (ind_best_model) {
           best_state_point <- get_best_state_point(
             plot_data = plot_data,
             measure = "loss"
@@ -633,7 +618,29 @@ BaseModelCore <- R6::R6Class(
             x = best_state_point$epoch,
             y = best_state_point$value,
             type = "segment",
-            appearance = 1L
+            state = "Best"
+          )
+        }
+
+        tmp_plot <- tmp_plot + ggplot2::theme_classic() +
+          ggplot2::ylab("value") +
+          ggplot2::xlab("epoch") +
+          ggplot2::coord_cartesian(ylim = c(y_min, y_max), xlim = c(x_min, x_max)) +
+          ggplot2::scale_color_manual(
+            values = c(
+              train = "red",
+              validation = "blue",
+              test = "darkgreen"
+            )
+          ) +
+          ggplot2::theme(
+            text = ggplot2::element_text(size = text_size),
+            legend.position = "bottom"
+          )
+
+        if (ind_best_model || ind_selected_model) {
+          tmp_plot <- tmp_plot + ggplot2::scale_linetype_manual(
+            values = c(Best = 1, Final = 3L)
           )
         }
         return(tmp_plot)
@@ -839,7 +846,7 @@ BaseModelCore <- R6::R6Class(
     #' @description Number of layers.
     #' @return Returns an `int` describing the number of layers available for
     #' embedding.
-    get_n_layers=function(){
+    get_n_layers = function() {
       return(private$model$config$num_hidden_layers)
     },
     #--------------------------------------------------------------------------
