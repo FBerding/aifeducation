@@ -117,8 +117,6 @@ Fill_Mask_Server <- function(id, model) {
         tmp_model <- model()$BaseModel
       }
 
-      print(input$txt_for_fill_mask)
-
       solutions <- try(
         tmp_model$fill_mask(
           masked_text = input$txt_for_fill_mask,

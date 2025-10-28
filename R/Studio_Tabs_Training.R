@@ -137,12 +137,6 @@ Training_Server <- function(id, model) {
             choices = list(
               "Loss" = "loss"
             )
-          ),
-          shinyWidgets::materialSwitch(
-            inputId = ns("training_min_max"),
-            label = "Add Min/Max",
-            value = TRUE,
-            status = "primary"
           )
         )
       } else {
