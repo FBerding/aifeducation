@@ -86,6 +86,7 @@ TEClassifierParallelPrototype <- R6::R6Class(
     #' @param tf_bias `r get_param_doc_desc("tf_bias")`
     #' @param tf_parametrizations `r get_param_doc_desc("tf_parametrizations")`
     #' @param tf_normalization_type `r get_param_doc_desc("tf_normalization_type")`
+    #' @param tf_normalization_position `r get_param_doc_desc("tf_normalization_position")`
     #' @param tf_residual_type `r get_param_doc_desc("tf_residual_type")`
     #' @param merge_attention_type `r get_param_doc_desc("merge_attention_type")`
     #' @param merge_num_heads `r get_param_doc_desc("merge_num_heads")`
@@ -142,6 +143,7 @@ TEClassifierParallelPrototype <- R6::R6Class(
                          tf_bias = FALSE,
                          tf_parametrizations = "None",
                          tf_normalization_type = "LayerNorm",
+                         tf_normalization_position = "pre",
                          tf_residual_type = "ResidualGate",
                          merge_attention_type = "multi_head",
                          merge_num_heads = 1L,
@@ -211,6 +213,7 @@ TEClassifierParallelPrototype <- R6::R6Class(
         tf_bias = private$model_config$tf_bias,
         tf_parametrizations = private$model_config$tf_parametrizations,
         tf_normalization_type = private$model_config$tf_normalization_type,
+        tf_normalization_position = private$model_config$tf_normalization_position,
         tf_residual_type = private$model_config$tf_residual_type,
         merge_attention_type = private$model_config$merge_attention_type,
         merge_normalization_type = private$model_config$merge_normalization_type,
@@ -224,14 +227,14 @@ TEClassifierParallelPrototype <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     check_param_combinations_configuration = function() {
-      if(private$model_config$feat_size<private$model_config$merge_pooling_features){
+      if (private$model_config$feat_size < private$model_config$merge_pooling_features) {
         warning("merge_pooling_features must be equal or lower as feat_size. Set merge_pooling_features=feat_size.")
-        private$model_config$merge_pooling_features=private$model_config$feat_size
+        private$model_config$merge_pooling_features <- private$model_config$feat_size
       }
 
       if (private$model_config$rec_n_layers == 1L && private$model_config$rec_dropout > 0.0) {
         print_message(
-          msg = "Dropout for recurrent requires at least two layers. Setting rec_dropout to 0.0.",
+          msg = "Dropout for recurrent layers requires at least two layers. Setting rec_dropout to 0.0.",
           trace = TRUE
         )
         private$model_config$rec_dropout <- 0.0
