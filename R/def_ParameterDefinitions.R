@@ -2100,7 +2100,7 @@ get_param_def <- function(param_name) {
 doc_formula <- function(string_formula) {
   return(
     paste0(
-      "\\ifelse{latex}{$", string_formula, "$}{\\ifelse{html}{", string_formula, "}{`", string_formula, "`}}"
+      "\\ifelse{latex}{$", string_formula, "$}{\\ifelse{html}{$", string_formula, "$}{`", string_formula, "`}}"
     )
   )
 }
