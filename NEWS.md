@@ -18,10 +18,17 @@ editor_options:
   [Xiong et al. (2020)](https://doi.org/10.48550/arXiv.2002.04745) for
   transformer encoder layers.
 - Added new options for plotting training history.
+- Fixed an errors causing pseudo labeling to crash in some cases.
 
 **FeatureExtractor**
 
 - Added new options for plotting training history.
+
+**Graphical User Interface Aifeducation Studio**
+
+- Added new controlling widgets for the new options for plotting training history.
+- Reduced the number of columns for sustainability data for more transparency (BaseModels and TextEmbeddingModels).
+- Added a calculation of the total number of words a TextEmbeddingModel can maximal use.
 
 # aifeducation 1.1.2
 
