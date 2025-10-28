@@ -849,7 +849,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
           test_data = test_data,
           reset_model = TRUE,
           use_callback = TRUE,
-          log_dir = private$log_config$log_state_file,
+          log_dir = private$log_config$log_dir,
           log_write_interval = private$log_config$log_write_interval,
           log_top_value = iteration,
           log_top_total = self$last_training$config$n_folds + 1L,
