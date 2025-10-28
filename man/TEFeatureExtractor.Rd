@@ -264,6 +264,8 @@ Method for requesting a plot of the training history.
 This method requires the \emph{R} package 'ggplot2' to work.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TEFeatureExtractor$plot_training_history(
+  x_min = NULL,
+  x_max = NULL,
   y_min = NULL,
   y_max = NULL,
   ind_best_model = TRUE,
@@ -274,6 +276,10 @@ This method requires the \emph{R} package 'ggplot2' to work.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
+\item{\code{x_min}}{\code{int} Minimal value for x-axis. Set to \code{NULL} for an automatic adjustment. Allowed values: \ifelse{latex}{$ x $}{\ifelse{html}{ x }{` x `}}}
+
+\item{\code{x_max}}{\code{int} Maximal value for x-axis. Set to \code{NULL} for an automatic adjustment. Allowed values: \ifelse{latex}{$ x $}{\ifelse{html}{ x }{` x `}}}
+
 \item{\code{y_min}}{\code{int} Minimal value for y-axis. Set to \code{NULL} for an automatic adjustment. Allowed values: \ifelse{latex}{$ x $}{\ifelse{html}{ x }{` x `}}}
 
 \item{\code{y_max}}{\code{int} Maximal value for y-axis. Set to \code{NULL} for an automatic adjustment. Allowed values: \ifelse{latex}{$ x $}{\ifelse{html}{ x }{` x `}}}
@@ -281,10 +287,6 @@ This method requires the \emph{R} package 'ggplot2' to work.
 \item{\code{ind_best_model}}{\code{bool} If \code{TRUE} the plot indicates the best states of the model according to the chosen measure.}
 
 \item{\code{text_size}}{\code{int} Size of text elements. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{1 <= x }{`1 <= x `}}}
-
-\item{\code{x_min}}{\code{int} Minimal value for x-axis. Set to \code{NULL} for an automatic adjustment. Allowed values: \ifelse{latex}{$ x $}{\ifelse{html}{ x }{` x `}}}
-
-\item{\code{x_max}}{\code{int} Maximal value for x-axis. Set to \code{NULL} for an automatic adjustment. Allowed values: \ifelse{latex}{$ x $}{\ifelse{html}{ x }{` x `}}}
 }
 \if{html}{\out{</div>}}
 }

@@ -61,6 +61,7 @@ Other Base Model:
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_flops_estimates"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_flops_estimates'><code>aifeducation::BaseModelCore$get_flops_estimates()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_model"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_model'><code>aifeducation::BaseModelCore$get_model()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_model_type"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_model_type'><code>aifeducation::BaseModelCore$get_model_type()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_n_layers"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_n_layers'><code>aifeducation::BaseModelCore$get_n_layers()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_special_tokens"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_special_tokens'><code>aifeducation::BaseModelCore$get_special_tokens()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_tokenizer_statistics"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_tokenizer_statistics'><code>aifeducation::BaseModelCore$get_tokenizer_statistics()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="load_from_disk"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-load_from_disk'><code>aifeducation::BaseModelCore$load_from_disk()</code></a></span></li>
@@ -76,6 +77,13 @@ Other Base Model:
 \if{latex}{\out{\hypertarget{method-BaseModelModernBert-configure}{}}}
 \subsection{Method \code{configure()}}{
 Configures a new object of this class.
+Please ensure that your chosen configuration comply with the following
+guidelines:
+\itemize{
+\item hidden_size is a multiple of num_attention_heads.
+\item hidden_size/num_attention_heads must be a multiple of 2.
+\item global_attn_every_n_layers is equal or smaller as num_hidden_layers.
+}
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{BaseModelModernBert$configure(
   tokenizer,

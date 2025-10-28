@@ -29,6 +29,7 @@ Other Base Model:
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-BaseModelFunnel-configure}{\code{BaseModelFunnel$configure()}}
+\item \href{#method-BaseModelFunnel-get_n_layers}{\code{BaseModelFunnel$get_n_layers()}}
 \item \href{#method-BaseModelFunnel-clone}{\code{BaseModelFunnel$clone()}}
 }
 }
@@ -75,6 +76,11 @@ Other Base Model:
 \if{latex}{\out{\hypertarget{method-BaseModelFunnel-configure}{}}}
 \subsection{Method \code{configure()}}{
 Configures a new object of this class.
+Please ensure that your chosen configuration comply with the following
+guidelines:
+\itemize{
+\item hidden_size is a multiple of num_attention_heads.
+}
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{BaseModelFunnel$configure(
   tokenizer,
@@ -130,6 +136,20 @@ embedding. Allowed values: \ifelse{latex}{$1 <= x <= 2048$}{\ifelse{html}{1 <= x
 }
 \subsection{Returns}{
 Does nothing return.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-BaseModelFunnel-get_n_layers"></a>}}
+\if{latex}{\out{\hypertarget{method-BaseModelFunnel-get_n_layers}{}}}
+\subsection{Method \code{get_n_layers()}}{
+Number of layers.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{BaseModelFunnel$get_n_layers()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns an \code{int} describing the number of layers available for
+embedding.
 }
 }
 \if{html}{\out{<hr>}}

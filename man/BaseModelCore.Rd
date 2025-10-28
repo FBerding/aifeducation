@@ -48,6 +48,7 @@ Objects of class \code{TokenizerBase}.}
 \item \href{#method-BaseModelCore-get_model}{\code{BaseModelCore$get_model()}}
 \item \href{#method-BaseModelCore-get_model_type}{\code{BaseModelCore$get_model_type()}}
 \item \href{#method-BaseModelCore-get_final_size}{\code{BaseModelCore$get_final_size()}}
+\item \href{#method-BaseModelCore-get_n_layers}{\code{BaseModelCore$get_n_layers()}}
 \item \href{#method-BaseModelCore-get_flops_estimates}{\code{BaseModelCore$get_flops_estimates()}}
 \item \href{#method-BaseModelCore-set_publication_info}{\code{BaseModelCore$set_publication_info()}}
 \item \href{#method-BaseModelCore-estimate_sustainability_inference_fill_mask}{\code{BaseModelCore$estimate_sustainability_inference_fill_mask()}}
@@ -369,6 +370,20 @@ Size of the final layer.
 \subsection{Returns}{
 Returns an \code{int} describing the number of dimensions of the last
 hidden layer.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-BaseModelCore-get_n_layers"></a>}}
+\if{latex}{\out{\hypertarget{method-BaseModelCore-get_n_layers}{}}}
+\subsection{Method \code{get_n_layers()}}{
+Number of layers.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{BaseModelCore$get_n_layers()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns an \code{int} describing the number of layers available for
+embedding.
 }
 }
 \if{html}{\out{<hr>}}
