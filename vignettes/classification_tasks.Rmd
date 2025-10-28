@@ -18,11 +18,12 @@ knitr::opts_chunk$set(
 )
 running_num_figures <- 1
 
-#Clean examples folder
-example_folders=setdiff(x=list.dirs(path="examples"),
-                        y=c("examples","examples/bert_uncased"))
-unlink(x=example_folders,recursive = TRUE)
-
+# Clean examples folder
+example_folders <- setdiff(
+  x = list.dirs(path = "examples"),
+  y = c("examples", "examples/bert_uncased")
+)
+unlink(x = example_folders, recursive = TRUE)
 ```
 
 # 1 Introduction and Overview
@@ -679,7 +680,8 @@ the computations should take only some minutes.
 Now the model is ready to use. At the beginning we can explore some tokenizer statistics.
 
 ```{r, include = TRUE, eval = TRUE}
-tokenizer$get_tokenizer_statistics()
+# We use t() to improve the readability of the table
+t(tokenizer$get_tokenizer_statistics())
 ```
 
 ```{r, include = FALSE, eval = TRUE}
@@ -735,7 +737,8 @@ If you would like to analyse the ecological impact of training the tokenizer you
 can  get an estimation of energy consumption and CO2-emission.
 
 ```{r, include = TRUE, eval = TRUE}
-tokenizer$get_sustainability_data("training")
+# We use t() to improve the readability of the table
+t(tokenizer$get_sustainability_data("training"))
 ```
 
 Since tokenizers can be trained very efficient these values will be very low in most cases.
@@ -910,7 +913,7 @@ A plot of the training history of the last training can be shown as follows:
 
 ```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Example of a Training History for a BaseModel.")}
 base_model$plot_training_history(
-  ind_best_model=TRUE
+  ind_best_model = TRUE
 )
 ```
 
@@ -924,7 +927,8 @@ To explore the ecological impact of the training and fine-tuning of a model you 
 call `get_sustainability_data("training")`.
 
 ```{r, include = TRUE, eval = TRUE}
-base_model$get_sustainability_data("training")
+# We use t() to improve the readability of the table
+t(base_model$get_sustainability_data("training"))
 ```
 
 The resulting table provides you detailed information on every single training run with
@@ -954,7 +958,8 @@ texts to be used.
 The results of every run can be accessed via `get_sustainability_data("inference")`.
 
 ```{r, include = TRUE, eval = TRUE}
-base_model$get_sustainability_data("inference")
+# We use t() to improve the readability of the table
+t(base_model$get_sustainability_data("inference"))
 ```
 
 **FLOPS Estimates**
@@ -1210,7 +1215,7 @@ can call a special method.
 
 ```{r, include = TRUE, eval = FALSE}
 bert_modeling$BaseModel$plot_training_history(
-  ind_best_model=TRUE
+  ind_best_model = TRUE
 )
 ```
 
@@ -1331,6 +1336,7 @@ classifier$configure(
   tf_bias = FALSE,
   tf_parametrizations = "None",
   tf_normalization_type = "LayerNorm",
+  tf_normalization_position = "pre",
   tf_residual_type = "ResidualGate"
 )
 ```
@@ -1657,7 +1663,8 @@ tracker, you can receive information on sustainability by calling
 `classifier$get_sustainability_data()`.
 
 ```{r, include = TRUE, eval = TRUE}
-classifier$get_sustainability_data()
+# We use t() to improve the readability of the table
+t(classifier$get_sustainability_data())
 ```
 
 ## 5.6 Saving and Loading a Classifier
@@ -1846,6 +1853,7 @@ classifier_prototype$configure(
   tf_bias = FALSE,
   tf_parametrizations = "None",
   tf_normalization_type = "LayerNorm",
+  tf_normalization_position = "pre",
   tf_residual_type = "ResidualGate",
   embedding_dim = 2
 )
@@ -2233,7 +2241,7 @@ You can plot the training history of the model with:
 
 ```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Training History of a Feature Extractor.")}
 feature_extractor$plot_training_history(
-  ind_best_model=TRUE
+  ind_best_model = TRUE
 )
 ```
 
@@ -2304,6 +2312,7 @@ classifier_with_fe$configure(
   tf_bias = FALSE,
   tf_parametrizations = "None",
   tf_normalization_type = "LayerNorm",
+  tf_normalization_position = "pre",
   tf_residual_type = "ResidualGate"
 )
 ```
@@ -2376,11 +2385,11 @@ In contrast to the classifiers this state is also the final state of the model a
 
 ```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Example of a Training History for a BaseModel emphasizing the Best Model State.")}
 base_model$plot_training_history(
-  x_min=NULL,
-  x_max=NULL,
-  y_min = NULL, 
-  y_max = NULL, 
-  ind_best_model=TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = NULL,
+  ind_best_model = TRUE,
   text_size = 10L
 )
 ```
