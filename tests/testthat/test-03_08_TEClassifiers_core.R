@@ -104,7 +104,7 @@ for (object_class_name in object_class_names) {
 
         # Create test object with a given combination of args
         classifier <- create_object(object_class_name)
-        #print(test_combination)
+        # print(test_combination)
         suppressMessages(
           do.call(
             what = classifier$configure,
@@ -601,25 +601,25 @@ for (object_class_name in object_class_names) {
           } else {
             pl_step <- NULL
           }
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "loss", final_training = FALSE, add_min_max = TRUE), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "avg_iota", final_training = FALSE, add_min_max = TRUE), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "accuracy", final_training = FALSE, add_min_max = TRUE), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "balanced_accuracy", final_training = FALSE, add_min_max = TRUE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "loss", final_training = FALSE, add_min_max = TRUE, ind_best_model = TRUE, ind_selected_model = TRUE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "avg_iota", final_training = FALSE, add_min_max = TRUE, ind_best_model = FALSE, ind_selected_model = TRUE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "accuracy", final_training = FALSE, add_min_max = TRUE, ind_best_model = FALSE, ind_selected_model = FALSE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "balanced_accuracy", final_training = FALSE, add_min_max = TRUE, ind_best_model = TRUE, ind_selected_model = FALSE), class = "ggplot")
 
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "loss", final_training = FALSE, add_min_max = TRUE, y_min = 0, y_max = 2), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "avg_iota", final_training = FALSE, add_min_max = TRUE, y_min = 0, y_max = 1), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "accuracy", final_training = FALSE, add_min_max = TRUE, y_min = 0, y_max = 1), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "balanced_accuracy", final_training = FALSE, add_min_max = TRUE, y_min = 0, y_max = 1), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "loss", final_training = FALSE, add_min_max = TRUE, y_min = 0, y_max = 2, ind_best_model = TRUE, ind_selected_model = FALSE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "avg_iota", final_training = FALSE, add_min_max = TRUE, y_min = 0, y_max = 1, ind_best_model = FALSE, ind_selected_model = FALSE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "accuracy", final_training = FALSE, add_min_max = TRUE, y_min = 0, y_max = 1, ind_best_model = FALSE, ind_selected_model = TRUE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "balanced_accuracy", final_training = FALSE, add_min_max = TRUE, y_min = 0, y_max = 1, ind_best_model = TRUE, ind_selected_model = TRUE), class = "ggplot")
 
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "loss", final_training = FALSE, add_min_max = FALSE), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "avg_iota", final_training = FALSE, add_min_max = FALSE), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "accuracy", final_training = FALSE, add_min_max = FALSE), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "balanced_accuracy", final_training = FALSE, add_min_max = FALSE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "loss", final_training = FALSE, add_min_max = FALSE, ind_best_model = TRUE, ind_selected_model = TRUE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "avg_iota", final_training = FALSE, add_min_max = FALSE, ind_best_model = TRUE, ind_selected_model = FALSE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "accuracy", final_training = FALSE, add_min_max = FALSE, ind_best_model = FALSE, ind_selected_model = FALSE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "balanced_accuracy", final_training = FALSE, add_min_max = FALSE, ind_best_model = FALSE, ind_selected_model = TRUE), class = "ggplot")
 
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "loss", final_training = TRUE), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "avg_iota", final_training = TRUE), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "accuracy", final_training = TRUE), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "balanced_accuracy", final_training = TRUE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "loss", final_training = TRUE, ind_best_model = TRUE, ind_selected_model = FALSE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "avg_iota", final_training = TRUE, ind_best_model = TRUE, ind_selected_model = TRUE), class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "accuracy", final_training = TRUE), ind_best_model = FALSE, ind_selected_model = TRUE, class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "balanced_accuracy", final_training = TRUE, ind_best_model = FALSE, ind_selected_model = FALSE), class = "ggplot")
         })
 
         test_that(paste(

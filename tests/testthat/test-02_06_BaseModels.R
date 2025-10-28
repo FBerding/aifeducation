@@ -156,10 +156,15 @@ for (object_class_name in object_class_names) {
       expect_true("loss" %in% colnames(history))
       expect_true("val_loss" %in% colnames(history))
 
-      expect_s3_class(object = base_model$plot_training_history(y_min = NULL, y_max = NULL), class = "ggplot")
-      expect_s3_class(object = base_model$plot_training_history(y_min = 0, y_max = NULL), class = "ggplot")
-      expect_s3_class(object = base_model$plot_training_history(y_min = 0, y_max = 10), class = "ggplot")
-      expect_s3_class(object = base_model$plot_training_history(y_min = NULL, y_max = 10), class = "ggplot")
+      expect_s3_class(object = base_model$plot_training_history(y_min = NULL, y_max = NULL, x_min = NULL, x_max = NULL, ind_best_model = TRUE), class = "ggplot")
+      expect_s3_class(object = base_model$plot_training_history(y_min = 0, y_max = NULL, x_min = NULL, x_max = NULL, ind_best_model = FALSE), class = "ggplot")
+      expect_s3_class(object = base_model$plot_training_history(y_min = 0, y_max = 10, x_min = NULL, x_max = NULL, ind_best_model = TRUE), class = "ggplot")
+      expect_s3_class(object = base_model$plot_training_history(y_min = NULL, y_max = 10, x_min = NULL, x_max = NULL, ind_best_model = FALSE), class = "ggplot")
+
+      expect_s3_class(object = base_model$plot_training_history(y_min = NULL, y_max = NULL, x_min = 1L, x_max = NULL, ind_best_model = TRUE), class = "ggplot")
+      expect_s3_class(object = base_model$plot_training_history(y_min = 0, y_max = NULL, x_min = NULL, x_max = 2L, ind_best_model = FALSE), class = "ggplot")
+      expect_s3_class(object = base_model$plot_training_history(y_min = 0, y_max = 10, x_min = 1L, x_max = 2L, ind_best_model = TRUE), class = "ggplot")
+      expect_s3_class(object = base_model$plot_training_history(y_min = NULL, y_max = 10, x_min = NULL, x_max = NULL, ind_best_model = TRUE), class = "ggplot")
     })
 
     test_that(paste(

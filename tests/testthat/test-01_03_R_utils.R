@@ -98,23 +98,23 @@ test_that("check_class", {
 
 test_that("check_type", {
   types <- c("bool", "int", "double", "(double", "double)", "(double)", "string", "vector", "list")
-  objects=list(
-    "bool"=TRUE,
-    "int"=2L,
-    "double"=0.5,
-    "(double"=0.5,
-    "double)"=0.5,
-    "(double)"=0.5,
-    "string"="test_string",
-    "vector"=c(1L,0.5),
-    "list"=list(a=5,b=10)
+  objects <- list(
+    "bool" = TRUE,
+    "int" = 2L,
+    "double" = 0.5,
+    "(double" = 0.5,
+    "double)" = 0.5,
+    "(double)" = 0.5,
+    "string" = "test_string",
+    "vector" = c(1L, 0.5),
+    "list" = list(a = 5, b = 10)
   )
   allow_null_vars <- c(TRUE, FALSE)
   for (type in types) {
     for (allow_null in allow_null_vars) {
       expect_no_error(
         check_type(
-          object=objects[[type]],
+          object = objects[[type]],
           object_name = "test_object",
           type = type,
           allow_NULL = allow_null,
@@ -124,10 +124,10 @@ test_that("check_type", {
         )
       )
 
-      if(allow_null){
+      if (allow_null) {
         expect_no_error(
           check_type(
-            object=NULL,
+            object = NULL,
             object_name = "test_object",
             type = type,
             allow_NULL = allow_null,
@@ -139,7 +139,7 @@ test_that("check_type", {
       } else {
         expect_error(
           check_type(
-            object=NULL,
+            object = NULL,
             object_name = "test_object",
             type = type,
             allow_NULL = allow_null,
@@ -149,7 +149,6 @@ test_that("check_type", {
           )
         )
       }
-
     }
   }
 })
