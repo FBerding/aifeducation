@@ -173,7 +173,7 @@ core python packages in order to use this package. In the case you would like to
 install the packages manually we recommend the following versions.
 
 ```{r, include = TRUE, eval=TRUE}
-aifeducation::get_recommended_py_versions()
+t(aifeducation::get_recommended_py_versions())
 ```
 
 We have tested the package with these versions ensuring that *aifeducation* works correctly.

@@ -2369,19 +2369,13 @@ at a later time point in combination with other models.
 
 # 7 Plots for Training History
 ## 7.1 BaseModels
-BaseModels, TEFeatureExtractors, and classifiers provide you with the possibility to create plots
-showing the training process of your model. Requesting these plots is similar for all
-objects. However, classifiers have the most options for customizing graphics. 
-In this chapter we show you how to use the plots. We refer to the models
-of the previous chapters in order to give you some examples.
 
-We start with the base models. The arguments `x_min`, `x_max`, `y_min`, and `y_max` allow
-you to zoom in our out. If you set these argument to `NULL` the values are determined automatically.
+BaseModels, TEFeatureExtractors, and classifiers allow you to create plots showing your model's training process. The process of requesting these plots is similar for all objects. However, classifiers offer the greatest degree of customization of graphics. This chapter shows you how to use the plots. We refer to the models from previous chapters to provide some examples.
 
-The argument `ind_best_model` allows you to emphasize the epoch with the smallest loss for the
-validation sample. In general, this is the state of the model with the best generalization abilities.
-In contrast to the classifiers this state is also the final state of the model after training. 
-`text_size` allows you to increase or decrease the size of the texts within the graphic. 
+We start with the base models. The`x_min`, `x_max`, `y_min`, and `y_max` arguments allow you to zoom in or out. If you set these arguments to `NULL`, the values will be determined automatically.
+
+The ind_best_model argument allows you to emphasise the epoch with the smallest loss for the validation sample. In general, this is the state of the model with the best generalization abilities. Unlike the classifiers, this is also the final state of the model after training.
+The `text_size` argument allows you to increase or decrease the size of the text within the graphic.
 
 ```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Example of a Training History for a BaseModel emphasizing the Best Model State.")}
 base_model$plot_training_history(
@@ -2399,10 +2393,11 @@ running_num_figures <- running_num_figures + 1
 ```
 
 ## 7.2 Classifiers
-Classifiers offer a higher number of options. Again with `x_min`, `x_max`, `y_min`, and `y_max` you
-can define the area the plot should show. Setting these argument to `NULL` will generate
-adequate values automatically. With `measure` you can choose the metric you would like to see.
-For example the following plot shows the loss.
+
+Classifiers offer a greater variety of options. With the `x_min`, `x_max`, `y_min` and `y_max` arguments, 
+you can define the area that the plot should show. Setting these arguments to `NULL` 
+will generate adequate values automatically. With `measure`, you can select the metric you would like to see.
+For example, the following plot shows the loss.
 
 ```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Example of a Training History for a Classifier emphasizing the Loss.")}
 classifier$plot_training_history(
@@ -2424,7 +2419,7 @@ classifier$plot_training_history(
 running_num_figures <- running_num_figures + 1
 ```
 
-The following plot shows the development of the average iota values during training.
+The following plot illustrates how the average iota values developed during the training process.
 
 ```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Example of a Training History for a Classifier emphasizing the Average Iota.")}
 classifier$plot_training_history(
@@ -2446,11 +2441,8 @@ classifier$plot_training_history(
 running_num_figures <- running_num_figures + 1
 ```
 
-If you set `ind_best_model` to `TRUE` you will see some additional points in the graphic.
-These point represent the epochs and the corresponding values according to the chosen metric
-where the model performed best. In the case of metrics such as the loss the values should be close to 0
-while metrics such as accuracy, balanced accuracy, and average iota the best values are close to 1. You can
-see one point for every fold during training. 
+Setting `ind_best_model` to `TRUE` will display additional points in the graphic.
+These points represent the epochs and their corresponding values according to the chosen metric at which the model performed best. For metrics such as loss, the values should be close to 0, while for metrics such as accuracy, balanced accuracy and average iota, the best values are close to 1. You can see one point for every fold during training.
 
 ```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Example of a Training History for a Classifier emphasizing the Loss and the best Model States.")}
 classifier$plot_training_history(
@@ -2492,17 +2484,10 @@ classifier$plot_training_history(
 running_num_figures <- running_num_figures + 1
 ```
 
-Please note that these point indicate the best states of the model according to the chosen metric in every fold.
-However, these values are not always the same values for the final state of the model. The reason is that
-the best state of a model during every training loop is determined by the best value for average iota. In the
-case that there are multiple states of a model with the same values for average iota the state is selected
-with the best value for average iota *and*, in a second step, with the best value for the balanced accuracy. In the case that there are still multiple states the loss is taken into account. That is, possible best states are all
-states with the best value for average iota. These states are reduced to the states that have the best value for
-balanced accuracy, and these states are reduced to the states with the best values for the loss. From these the
-states with  the highest number of epochs is used.
+Please note that these points indicate the optimal state of the model according to the chosen metric for each fold.
+However, these values do not necessarily correspond to the final state of the model. This is because the best state of a model during each training loop is determined by the best average iota value. If there are multiple states of a model with the same average iota value, the state with the best average iota value is selected, and then the state with the best balanced accuracy value. If there are still multiple states, the loss is taken into account. In other words, possible best states are all states with the best average iota value. These states are then reduced to those with the best balanced accuracy value, and these states are then reduced again to those with the best loss value. The state with the highest number of epochs is then used.
 
-You can add the final states of the model for every fold by setting `ind_selected_model`
-to `TRUE`.
+Set `ind_selected_model` to `TRUE` to add the final states of the model for every fold.
 
 ```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Example of a Training History for a Classifier emphasizing the Loss, the best Model States, and the Final Model States.")}
 classifier$plot_training_history(
@@ -2524,10 +2509,7 @@ classifier$plot_training_history(
 running_num_figures <- running_num_figures + 1
 ```
 
-Since the performance of a model is determined by several folds the minimal and maximal values
-allow a deeper understanding of the training process. To add these to the graphic set 
-`add_min_max` to `TRUE`. Now the plot shows the complete range of values for every epoch
-according to the chosen metric. 
+Since the performance of a model is determined by several factors, the minimum and maximum values provide a deeper understanding of the training process. To include these in the plot, set `add_min_max` to `TRUE`. The plot will now show the full range of values for each epoch according to the chosen metric. 
 
 ```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Example of a Training History for a Classifier emphasizing the Loss with Minimal and Maximal Values.")}
 classifier$plot_training_history(
@@ -2549,11 +2531,10 @@ classifier$plot_training_history(
 running_num_figures <- running_num_figures + 1
 ```
 
-With the argument `final_training` you can switch the plot between the phase of
-performance estimation and the final training of the model. Since the final
-training phase differentiate only between a training and validation data set there 
-is no line for a test data set. In addition, there are no folds. Thus, the argument
-`add_min_max` has no functionality. 
+Using the argument `final_trainin`', you can switch between the performance estimation 
+phase and the final training phase of the model. Since the final training phase 
+only differentiates between training and validation data sets, there is no line 
+for test data. In addition, there are no folds. Therefore, the argument `add_min_max` has no functionality. 
 
 ```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Example of a Training History for a Classifier emphasizing the Loss at the Final Training Phase.")}
 classifier$plot_training_history(
@@ -2575,10 +2556,10 @@ classifier$plot_training_history(
 running_num_figures <- running_num_figures + 1
 ```
 
-The last important argument is `pl_step`. This value is only relevant
-if the model used pseudo labeling during training. With this parameter you can select
-the step during pseudo labeling that should be displayed on the graphic. This works
-for the performance estimation as well as for the final training phase. 
+The final important argument is `pl_step`. 
+This value is only relevant if the model used pseudo labeling during training. 
+This parameter allows you to select the step during pseudo labeling 
+that should be displayed in the plot. This works for performance estimation as well as the final training phase. 
 
 # References
 
