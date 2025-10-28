@@ -618,7 +618,7 @@ for (object_class_name in object_class_names) {
 
           expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "loss", final_training = TRUE, ind_best_model = TRUE, ind_selected_model = FALSE), class = "ggplot")
           expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "avg_iota", final_training = TRUE, ind_best_model = TRUE, ind_selected_model = TRUE), class = "ggplot")
-          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "accuracy", final_training = TRUE), ind_best_model = FALSE, ind_selected_model = TRUE, class = "ggplot")
+          expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "accuracy", final_training = TRUE, ind_best_model = FALSE, ind_selected_model = TRUE), class = "ggplot")
           expect_s3_class(object = classifier$plot_training_history(pl_step = pl_step, measure = "balanced_accuracy", final_training = TRUE, ind_best_model = FALSE, ind_selected_model = FALSE), class = "ggplot")
         })
 
