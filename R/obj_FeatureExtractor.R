@@ -405,7 +405,7 @@ TEFeatureExtractor <- R6::R6Class(
         if (trace) {
           cat(paste(
             get_time_stamp(),
-            "Batch", i, "/", total_number_of_bachtes, "done", "\n"
+            "Compress Embeddings - Batch", i, "/", total_number_of_bachtes, "done", "\n"
           ))
         }
         gc()
