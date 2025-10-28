@@ -47,14 +47,84 @@ Sustainability_Server <- function(id, model) {
     # global variables-----------------------------------------------------------
     ns <- session$ns
 
-    output$ui_training <- DT::renderDataTable(
-      return(model()$get_sustainability_data("training"))
-    )
+    output$ui_training <- DT::renderDataTable({
+      if (inherits(model(), "BaseModelCore") ||
+        inherits(model(), "TextEmbeddingModel")) {
+        if (inherits(model(), "BaseModelCore")) {
+          sus_data <- model()$get_sustainability_data("training")
+        } else {
+          sus_data <- model()$BaseModel$get_sustainability_data("training")
+        }
+        if (nrow(sus_data) > 0) {
+          select_columns <- c(
+            "date",
+            "task",
+            "region.country_iso_code",
+            "sustainability_data.duration_sec",
+            "sustainability_data.co2eq_kg",
+            "sustainability_data.total_energy_kwh"
+          )
+          sus_data <- sus_data[, select_columns]
+          colnames(sus_data) <- c(
+            "date",
+            "task",
+            "region",
+            "duration (sec)",
+            "co2eq kg",
+            "total kwh"
+          )
+          return(sus_data)
+        } else {
+          return(NULL)
+        }
+      } else {
+        return(NULL)
+      }
+    })
 
     output$ui_inference <- DT::renderDataTable({
       if (inherits(model(), "BaseModelCore") ||
         inherits(model(), "TextEmbeddingModel")) {
-        return(model()$get_sustainability_data("inference"))
+        if (inherits(model(), "BaseModelCore")) {
+          sus_data <- model()$get_sustainability_data("inference")
+        } else {
+          sus_data <- model()$BaseModel$get_sustainability_data("inference")
+        }
+
+        if (nrow(sus_data) > 0) {
+          select_columns <- c(
+            "date",
+            "task",
+            "region.country_iso_code",
+            "sustainability_data.duration_sec",
+            "sustainability_data.co2eq_kg",
+            "sustainability_data.total_energy_kwh",
+            "n",
+            "batch",
+            "min_seq_len",
+            "mean_seq_len",
+            "sd_seq_len",
+            "max_seq_len"
+          )
+          sus_data <- sus_data[, select_columns]
+          colnames(sus_data) <- c(
+            "date",
+            "task",
+            "region",
+            "duration (sec)",
+            "co2eq kg",
+            "total kwh",
+            "n",
+            "batch",
+            "min_seq_len",
+            "mean_seq_len",
+            "sd_seq_len",
+            "max_seq_len"
+          )
+          return(sus_data)
+        } else {
+          return(NULL)
+        }
       }
     })
   })
