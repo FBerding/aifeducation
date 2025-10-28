@@ -836,6 +836,13 @@ BaseModelCore <- R6::R6Class(
       return(private$model$config$hidden_size)
     },
     #--------------------------------------------------------------------------
+    #' @description Number of layers.
+    #' @return Returns an `int` describing the number of layers available for
+    #' embedding.
+    get_n_layers=function(){
+      return(private$model$config$num_hidden_layers)
+    },
+    #--------------------------------------------------------------------------
     #' @description Flop estimates
     #' @return Returns a `data.frame` containing statistics about the flops.
     get_flops_estimates = function() {

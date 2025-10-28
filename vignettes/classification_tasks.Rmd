@@ -1803,7 +1803,7 @@ classifier_prototype$configure(
   skip_connection_type = "ResidualGate",
   cls_pooling_features = 50,
   cls_pooling_type = "MinMax",
-  metric_type = "CosineDistance",
+  metric_type = "Euclidean",
   feat_act_fct = "ELU",
   feat_size = 256,
   feat_bias = TRUE,
@@ -1900,7 +1900,7 @@ classifier_prototype$train(
   Ns = 5,
   Nq = 3,
   loss_alpha = 0.5,
-  loss_margin = 1.00,
+  loss_margin = 0.05,
   sampling_separate = FALSE,
   sampling_shuffle = TRUE,
   trace = TRUE,
@@ -1967,7 +1967,7 @@ classifier_prototype$plot_training_history(
   x_max = NULL,
   y_min = NULL,
   y_max = NULL,
-  add_min_max = TRUE,
+  add_min_max = FALSE,
   text_size = 10
 )
 ```
@@ -2447,7 +2447,7 @@ see one point for every fold during training.
 classifier$plot_training_history(
   final_training = FALSE,
   pl_step = NULL,
-  measure = "avg_iota",
+  measure = "loss",
   ind_best_model = TRUE,
   ind_selected_model = FALSE,
   x_min = NULL,
@@ -2499,7 +2499,7 @@ to `TRUE`.
 classifier$plot_training_history(
   final_training = FALSE,
   pl_step = NULL,
-  measure = "avg_iota",
+  measure = "loss",
   ind_best_model = TRUE,
   ind_selected_model = TRUE,
   x_min = NULL,
@@ -2524,7 +2524,7 @@ according to the chosen metric.
 classifier$plot_training_history(
   final_training = FALSE,
   pl_step = NULL,
-  measure = "avg_iota",
+  measure = "loss",
   ind_best_model = TRUE,
   ind_selected_model = TRUE,
   x_min = NULL,
@@ -2550,7 +2550,7 @@ is no line for a test data set. In addition, there are no folds. Thus, the argum
 classifier$plot_training_history(
   final_training = TRUE,
   pl_step = NULL,
-  measure = "avg_iota",
+  measure = "loss",
   ind_best_model = TRUE,
   ind_selected_model = TRUE,
   x_min = NULL,

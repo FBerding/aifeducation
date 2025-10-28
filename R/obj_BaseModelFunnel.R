@@ -104,6 +104,13 @@ BaseModelFunnel <- R6::R6Class(
                          activation_dropout = 0.0) {
       arguments <- get_called_args(n = 1L)
       private$do_configuration(args = arguments)
+    },
+    #--------------------------------------------------------------------------
+    #' @description Number of layers.
+    #' @return Returns an `int` describing the number of layers available for
+    #' embedding.
+    get_n_layers=function(){
+      return(sum(private$model$config$block_repeats * private$model$config$block_sizes))
     }
   )
 )
