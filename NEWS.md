@@ -30,6 +30,14 @@ editor_options:
 - Reduced the number of columns for sustainability data for more transparency (BaseModels and TextEmbeddingModels).
 - Added a calculation of the total number of words a TextEmbeddingModel can maximal use.
 
+**Cache and Memory Management**
+
+- Added a function to monitor files temporary files. 
+
+**DataManagerClassifier**
+
+- Optimized cache. Now unnecessary temporary files are removed after training a classifier correctly. 
+
 # aifeducation 1.1.2
 
 **Major Changes**

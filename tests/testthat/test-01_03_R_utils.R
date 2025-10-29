@@ -152,3 +152,11 @@ test_that("check_type", {
     }
   }
 })
+
+test_that("inspect_tmp_dir", {
+  suppressMessages(
+    results=inspect_tmp_dir()
+  )
+  expect_type(object=results,type="list")
+  expect_gte(results$cum_size,0L)
+})
