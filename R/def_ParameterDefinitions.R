@@ -828,7 +828,7 @@ get_param_dict <- function() {
     gui_box = "General Settings",
     gui_label = "Size of Validation Data Set",
     default_value = 0.1,
-    test_values = 0.25
+    test_values = 0.33
   )
   param$val_size <- param$data_val_size
 
