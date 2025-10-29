@@ -168,7 +168,6 @@ TextEmbeddingModel <- R6::R6Class(
     }
   ),
   public = list(
-
     #' @field BaseModel ('BaseModelCore')\cr
     #' Object of class `BaseModelCore`.
     BaseModel = NULL,

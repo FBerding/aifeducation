@@ -66,6 +66,10 @@ BaseModelModernBert <- R6::R6Class(
       }
 
       if (args$global_attn_every_n_layers > args$num_hidden_layers) {
+        print("args$global_attn_every_n_layers")
+        print(args$global_attn_every_n_layers)
+        print("args$num_hidden_layers")
+        print(args$num_hidden_layers)
         stop("global_attn_every_n_layers must be equal or smaller num_hidden_layers.")
       }
     }

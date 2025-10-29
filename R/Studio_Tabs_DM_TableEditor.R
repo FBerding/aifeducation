@@ -346,7 +346,6 @@ DataManagement_TableEditorServer <- function(id, log_dir, volumes) {
     })
 
 
-
     #--------------------------------------------------------------------------
   })
 }

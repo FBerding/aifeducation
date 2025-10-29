@@ -30,7 +30,6 @@ test_that("Setup Classifier Data", {
   )
 
 
-
   # Start creation and training---------------------------------------------------
   for (framework in ml_frameworks) {
     for (method in method_list) {

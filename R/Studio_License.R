@@ -37,7 +37,6 @@ License_UI <- function(id) {
 }
 
 
-
 #' Server function for: graphical user interface for showing the license.
 #'
 #' Functions generates the functionality of a page on the server.

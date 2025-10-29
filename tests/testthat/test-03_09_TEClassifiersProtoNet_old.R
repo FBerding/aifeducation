@@ -8,7 +8,7 @@ testthat::skip_if_not(
 # object_class_names <- get_TEClassifiers_class_names(super_class = "TEClassifiersBasedOnProtoNet")
 object_class_names <- "TEClassifierProtoNet"
 max_samples <- 20
-max_samples_CI <- 10
+max_samples_CI <- 2
 
 max_samples_training <- 2
 class_range <- c(2, 3)

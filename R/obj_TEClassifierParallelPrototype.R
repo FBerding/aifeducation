@@ -241,8 +241,7 @@ TEClassifierParallelPrototype <- R6::R6Class(
       }
     },
     #--------------------------------------------------------------------------
-    adjust_configuration = function() {
-    }
+    adjust_configuration = function() {}
   )
 )
 

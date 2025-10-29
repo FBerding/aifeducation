@@ -218,7 +218,6 @@ get_dict_input_types <- function(input_type) {
 }
 
 
-
 # ===============================================================================
 #' @title Generate layer documentation
 #' @description Function for generating the documentation of a specific layer.
@@ -356,7 +355,6 @@ get_layer_documentation <- function(layer_name, title_format = "bold", subtitle_
   )
   return(markdown_doc)
 }
-
 
 
 #' @title Generate documentation for core models

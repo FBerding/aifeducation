@@ -122,7 +122,6 @@ create_process_modal <- function(ns,
 }
 
 
-
 #' @title Starts and monitors a long running task
 #' @description This function is supposed to be used as a server function. It contains the set up of a long running
 #'   tasks, the creation of a modal, and the reporting of the current status of the long running task.

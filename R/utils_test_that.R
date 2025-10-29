@@ -130,8 +130,9 @@ generate_args_for_tests <- function(object_name,
 #' @return Returns an `int` depending on the test environment.
 #' @family Utils TestThat Developers
 check_adjust_n_samples_on_CI <- function(
-    n_samples_requested,
-    n_CI = 50L) {
+  n_samples_requested,
+  n_CI = 50L
+) {
   # If on github use only a small random sample
   if (Sys.getenv("CI") != "true") {
     return(min(n_samples_requested, n_CI))

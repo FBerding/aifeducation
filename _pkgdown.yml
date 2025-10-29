@@ -68,6 +68,10 @@ reference:
 - contents:
   - has_concept("performance measures")
 
+- subtitle: Memory and cache management
+- contents:
+  - has_concept("Memory Cache")
+
 - title: For Developers
 - subtitle: R6 Classes
 - contents:

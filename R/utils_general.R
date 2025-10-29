@@ -145,7 +145,6 @@ array_form_bind <- function(...) {
 }
 
 
-
 #' @title Generate ID suffix for objects
 #' @description Function for generating an ID suffix for objects of class [TextEmbeddingModel],
 #'   [TEClassifierRegular], and [TEClassifierProtoNet].

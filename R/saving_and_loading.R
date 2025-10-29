@@ -69,9 +69,7 @@ save_to_disk <- function(object,
       dir_path = dir_path,
       folder_name = folder_name
     )
-  } else {
-
-  }
+  } else {}
 }
 
 

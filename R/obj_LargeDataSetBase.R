@@ -22,7 +22,6 @@
 LargeDataSetBase <- R6::R6Class(
   classname = "LargeDataSetBase",
   public = list(
-
     #--------------------------------------------------------------------------
     #' @description Number of columns in the data set.
     #' @return `int` describing the number of columns in the data set.
