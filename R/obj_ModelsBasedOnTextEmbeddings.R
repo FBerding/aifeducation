@@ -335,7 +335,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       if (ind_best_model || ind_selected_model) {
         if (final_training) {
           tmp_plot <- tmp_plot + ggplot2::scale_linetype_manual(
-            values = c(best = 1, final = 3L)
+            values = c(best = 5L, final = 3L)
           )
         } else {
           tmp_plot <- tmp_plot + ggplot2::scale_shape_manual(
