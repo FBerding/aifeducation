@@ -32,7 +32,7 @@ editor_options:
 
 **Cache and Memory Management**
 
-- Added a function to monitor files temporary files. 
+- Added a function to monitor temporary files. 
 
 **DataManagerClassifier**
 
