@@ -1484,7 +1484,7 @@ get_param_dict <- function() {
   param$merge_pooling_features <- param$cls_pooling_features
   param$merge_pooling_features$gui_box <- "Merge Layer"
 
-  param$cls_head_type=list(
+  param$cls_head_type <- list(
     type = "string",
     min = NULL,
     max = NULL,
@@ -1503,7 +1503,7 @@ get_param_dict <- function() {
     test_values = NULL
   )
 
-  param$projection_type=list(
+  param$projection_type <- list(
     type = "string",
     min = NULL,
     max = NULL,
@@ -2140,7 +2140,7 @@ get_param_def <- function(param_name) {
 doc_formula <- function(string_formula) {
   return(
     paste0(
-      "\\ifelse{latex}{$", string_formula, "$}{\\ifelse{html}{$", string_formula, "$}{`", string_formula, "`}}"
+      "\\ifelse{latex}{$", string_formula, "$}{\\ifelse{html}{", string_formula, "}{`", string_formula, "`}}"
     )
   )
 }

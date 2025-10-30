@@ -290,6 +290,7 @@ a saved classifier.</p>
 <span>  feature_extractor <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  target_levels <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  shared_feat_layer <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  cls_head_type <span class="op">=</span> <span class="st">"Regular"</span>,</span>
 <span>  feat_act_fct <span class="op">=</span> <span class="st">"ELU"</span>,</span>
 <span>  feat_size <span class="op">=</span> <span class="fl">50L</span>,</span>
 <span>  feat_bias <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -371,6 +372,10 @@ indicating a higher category/class. For nominal data the order does not matter.<
 
 <dt><code>shared_feat_layer</code></dt>
 <dd><p><code>bool</code> If <code>TRUE</code> all streams use the same feature layer. If <code>FALSE</code> all streams use their own feature layer.</p></dd>
+
+
+<dt><code>cls_head_type</code></dt>
+<dd><p><code>string</code> Type of classification head. Allowed values: 'Regular', 'PairwiseOrthogonal'</p></dd>
 
 
 <dt><code>feat_act_fct</code></dt>
@@ -542,7 +547,7 @@ indicating a higher category/class. For nominal data the order does not matter.<
 
 
 <dt><code>tf_normalization_position</code></dt>
-<dd><p><code>string</code> Position where the normalization should be applied. Allowed values: 'pre', 'post'</p></dd>
+<dd><p><code>string</code> Position where the normalization should be applied. Allowed values: 'Pre', 'Post'</p></dd>
 
 
 <dt><code>tf_residual_type</code></dt>

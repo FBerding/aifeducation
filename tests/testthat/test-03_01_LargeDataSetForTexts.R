@@ -4,8 +4,8 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
-#Start time
-test_time_start=Sys.time()
+# Start time
+test_time_start <- Sys.time()
 
 # SetUp Test---------------------------------------------------------------------
 root_path_data <- testthat::test_path("test_data/LargeDataSetForTexts")
@@ -811,8 +811,8 @@ if (dir.exists(root_path_results)) {
   )
 }
 
-#Monitor test time
+# Monitor test time
 monitor_test_time_on_CI(
-  start_time=test_time_start,
-  test_name="03_01_LargeDataSetForTexts"
+  start_time = test_time_start,
+  test_name = "03_01_LargeDataSetForTexts"
 )

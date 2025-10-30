@@ -9,8 +9,8 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
-#Start time
-test_time_start=Sys.time()
+# Start time
+test_time_start <- Sys.time()
 
 load_all_py_scripts()
 
@@ -133,8 +133,8 @@ test_that("Generating Test Data", {
   # print("Test data generated.")
 })
 
-#Monitor test time
+# Monitor test time
 monitor_test_time_on_CI(
-  start_time=test_time_start,
-  test_name="00_01_generating_test_data"
-  )
+  start_time = test_time_start,
+  test_name = "00_01_generating_test_data"
+)

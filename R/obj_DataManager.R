@@ -90,8 +90,8 @@ DataManagerClassifier <- R6::R6Class(
       # Checking Prerequisites---------------------------------------------------
       check_all_args(get_called_args(n = 1L))
 
-      #Set cache dir
-      private$cache_dir=file.path(create_and_get_tmp_dir(),paste0("dm_",generate_id(5L)))
+      # Set cache dir
+      private$cache_dir <- file.path(create_and_get_tmp_dir(), paste0("dm_", generate_id(5L)))
 
       # Create Dataset-------------------------------------------------------
       private$prepare_datasets(
@@ -507,14 +507,11 @@ DataManagerClassifier <- R6::R6Class(
     #-----------------------------------------------------------------------------
   ),
   private = list(
-
-    cache_dir=NULL,
-
+    cache_dir = NULL,
     finalize = function() {
-      unlink(x=private$cache_dir,recursive = TRUE)
+      unlink(x = private$cache_dir, recursive = TRUE)
       gc()
     },
-
     prepare_datasets = function(data_embeddings, data_targets, trace) {
       if (inherits(data_embeddings, "EmbeddedText")) {
         data_set_embeddings <- data_embeddings$convert_to_LargeDataSetForTextEmbeddings()

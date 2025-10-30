@@ -4,8 +4,8 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
-#Start time
-test_time_start=Sys.time()
+# Start time
+test_time_start <- Sys.time()
 
 # config------------------------------------------------------------------------
 object_class_names <- get_TEClassifiers_class_names(super_class = "ClassifiersBasedOnTextEmbeddings")
@@ -76,11 +76,11 @@ for (object_class_name in object_class_names) {
   # Test for different number of classes
   for (n_classes in class_range) {
     if (!skip_creation_test) {
-    for (i in 1:check_adjust_n_samples_on_CI(
-      n_samples_requested = max_samples,
-      n_CI = max_samples_CI
-    )) {
-      # Core Tests of the models-------------------------------------------------
+      for (i in 1:check_adjust_n_samples_on_CI(
+        n_samples_requested = max_samples,
+        n_CI = max_samples_CI
+      )) {
+        # Core Tests of the models-------------------------------------------------
 
         # Create a List of all relevant combinations of arguments and reduce the number
         # to the desired sample size.
@@ -643,8 +643,8 @@ for (object_class_name in object_class_names) {
   }
 }
 
-#Monitor test time
+# Monitor test time
 monitor_test_time_on_CI(
-  start_time=test_time_start,
-  test_name="03_08_TEClassifiers_core"
+  start_time = test_time_start,
+  test_name = "03_08_TEClassifiers_core"
 )

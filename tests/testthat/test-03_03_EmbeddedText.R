@@ -4,8 +4,8 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
-#Start time
-test_time_start=Sys.time()
+# Start time
+test_time_start <- Sys.time()
 
 # SetUp Test---------------------------------------------------------------------
 root_path_general_data <- testthat::test_path("test_data/Embeddings")
@@ -110,8 +110,8 @@ test_that("EmbeddedText - No FeatureExtractor", {
   expect_equal(new_data_set_converted$get_pad_value(), -100)
 })
 
-#Monitor test time
+# Monitor test time
 monitor_test_time_on_CI(
-  start_time=test_time_start,
-  test_name="03_03_EmbeddedText"
+  start_time = test_time_start,
+  test_name = "03_03_EmbeddedText"
 )

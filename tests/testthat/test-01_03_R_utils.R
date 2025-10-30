@@ -1,5 +1,5 @@
-#Start time
-test_time_start=Sys.time()
+# Start time
+test_time_start <- Sys.time()
 
 test_that("get_n_chunks", {
   times <- sample(x = seq.int(from = 2, to = 100, by = 1), size = 1)
@@ -157,15 +157,15 @@ test_that("check_type", {
 })
 
 test_that("inspect_tmp_dir", {
-  suppressMessages(
-    {results=inspect_tmp_dir()}
-  )
-  expect_type(object=results,type="list")
-  expect_gte(results$cum_size,0L)
+  suppressMessages({
+    results <- inspect_tmp_dir()
+  })
+  expect_type(object = results, type = "list")
+  expect_gte(results$cum_size, 0L)
 })
 
-#Monitor test time
+# Monitor test time
 monitor_test_time_on_CI(
-  start_time=test_time_start,
-  test_name="00_01_03_R_utils"
+  start_time = test_time_start,
+  test_name = "00_01_03_R_utils"
 )

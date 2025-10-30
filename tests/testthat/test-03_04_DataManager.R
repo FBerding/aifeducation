@@ -4,8 +4,8 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
-#Start time
-test_time_start=Sys.time()
+# Start time
+test_time_start <- Sys.time()
 
 # SetUp-------------------------------------------------------------------------
 root_path_general_data <- testthat::test_path("test_data/Embeddings")
@@ -241,8 +241,8 @@ for (method in methods) {
   }
 }
 
-#Monitor test time
+# Monitor test time
 monitor_test_time_on_CI(
-  start_time=test_time_start,
-  test_name="03_04_DataManager"
+  start_time = test_time_start,
+  test_name = "03_04_DataManager"
 )

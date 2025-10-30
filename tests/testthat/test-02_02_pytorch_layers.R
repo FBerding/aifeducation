@@ -4,8 +4,8 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
-#Start time
-test_time_start=Sys.time()
+# Start time
+test_time_start <- Sys.time()
 
 # Load python scripts
 load_all_py_scripts()
@@ -843,8 +843,8 @@ test_that("layer_global_average_pooling_1d", {
   )
 })
 
-#Monitor test time
+# Monitor test time
 monitor_test_time_on_CI(
-  start_time=test_time_start,
-  test_name="02_02_pytorch_layers"
+  start_time = test_time_start,
+  test_name = "02_02_pytorch_layers"
 )

@@ -151,7 +151,7 @@ class TEClassifierSequential(torch.nn.Module):
                 in_features=cls_pooling_features,
                 out_features=n_target_levels)
         elif cls_type=="PairwiseOrthogonal":
-          self.classification_head=block_orthogonal_dense(
+          self.classification_head=pairwise_orthogonal_dense(
                 input_size=cls_pooling_features,
                 output_size=n_target_levels,
                 bias=False,
@@ -405,7 +405,7 @@ class TEClassifierParallel(torch.nn.Module):
                 in_features=merge_pooling_features,
                 out_features=n_target_levels)
         elif cls_type=="PairwiseOrthogonal":
-          self.classification_head=block_orthogonal_dense(
+          self.classification_head=pairwise_orthogonal_dense(
                 input_size=merge_pooling_features,
                 output_size=n_target_levels,
                 bias=False,
@@ -615,12 +615,12 @@ class TEClassifierPrototype(torch.nn.Module):
           bias=True)
     elif self.projection_type=="PairwiseOrthogonal":
       if core_net_type=="sequential":
-        self.embedding_head=block_orthogonal_dense(
+        self.embedding_head=pairwise_orthogonal_dense(
           input_size=cls_pooling_features,
           output_size=self.embedding_dim,
           bias=True)
       elif core_net_type=="parallel":
-        self.embedding_head=block_orthogonal_dense(
+        self.embedding_head=pairwise_orthogonal_dense(
           input_size=merge_pooling_features,
           output_size=self.embedding_dim,
           bias=True)

@@ -692,9 +692,9 @@ In this table you can see an estimation of the number of words for the whole tra
 the total number of tokens resulting from the raw texts and the number of sequences 
 if the length of a sequence is limited to the value shown in the column 'max_token_length'.
 Furthermore, you can see the three statistics proposed by Kaya and Tantug (2024, p.5).
-$$\mu_t$$ refers to the average number of tokens per sequence, $$\mu_w$$ refers to the
-average number of words per sequence, and $$\mu_g$$ refers to the average number of tokens per word.
-$$\mu_g$$ is called the tokenizer granularity rate and describes how many tokens are
+$\mu_t$ refers to the average number of tokens per sequence, $\mu_w$ refers to the
+average number of words per sequence, and $\mu_g$ refers to the average number of tokens per word.
+$\mu_g$ is called the tokenizer granularity rate and describes how many tokens are
 necessary to represent a single word. This value is very important as a higher value implies
 that the same text is spitted into a longer sequence of tokens than for a tokenizer
 with a lower value. Since large language models have a maximum limit on the length
@@ -969,7 +969,8 @@ estimated during every training run. With `get_flops_estimates` you receive a
 table. 
 
 ```{r, include = TRUE, eval = TRUE}
-base_model$get_flops_estimates()
+# We use t() to improve the readability of the table
+t(base_model$get_flops_estimates())
 ```
 
 At the moment only an architecture-based approach is available. The number of FLOPS
@@ -1294,7 +1295,7 @@ classifier$configure(
   skip_connection_type = "ResidualGate",
   cls_pooling_features = 50,
   cls_pooling_type = "MinMax",
-  cls_head_type="PairwiseOrthogonal",
+  cls_head_type = "Regular",
   feat_act_fct = "ELU",
   feat_size = 256,
   feat_bias = TRUE,
@@ -1337,7 +1338,7 @@ classifier$configure(
   tf_bias = FALSE,
   tf_parametrizations = "None",
   tf_normalization_type = "LayerNorm",
-  tf_normalization_position = "pre",
+  tf_normalization_position = "Pre",
   tf_residual_type = "ResidualGate"
 )
 ```
@@ -1811,7 +1812,7 @@ classifier_prototype$configure(
   skip_connection_type = "ResidualGate",
   cls_pooling_features = 50,
   cls_pooling_type = "MinMax",
-  projection_type="PairwiseOrthogonal",
+  projection_type = "PairwiseOrthogonal",
   metric_type = "Euclidean",
   feat_act_fct = "ELU",
   feat_size = 256,
@@ -1855,7 +1856,7 @@ classifier_prototype$configure(
   tf_bias = FALSE,
   tf_parametrizations = "None",
   tf_normalization_type = "LayerNorm",
-  tf_normalization_position = "pre",
+  tf_normalization_position = "Pre",
   tf_residual_type = "ResidualGate",
   embedding_dim = 2
 )
@@ -2272,7 +2273,7 @@ classifier_with_fe$configure(
   skip_connection_type = "ResidualGate",
   cls_pooling_features = 50,
   cls_pooling_type = "MinMax",
-  cls_head_type="PairwiseOrthogonal",
+  cls_head_type = "Regular",
   feat_act_fct = "ELU",
   feat_size = 256,
   feat_bias = TRUE,
@@ -2315,7 +2316,7 @@ classifier_with_fe$configure(
   tf_bias = FALSE,
   tf_parametrizations = "None",
   tf_normalization_type = "LayerNorm",
-  tf_normalization_position = "pre",
+  tf_normalization_position = "Pre",
   tf_residual_type = "ResidualGate"
 )
 ```
@@ -2534,7 +2535,7 @@ classifier$plot_training_history(
 running_num_figures <- running_num_figures + 1
 ```
 
-Using the argument `final_trainin`', you can switch between the performance estimation 
+Using the argument `final_training`, you can switch between the performance estimation 
 phase and the final training phase of the model. Since the final training phase 
 only differentiates between training and validation data sets, there is no line 
 for test data. In addition, there are no folds. Therefore, the argument `add_min_max` has no functionality. 

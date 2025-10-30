@@ -5,8 +5,8 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
-#Start time
-test_time_start=Sys.time()
+# Start time
+test_time_start <- Sys.time()
 
 # Config transformer library
 transformers$utils$logging$set_verbosity_error()
@@ -243,8 +243,8 @@ for (object_class_name in object_class_names) {
   unlink(paste0(tmp_dir), recursive = TRUE)
 }
 
-#Monitor test time
+# Monitor test time
 monitor_test_time_on_CI(
-  start_time=test_time_start,
-  test_name="02_07_BaseModels_from_hf"
+  start_time = test_time_start,
+  test_name = "02_07_BaseModels_from_hf"
 )

@@ -49,7 +49,7 @@ update_values_to_new_1.1.0 <- function(value) {
       "cls", "CLS",
       "average", "Average",
       "mean", "Mean",
-      "regular","Regular"
+      "regular", "Regular"
     )
 
     value_table <- matrix(

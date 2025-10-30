@@ -130,9 +130,8 @@ generate_args_for_tests <- function(object_name,
 #' @return Returns an `int` depending on the test environment.
 #' @family Utils TestThat Developers
 check_adjust_n_samples_on_CI <- function(
-  n_samples_requested,
-  n_CI = 50L
-) {
+    n_samples_requested,
+    n_CI = 50L) {
   # If on github use only a small random sample
   if (Sys.getenv("CI") != "true") {
     return(min(n_samples_requested, n_CI))
@@ -363,10 +362,16 @@ random_bool_on_CI <- function() {
   }
 }
 
-monitor_test_time_on_CI=function(start_time,test_name){
-  if (is_on_CI()) {
-    cat(paste(test_name,"Duration:",format(Sys.time()-start_time)))
-  } else {
-    cat(paste(test_name,"Duration:",format(Sys.time()-start_time)))
+#' @title Print duration of a test on CI
+#' @description Function prints the duration of a test to console if the test is
+#' running on CI. If not no output appears in console.
+#' @param test_name `string` Name of the test to print.
+#' @param start_time `POSIXct` Start time of the test.
+#' @return Returns nothing.
+#' @family Utils TestThat Developers
+#' @export
+monitor_test_time_on_CI <- function(start_time, test_name) {
+  if (Sys.getenv("CI") == "true") {
+    print(paste(test_name, "Duration:", format(Sys.time() - start_time)))
   }
 }

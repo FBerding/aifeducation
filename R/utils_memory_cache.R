@@ -54,11 +54,11 @@ clean_tmp_dir <- function() {
 inspect_tmp_dir <- function() {
   tmp_dir <- create_and_get_tmp_dir()
   file_list <- list.files(
-    path=tmp_dir,
-    all.files=TRUE,
-    full.names=TRUE,
-    recursive=TRUE
-    )
+    path = tmp_dir,
+    all.files = TRUE,
+    full.names = TRUE,
+    recursive = TRUE
+  )
   n_files <- length(file_list)
   cum_file_size <- 0L
   if (n_files > 0L) {
@@ -68,9 +68,9 @@ inspect_tmp_dir <- function() {
   } else {
     file_list <- NULL
   }
-  results=list(
-    files=file_list,
-    cum_size=cum_file_size
+  results <- list(
+    files = file_list,
+    cum_size = cum_file_size
   )
   message(n_files, " files with ", format_size(cum_file_size))
   return(results)
@@ -87,16 +87,16 @@ inspect_tmp_dir <- function() {
 #' @keywords internal
 #' @noRd
 #'
-format_size<-function(size){
-  if(size>=10^12){
-    return(paste(size/(10^12),"TB"))
-  } else if(size<10^12 & size>=10^9){
-    return(paste(round(size/(10^9),digits=3),"GB"))
-  } else if(size<10^9 & size>=10^6){
-    return(paste(round(size/(10^6),digits=3),"MB"))
-  } else if(size<10^6 & size>=10^3){
-    return(paste(round(size/(10^3),digits=3),"KB"))
-  } else if(size<10^3 & size>=0){
-    return(paste(round(size,digits=3),"Byte"))
+format_size <- function(size) {
+  if (size >= 10^12) {
+    return(paste(size / (10^12), "TB"))
+  } else if (size < 10^12 & size >= 10^9) {
+    return(paste(round(size / (10^9), digits = 3), "GB"))
+  } else if (size < 10^9 & size >= 10^6) {
+    return(paste(round(size / (10^6), digits = 3), "MB"))
+  } else if (size < 10^6 & size >= 10^3) {
+    return(paste(round(size / (10^3), digits = 3), "KB"))
+  } else if (size < 10^3 & size >= 0) {
+    return(paste(round(size, digits = 3), "Byte"))
   }
 }

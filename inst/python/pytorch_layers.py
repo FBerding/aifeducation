@@ -110,7 +110,7 @@ class identity_layer(torch.nn.Module):
 
 #Blockwise orthogonal dense layer----------------------------------------------
 #Function required for block_orth_dense to speed up comutations via vmap
-def apply_weights_block_orth_dense(x, weights):
+def apply_weights_pair_orth_dense(x, weights):
   return torch.matmul(x,weights.to(x.device,x.dtype))
 
 # Input size must be equal or greater as output_size
@@ -119,7 +119,7 @@ def apply_weights_block_orth_dense(x, weights):
 #Li, X., Chang, D., Ma, Z., Tan, Z.‑H., Xue, J.‑H., Cao, J., Yu, J. & Guo, J. (2020). 
 #OSLNet: Deep Small-Sample Classification With an Orthogonal Softmax Layer. 
 #IEEE Transactions on Image Processing, 29, 6482–6495. https://doi.org/10.1109/TIP.2020.2990277
-class block_orthogonal_dense(torch.nn.Module):
+class pairwise_orthogonal_dense(torch.nn.Module):
   def __init__(self,input_size,output_size,bias=False,device=None,dtype=None):
     super().__init__()
     self.input_size=input_size
@@ -149,7 +149,7 @@ class block_orthogonal_dense(torch.nn.Module):
       for i in range(range_start,range_end):
         self.design_matrix[i,j]=1
       range_start=range_end
-    self.apply_weights_vmap=torch.vmap(func=apply_weights_block_orth_dense, in_dims=(-2,None), out_dims=-2, randomness='error', chunk_size=None)
+    self.apply_weights_vmap=torch.vmap(func=apply_weights_pair_orth_dense, in_dims=(-2,None), out_dims=-2, randomness='error', chunk_size=None)
     
   def forward(self,x):
     weights_design=self.weight.expand(self.n_params,self.n_params)*self.unit_matrix.to(self.weight.device)
@@ -203,7 +203,7 @@ class dense_layer_with_mask(torch.nn.Module):
               dtype=dtype
               )
     elif self.connection_type=="PairwiseOrthogonal":
-      self.dense=block_orthogonal_dense(
+      self.dense=pairwise_orthogonal_dense(
         input_size=self.input_size,
         output_size=self.output_size,
         bias=self.bias,

@@ -1,7 +1,7 @@
 testthat::skip_on_cran()
 
-#Start time
-test_time_start=Sys.time()
+# Start time
+test_time_start <- Sys.time()
 
 test_that("Clean tmp directories", {
   tmp_data <- testthat::test_path("test_data_tmp")
@@ -24,8 +24,8 @@ test_that("Clean tmp directories", {
   )
 })
 
-#Monitor test time
+# Monitor test time
 monitor_test_time_on_CI(
-  start_time=test_time_start,
-  test_name="99_clean_tmp_directories"
+  start_time = test_time_start,
+  test_name = "99_clean_tmp_directories"
 )

@@ -1,5 +1,5 @@
-#Start time
-test_time_start=Sys.time()
+# Start time
+test_time_start <- Sys.time()
 
 test_that("logging in R - state log", {
   dir <- testthat::test_path("test_artefacts")
@@ -47,8 +47,8 @@ test_that("logging in R - loss log", {
   expect_equal(unname(as.matrix(res)[1, 1:3]), c(-100, -100, -100))
 })
 
-#Monitor test time
+# Monitor test time
 monitor_test_time_on_CI(
-  start_time=test_time_start,
-  test_name="01_06_logging"
+  start_time = test_time_start,
+  test_name = "01_06_logging"
 )

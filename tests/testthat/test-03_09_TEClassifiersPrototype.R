@@ -4,8 +4,8 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
-#Start time
-test_time_start=Sys.time()
+# Start time
+test_time_start <- Sys.time()
 
 # config------------------------------------------------------------------------
 object_class_names <- get_TEClassifiers_class_names(super_class = "TEClassifiersBasedOnProtoNet")
@@ -326,8 +326,8 @@ for (object_class_name in object_class_names) {
   }
 }
 
-#Monitor test time
+# Monitor test time
 monitor_test_time_on_CI(
-  start_time=test_time_start,
-  test_name="03_09_TEClassifierPrototype"
+  start_time = test_time_start,
+  test_name = "03_09_TEClassifierPrototype"
 )

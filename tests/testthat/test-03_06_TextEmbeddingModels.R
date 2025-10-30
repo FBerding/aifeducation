@@ -9,8 +9,8 @@ testthat::skip_if_not(
   message = "Base models for tests not available"
 )
 
-#Start time
-test_time_start=Sys.time()
+# Start time
+test_time_start <- Sys.time()
 
 # SetUp-------------------------------------------------------------------------
 # Set paths
@@ -625,8 +625,8 @@ for (base_model_type in base_model_type_list) {
   }
 }
 
-#Monitor test time
+# Monitor test time
 monitor_test_time_on_CI(
-  start_time=test_time_start,
-  test_name="03_06_TextEmbeddingModels"
+  start_time = test_time_start,
+  test_name = "03_06_TextEmbeddingModels"
 )
