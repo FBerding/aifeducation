@@ -59,7 +59,6 @@ inspect_tmp_dir <- function() {
     full.names=TRUE,
     recursive=TRUE
     )
-  print(file_list)
   n_files <- length(file_list)
   cum_file_size <- 0L
   if (n_files > 0L) {
