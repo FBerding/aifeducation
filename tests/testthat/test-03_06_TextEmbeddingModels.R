@@ -621,3 +621,9 @@ for (base_model_type in base_model_type_list) {
     }
   }
 }
+
+#Monitor test time
+monitor_test_time_on_CI(
+  start_time=test_time_start,
+  test_name="03_06_TextEmbeddingModels"
+)

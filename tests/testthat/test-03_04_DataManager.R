@@ -237,3 +237,9 @@ for (method in methods) {
     }
   }
 }
+
+#Monitor test time
+monitor_test_time_on_CI(
+  start_time=test_time_start,
+  test_name="03_04_DataManager"
+)

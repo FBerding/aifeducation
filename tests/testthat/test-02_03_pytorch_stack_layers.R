@@ -4,6 +4,9 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
+#Start time
+test_time_start=Sys.time()
+
 # Load python scripts
 load_all_py_scripts()
 
@@ -14,6 +17,8 @@ test_that("stack_dense_layer", {
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
   sequence_length <- sample(x = seq(from = 1, to = times, by = 1), size = 30, replace = TRUE)
+
+
   example_tensor <- generate_tensors(
     times = times,
     features = features,
@@ -77,6 +82,7 @@ test_that("stack_dense_layer", {
     mask_features = values[[4]]
   )
   expect_equal(tensor_to_numpy(y_1[[1]]), tensor_to_numpy(y_2[[1]]))
+
 })
 
 # Stack Reccurent layers----------------------------------------------------
@@ -317,3 +323,9 @@ test_that("stack_n_gram_convolution", {
     expect_equal(dim(tensor_to_numpy(y_1[[1]])), c(length(sequence_length), times, features))
   }
 })
+
+#Monitor test time
+monitor_test_time_on_CI(
+  start_time=test_time_start,
+  test_name="02_03_pytorch_stack_layers"
+)

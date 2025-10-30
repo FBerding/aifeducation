@@ -4,6 +4,9 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
+#Start time
+test_time_start=Sys.time()
+
 # Load python scripts
 load_all_py_scripts()
 
@@ -46,3 +49,9 @@ test_that("CosineDistance", {
     )
   )
 })
+
+#Monitor test time
+monitor_test_time_on_CI(
+  start_time=test_time_start,
+  test_name="02_04_other_functions"
+)
