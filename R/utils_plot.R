@@ -209,7 +209,7 @@ get_selected_states_from_folds <- function(data_folds, measure) {
 #' @family Utils Plots Developers
 #' @keywords internal
 #' @noRd
-add_point <- function(plot_object, x, y, type = "segment", state = "Best") {
+add_point <- function(plot_object, x, y, type = "segment", state = "best") {
   if (type == "segment") {
     plot_object <- plot_object + ggplot2::geom_segment(
       ggplot2::aes(
