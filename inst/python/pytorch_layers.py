@@ -131,12 +131,12 @@ class block_orthogonal_dense(torch.nn.Module):
     self.n_params_residual=self.input_size-self.n_params
     self.n_params=self.n_params+self.n_params_residual
 
-    self.weight=torch.nn.parameter.Parameter(torch.rand(1,self.n_params))
+    self.weight=torch.nn.parameter.Parameter(torch.rand(1,self.n_params)).to(device)
     if self.bias:
-      self.beta=torch.nn.parameter.Parameter(torch.zeros(1,self.output_size))
+      self.beta=torch.nn.parameter.Parameter(torch.zeros(1,self.output_size)).to(device)
 
-    self.design_matrix=torch.zeros((self.input_size,self.output_size))
-    self.unit_matrix=torch.zeros((self.input_size,self.input_size)).fill_diagonal_(1)
+    self.design_matrix=torch.zeros((self.input_size,self.output_size)).to(device)
+    self.unit_matrix=torch.zeros((self.input_size,self.input_size)).fill_diagonal_(1).to(device)
     
     range_start=0
     residual_counter=1
@@ -152,8 +152,8 @@ class block_orthogonal_dense(torch.nn.Module):
     self.apply_weights_vmap=torch.vmap(func=apply_weights_block_orth_dense, in_dims=(-2,None), out_dims=-2, randomness='error', chunk_size=None)
     
   def forward(self,x):
-    weights_design=self.weight.expand(self.n_params,self.n_params)*self.unit_matrix
-    weights_design=torch.matmul(weights_design,self.design_matrix.to(weights_design.dtype))
+    weights_design=self.weight.expand(self.n_params,self.n_params)*self.unit_matrix.to(self.weight.device)
+    weights_design=torch.matmul(weights_design,self.design_matrix.to(dtype=weights_design.dtype,device=weights_design.device))
     if x.dim()>2:
       y=self.apply_weights_vmap(x,weights_design)
     else:
@@ -202,7 +202,7 @@ class dense_layer_with_mask(torch.nn.Module):
               device=device, 
               dtype=dtype
               )
-    elif self.connection_type=="BlockwiseOrthogonal":
+    elif self.connection_type=="PairwiseOrthogonal":
       self.dense=block_orthogonal_dense(
         input_size=self.input_size,
         output_size=self.output_size,
