@@ -1489,7 +1489,12 @@ get_param_dict <- function() {
     min = NULL,
     max = NULL,
     allow_null = FALSE,
-    allowed_values = c("Regular", "BlockwiseOrthogonal"),
+    allowed_values = c("Regular", "PairwiseOrthogonal"),
+    values_desc = list(
+      Regular = "Applies a fully connected dense layer between the network and the
+      final layer that calculates the classes.",
+      PairwiseOrthogonal = "Applies a pairwise orthogonal layer as classification head as described by [Li et al. 2020](https://doi.org/10.1109/TIP.2020.2990277)."
+    ),
     desc = "Type of classification head.",
     gui_box = "Classifiction Pooling Layer",
     gui_label = "Classification Head",
@@ -1503,7 +1508,14 @@ get_param_dict <- function() {
     min = NULL,
     max = NULL,
     allow_null = FALSE,
-    allowed_values = c("Regular", "BlockwiseOrthogonal"),
+    allowed_values = c("Regular", "PairwiseOrthogonal"),
+    values_desc = list(
+      Regular = "Applies a fully connected dense layer for calculating the position of a point on all axes. That is,
+      all neurons can contribute to every axes.",
+      PairwiseOrthogonal = "Applies a pairwise orthogonal layer without activation for calculating the position of a point. That is,
+      a neuron contributes only to one specific axis and an axis is influenced only by a disjoint Subsample of all neurons. The layer is described by
+       [Li et al. 2020](https://doi.org/10.1109/TIP.2020.2990277) in the context of classification heads."
+    ),
     desc = "Type of projection.",
     gui_box = "General Settings",
     gui_label = "Projection Type",

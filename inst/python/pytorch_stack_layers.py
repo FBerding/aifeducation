@@ -170,7 +170,7 @@ class stack_recurrent_layers(torch.nn.Module):
   
 #stack_tf_encoder_layer--------------------------------
 class stack_tf_encoder_layer(torch.nn.Module):
-  def __init__(self,dense_dim,n_layers,times, features,pad_value,dropout_rate_1,dropout_rate_2,act_fct="ELU",attention_type="MultiHead",positional_embedding="absolute",num_heads=1,bias=True,parametrizations="None",normalization_type="LayerNorm",normalization_position="pre",device=None, dtype=None,residual_type="None"):
+  def __init__(self,dense_dim,n_layers,times, features,pad_value,dropout_rate_1,dropout_rate_2,act_fct="ELU",attention_type="MultiHead",positional_embedding="absolute",num_heads=1,bias=True,parametrizations="None",normalization_type="LayerNorm",normalization_position="Pre",device=None, dtype=None,residual_type="None"):
     super().__init__()
     self.features=features
     self.dense_dim=dense_dim
