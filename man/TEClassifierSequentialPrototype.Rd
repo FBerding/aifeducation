@@ -189,6 +189,7 @@ Creating a new instance of this class.
   skip_connection_type = "ResidualGate",
   cls_pooling_features = 50L,
   cls_pooling_type = "MinMax",
+  projection_type = "Regular",
   metric_type = "Euclidean",
   feat_act_fct = "ELU",
   feat_size = 50L,
@@ -261,6 +262,8 @@ indicating a higher category/class. For nominal data the order does not matter.}
 \item{\code{cls_pooling_features}}{\code{int} Number of features to be extracted at the end of the model. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{$1 <= x $}{`1 <= x `}}}
 
 \item{\code{cls_pooling_type}}{\code{string} Type of extracting intermediate features. Allowed values: 'Max', 'Min', 'MinMax'}
+
+\item{\code{projection_type}}{\code{string} Type of projection. Allowed values: 'Regular', 'BlockwiseOrthogonal'}
 
 \item{\code{metric_type}}{\code{string} Type of metric used for calculating the distance. Allowed values: 'Euclidean', 'CosineDistance'}
 

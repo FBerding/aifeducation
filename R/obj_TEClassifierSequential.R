@@ -34,6 +34,7 @@ TEClassifierSequential <- R6::R6Class(
     #' @param skip_connection_type `r get_param_doc_desc("skip_connection_type")`
     #' @param cls_pooling_features `r get_param_doc_desc("cls_pooling_features")`
     #' @param cls_pooling_type `r get_param_doc_desc("cls_pooling_type")`
+    #' @param cls_head_type `r get_param_doc_desc("cls_head_type")`
     #' @param feat_act_fct `r get_param_doc_desc("feat_act_fct")`
     #' @param feat_size `r get_param_doc_desc("feat_size")`
     #' @param feat_bias `r get_param_doc_desc("feat_bias")`
@@ -87,6 +88,7 @@ TEClassifierSequential <- R6::R6Class(
                          skip_connection_type = "ResidualGate",
                          cls_pooling_features = NULL,
                          cls_pooling_type = "MinMax",
+                         cls_head_type="Regular",
                          feat_act_fct = "ELU",
                          feat_size = 50L,
                          feat_bias = TRUE,
@@ -150,6 +152,7 @@ TEClassifierSequential <- R6::R6Class(
         skip_connection_type = private$model_config$skip_connection_type,
         cls_pooling_features = as.integer(private$model_config$cls_pooling_features),
         cls_pooling_type = private$model_config$cls_pooling_type,
+        cls_type=private$model_config$cls_head_type,
         feat_act_fct = private$model_config$feat_act_fct,
         feat_size = as.integer(private$model_config$feat_size),
         feat_bias = private$model_config$feat_bias,

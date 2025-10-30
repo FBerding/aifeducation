@@ -52,6 +52,7 @@ class stack_dense_layer(torch.nn.Module):
           input_size=self.hidden_size,
           output_size=self.hidden_size,
           times=self.times,
+          connection_type="Regular",
           act_fct=self.act_fct,
           bias=self.bias,
           dropout=self.dropout,

@@ -108,6 +108,60 @@ class identity_layer(torch.nn.Module):
       x=torch.where(condition=mask_features,input=self.pad_value,other=x)
     return x,seq_len,mask_times,mask_features
 
+#Blockwise orthogonal dense layer----------------------------------------------
+#Function required for block_orth_dense to speed up comutations via vmap
+def apply_weights_block_orth_dense(x, weights):
+  return torch.matmul(x,weights.to(x.device,x.dtype))
+
+# Input size must be equal or greater as output_size
+# Forward pass takes rensors of shape (any, input_size) and returns (any, output_size)
+# Layer is suggested in 
+#Li, X., Chang, D., Ma, Z., Tan, Z.‑H., Xue, J.‑H., Cao, J., Yu, J. & Guo, J. (2020). 
+#OSLNet: Deep Small-Sample Classification With an Orthogonal Softmax Layer. 
+#IEEE Transactions on Image Processing, 29, 6482–6495. https://doi.org/10.1109/TIP.2020.2990277
+class block_orthogonal_dense(torch.nn.Module):
+  def __init__(self,input_size,output_size,bias=False,device=None,dtype=None):
+    super().__init__()
+    self.input_size=input_size
+    self.output_size=output_size
+    self.bias=bias
+    
+    self.n_params_ratio=math.floor(self.input_size/self.output_size)
+    self.n_params=self.n_params_ratio*self.output_size
+    self.n_params_residual=self.input_size-self.n_params
+    self.n_params=self.n_params+self.n_params_residual
+
+    self.weight=torch.nn.parameter.Parameter(torch.rand(1,self.n_params))
+    if self.bias:
+      self.beta=torch.nn.parameter.Parameter(torch.zeros(1,self.output_size))
+
+    self.design_matrix=torch.zeros((self.input_size,self.output_size))
+    self.unit_matrix=torch.zeros((self.input_size,self.input_size)).fill_diagonal_(1)
+    
+    range_start=0
+    residual_counter=1
+    for j in range(0,self.output_size):
+      if residual_counter<=self.n_params_residual:
+        range_end=range_start+self.n_params_ratio+1
+        residual_counter=residual_counter+1
+      else:
+        range_end=range_start+self.n_params_ratio
+      for i in range(range_start,range_end):
+        self.design_matrix[i,j]=1
+      range_start=range_end
+    self.apply_weights_vmap=torch.vmap(func=apply_weights_block_orth_dense, in_dims=(-2,None), out_dims=-2, randomness='error', chunk_size=None)
+    
+  def forward(self,x):
+    weights_design=self.weight.expand(self.n_params,self.n_params)*self.unit_matrix
+    weights_design=torch.matmul(weights_design,self.design_matrix.to(weights_design.dtype))
+    if x.dim()>2:
+      y=self.apply_weights_vmap(x,weights_design)
+    else:
+      y=torch.matmul(x,weights_design)
+    if self.bias:
+      y=y+self.beta
+    return y
+
 #DenseLayer_with_mask-----------------------------------------------------------
 #Dense layer that can handel masked sequences
 # Returns a list with the following tensors
@@ -118,11 +172,12 @@ class identity_layer(torch.nn.Module):
 # True indicates that the sequence or is padded. If True these values should not be part 
 # of further computations. mask_features is adapted to the new output size
 class dense_layer_with_mask(torch.nn.Module):
-  def __init__(self,input_size,output_size,times,pad_value,act_fct="ELU",normalization_type="LayerNorm",dropout=0.0,bias=True,parametrizations="None",device=None, dtype=None,residual_type="None"):
+  def __init__(self,input_size,output_size,times,pad_value,connection_type="Regular",act_fct="ELU",normalization_type="LayerNorm",dropout=0.0,bias=True,parametrizations="None",device=None, dtype=None,residual_type="None"):
     super().__init__()
     
     self.input_size=input_size
     self.output_size=output_size
+    self.connection_type=connection_type
     if isinstance(pad_value, torch.Tensor):
       self.pad_value=pad_value.detach()
     else:
@@ -138,13 +193,23 @@ class dense_layer_with_mask(torch.nn.Module):
       features=self.output_size,
       pad_value= self.pad_value,
       eps=1e-5)
-    self.dense=torch.nn.Linear(
-            in_features=self.input_size,
-            out_features=self.output_size,
-            bias=self.bias,
-            device=device, 
-            dtype=dtype
-            )
+    
+    if self.connection_type=="Regular":
+      self.dense=torch.nn.Linear(
+              in_features=self.input_size,
+              out_features=self.output_size,
+              bias=self.bias,
+              device=device, 
+              dtype=dtype
+              )
+    elif self.connection_type=="BlockwiseOrthogonal":
+      self.dense=block_orthogonal_dense(
+        input_size=self.input_size,
+        output_size=self.output_size,
+        bias=self.bias,
+        device=device, 
+        dtype=dtype
+        )
     if self.parametrizations=="OrthogonalWeights":
       torch.nn.utils.parametrizations.orthogonal(module=self.dense, name='weight',orthogonal_map="matrix_exp")
     elif self.parametrizations=="WeightNorm":

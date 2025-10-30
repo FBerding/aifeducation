@@ -165,6 +165,7 @@ Creating a new instance of this class.
   feature_extractor = NULL,
   target_levels = NULL,
   shared_feat_layer = TRUE,
+  cls_head_type = "Regular",
   feat_act_fct = "ELU",
   feat_size = 50L,
   feat_bias = TRUE,
@@ -236,6 +237,8 @@ note that order matters. For ordinal data please ensure that the levels are sort
 indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{shared_feat_layer}}{\code{bool} If \code{TRUE} all streams use the same feature layer. If \code{FALSE} all streams use their own feature layer.}
+
+\item{\code{cls_head_type}}{\code{string} Type of classification head. Allowed values: 'Regular', 'BlockwiseOrthogonal'}
 
 \item{\code{feat_act_fct}}{\code{string} Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
 

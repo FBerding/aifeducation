@@ -93,6 +93,7 @@ TEClassifierParallelPrototype <- R6::R6Class(
     #' @param merge_normalization_type `r get_param_doc_desc("merge_normalization_type")`
     #' @param metric_type `r get_param_doc_desc("metric_type")`
     #' @param embedding_dim `r get_param_doc_desc("embedding_dim")`
+    #' @param projection_type `r get_param_doc_desc("projection_type")`
     #' @return Function does nothing return. It modifies the current object.
     configure = function(name = NULL,
                          label = NULL,
@@ -101,6 +102,7 @@ TEClassifierParallelPrototype <- R6::R6Class(
                          target_levels = NULL,
                          metric_type = "Euclidean",
                          shared_feat_layer = TRUE,
+                         projection_type="Regular",
                          feat_act_fct = "ELU",
                          feat_size = 50L,
                          feat_bias = TRUE,
@@ -171,6 +173,7 @@ TEClassifierParallelPrototype <- R6::R6Class(
         skip_connection_type = "None",
         metric_type = private$model_config$metric_type,
         shared_feat_layer = private$model_config$shared_feat_layer,
+        projection_type=private$model_config$projection_type,
         feat_act_fct = private$model_config$feat_act_fct,
         feat_size = as.integer(private$model_config$feat_size),
         feat_bias = private$model_config$feat_bias,

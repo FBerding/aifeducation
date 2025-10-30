@@ -1484,6 +1484,34 @@ get_param_dict <- function() {
   param$merge_pooling_features <- param$cls_pooling_features
   param$merge_pooling_features$gui_box <- "Merge Layer"
 
+  param$cls_head_type=list(
+    type = "string",
+    min = NULL,
+    max = NULL,
+    allow_null = FALSE,
+    allowed_values = c("Regular", "BlockwiseOrthogonal"),
+    desc = "Type of classification head.",
+    gui_box = "Classifiction Pooling Layer",
+    gui_label = "Classification Head",
+    default_value = "Regular",
+    default_historic = "Regular",
+    test_values = NULL
+  )
+
+  param$projection_type=list(
+    type = "string",
+    min = NULL,
+    max = NULL,
+    allow_null = FALSE,
+    allowed_values = c("Regular", "BlockwiseOrthogonal"),
+    desc = "Type of projection.",
+    gui_box = "General Settings",
+    gui_label = "Projection Type",
+    default_value = "Regular",
+    default_historic = "Regular",
+    test_values = NULL
+  )
+
   param$cls_pooling_type <- list(
     type = "string",
     min = NULL,

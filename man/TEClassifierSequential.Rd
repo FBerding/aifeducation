@@ -171,6 +171,7 @@ Creating a new instance of this class.
   skip_connection_type = "ResidualGate",
   cls_pooling_features = NULL,
   cls_pooling_type = "MinMax",
+  cls_head_type = "Regular",
   feat_act_fct = "ELU",
   feat_size = 50L,
   feat_bias = TRUE,
@@ -241,6 +242,8 @@ indicating a higher category/class. For nominal data the order does not matter.}
 \item{\code{cls_pooling_features}}{\code{int} Number of features to be extracted at the end of the model. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{$1 <= x $}{`1 <= x `}}}
 
 \item{\code{cls_pooling_type}}{\code{string} Type of extracting intermediate features. Allowed values: 'Max', 'Min', 'MinMax'}
+
+\item{\code{cls_head_type}}{\code{string} Type of classification head. Allowed values: 'Regular', 'BlockwiseOrthogonal'}
 
 \item{\code{feat_act_fct}}{\code{string} Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
 

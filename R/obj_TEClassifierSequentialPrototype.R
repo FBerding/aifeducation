@@ -89,6 +89,7 @@ TEClassifierSequentialPrototype <- R6::R6Class(
     #' @param tf_residual_type `r get_param_doc_desc("tf_residual_type")`
     #' @param metric_type `r get_param_doc_desc("metric_type")`
     #' @param embedding_dim `r get_param_doc_desc("embedding_dim")`
+    #' @param projection_type `r get_param_doc_desc("projection_type")`
     #' @return Function does nothing return. It modifies the current object.
     configure = function(name = NULL,
                          label = NULL,
@@ -98,6 +99,7 @@ TEClassifierSequentialPrototype <- R6::R6Class(
                          skip_connection_type = "ResidualGate",
                          cls_pooling_features = 50L,
                          cls_pooling_type = "MinMax",
+                         projection_type="Regular",
                          metric_type = "Euclidean",
                          feat_act_fct = "ELU",
                          feat_size = 50L,
@@ -164,6 +166,7 @@ TEClassifierSequentialPrototype <- R6::R6Class(
         skip_connection_type = private$model_config$skip_connection_type,
         cls_pooling_features = as.integer(private$model_config$cls_pooling_features),
         cls_pooling_type = private$model_config$cls_pooling_type,
+        projection_type=private$model_config$projection_type,
         metric_type = private$model_config$metric_type,
         feat_act_fct = private$model_config$feat_act_fct,
         feat_size = as.integer(private$model_config$feat_size),

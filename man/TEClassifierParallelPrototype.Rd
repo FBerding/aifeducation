@@ -184,6 +184,7 @@ Creating a new instance of this class.
   target_levels = NULL,
   metric_type = "Euclidean",
   shared_feat_layer = TRUE,
+  projection_type = "Regular",
   feat_act_fct = "ELU",
   feat_size = 50L,
   feat_bias = TRUE,
@@ -258,6 +259,8 @@ indicating a higher category/class. For nominal data the order does not matter.}
 \item{\code{metric_type}}{\code{string} Type of metric used for calculating the distance. Allowed values: 'Euclidean', 'CosineDistance'}
 
 \item{\code{shared_feat_layer}}{\code{bool} If \code{TRUE} all streams use the same feature layer. If \code{FALSE} all streams use their own feature layer.}
+
+\item{\code{projection_type}}{\code{string} Type of projection. Allowed values: 'Regular', 'BlockwiseOrthogonal'}
 
 \item{\code{feat_act_fct}}{\code{string} Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
 

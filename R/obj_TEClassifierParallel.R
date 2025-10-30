@@ -33,6 +33,7 @@ TEClassifierParallel <- R6::R6Class(
     #' @param feature_extractor `r get_param_doc_desc("feature_extractor")`
     #' @param target_levels `r get_param_doc_desc("target_levels")`
     #' @param shared_feat_layer `r get_param_doc_desc("shared_feat_layer")`
+    #' @param cls_head_type `r get_param_doc_desc("cls_head_type")`
     #' @param feat_act_fct `r get_param_doc_desc("feat_act_fct")`
     #' @param feat_size `r get_param_doc_desc("feat_size")`
     #' @param feat_bias `r get_param_doc_desc("feat_bias")`
@@ -89,6 +90,7 @@ TEClassifierParallel <- R6::R6Class(
                          feature_extractor = NULL,
                          target_levels = NULL,
                          shared_feat_layer = TRUE,
+                         cls_head_type="Regular",
                          feat_act_fct = "ELU",
                          feat_size = 50L,
                          feat_bias = TRUE,
@@ -155,6 +157,7 @@ TEClassifierParallel <- R6::R6Class(
         n_target_levels = as.integer(length(private$model_config$target_levels)),
         pad_value = as.integer(private$text_embedding_model$pad_value),
         shared_feat_layer = private$model_config$shared_feat_layer,
+        cls_type=private$model_config$cls_head_type,
         feat_act_fct = private$model_config$feat_act_fct,
         feat_size = as.integer(private$model_config$feat_size),
         feat_bias = private$model_config$feat_bias,
