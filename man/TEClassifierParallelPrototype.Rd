@@ -346,7 +346,7 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{tf_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values: 'LayerNorm', 'None'}
 
-\item{\code{tf_normalization_position}}{\code{string} Position where the normalization should be applied. Allowed values: 'pre', 'post'}
+\item{\code{tf_normalization_position}}{\code{string} Position where the normalization should be applied. Allowed values: 'Pre', 'Post'}
 
 \item{\code{tf_residual_type}}{\code{string} Type of residual connenction for all layers and stack of layers. Allowed values: 'ResidualGate', 'Addition', 'None'}
 
