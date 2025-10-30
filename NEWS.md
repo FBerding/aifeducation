@@ -19,6 +19,11 @@ editor_options:
   transformer encoder layers.
 - Added new options for plotting training history.
 - Fixed an errors causing pseudo labeling to crash in some cases.
+- Added a new type of classification head: OLS-Layer described by 
+  [Li et al. 2020](https://doi.org/10.1109/TIP.2020.2990277). The new head
+  is available for TEClassifierSequential and TEClassifierParallel. For the
+  classifiers working with prototypes the layer can be used to change the
+  projection into the embedding space (parameter projection_type).
 
 **FeatureExtractor**
 
