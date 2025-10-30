@@ -1455,7 +1455,7 @@ get_param_dict <- function() {
     min = NULL,
     max = NULL,
     allow_null = FALSE,
-    allowed_values = c("pre", "post"),
+    allowed_values = c("Pre", "Post"),
     values_desc = list(
       pre = "Applies normalization before the layers as described by [Xiong et al. (2020)](https://doi.org/10.48550/arXiv.2002.04745).",
       post = "Applies normalization after the layers as described in the original transformer model."
@@ -1463,8 +1463,8 @@ get_param_dict <- function() {
     desc = "Position where the normalization should be applied.",
     gui_box = "General Settings",
     gui_label = "Normalization Position",
-    default_value = "pre",
-    default_historic = "post",
+    default_value = "Pre",
+    default_historic = "Post",
     test_values = NULL
   )
 

@@ -595,7 +595,7 @@ class layer_abs_positional_embedding(torch.nn.Module):
 
 #layer tf_encoder
 class layer_tf_encoder(torch.nn.Module):
-  def __init__(self, dense_dim,times, features,pad_value, dropout_rate_1,dropout_rate_2,attention_type="MultiHead",num_heads=2,act_fct="ELU",bias=True,parametrizations="None",normalization_type="LayerNorm",normalization_position="pre",device=None, dtype=None,residual_type="None"):
+  def __init__(self, dense_dim,times, features,pad_value, dropout_rate_1,dropout_rate_2,attention_type="MultiHead",num_heads=2,act_fct="ELU",bias=True,parametrizations="None",normalization_type="LayerNorm",normalization_position="Pre",device=None, dtype=None,residual_type="None"):
     super().__init__()
     
     self.dense_dim=dense_dim
@@ -681,7 +681,7 @@ class layer_tf_encoder(torch.nn.Module):
 
   def forward(self,x,seq_len,mask_times,mask_features):
     #Post Layer Normalization
-    if self.normalization_position=="post":
+    if self.normalization_position=="Post":
       #Sub-Layer 1
       if self.attention_type=="Fourier":
         y=self.attention(x*(~mask_features))
@@ -707,7 +707,7 @@ class layer_tf_encoder(torch.nn.Module):
       output=self.normalization_2(output[0],output[1],output[2],output[3])
     
     #Pre-Layer-Normalization
-    if self.normalization_position=="pre":
+    if self.normalization_position=="Pre":
       #Sub-Layer 1
       xn=self.normalization_1(x,seq_len,mask_times,mask_features)[0]
       if self.attention_type=="Fourier":

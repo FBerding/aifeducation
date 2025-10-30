@@ -152,8 +152,8 @@ class TEClassifierSequential(torch.nn.Module):
                 out_features=n_target_levels)
         elif cls_type=="BlockwiseOrthogonal":
           self.classification_head=block_orthogonal_dense(
-                in_features=cls_pooling_features,
-                out_features=n_target_levels,
+                input_size=cls_pooling_features,
+                output_size=n_target_levels,
                 bias=False,
                 device=device, 
                 dtype=dtype)
