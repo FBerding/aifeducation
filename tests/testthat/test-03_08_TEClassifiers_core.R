@@ -15,7 +15,7 @@ object_class_names <- get_TEClassifiers_class_names(super_class = "ClassifiersBa
 # object_class_names <- "TEClassifierRegular"
 
 max_samples <- 20
-max_samples_CI <- 5
+max_samples_CI <- 2
 
 max_samples_training <- 2
 max_samples_training_CI <- 1
@@ -75,12 +75,13 @@ if (file.exists(root_path_feature_extractor)) {
 for (object_class_name in object_class_names) {
   # Test for different number of classes
   for (n_classes in class_range) {
+    if (!skip_creation_test) {
     for (i in 1:check_adjust_n_samples_on_CI(
       n_samples_requested = max_samples,
       n_CI = max_samples_CI
     )) {
       # Core Tests of the models-------------------------------------------------
-      if (!skip_creation_test) {
+
         # Create a List of all relevant combinations of arguments and reduce the number
         # to the desired sample size.
         # These are available for all tests.

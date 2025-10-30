@@ -183,6 +183,9 @@ test_that("stack_tf_encoder_layer", {
   masking_layer <- py$masking_layer(pad_value)
   values <- masking_layer(example_tensor)
 
+  normalization_positions=c("Post","Pre")
+  residual_types=c("None","Addition","ResidualGate")
+
   # Test for equal, more, and fewer features as input size
   features_output <- c(
     features,
@@ -191,6 +194,8 @@ test_that("stack_tf_encoder_layer", {
   )
 
   for (attention_type in attention_types) {
+    for(normalization_position in normalization_positions){
+      for(residual_type in residual_types){
     layer <- py$stack_tf_encoder_layer(
       dense_dim = as.integer(4 * features),
       attention_type = attention_type,
@@ -202,11 +207,12 @@ test_that("stack_tf_encoder_layer", {
       dropout_rate_2 = 0.2,
       pad_value = as.integer(pad_value),
       positional_embedding = "absolute",
+      normalization_position=normalization_position,
       bias = TRUE,
       parametrizations = "None",
       dtype = values[[1]]$dtype,
       device = device,
-      residual_type = "ResidualGate"
+      residual_type = residual_type
     )$to(device)
     layer$eval()
 
@@ -241,6 +247,8 @@ test_that("stack_tf_encoder_layer", {
       mask_features = values[[4]]
     )
     expect_equal(tensor_to_numpy(y_1[[1]]), tensor_to_numpy(y_2[[1]]))
+      }
+    }
   }
 })
 

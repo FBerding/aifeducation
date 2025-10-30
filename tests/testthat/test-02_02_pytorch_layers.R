@@ -272,7 +272,7 @@ test_that("DenseLayer with Mask", {
   device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
   normalization_types <- c("None", "LayerNorm")
   residual_types <- c("None", "Addition", "ResidualGate")
-  connection_types <- c("Regular", "BlockwiseOrthogonal")
+  connection_types <- c("Regular", "PairwiseOrthogonal")
   pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
