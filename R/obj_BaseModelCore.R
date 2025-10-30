@@ -618,7 +618,7 @@ BaseModelCore <- R6::R6Class(
             x = best_state_point$epoch,
             y = best_state_point$value,
             type = "segment",
-            state = "Best"
+            state = "best"
           )
         }
 
@@ -640,7 +640,7 @@ BaseModelCore <- R6::R6Class(
 
         if (ind_best_model) {
           tmp_plot <- tmp_plot + ggplot2::scale_linetype_manual(
-            values = c(Best = 1, Final = 3L)
+            values = c(best = 1, final = 3L)
           )
         }
         return(tmp_plot)

@@ -249,7 +249,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
             x = best_state_point$epoch,
             y = best_state_point$value,
             type = "segment",
-            state = "Best"
+            state = "best"
           )
         } else {
           best_state_point <- list(
@@ -268,7 +268,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
             x = selected_state_point$epoch,
             y = selected_state_point$value,
             type = "segment",
-            state = "Final"
+            state = "final"
           )
         } else {
           selected_state_point <- list(
@@ -299,7 +299,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
             x = best_states$epochs,
             y = best_states$values,
             type = "point",
-            state = "Best"
+            state = "best"
           )
         }
         if (ind_selected_model) {
@@ -312,7 +312,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
             x = selected_states$epochs,
             y = selected_states$values,
             type = "point",
-            state = "Final"
+            state = "final"
           )
         }
       }
@@ -335,11 +335,11 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       if (ind_best_model || ind_selected_model) {
         if (final_training) {
           tmp_plot <- tmp_plot + ggplot2::scale_linetype_manual(
-            values = c(Best = 1, Final = 3L)
+            values = c(best = 1, final = 3L)
           )
         } else {
           tmp_plot <- tmp_plot + ggplot2::scale_shape_manual(
-            values = c(Best = 16L, Final = 15L)
+            values = c(best = 16L, final = 15L)
           )
         }
       }
