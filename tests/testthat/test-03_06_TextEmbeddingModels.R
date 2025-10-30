@@ -9,6 +9,9 @@ testthat::skip_if_not(
   message = "Base models for tests not available"
 )
 
+#Start time
+test_time_start=Sys.time()
+
 # SetUp-------------------------------------------------------------------------
 # Set paths
 root_path_data <- testthat::test_path("test_data_tmp/TEM")

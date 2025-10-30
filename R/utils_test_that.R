@@ -365,8 +365,8 @@ random_bool_on_CI <- function() {
 
 monitor_test_time_on_CI=function(start_time,test_name){
   if (is_on_CI()) {
-    print(paste(test_name,"Duration:",format(Sys.time()-start_time)))
+    cat(paste(test_name,"Duration:",format(Sys.time()-start_time)))
   } else {
-    print(paste(test_name,"Duration:",format(Sys.time()-start_time)))
+    cat(paste(test_name,"Duration:",format(Sys.time()-start_time)))
   }
 }

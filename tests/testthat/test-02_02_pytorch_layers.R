@@ -358,7 +358,7 @@ test_that("layer_tf_encoder", {
   device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
   attention_types <- c("MultiHead", "Fourier")
   normalization_types <- c("None", "LayerNorm")
-  normalization_positions <- c("post", "pre")
+  normalization_positions <- c("Post", "Pre")
 
   pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)

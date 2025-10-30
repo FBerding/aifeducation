@@ -4,6 +4,9 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
+#Start time
+test_time_start=Sys.time()
+
 # SetUp-------------------------------------------------------------------------
 # Set paths
 root_path_data <- testthat::test_path("test_data/FeatureExtractor")
