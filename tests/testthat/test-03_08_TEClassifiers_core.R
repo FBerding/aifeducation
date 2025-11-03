@@ -507,19 +507,13 @@ for (object_class_name in object_class_names) {
           )
         )
 
-        if (object_class_name == "TEClassifierSequentialPrototype" & j <= 1) {
+        if (object_class_name == "TEClassifierSequential" && j <= 1) {
           use_pl <- TRUE
         } else {
           use_pl <- FALSE
         }
 
-        if (object_class_name == "TEClassifierSequential" & j <= 1) {
-          use_pl <- TRUE
-        } else {
-          use_pl <- FALSE
-        }
-
-        if (object_class_name == "TEClassifierParallel" & j <= 1) {
+        if (object_class_name == "TEClassifierParallel" && j <= 1) {
           use_sc <- TRUE
         } else {
           use_sc <- FALSE

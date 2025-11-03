@@ -556,6 +556,7 @@ build_aife_site <- function(clear_docs = FALSE) {
   pkgdown::build_redirects()
 
   pkgdown::preview_site()
+  devtools::load_all()
 }
 
 

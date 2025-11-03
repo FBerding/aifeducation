@@ -949,7 +949,7 @@ get_param_dict <- function() {
     gui_box = "Pseudo Labeling",
     gui_label = "Number of Steps",
     default_value = 5L,
-    test_values = 3L
+    test_values = 2L
   )
   param$pl_anchor <- list(
     type = "double",
