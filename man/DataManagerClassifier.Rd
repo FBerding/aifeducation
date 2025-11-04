@@ -120,7 +120,7 @@ The remaining cases are part of the training data. Allowed values: \ifelse{latex
 
 \item{\code{pad_value}}{\code{int} Value indicating padding. This value should no be in the range of
 regluar values for computations. Thus it is not recommended to chance this value.
-Default is \code{-100}. Allowed values: \ifelse{latex}{$ x <= -100$}{\ifelse{html}{ x <= -100}{` x <= -100`}}}
+Default is \code{-100}. Allowed values: \ifelse{latex}{$ x <= -1$}{\ifelse{html}{ x <= -1}{` x <= -1`}}}
 
 \item{\code{one_hot_encoding}}{\code{bool} If \code{TRUE} all labels are converted to one hot encoding.}
 

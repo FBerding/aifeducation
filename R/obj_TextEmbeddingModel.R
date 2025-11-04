@@ -194,7 +194,7 @@ TextEmbeddingModel <- R6::R6Class(
     configure = function(model_name = NULL,
                          model_label = NULL,
                          model_language = NULL,
-                         max_length = 0L,
+                         max_length = 512L,
                          chunks = 2L,
                          overlap = 0L,
                          emb_layer_min = 1L,

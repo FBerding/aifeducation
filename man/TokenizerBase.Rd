@@ -161,7 +161,7 @@ Method for encoding words of raw texts into integers.
 
 \item{\code{max_token_sequence_length}}{\code{int} Maximal number of tokens per chunk. Allowed values: \ifelse{latex}{$20 <= x $}{\ifelse{html}{20 <= x }{`20 <= x `}}}
 
-\item{\code{n_chunks}}{\code{int} Maximal number chunks. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{1 <= x }{`1 <= x `}}}
+\item{\code{n_chunks}}{\code{int} Maximal number chunks. Allowed values: \ifelse{latex}{$2 <= x $}{\ifelse{html}{2 <= x }{`2 <= x `}}}
 
 \item{\code{token_encodings_only}}{\code{bool}
 \itemize{

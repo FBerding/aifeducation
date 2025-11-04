@@ -135,7 +135,7 @@ get_param_dict <- function() {
 
   param$n_chunks <- list(
     type = "int",
-    min = 1L,
+    min = 2L,
     max = Inf,
     allow_null = FALSE,
     allowed_values = NULL,
@@ -343,7 +343,7 @@ get_param_dict <- function() {
   param$pad_value <- list(
     type = "int",
     min = -Inf,
-    max = -100L,
+    max = -1L,
     allow_null = FALSE,
     allowed_values = NULL,
     desc = "Value indicating padding. This value should no be in the range of
@@ -1480,7 +1480,7 @@ get_param_dict <- function() {
     gui_box = "Classifiction Pooling Layer",
     gui_label = "Size",
     default_value = 32L,
-    test_values = 10L
+    test_values = 4L
   )
   param$merge_pooling_features <- param$cls_pooling_features
   param$merge_pooling_features$gui_box <- "Merge Layer"

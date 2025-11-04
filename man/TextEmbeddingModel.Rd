@@ -78,7 +78,7 @@ Method for creating a new text embedding model
   model_name = NULL,
   model_label = NULL,
   model_language = NULL,
-  max_length = 0L,
+  max_length = 512L,
   chunks = 2L,
   overlap = 0L,
   emb_layer_min = 1L,
@@ -118,7 +118,7 @@ Please note that BaseModelFunnel allows only 'CLS'. Allowed values: 'CLS', 'Aver
 
 \item{\code{pad_value}}{\code{int} Value indicating padding. This value should no be in the range of
 regluar values for computations. Thus it is not recommended to chance this value.
-Default is \code{-100}. Allowed values: \ifelse{latex}{$ x <= -100$}{\ifelse{html}{ x <= -100}{` x <= -100`}}}
+Default is \code{-100}. Allowed values: \ifelse{latex}{$ x <= -1$}{\ifelse{html}{ x <= -1}{` x <= -1`}}}
 
 \item{\code{base_model}}{\code{BaseModelCore} BaseModels for processing raw texts.}
 

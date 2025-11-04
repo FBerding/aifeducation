@@ -66,7 +66,7 @@ generate_args_for_tests <- function(object_name,
           arg_value_list[param] <- list(sample(x = c(FALSE, TRUE), size = 1L))
         } else {
           if (current_entry$min == -Inf) {
-            tmp_min <- -1L
+            tmp_min <- -100L
           } else {
             tmp_min <- current_entry$min
           }
