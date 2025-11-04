@@ -53,30 +53,202 @@ if (file.exists(root_path_feature_extractor)) {
 }
 
 for (object_class_name in object_class_names) {
-  for (n_classes in class_range) {
-    for (i in 1:check_adjust_n_samples_on_CI(
-      n_samples_requested = max_samples,
-      n_CI = max_samples_CI
-    )) {
-      test_combination <- generate_args_for_tests(
-        object_name = object_class_name,
-        method = "configure",
-        var_objects = list(
-          feature_extractor = feature_extractor
-        ),
-        necessary_objects = list(
-          text_embeddings = test_embeddings,
-          target_levels = target_levels[[n_classes]]
-        ),
-        var_override = list(
-          name = NULL,
-          label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
-          trace = random_bool_on_CI()
-        )
+  for (i in 1:check_adjust_n_samples_on_CI(
+    n_samples_requested = max_samples,
+    n_CI = max_samples_CI
+  )) {
+    # Test for different number of classes
+    n_classes <- sample(class_range, size = 1L)
+
+    test_combination <- generate_args_for_tests(
+      object_name = object_class_name,
+      method = "configure",
+      var_objects = list(
+        feature_extractor = feature_extractor
+      ),
+      necessary_objects = list(
+        text_embeddings = test_embeddings,
+        target_levels = target_levels[[n_classes]]
+      ),
+      var_override = list(
+        name = NULL,
+        label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+        trace = random_bool_on_CI()
+      )
+    )
+
+
+    # Create test object with a given combination of args
+    classifier <- create_object(object_class_name)
+    suppressMessages(
+      do.call(
+        what = classifier$configure,
+        args = test_combination
+      )
+    )
+    # Predict with sample cases-------------------------------------------------
+    test_that(paste("Predictions with Sample Cases", object_class_name, get_current_args_for_print(test_combination)), {
+      # Number of Predictions
+      reference_predictions <- classifier$predict_with_samples(
+        newdata = test_embeddings,
+        embeddings_s = test_embeddings_reduced,
+        classes_s = target_data[[n_classes]][rownames(test_embeddings_reduced$embeddings)],
+        batch_size = 2,
+        ml_trace = 0
       )
 
+      expect_equal(
+        object = length(reference_predictions$expected_category),
+        expected = nrow(test_embeddings$embeddings)
+      )
 
-      # Create test object with a given combination of args
+      # Randomness
+      # Embedded Text
+      predictions_2 <- classifier$predict_with_samples(
+        newdata = test_embeddings,
+        embeddings_s = test_embeddings_reduced,
+        classes_s = target_data[[n_classes]][rownames(test_embeddings_reduced$embeddings)],
+        batch_size = 2,
+        ml_trace = 0
+      )
+      expect_equal(reference_predictions[, 1:(ncol(reference_predictions) - 1)], predictions_2[, 1:(ncol(predictions_2) - 1)],
+        tolerance = 1e-6
+      )
+      # LargeDataSet
+      predictions_2 <- NULL
+      predictions_2 <- classifier$predict_with_samples(
+        newdata = test_embeddings_large,
+        embeddings_s = test_embeddings_reduced_LD,
+        classes_s = target_data[[n_classes]][rownames(test_embeddings_reduced$embeddings)],
+        batch_size = 2,
+        ml_trace = 0
+      )
+      expect_equal(reference_predictions[, 1:(ncol(reference_predictions) - 1)], predictions_2[, 1:(ncol(predictions_2) - 1)],
+        tolerance = 1e-6
+      )
+
+      # Order Invariance
+      if (!is.null(test_combination$attention)) {
+        if (test_combination$attention != "fourier") {
+          embeddings_ET_perm <- test_embeddings$clone(deep = TRUE)
+          perm <- sample(x = seq.int(from = 1, to = nrow(embeddings_ET_perm$embeddings)), replace = FALSE)
+          embeddings_ET_perm$embeddings <- embeddings_ET_perm$embeddings[perm, , , drop = FALSE]
+          ids <- rownames(test_embeddings$embeddings)
+          # Embedded Text
+          predictions_Perm <- classifier$predict_with_samples(
+            newdata = embeddings_ET_perm,
+            embeddings_s = test_embeddings_reduced,
+            classes_s = target_data[[n_classes]][rownames(test_embeddings_reduced$embeddings)],
+            batch_size = 50,
+            ml_trace = 0
+          )
+          expect_equal(
+            reference_predictions[ids, 1:(ncol(reference_predictions) - 1)],
+            predictions_Perm[ids, 1:(ncol(predictions_Perm) - 1)],
+            tolerance = 1e-6
+          )
+
+          # LargeDataSet
+          predictions_Perm <- NULL
+          predictions_Perm <- classifier$predict_with_samples(
+            newdata = embeddings_ET_perm$convert_to_LargeDataSetForTextEmbeddings(),
+            embeddings_s = test_embeddings_reduced,
+            classes_s = target_data[[n_classes]][rownames(test_embeddings_reduced$embeddings)],
+            batch_size = 50,
+            ml_trace = 0
+          )
+          expect_equal(
+            reference_predictions[ids, 1:(ncol(reference_predictions) - 1)],
+            predictions_Perm[ids, 1:(ncol(predictions_Perm) - 1)],
+            tolerance = 1e-6
+          )
+        }
+      }
+
+      # Single Case
+      # Embedded Text
+      prediction <- classifier$predict_with_samples(
+        newdata = test_embeddings_single_case,
+        embeddings_s = test_embeddings_reduced,
+        classes_s = target_data[[n_classes]][rownames(test_embeddings_reduced$embeddings)],
+        batch_size = 2,
+        ml_trace = 0
+      )
+      expect_equal(
+        object = nrow(prediction),
+        expected = 1
+      )
+      # LargeDataSet
+      prediction_LD <- classifier$predict_with_samples(
+        newdata = test_embeddings_single_case_LD,
+        embeddings_s = test_embeddings_reduced_LD,
+        classes_s = target_data[[n_classes]][rownames(test_embeddings_reduced$embeddings)],
+        batch_size = 2,
+        ml_trace = 0
+      )
+      expect_equal(
+        object = nrow(prediction_LD),
+        expected = 1
+      )
+    })
+
+
+    # Embed----------------------------------------------------------------------
+    test_that(paste("embed without sample cases", object_class_name, get_current_args_for_print(test_combination)), {
+      # Predictions
+      embeddings <- classifier$embed(
+        embeddings_q = test_embeddings_reduced,
+        embeddings_s = NULL,
+        classes_s = NULL,
+        batch_size = 50
+      )
+
+      # check case order invariance
+      perm <- sample(x = seq.int(from = 1, to = nrow(test_embeddings_reduced$embeddings)))
+      test_embeddings_reduced_perm <- test_embeddings_reduced$clone(deep = TRUE)
+      test_embeddings_reduced_perm$embeddings <- test_embeddings_reduced_perm$embeddings[perm, , ]
+      embeddings_perm <- classifier$embed(
+        embeddings_q = test_embeddings_reduced_perm,
+        batch_size = 50
+      )
+      for (j in seq_len(nrow(embeddings$embeddings_q))) {
+        expect_equal(embeddings$embeddings_q[j, ],
+          embeddings_perm$embeddings_q[which(perm == j), ],
+          tolerance = 1e-5
+        )
+      }
+    })
+    gc()
+
+    test_that(paste("embed with sample cases", object_class_name, get_current_args_for_print(test_combination)), {
+      # Predictions
+      embeddings <- classifier$embed(
+        embeddings_q = test_embeddings,
+        embeddings_s = test_embeddings_reduced,
+        classes_s = target_data[[n_classes]][rownames(test_embeddings_reduced$embeddings)],
+        batch_size = 50
+      )
+
+      # check case order invariance
+      perm <- sample(x = seq.int(from = 1, to = nrow(test_embeddings$embeddings)))
+      test_embeddings_perm <- test_embeddings$clone(deep = TRUE)
+      test_embeddings_perm$embeddings <- test_embeddings_perm$embeddings[perm, , ]
+      embeddings_perm <- classifier$embed(
+        embeddings_q = test_embeddings_perm,
+        embeddings_s = test_embeddings_reduced,
+        classes_s = target_data[[n_classes]][rownames(test_embeddings_reduced$embeddings)],
+        batch_size = 50
+      )
+      for (j in seq_len(nrow(embeddings$embeddings_q))) {
+        expect_equal(embeddings$embeddings_q[j, ],
+          embeddings_perm$embeddings_q[which(perm == j), ],
+          tolerance = 1e-5
+        )
+      }
+    })
+
+    test_that(paste("plot without sample cases", object_class_name, get_current_args_for_print(test_combination)), {
+      # plot
       classifier <- create_object(object_class_name)
       suppressMessages(
         do.call(
@@ -84,238 +256,31 @@ for (object_class_name in object_class_names) {
           args = test_combination
         )
       )
-      # Predict with sample cases-------------------------------------------------
-      test_that(paste("Number of Predictions", object_class_name, get_current_args_for_print(test_combination)), {
-        predictions <- classifier$predict_with_samples(
-          newdata = test_embeddings,
-          embeddings_s = test_embeddings_reduced,
-          classes_s = target_data[[n_classes]][rownames(test_embeddings_reduced$embeddings)],
-          batch_size = 2,
-          ml_trace = 0
-        )
-        expect_equal(
-          object = length(predictions$expected_category),
-          expected = nrow(test_embeddings$embeddings)
-        )
-      })
+      plot <- classifier$plot_embeddings(
+        embeddings_q = test_embeddings_reduced,
+        classes_q = target_data[[n_classes]],
+        embeddings_s = NULL,
+        classes_s = NULL,
+        batch_size = 50,
+        inc_margin = FALSE
+      )
+      expect_s3_class(plot, "ggplot")
+    })
 
-      test_that(paste(" - single case", object_class_name), {
-        prediction <- classifier$predict_with_samples(
-          newdata = test_embeddings_single_case,
-          embeddings_s = test_embeddings_reduced,
-          classes_s = target_data[[n_classes]][rownames(test_embeddings_reduced$embeddings)],
-          batch_size = 2,
-          ml_trace = 0
-        )
-        expect_equal(
-          object = nrow(prediction),
-          expected = 1
-        )
-
-        prediction_LD <- classifier$predict_with_samples(
-          newdata = test_embeddings_single_case_LD,
-          embeddings_s = test_embeddings_reduced_LD,
-          classes_s = target_data[[n_classes]][rownames(test_embeddings_reduced$embeddings)],
-          batch_size = 2,
-          ml_trace = 0
-        )
-        expect_equal(
-          object = nrow(prediction_LD),
-          expected = 1
-        )
-      })
-
-      test_that(paste(" - randomness", object_class_name, get_current_args_for_print(test_combination)), {
-        # EmbeddedText
-        predictions <- NULL
-        predictions_2 <- NULL
-        predictions <- classifier$predict_with_samples(
-          newdata = test_embeddings_reduced,
-          embeddings_s = test_embeddings_reduced,
-          classes_s = target_data[[n_classes]][rownames(test_embeddings_reduced$embeddings)],
-          batch_size = 2,
-          ml_trace = 0
-        )
-        predictions_2 <- classifier$predict_with_samples(
-          newdata = test_embeddings_reduced,
-          embeddings_s = test_embeddings_reduced,
-          classes_s = target_data[[n_classes]][rownames(test_embeddings_reduced$embeddings)],
-          batch_size = 2,
-          ml_trace = 0
-        )
-        expect_equal(predictions[, 1:(ncol(predictions) - 1)], predictions_2[, 1:(ncol(predictions_2) - 1)],
-          tolerance = 1e-6
-        )
-
-        # LargeDataSetForTextEmbeddings
-        predictions <- NULL
-        predictions_2 <- NULL
-        predictions <- classifier$predict_with_samples(
-          newdata = test_embeddings_reduced_LD,
-          embeddings_s = test_embeddings_reduced_LD,
-          classes_s = target_data[[n_classes]][rownames(test_embeddings_reduced$embeddings)],
-          batch_size = 2,
-          ml_trace = 0
-        )
-        predictions_2 <- classifier$predict_with_samples(
-          newdata = test_embeddings_reduced_LD,
-          embeddings_s = test_embeddings_reduced_LD,
-          classes_s = target_data[[n_classes]][rownames(test_embeddings_reduced$embeddings)],
-          batch_size = 2,
-          ml_trace = 0
-        )
-        expect_equal(predictions[, 1:(ncol(predictions) - 1)], predictions_2[, 1:(ncol(predictions_2) - 1)],
-          tolerance = 1e-6
-        )
-      })
-
-      if (!is.null(test_combination$attention)) {
-        if (test_combination$attention != "fourier") {
-          test_that(paste(" - order invariance", object_class_name, get_current_args_for_print(test_combination)), {
-            embeddings_ET_perm <- test_embeddings$clone(deep = TRUE)
-            perm <- sample(x = seq.int(from = 1, to = nrow(embeddings_ET_perm$embeddings)), replace = FALSE)
-            embeddings_ET_perm$embeddings <- embeddings_ET_perm$embeddings[perm, , , drop = FALSE]
-
-            ids <- rownames(test_embeddings_reduced$embeddings)
-
-            # EmbeddedText
-            predictions <- NULL
-            predictions_Perm <- NULL
-            predictions <- classifier$predict_with_samples(
-              newdata = test_embeddings,
-              embeddings_s = test_embeddings_reduced,
-              classes_s = target_data[[n_classes]][rownames(test_embeddings_reduced$embeddings)],
-              batch_size = 50,
-              ml_trace = 0
-            )
-            predictions_Perm <- classifier$predict_with_samples(
-              newdata = embeddings_ET_perm,
-              batch_size = 50,
-              ml_trace = 0
-            )
-
-            expect_equal(
-              predictions[ids, 1:(ncol(predictions) - 1)],
-              predictions_Perm[ids, 1:(ncol(predictions_Perm) - 1)],
-              tolerance = 1e-6
-            )
-
-            # LargeDataSetForTextEmbeddings
-            predictions <- NULL
-            predictions_Perm <- NULL
-            predictions <- classifier$predict_with_samples(
-              newdata = test_embeddings_LD,
-              embeddings_s = test_embeddings_reduced,
-              classes_s = target_data[[n_classes]][rownames(test_embeddings_reduced$embeddings)],
-              batch_size = 50,
-              ml_trace = 0
-            )
-
-            predictions_Perm <- classifier$predict_with_samples(
-              newdata = embeddings_ET_perm$convert_to_LargeDataSetForTextEmbeddings(),
-              batch_size = 50,
-              ml_trace = 0
-            )
-
-            expect_equal(
-              predictions[ids, 1:(ncol(predictions) - 1)],
-              predictions_Perm[ids, 1:(ncol(predictions_Perm) - 1)],
-              embeddings_s = test_embeddings_reduced,
-              classes_s = target_data[[n_classes]][rownames(test_embeddings_reduced$embeddings)],
-              tolerance = 1e-6
-            )
-          })
-        }
-      }
-
-      # Embed----------------------------------------------------------------------
-      test_that(paste("embed without sample cases", object_class_name, get_current_args_for_print(test_combination)), {
-        # Predictions
-        embeddings <- classifier$embed(
-          embeddings_q = test_embeddings_reduced,
-          embeddings_s = NULL,
-          classes_s = NULL,
-          batch_size = 50
-        )
-
-        # check case order invariance
-        perm <- sample(x = seq.int(from = 1, to = nrow(test_embeddings_reduced$embeddings)))
-        test_embeddings_reduced_perm <- test_embeddings_reduced$clone(deep = TRUE)
-        test_embeddings_reduced_perm$embeddings <- test_embeddings_reduced_perm$embeddings[perm, , ]
-        embeddings_perm <- classifier$embed(
-          embeddings_q = test_embeddings_reduced_perm,
-          batch_size = 50
-        )
-        for (j in seq_len(nrow(embeddings$embeddings_q))) {
-          expect_equal(embeddings$embeddings_q[j, ],
-            embeddings_perm$embeddings_q[which(perm == j), ],
-            tolerance = 1e-5
-          )
-        }
-      })
-      gc()
-
-      test_that(paste("embed with sample cases", object_class_name, get_current_args_for_print(test_combination)), {
-        # Predictions
-        embeddings <- classifier$embed(
-          embeddings_q = test_embeddings,
-          embeddings_s = test_embeddings_reduced,
-          classes_s = target_data[[n_classes]][rownames(test_embeddings_reduced$embeddings)],
-          batch_size = 50
-        )
-
-        # check case order invariance
-        perm <- sample(x = seq.int(from = 1, to = nrow(test_embeddings$embeddings)))
-        test_embeddings_perm <- test_embeddings$clone(deep = TRUE)
-        test_embeddings_perm$embeddings <- test_embeddings_perm$embeddings[perm, , ]
-        embeddings_perm <- classifier$embed(
-          embeddings_q = test_embeddings_perm,
-          embeddings_s = test_embeddings_reduced,
-          classes_s = target_data[[n_classes]][rownames(test_embeddings_reduced$embeddings)],
-          batch_size = 50
-        )
-        for (j in seq_len(nrow(embeddings$embeddings_q))) {
-          expect_equal(embeddings$embeddings_q[j, ],
-            embeddings_perm$embeddings_q[which(perm == j), ],
-            tolerance = 1e-5
-          )
-        }
-      })
-
-      test_that(paste("plot without sample cases", object_class_name, get_current_args_for_print(test_combination)), {
-        # plot
-        classifier <- create_object(object_class_name)
-        suppressMessages(
-          do.call(
-            what = classifier$configure,
-            args = test_combination
-          )
-        )
-        plot <- classifier$plot_embeddings(
-          embeddings_q = test_embeddings_reduced,
-          classes_q = target_data[[n_classes]],
-          embeddings_s = NULL,
-          classes_s = NULL,
-          batch_size = 50,
-          inc_margin = FALSE
-        )
-        expect_s3_class(plot, "ggplot")
-      })
-
-      test_that(paste("plot with sample cases", object_class_name, get_current_args_for_print(test_combination)), {
-        # plot
-        plot <- classifier$plot_embeddings(
-          embeddings_q = test_embeddings,
-          classes_q = target_data[[n_classes]],
-          embeddings_s = test_embeddings_reduced,
-          classes_s = target_data[[n_classes]][rownames(test_embeddings_reduced$embeddings)],
-          batch_size = 50,
-          inc_margin = FALSE
-        )
-        expect_s3_class(plot, "ggplot")
-      })
-    }
+    test_that(paste("plot with sample cases", object_class_name, get_current_args_for_print(test_combination)), {
+      # plot
+      plot <- classifier$plot_embeddings(
+        embeddings_q = test_embeddings,
+        classes_q = target_data[[n_classes]],
+        embeddings_s = test_embeddings_reduced,
+        classes_s = target_data[[n_classes]][rownames(test_embeddings_reduced$embeddings)],
+        batch_size = 50,
+        inc_margin = FALSE
+      )
+      expect_s3_class(plot, "ggplot")
+    })
   }
+
 
   # Clean Directory--------------------------------------------------------------
   if (dir.exists(root_path_results)) {

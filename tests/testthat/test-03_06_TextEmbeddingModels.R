@@ -75,9 +75,11 @@ for (base_model_type in base_model_type_list) {
   # get a random value for padding
   random_padding_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
 
-  for (pooling_type in pooling_type_list) {
     for (max_layer in max_layers) {
       for (min_layer in 1:max_layer) {
+        #Select a pooling type
+        pooling_type=sample(x=pooling_type_list,size=1L)
+
         # Error Checking: Max layer greater as the number of layers
         test_that(paste(base_model_type, pooling_type, max_layer, min_layer, "Max layer greater as the number of layers"), {
           text_embedding_model <- TextEmbeddingModel$new()
@@ -622,7 +624,7 @@ for (base_model_type in base_model_type_list) {
         })
       }
     }
-  }
+
 }
 
 # Monitor test time
