@@ -121,6 +121,7 @@ get_param_dict <- function() {
   )
 
   param$max_length <- param$max_token_sequence_length
+  param$max_length$test_values=400L
   param$max_length$desc <- "Maximal number of token per chunks. Must be equal or lower
   as the maximal postional embeddings for the model."
 
@@ -159,7 +160,7 @@ get_param_dict <- function() {
     gui_label = NULL,
     default_value = 1L,
     default_historic = 1L,
-    test_values = NULL
+    test_values = 1L
   )
 
   param$emb_layer_max <- list(
@@ -173,7 +174,7 @@ get_param_dict <- function() {
     gui_label = NULL,
     default_value = 1L,
     default_historic = 1L,
-    test_values = NULL
+    test_values =c(1L,2L)
   )
 
   param$emb_pool_type <- list(
