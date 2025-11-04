@@ -208,7 +208,7 @@ Now you can start your work.
 
 ## 2.2 Data Management
 
-### 2.2.1 Introducation
+### 2.2.1 Introduction
 
 In the context of use cases for *aifeducation,* three different types of
 data are necessary: raw texts, text embeddings, and target data which
@@ -1253,7 +1253,7 @@ are combined to create the final output of the whole model.
 running_num_figures <- running_num_figures + 1
 ```
 
-You can find the name of the used core model in the name of the classifier. For
+You can find the name of the used core model in the name of the classifiers. For
 example `TEClassifierSequential` uses a *sequential* core model while
 `TEClassifierParallel` uses a *parallel* core model.
 
@@ -1265,7 +1265,7 @@ to build a high number of different models.
 Second, you can choose how the core model is used for classification. At the moment
 a probability and metric based classifier is possible. 
 
-- **Probability Classifiers:**  Probability classifiers are used to predict a 
+- **Probability Based Classifiers:**  Probability classifiers are used to predict a 
   probability distribution for different classes/categories. This is the standard case most common
   in literature.
 - **Prototype Based Classifiers:** Prototype based classifiers are a kind of metric
@@ -1274,12 +1274,99 @@ a probability and metric based classifier is possible.
   between a case and all prototypes. The class/category of the prototype with the smallest distance
   to the case is assigned to that case. In contrast to the probability classifiers
   these models can handle classes/categories that were not part of the training. For more details
-  please refer to section 6.1.
+  please refer to section 7.
+
+The training of a classifier consists of two stages. The first stage aims to
+estimate the performance of the model while the second stage trains the model
+for application.
+  
+For performance estimation, training splits the data into several chunks
+based on cross-fold validation. The number of folds is set with
+`data_folds`. In every case, one fold is not used for training and
+serves as a *test* sample. The remaining data is used to create a
+*training* and a *validation* sample. The percentage of cases within
+each fold used as a validation sample is determined with
+`data_val_size`. This sample is used to determine the state of the model
+that generalizes best. All performance values saved in the trained
+classifier refer to the test sample. This data has never been used
+during training and provides a more realistic estimation of a
+classifier's performance.  
+  
+Since *aifedcuation* tries to address the special needs in educational
+and social science, some special training steps are integrated for all models.
+
+-   **Synthetic Cases:** In case of imbalanced data, it is recommended
+    to augment your data. Before training, a number of new units
+    is created via different techniques. Currently you can request
+    the *K-Nearest Neighbor OveRsampling Approach (KNNOR)*
+    developed by Islam et al. (2022). The aim is to create new
+    cases that fill the gap to the majority class. Multi-class problems
+    are reduced to a two class problem (class under investigation vs.
+    all others) for generating these units. If the technique allows to
+    set the number of neighbors during generation, you can configure the
+    data generation with `sc_min_k` and `sc_max_k`. The synthetic cases
+    for every class are generated for all *k* between `sc_min_k` and
+    `sc_max_k`. Every *k* contributes proportionally to the synthetic
+    cases.
+
+-   **Pseudo-Labeling:** This technique is relevant if you have labeled
+    target data and a large number of unlabeled target data. The idea is to integrate
+    the unlabeled into training to increase performance and to avoid high costs by
+    labeling a high number of cases manually. With the
+    different parameters starting with `pl_`, you can configure the
+    process of pseudo-labeling. Implementation of pseudo-labeling is
+    based on Cascante-Bonilla et al. (2020). To apply pseudo-labeling,
+    you have to set `use_pl=TRUE`. `pl_max=1.00`, `pl_anchor=1.00`, and
+    `pl_min=0.00` are used to describe the certainty of a prediction. 0
+    refers to random guessing while 1 refers to perfect certainty.
+    `pl_anchor` is used as a reference value. The distance to
+    `pl_anchor` is calculated for every case. Then, they are sorted with
+    an increasing distance from `pl_anchor`. The proportion of added
+    pseudo-labeled data into training increases with every step. The
+    maximum number of steps is determined with `pl_max_steps`. Cases close to
+    `pl_anchor` are included first.
+
+Figure `r running_num_figures` illustrates the training loop for the cases that all options
+are set to `TRUE`.
+
+![Figure `r running_num_figures`: Overview of the Steps to Perform a Classification](classif_fig_05.png){width="100%"}  
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```  
+
+The example stated in the Figure applies the generation of synthetic cases and the
+algorithm proposed by Cascante-Bonilla et al. (2020). For every fold,
+the training starts with generating synthetic cases to fill the gap
+between the classes and the majority class. After this, an initial
+training of the classifiers starts. The trained classifier is used to
+predict pseudo-labels for the unlabeled part of the data and adds 20% of
+the cases with the highest certainty for their pseudo-labels to the
+training data set. Now new synthetic cases are generated based on both
+the labeled data and the newly added pseudo-labeled data. The classifier
+is re-initialized and trained again. After training, the classifier
+predicts the potential labels of *all* originally unlabeled data and
+adds 40% of the pseudo-labeled data to the training data with the
+highest certainty. Again, new synthetic cases are generated on both the
+labeled and added pseudo-labeled data. The model is again re-initialized
+and trained again until the maximum number of steps for pseudo labeling
+(`pl_max_steps`) is reached. After this, the logarithm is restated for
+the next fold until the number of folds (`data_folds`) is reached. All
+of these steps are only used to estimate the performance of the
+classifier to evaluate for unknown data.
+
+The last phase of the training begins after the last fold. In the final
+training, the data set is split only into a training and validation set
+without a test set to provide the maximum amount of data for the best
+performance in final training. All configurations of the performance 
+estimation phase are used in the final training phase.
   
 > Please note that creating, training, and predicting works for all types of classifiers 
-> as described in the sections below.
+> as described in the chapters below.
 
-## 5.2 Create a Classifier
+# 6 Probability Based Classifiers
+
+## 6.1 Creation
 
 To show you how to create a classifier we use a classifier of class `TEClassifierSequential`
 as an example. With the sample data from section 2.3 and the text embeddings from
@@ -1361,7 +1448,7 @@ predict. This can be numbers or even words.
 
 With `feature_extractor` you can add a feature extractor that tries to
 reduce the number of features of your text embeddings before passing the
-embeddings to the classifier. You can read more on this in Section 6.2.
+embeddings to the classifier. You can read more on this in section 8.
 
 With the help of the other parameters you can define the complexity and abilities of your model.
 A description of the different models can be found in [A01 Layers and Stack of Layers](https://fberding.github.io/aifeducation/articles/a01_layers_and_stack_layers.html). 
@@ -1378,30 +1465,34 @@ bert_modeling$get_n_features()
 The number for `feat_size` should be equal or lesser as this value since this layer
 tries to compress the text embeddings to a lower number of dimensions. While this reduces the number
 of parameters for all following layers and decreases the time to train and use the model it can cost information.
-You can experiment with this value to find a good balance between speed and performance.
-
+You can experiment with this value to find a good balance between speed and performance. 
 In addition, the parameter `cls_pooling_features` should be equal or less the number you used
-for `feat_size`. With `cls_pooling_features` you determine how many of the resulting features sould be used
+for `feat_size`. With `cls_pooling_features` you determine how many of the resulting features should be used
 for classification. Thus, this value acts as a filter.
 
 > The vignette [04 Model configuration](model_configuration.html)
 > provides details on how to configure a classifier.
 
-In our example we use only two recurrent layers (`rec_n_layers=2`) and one 
-dense layer (`dense_n_layers=1`). All other layers are omitted from the model
-by setting the number of layers to zero (`conv_n_layers=0`,`tf_n_layers=0`).
+In our example we use only one encoder layer (`tf_n_layers=1`). All other layers are omitted from the model
+by setting the number of layers to zero (`dense_n_layers=0`,`conv_n_layers=0`,`rec_n_layers=0`).
 
 As pooling method we use minimum and maximum (`cls_pooling_type="MinMax"`). 
-That is, the 15 highest and the 15 lowest features are used for calculating
-the classes/labels. The number of values can be determined with `intermediate_features=30`.
+That is, the 25 highest and the 25 lowest features are used for calculating
+the classes/labels. The number of values can be determined with `cls_pooling_features=50`.
+
+In this example we use a special classification head (`cls_head_type = "PairwiseOrthogonal"`) proposed by (Li et al. (2020))[https://doi.org/10.1109/TIP.2020.2990277]. This layer allows every neuron only
+to establish a connection to a single class. In contrast to regular dense layers 
+(`cls_head_type = "Regular"`) where all neurons of the previous layer are connected
+all classes. 
 
 After you have created a new classifier, you can begin training. 
 You can see the number of learnable parameters of your model with:
+
 ```{r, include = TRUE, eval = TRUE}
 classifier$count_parameter()
 ```
 
-## 5.3 Training a Classifier
+## 6.2 Training
 
 To start the training of your classifier, you have to call the `train`
 method. Similarly, for the creation of the classifier, you must provide
@@ -1410,18 +1501,6 @@ target data to `data_targets`. Please remember that `data_targets`
 expects a **named** factor where the names correspond to the IDs of the
 corresponding text embeddings. Text embeddings and target data that
 cannot be matched are omitted from training.
-
-For performance estimation, training splits the data into several chunks
-based on cross-fold validation. The number of folds is set with
-`data_folds`. In every case, one fold is not used for training and
-serves as a *test* sample. The remaining data is used to create a
-*training* and a *validation* sample. The percentage of cases within
-each fold used as a validation sample is determined with
-`data_val_size`. This sample is used to determine the state of the model
-that generalizes best. All performance values saved in the trained
-classifier refer to the test sample. This data has never been used
-during training and provides a more realistic estimation of a
-classifier's performance.
 
 ```{r, include = TRUE, eval = TRUE}
 classifier$train(
@@ -1478,74 +1557,6 @@ simultaneously. Please adjust this value to your machine's capacities.
 Please note that the batch size can have an impact on the classifier's
 performance.
 
-Since *aifedcuation* tries to address the special needs in educational
-and social science, some special training steps are integrated into this
-method.
-
--   **Synthetic Cases:** In case of imbalanced data, it is recommended
-    to set `use_sc=TRUE`. Before training, a number of synthetic units
-    is created via different techniques. Currently you can request
-    the *K-Nearest Neighbor OveRsampling Approach (KNNOR)*
-    developed by Islam et al. (2022). The aim is to create new
-    cases that fill the gap to the majority class. Multi-class problems
-    are reduced to a two class problem (class under investigation vs.
-    all others) for generating these units. If the technique allows to
-    set the number of neighbors during generation, you can configure the
-    data generation with `sc_min_k` and `sc_max_k`. The synthetic cases
-    for every class are generated for all *k* between `sc_min_k` and
-    `sc_max_k`. Every *k* contributes proportionally to the synthetic
-    cases.
-
--   **Pseudo-Labeling:** This technique is relevant if you have labeled
-    target data and a large number of unlabeled target data. With the
-    different parameters starting with "pl\_", you can configure the
-    process of pseudo-labeling. Implementation of pseudo-labeling is
-    based on Cascante-Bonilla et al. (2020). To apply pseudo-labeling,
-    you have to set `use_pl=TRUE`. `pl_max=1.00`, `pl_anchor=1.00`, and
-    `pl_min=0.00` are used to describe the certainty of a prediction. 0
-    refers to random guessing while 1 refers to perfect certainty.
-    `pl_anchor` is used as a reference value. The distance to
-    `pl_anchor` is calculated for every case. Then, they are sorted with
-    an increasing distance from `pl_anchor`. The proportion of added
-    pseudo-labeled data into training increases with every step. The
-    maximum number of steps is determined with `pl_max_steps`. Cases close to
-    `pl_anchor` are included first.
-
-Figure `r running_num_figures` illustrates the training loop for the cases that all options
-are set to `TRUE`.
-
-![Figure `r running_num_figures`: Overview of the Steps to Perform a Classification](classif_fig_05.png){width="100%"}
-
-```{r, include = FALSE}
-running_num_figures <- running_num_figures + 1
-```
-
-The example above applies the generation of synthetic cases and the
-algorithm proposed by Cascante-Bonilla et al. (2020). For every fold,
-the training starts with generating synthetic cases to fill the gap
-between the classes and the majority class. After this, an initial
-training of the classifiers starts. The trained classifier is used to
-predict pseudo-labels for the unlabeled part of the data and adds 20% of
-the cases with the highest certainty for their pseudo-labels to the
-training data set. Now new synthetic cases are generated based on both
-the labeled data and the newly added pseudo-labeled data. The classifier
-is re-initialized and trained again. After training, the classifier
-predicts the potential labels of *all* originally unlabeled data and
-adds 40% of the pseudo-labeled data to the training data with the
-highest certainty. Again, new synthetic cases are generated on both the
-labeled and added pseudo-labeled data. The model is again re-initialized
-and trained again until the maximum number of steps for pseudo labeling
-(`pl_max_steps`) is reached. After this, the logarithm is restated for
-the next fold until the number of folds (`data_folds`) is reached. All
-of these steps are only used to estimate the performance of the
-classifier to evaluate for unknown data.
-
-The last phase of the training begins after the last fold. In the final
-training, the data set is split only into a training and validation set
-without a test set to provide the maximum amount of data for the best
-performance in final training. All configurations of the performance 
-estimation phase are used in the final training phase.
-
 Since training a neural net is energy consuming, *aifeducation* allows
 you to estimate its ecological impact with the help of the python
 library `codecarbon`. Thus, `sustain_track` is set to `TRUE` by default.
@@ -1573,14 +1584,17 @@ left empty.
 
 In order to visualize the progress of training you can request a plot 
 which shows how important performance measures develop over epochs.
+You can choose between classifier's loss (`"loss"`), accuracy (`"accuracy"`),  
+balanced accuracy(`"balanced_accuracy"`), and average iota(`"avg_iota"`). Set 
+`final_training=FALSE` to request mean values of all folds used during the performance estimation phase.
 
-```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier"),fig.align="center"}
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier during Performance Estimation Stage (loss)"),fig.align="center"}
 classifier$plot_training_history(
   final_training = FALSE,
   pl_step = NULL,
   measure = "loss",
   ind_best_model = FALSE,
-  ind_selected_model = FALSE,
+  ind_selected_model = TRUE,
   x_min = NULL,
   x_max = NULL,
   y_min = NULL,
@@ -1594,13 +1608,80 @@ classifier$plot_training_history(
 running_num_figures <- running_num_figures + 1
 ```
 
-For this method it is important to decide which performance measure you would like to
-plot. Classifier's loss (`"loss"`), accuracy (`"accuracy"`), and 
-balanced accuracy(`"balanced_accuracy"`) are possible. If you would like to see only the 
-development of the last training phase set `final_training=TRUE`. If this parameter
-is `FALSE` the plot uses the data generated during the performance estimation phase.
+Figure `r running_num_figures-1` shows the development of the loss as a mean of all folds. In general
+the curve for training should decrease to zero. The curves for the validation and
+test sample should decrease and start increasing after a certain point. 
 
-## 5.4 Evaluating Classifier's Performance
+Since the there are some measures which provide a better interpretation as the loss you can request further plots.
+The following plot shows the development of average iota for all categories/classes. 
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier during Performance Estimation Stage (iota)"),fig.align="center"}
+classifier$plot_training_history(
+  final_training = FALSE,
+  pl_step = NULL,
+  measure = "avg_iota",
+  ind_best_model = FALSE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = 1L,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+Average iota ranges between `0`and `1` and indicates how good the 
+predictions represent the true values.
+
+To see the training process of the final training stage you have to set 
+`final_training=TRUE` as shown in the two following Figures. 
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier during Final Training Stage (loss)"),fig.align="center"}
+classifier$plot_training_history(
+  final_training = TRUE,
+  pl_step = NULL,
+  measure = "loss",
+  ind_best_model = FALSE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = 1L,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier during Final Training Stage (iota)"),fig.align="center"}
+classifier$plot_training_history(
+  final_training = TRUE,
+  pl_step = NULL,
+  measure = "avg_iota",
+  ind_best_model = FALSE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = 1L,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+## 6.3 Performance Evaluation
 
 After finishing training, you can evaluate the performance of the
 classifier. For every fold, the classifier is applied to the test sample
@@ -1626,7 +1707,8 @@ You can access the concrete values as mean values across all folds
 via `reliability$test_metric_mean`. In our example this would be:
 
 ```{r, include = TRUE, eval = TRUE}
-classifier$reliability$test_metric_mean
+# We use t() to improve the readability of the table
+t(classifier$reliability$test_metric_mean)
 ```
 
 An addition, standard measures from machine learning are reported. These
@@ -1639,7 +1721,8 @@ are
 You can access these values as follows:
 
 ```{r, include = TRUE, eval = TRUE}
-classifier$reliability$standard_measures_mean
+# We use t() to improve the readability of the table
+t(classifier$reliability$standard_measures_mean)
 ```
 
 Finally, you can plot a coding stream scheme showing how the cases of
@@ -1658,7 +1741,7 @@ beyond the scope of this vignette. Instead, we would like to refer to
 the cited literature of content analysis and machine learning if you
 would like to dive deeper into this topic.
 
-## 5.5 Sustainability
+## 6.4 Sustainability
 
 In case the classifier was trained with an active sustainability
 tracker, you can receive information on sustainability by calling
@@ -1669,7 +1752,7 @@ tracker, you can receive information on sustainability by calling
 t(classifier$get_sustainability_data())
 ```
 
-## 5.6 Saving and Loading a Classifier
+## 6.5 Saving and Loading a Classifier
 
 Saving and loading follows the same pattern as for the other objects in
 *aifeducation*. You can save the classifier by calling `save_to_disk`.
@@ -1690,7 +1773,7 @@ the model call `load_from_disk`.
 classifier <- load_from_disk("examples/cls_imdb_movie_reviews")
 ```
 
-## 5.7 Predicting New Data
+## 6.6 Predicting New Data
 
 If you would like to apply your classifier to new data, two steps are
 necessary. You must first transform the raw text into a numerical
@@ -1747,17 +1830,15 @@ educational and social sciences such as correlation analysis, regression
 analysis, structural equation modeling, latent class analysis or
 analysis of variance.
 
-Now you are ready to to use *aifeducation*. In section 6 we describe
+Now you are ready to to use *aifeducation*. In section 7 we describe
 further models for classification tasks and for improving model
 performance.
 
-# 6 Extensions
+# 7 Prototype Based Classifiers (ProtoNet)
 
-## 6.1 Classifiers: ProtoNet
+## 7.1 Introduction
 
-### 6.1.1 Introduction
-
-The classifier introduced in section 5 is a regular classifier which
+The classifier introduced in section 6 is a regular classifier which
 comes with the traditional challenges of deep learning, such as the need
 for a large number of training data, expensive hardware requirements,
 and only a limited possibility to interpret the model's parameters
@@ -1789,7 +1870,7 @@ replaces the original loss function with the loss function suggested by
 Zhang et al. (2019) and adds the learnable metric described by Oreshkin,
 Rodriguez, and Lacoste (2019) to increase performance.
 
-### 6.1.2 Configuration, Training, and Application without Sample Data
+## 7.2 Creation
 
 The application of a classifier based on ProtoNet is similar to the
 regular classifiers. The only difference is `embedding_dim`. A ProtoNet
@@ -1886,6 +1967,8 @@ Here, the color indicates the estimated class. As you can see,
 all cases are located very similarly and there seems to be no clear
 structure. Let us see how this changes when we train the model.
 
+## 7.3 Training
+
 ```{r, include = TRUE, eval=TRUE}
 classifier_prototype$train(
   data_embeddings = review_embeddings,
@@ -1966,14 +2049,79 @@ result in better performing classifiers.
 > and classes of the training data set (sample and query). These classes and prototypes are used
 > for the case that no sample data is provided.
 
-First we plot the training history.
-```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Prototypes"),fig.align="center"}
+First we plot the training history for the loss and average iota during 
+performance estimation stage. 
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Prototypes during Performance Estimation Stage (loss)"),fig.align="center"}
 classifier_prototype$plot_training_history(
   final_training = FALSE,
   pl_step = NULL,
   measure = "loss",
   ind_best_model = FALSE,
-  ind_selected_model = FALSE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = NULL,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Prototypes during Performance Estimation Stage (iota)"),fig.align="center"}
+classifier_prototype$plot_training_history(
+  final_training = FALSE,
+  pl_step = NULL,
+  measure = "avg_iota",
+  ind_best_model = FALSE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = NULL,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+The training history of the final training stage is displayed in the following 
+Figures.
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Prototypes during Final Training Stage (loss)"),fig.align="center"}
+classifier_prototype$plot_training_history(
+  final_training = FALSE,
+  pl_step = NULL,
+  measure = "loss",
+  ind_best_model = TRUE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = NULL,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Prototypes during Final Training Stage (iota)"),fig.align="center"}
+classifier_prototype$plot_training_history(
+  final_training = FALSE,
+  pl_step = NULL,
+  measure = "avg_iota",
+  ind_best_model = FALSE,
+  ind_selected_model = TRUE,
   x_min = NULL,
   x_max = NULL,
   y_min = NULL,
@@ -2007,7 +2155,7 @@ running_num_figures <- running_num_figures + 1
 As shown in the figure, all cases are now sorted. Cases of the class
 "neg" are located close to the prototype for "neg", while cases of the
 class "pos" are located near the prototype for "pos". The black cycle around the
-prototpyes represent the margin used during training (`loss_margin`). 
+prototypes represent the margin used during training (`loss_margin`). 
 Since we use the
 same data as during training, this result has to be expected. Only a
 small number of cases is located near the wrong prototype. This can be
@@ -2035,13 +2183,21 @@ plot_trained_2 <- classifier_prototype$plot_embeddings(
 plot_trained_2
 ```
 
+## 7.4 Performance Evaluation
+
 Finally, let us report the reliability of this classifier.
 
 ```{r, include = TRUE, eval=TRUE}
-classifier_prototype$reliability$test_metric_mean
+# We use t() to improve the readability of the table
+t(classifier_prototype$reliability$test_metric_mean)
 ```
 
-### 6.1.3 Application with Sample Data
+```{r, include = TRUE, eval=TRUE}
+# We use t() to improve the readability of the table
+t(classifier_prototype$reliability$standard_measures_mean)
+```
+
+### 7.5 Application with Sample Data
 
 Up to this point we did not provide sample data. Thus, the model used the 
 classes and prototypes available during training. This is **not** the regular
@@ -2062,6 +2218,7 @@ example_data$label[c(251:260)] <- "very positive"
 example_data$label <- factor(example_data$label)
 table(example_data$label, useNA = "ifany")
 ```
+
 Our aim is now to predict the 75 cases with no labels with the help of our trained 
 model although the model was trained only for two and different classes. Thus, we first have to split the data.
 The cases with classes/categories form the *sample set* and the cases without any classes/categories
@@ -2131,7 +2288,9 @@ plot_with_samples <- classifier_prototype$plot_embeddings(
 plot_with_samples
 ```
 
-## 6.2 Feature Extractors
+# 8 Feature Extractors
+
+## 8.1 Introduction
 
 Another option to increase a model's performance and/or to increase
 computational speed is to apply a feature extractor. For example, the
@@ -2161,6 +2320,8 @@ information from the compressed information of the latent space (Frochte
 2019, pp.280-281). The information is extended from 4 dimensions to 8.
 After training, the hidden representation of the latent space is used as
 a compression of the original input.
+
+# 7.2 Creation
 
 You can create a feature extractor as follows. In this example we use the
 text embeddings from section 4.
@@ -2214,6 +2375,8 @@ With `noise_factor` you can add some noise during training making the
 feature extractor perform a denoising auto-encoder, which can provide
 more robust generalizations.
 
+## 7.3 Training
+
 Training the extractor is identical to the other models in
 *aifeducation*. Please note that the text embeddings provided to
 `data_embeddings` must be generated with the same `TextEmbeddingModel` as
@@ -2253,6 +2416,8 @@ feature_extractor$plot_training_history(
 running_num_figures <- running_num_figures + 1
 ```
 
+## 7.4 Application
+
 After you have trained your feature extractor, you can use it for every
 classifier. Just pass the feature extractor to `feature_extractor`
 during configuration of the classifier. Please note that you now have to set the 
@@ -2261,7 +2426,7 @@ of the feature extractor and *not* depending on the number of features of the te
 model since the aim of the feature extractor is to reduce this number. `feat_size`
 should be equal or less the number for features of the feature extractor and
 `cls_pooling_features` should be equal or less the value for `feat_size`. 
-For the classifier described in section 5 this would look like:
+For the classifier described in section 6 this would look like:
 
 ```{r, include = TRUE, eval=TRUE}
 classifier_with_fe <- TEClassifierSequential$new()
@@ -2363,22 +2528,38 @@ feature extractor manually. This is done automatically for all classifiers.
 For example, let us explore the performance of the classifier.
 
 ```{r, include = TRUE, eval=TRUE}
-classifier_with_fe$reliability$test_metric_mean
+# We use t() to improve the readability of the table
+t(classifier_with_fe$reliability$test_metric_mean)
 ```
+
+```{r, include = TRUE, eval=TRUE}
+# We use t() to improve the readability of the table
+t(classifier_with_fe$reliability$standard_measures_mean)
+```
+
+# 7.5. Saving and Loading
 
 If you would like to save and load a `TEFeatureExtractor` independently from a classifier
 you can use the function pair `save_to_disk` and `load_from_disk` as with the other objects
 of this package. This is useful if you would like to use the `TEFeatureExtractor`
 at a later time point in combination with other models. 
 
-# 7 Plots for Training History
-## 7.1 BaseModels
+# 8 Plots for Training History
 
-BaseModels, TEFeatureExtractors, and classifiers allow you to create plots showing your model's training process. The process of requesting these plots is similar for all objects. However, classifiers offer the greatest degree of customization of graphics. This chapter shows you how to use the plots. We refer to the models from previous chapters to provide some examples.
+## 8.1 BaseModels
 
-We start with the base models. The`x_min`, `x_max`, `y_min`, and `y_max` arguments allow you to zoom in or out. If you set these arguments to `NULL`, the values will be determined automatically.
+BaseModels, TEFeatureExtractors, and classifiers allow you to create plots showing 
+your model's training process. The process of requesting these plots is similar for all objects. 
+However, classifiers offer the greatest degree of customization of graphics. 
+This chapter shows you how to use the plots. We refer to the models from previous 
+chapters to provide some examples.
 
-The ind_best_model argument allows you to emphasise the epoch with the smallest loss for the validation sample. In general, this is the state of the model with the best generalization abilities. Unlike the classifiers, this is also the final state of the model after training.
+We start with the base models. The`x_min`, `x_max`, `y_min`, and `y_max` arguments 
+allow you to zoom in or out. If you set these arguments to `NULL`, the values will be determined automatically.
+
+The `ind_best_model` argument allows you to emphasise the epoch with the smallest 
+loss for the validation sample. In general, this is the state of the model with the
+best generalization abilities. Unlike the classifiers, this is also the final state of the model after training.
 The `text_size` argument allows you to increase or decrease the size of the text within the graphic.
 
 ```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Example of a Training History for a BaseModel emphasizing the Best Model State.")}
@@ -2396,7 +2577,7 @@ base_model$plot_training_history(
 running_num_figures <- running_num_figures + 1
 ```
 
-## 7.2 Classifiers
+## 8.2 Classifiers
 
 Classifiers offer a greater variety of options. With the `x_min`, `x_max`, `y_min` and `y_max` arguments, 
 you can define the area that the plot should show. Setting these arguments to `NULL` 
@@ -2446,7 +2627,10 @@ running_num_figures <- running_num_figures + 1
 ```
 
 Setting `ind_best_model` to `TRUE` will display additional points in the graphic.
-These points represent the epochs and their corresponding values according to the chosen metric at which the model performed best. For metrics such as loss, the values should be close to 0, while for metrics such as accuracy, balanced accuracy and average iota, the best values are close to 1. You can see one point for every fold during training.
+These points represent the epochs and their corresponding values according to the chosen metric 
+at which the model performed best. For metrics such as loss, the values should be close to 0, 
+while for metrics such as accuracy, balanced accuracy and average iota, the best 
+values are close to 1. You can see one point for every fold during training.
 
 ```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Example of a Training History for a Classifier emphasizing the Loss and the best Model States.")}
 classifier$plot_training_history(
@@ -2488,8 +2672,16 @@ classifier$plot_training_history(
 running_num_figures <- running_num_figures + 1
 ```
 
-Please note that these points indicate the optimal state of the model according to the chosen metric for each fold.
-However, these values do not necessarily correspond to the final state of the model. This is because the best state of a model during each training loop is determined by the best average iota value. If there are multiple states of a model with the same average iota value, the state with the best average iota value is selected, and then the state with the best balanced accuracy value. If there are still multiple states, the loss is taken into account. In other words, possible best states are all states with the best average iota value. These states are then reduced to those with the best balanced accuracy value, and these states are then reduced again to those with the best loss value. The state with the highest number of epochs is then used.
+Please note that these points indicate the optimal state of the model according 
+to the chosen metric for each fold.
+However, these values do not necessarily correspond to the final state of the model. 
+This is because the best state of a model during each training loop is determined 
+by the best average iota value. If there are multiple states of a model 
+with the same average iota value, the states with the best average iota value is selected, 
+and then the state with the best balanced accuracy value. If there are still multiple states, 
+the loss is taken into account. In other words, possible best states are all states with the best average iota value. 
+These states are then reduced to those with the best balanced accuracy value, and these states are then 
+reduced again to those with the best loss value. The state with the highest number of epochs is finally used.
 
 Set `ind_selected_model` to `TRUE` to add the final states of the model for every fold.
 
@@ -2513,7 +2705,10 @@ classifier$plot_training_history(
 running_num_figures <- running_num_figures + 1
 ```
 
-Since the performance of a model is determined by several factors, the minimum and maximum values provide a deeper understanding of the training process. To include these in the plot, set `add_min_max` to `TRUE`. The plot will now show the full range of values for each epoch according to the chosen metric. 
+Since the performance of a model is determined by several factors, the minimum and 
+maximum values provide a deeper understanding of the training process. 
+To include these in the plot, set `add_min_max` to `TRUE`. 
+The plot will now show the full range of values for each epoch according to the chosen metric. 
 
 ```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Example of a Training History for a Classifier emphasizing the Loss with Minimal and Maximal Values.")}
 classifier$plot_training_history(
@@ -2536,7 +2731,7 @@ running_num_figures <- running_num_figures + 1
 ```
 
 Using the argument `final_training`, you can switch between the performance estimation 
-phase and the final training phase of the model. Since the final training phase 
+stage and the final training stage of the model. Since the final training phase 
 only differentiates between training and validation data sets, there is no line 
 for test data. In addition, there are no folds. Therefore, the argument `add_min_max` has no functionality. 
 
@@ -2563,7 +2758,7 @@ running_num_figures <- running_num_figures + 1
 The final important argument is `pl_step`. 
 This value is only relevant if the model used pseudo labeling during training. 
 This parameter allows you to select the step during pseudo labeling 
-that should be displayed in the plot. This works for performance estimation as well as the final training phase. 
+that should be displayed in the plot. This works for performance estimation as well as the final training stage. 
 
 # References
 
@@ -2654,6 +2849,10 @@ Workshop: Challenges in Representation Learning.
 Lee-Thorp, J., Ainslie, J., Eckstein, I. & Ontanon, S. (2021). FNet:
 Mixing Tokens with Fourier Transforms.
 <https://doi.org/10.48550/arXiv.2105.03824>
+
+Li, X., Chang, D., Ma, Z., Tan, Z.‑H., Xue, J.‑H., Cao, J., Yu, J. & Guo, J. (2020). 
+OSLNet: Deep Small-Sample Classification With an Orthogonal Softmax Layer. 
+IEEE Transactions on Image Processing, 29, 6482–6495. <https://doi.org/10.1109/TIP.2020.2990277>
 
 Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., Levy, O.,
 Lewis, M., Zettlemoyer, L., & Stoyanov, V. (2019). RoBERTa: A Robustly

@@ -8,7 +8,7 @@ editor_options:
 
 **BaseModels**
 
-- Fixed the not displayed documentation for BaseModelsCore and MPNet.
+- Fixed the not displayed documentation for BaseModelCore and MPNet.
 - Added new options for plotting training history.
 - Added improved error messages for BaseModelModernBert.
 
