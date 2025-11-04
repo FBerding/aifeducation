@@ -1766,6 +1766,7 @@ get_param_dict <- function() {
   param$feat_size <- param$dense_size
   param$feat_size$gui_box <- "Feature Layer"
   param$feat_size$min <- 2L
+  param$feat_size$test_values = c(4L,6L)
 
   # Transformer Layer------------------------------------------------------------
   param$encoder_dropout <- list(

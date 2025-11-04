@@ -452,6 +452,26 @@ for (object_class_name in object_class_names) {
       # Test for different number of classes
       n_classes <- sample(class_range, size = 1L)
 
+      if (object_class_name == "TEClassifierSequential" && j <= 1) {
+        use_pl <- TRUE
+        tf_n_layers=0L
+        ng_conv_n_layers=0L
+        rec_n_layers=0L
+        dense_n_layer=1L
+      } else {
+        use_pl <- FALSE
+        tf_n_layers=NULL
+        ng_conv_n_layers=NULL
+        rec_n_layers=NULL
+        dense_n_layers=NULL
+      }
+
+      if (object_class_name == "TEClassifierParallel" && j <= 1) {
+        use_sc <- TRUE
+      } else {
+        use_sc <- FALSE
+      }
+
       # Config sample
       test_combination <- generate_args_for_tests(
         object_name = object_class_name,
@@ -466,21 +486,13 @@ for (object_class_name in object_class_names) {
         var_override = list(
           name = NULL,
           label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
-          trace = random_bool_on_CI()
+          trace = random_bool_on_CI(),
+          tf_n_layers=tf_n_layers,
+          ng_conv_n_layers=ng_conv_n_layers,
+          rec_n_layers=rec_n_layers,
+          dense_n_layers=dense_n_layers
         )
       )
-
-      if (object_class_name == "TEClassifierSequential" && j <= 1) {
-        use_pl <- TRUE
-      } else {
-        use_pl <- FALSE
-      }
-
-      if (object_class_name == "TEClassifierParallel" && j <= 1) {
-        use_sc <- TRUE
-      } else {
-        use_sc <- FALSE
-      }
 
       # traing config sample
       train_args_combinations <- generate_args_for_tests(

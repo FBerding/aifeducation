@@ -37,6 +37,20 @@ generate_args_for_tests <- function(object_name,
   arg_names <- names(arg_list)
   param_dict <- get_param_dict()
 
+  #Check var_override for NULL entries and remove null entries
+  null_indices=c()
+  for(i in seq_along(var_override)){
+    if(is.null(var_override[[i]])){
+      null_indices=append(null_indices,i)
+    }
+  }
+  if(length(null_indices)>0){
+    var_override=var_override[setdiff(x=seq_along(var_override),y=null_indices)]
+  } else {
+    var_override=list()
+  }
+
+
   # Generate list of values for every parameter that can vary
   arg_value_list <- NULL
   for (param in arg_names) {
@@ -324,9 +338,8 @@ get_fixed_test_tensor <- function(pad_value) {
 
 #' @title Test if running on Continuous Integration (CI)
 #' @description Function checks if it is called on CI.
-#' @returns Returns `TRUE` if the following variables are set to "true"
+#' @returns Returns `TRUE` if one of the following variables are set to "true"
 #' * `"CI"`
-#' * `"NOT_CRAN"`
 #' * `"_R_CHECK_LIMIT_CORES_"`
 #' @family Utils TestThat Developers
 #' @noRd
@@ -334,7 +347,7 @@ get_fixed_test_tensor <- function(pad_value) {
 is_on_CI <- function() {
   if (
     Sys.getenv("CI") == "true" ||
-      Sys.getenv("NOT_CRAN") == "true" ||
+      #Sys.getenv("NOT_CRAN") == "true" ||
       Sys.getenv("_R_CHECK_LIMIT_CORES_") == "true"
   ) {
     return(TRUE)
@@ -371,7 +384,7 @@ random_bool_on_CI <- function() {
 #' @family Utils TestThat Developers
 #' @export
 monitor_test_time_on_CI <- function(start_time, test_name) {
-  if (Sys.getenv("CI") == "true") {
+  if (is_on_CI()) {
     print(paste(test_name, "Duration:", format(Sys.time() - start_time)))
   }
 }

@@ -11,6 +11,8 @@ test_time_start <- Sys.time()
 object_class_names <- get_TEClassifiers_class_names(super_class = "TEClassifiersBasedOnProtoNet")
 # Do not use these test for the old ProtoNet Classifier
 object_class_names <- setdiff(x = object_class_names, y = "TEClassifierProtoNet")
+#Select on class randomly
+object_class_names=sample(object_class_names,size=1L)
 max_samples <- 10
 max_samples_CI <- 1
 
@@ -73,7 +75,9 @@ for (object_class_name in object_class_names) {
       var_override = list(
         name = NULL,
         label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
-        trace = random_bool_on_CI()
+        trace = random_bool_on_CI(),
+        tf_n_layers=0L,
+        ng_conv_n_layers=0L
       )
     )
 

@@ -1031,7 +1031,11 @@ BaseModelCore <- R6::R6Class(
       results[1L, "n_epochs"] <- n_epoch
 
       results[1L, "package"] <- "calflops"
-      results[1L, "version"] <- get_py_package_version("calflops")
+      if(is_venv){
+        results[1L, "version"] <- get_py_package_version("calflops")
+      } else {
+        results[1L, "version"] <- NA
+      }
 
       results[1L, "date"] <- get_time_stamp()
 

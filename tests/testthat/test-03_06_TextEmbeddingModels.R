@@ -55,8 +55,6 @@ example_data_large_single$add_from_data.frame(example_data_for_large[1, ])
 # Set Chunks
 base_model_type_list <- BaseModelsIndex
 
-
-
 # Start tests--------------------------------------------------------------------
 for (base_model_type in base_model_type_list) {
   # Set path to the base model
@@ -201,16 +199,14 @@ for (base_model_type in base_model_type_list) {
     )
 
 
-    #---------------------------------------------------------------------
+    # Central methods--------------------------------------------------------
     # Create Model
     text_embedding_model <- TextEmbeddingModel$new()
     suppressMessages(
       do.call(what = text_embedding_model$configure,
-      args = config
+              args = config
+      )
     )
-    )
-
-    # Central methods--------------------------------------------------------
     # Check history
     test_that(paste(base_model_type, get_current_args_for_print(config), "history"), {
       history <- text_embedding_model$BaseModel$last_training$history
@@ -295,7 +291,7 @@ for (base_model_type in base_model_type_list) {
       for (i in 1:10) {
         expect_equal(embeddings$embeddings[i, , , drop = FALSE],
           embeddings_2$embeddings[i, , , drop = FALSE],
-          tolerance = 1e-2
+          tolerance = 1e-6
         )
       }
     })
