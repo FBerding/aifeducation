@@ -67,9 +67,6 @@ for (base_model_type in base_model_type_list) {
   # Load a BaseModel
   base_model <- load_from_disk(model_path)
 
-  # get a random value for padding
-  random_padding_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
-
   config <- generate_args_for_tests(
     object_name = "TextEmbeddingModel",
     method = "configure",
@@ -82,7 +79,6 @@ for (base_model_type in base_model_type_list) {
       model_label = paste0("Text Embedding via", base_model_type),
       model_language = "english",
       trace = random_bool_on_CI(),
-      pad_value = random_padding_value,
       emb_layer_max = 50000L
     )
   )
@@ -101,9 +97,6 @@ for (base_model_type in base_model_type_list) {
   # Load a BaseModel
   base_model <- load_from_disk(model_path)
 
-  # get a random value for padding
-  random_padding_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
-
   config <- generate_args_for_tests(
     object_name = "TextEmbeddingModel",
     method = "configure",
@@ -116,7 +109,6 @@ for (base_model_type in base_model_type_list) {
       model_label = paste0("Text Embedding via", base_model_type),
       model_language = "english",
       trace = random_bool_on_CI(),
-      pad_value = random_padding_value,
       emb_layer_min = 0L
     )
   )
@@ -135,9 +127,6 @@ for (base_model_type in base_model_type_list) {
   # Load a BaseModel
   base_model <- load_from_disk(model_path)
 
-  # get a random value for padding
-  random_padding_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
-
   config <- generate_args_for_tests(
     object_name = "TextEmbeddingModel",
     method = "configure",
@@ -150,7 +139,6 @@ for (base_model_type in base_model_type_list) {
       model_label = paste0("Text Embedding via", base_model_type),
       model_language = "english",
       trace = random_bool_on_CI(),
-      pad_value = random_padding_value,
       min_layer = 0L
     )
   )
@@ -179,9 +167,6 @@ for (base_model_type in base_model_type_list) {
     # Load a BaseModel
     base_model <- load_from_disk(model_path)
 
-    # get a random value for padding
-    random_padding_value <- sample(x = seq(from = -200, to = 0, by = 10), size = 1)
-
     config <- generate_args_for_tests(
       object_name = "TextEmbeddingModel",
       method = "configure",
@@ -193,8 +178,7 @@ for (base_model_type in base_model_type_list) {
         model_name = paste0(base_model_type, "_embedding"),
         model_label = paste0("Text Embedding via", base_model_type),
         model_language = "english",
-        trace = random_bool_on_CI(),
-        pad_value = random_padding_value
+        trace = random_bool_on_CI()
       )
     )
 
@@ -240,7 +224,7 @@ for (base_model_type in base_model_type_list) {
       expect_s3_class(embeddings, class = "EmbeddedText")
       expect_false(embeddings$is_compressed())
       expect_equal(embeddings$n_rows(), 10)
-      expect_equal(embeddings$get_pad_value(), random_padding_value)
+      expect_equal(embeddings$get_pad_value(), config$pad_value)
 
       # Check if embeddings are array with 3 dimensions
       expect_equal(length(dim(embeddings$embeddings)), 3)
@@ -251,7 +235,7 @@ for (base_model_type in base_model_type_list) {
         text_embeddings = embeddings$embeddings,
         features = text_embedding_model$get_n_features(),
         times = config$chunks,
-        pad_value = random_padding_value
+        pad_value = config$pad_value
       ))
 
       # check case order invariance
@@ -280,7 +264,7 @@ for (base_model_type in base_model_type_list) {
         embeddings_large$convert_to_EmbeddedText()$embeddings,
         tolerance = 1e-6
       )
-      expect_equal(embeddings_large$get_pad_value(), random_padding_value)
+      expect_equal(embeddings_large$get_pad_value(), config$pad_value)
 
       # Check absence of random variation
       embeddings_2 <- text_embedding_model$embed(
@@ -313,7 +297,7 @@ for (base_model_type in base_model_type_list) {
       expect_s3_class(embeddings, class = "LargeDataSetForTextEmbeddings")
       expect_false(embeddings$is_compressed())
       expect_equal(embeddings$n_rows(), nrow(example_data))
-      expect_equal(embeddings$get_pad_value(), random_padding_value)
+      expect_equal(embeddings$get_pad_value(), config$pad_value)
     })
 
     test_that(paste(base_model_type, get_current_args_for_print(config), "embed_large with log"), {
