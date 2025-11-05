@@ -29,7 +29,7 @@ get_recommended_py_versions <- function() {
     tokenizers = c("0.22.0", "0.22.1"),
     pandas = c("2.3.2", "2.3.3"),
     datasets = c("3.6.0", "3.6.0"),
-    codecarbon = c("3.0.0", "3.0.7"),
+    codecarbon = c("3.0.0", "3.0.8"),
     safetensors = c("0.6.2", "0.6.2"),
     torcheval = c("0.0.7", "0.0.7"),
     accelerate = c("1.10.1", "1.11.0"),
