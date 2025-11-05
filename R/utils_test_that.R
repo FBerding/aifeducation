@@ -38,18 +38,17 @@ generate_args_for_tests <- function(object_name,
   param_dict <- get_param_dict()
 
   #Check var_override for NULL entries and remove null entries
-  null_indices=c()
+  not_null_indices=c()
   for(i in seq_along(var_override)){
-    if(is.null(var_override[[i]])){
-      null_indices=append(null_indices,i)
+    if(!is.null(var_override[[i]])){
+      not_null_indices=append(not_null_indices,i)
     }
   }
-  if(length(null_indices)>0){
-    var_override=var_override[setdiff(x=seq_along(var_override),y=null_indices)]
+  if(length(not_null_indices)>0){
+    var_override=var_override[not_null_indices]
   } else {
     var_override=list()
   }
-
 
   # Generate list of values for every parameter that can vary
   arg_value_list <- NULL
@@ -118,6 +117,14 @@ generate_args_for_tests <- function(object_name,
   arg_comb_list <- NULL
   override_subset <- intersect(arg_names, names(var_override))
   necessary_subset <- intersect(arg_names, names(necessary_objects))
+
+  arg_comb_list=arg_value_list
+  #for(param in names(override_subset)){
+  #  arg_comb_list[param]=list(override_subset[[param]])
+  #}
+  #for(param in names(necessary_subset)){
+  #  arg_comb_list[param]=list(necessary_subset[[param]])
+  #}
 
   arg_comb_list <- append(x = arg_value_list, values = var_override[override_subset])
   arg_comb_list <- append(x = arg_comb_list, values = necessary_objects[necessary_subset])
