@@ -404,7 +404,7 @@ indicating a higher category/class. For nominal data the order does not matter.<
 
 
 <dt><code>cls_pooling_features</code></dt>
-<dd><p><code>int</code> Number of features to be extracted at the end of the model. Allowed values: $1 &lt;= x $</p></dd>
+<dd><p><code>int</code> Number of features to be extracted at the end of the model. Allowed values: 1 &lt;= x</p></dd>
 
 
 <dt><code>cls_pooling_type</code></dt>
@@ -424,7 +424,7 @@ indicating a higher category/class. For nominal data the order does not matter.<
 
 
 <dt><code>feat_size</code></dt>
-<dd><p><code>int</code> Number of neurons for each dense layer. Allowed values: $2 &lt;= x $</p></dd>
+<dd><p><code>int</code> Number of neurons for each dense layer. Allowed values: 2 &lt;= x</p></dd>
 
 
 <dt><code>feat_bias</code></dt>
@@ -432,7 +432,7 @@ indicating a higher category/class. For nominal data the order does not matter.<
 
 
 <dt><code>feat_dropout</code></dt>
-<dd><p><code>double</code> determining the dropout for the dense projection of the feature layer. Allowed values: $0 &lt;= x &lt;= 0.6$</p></dd>
+<dd><p><code>double</code> determining the dropout for the dense projection of the feature layer. Allowed values: 0 &lt;= x &lt;= 0.6</p></dd>
 
 
 <dt><code>feat_parametrizations</code></dt>
@@ -448,15 +448,15 @@ indicating a higher category/class. For nominal data the order does not matter.<
 
 
 <dt><code>ng_conv_n_layers</code></dt>
-<dd><p><code>int</code> determining how many times the n-gram layers should be added to the network. Allowed values: $0 &lt;= x $</p></dd>
+<dd><p><code>int</code> determining how many times the n-gram layers should be added to the network. Allowed values: 0 &lt;= x</p></dd>
 
 
 <dt><code>ng_conv_ks_min</code></dt>
-<dd><p><code>int</code> determining the minimal window size for n-grams. Allowed values: $2 &lt;= x $</p></dd>
+<dd><p><code>int</code> determining the minimal window size for n-grams. Allowed values: 2 &lt;= x</p></dd>
 
 
 <dt><code>ng_conv_ks_max</code></dt>
-<dd><p><code>int</code> determining the maximal window size for n-grams. Allowed values: $2 &lt;= x $</p></dd>
+<dd><p><code>int</code> determining the maximal window size for n-grams. Allowed values: 2 &lt;= x</p></dd>
 
 
 <dt><code>ng_conv_bias</code></dt>
@@ -464,7 +464,7 @@ indicating a higher category/class. For nominal data the order does not matter.<
 
 
 <dt><code>ng_conv_dropout</code></dt>
-<dd><p><code>double</code> determining the dropout for n-gram convolution layers. Allowed values: $0 &lt;= x &lt;= 0.6$</p></dd>
+<dd><p><code>double</code> determining the dropout for n-gram convolution layers. Allowed values: 0 &lt;= x &lt;= 0.6</p></dd>
 
 
 <dt><code>ng_conv_parametrizations</code></dt>
@@ -484,11 +484,11 @@ indicating a higher category/class. For nominal data the order does not matter.<
 
 
 <dt><code>dense_n_layers</code></dt>
-<dd><p><code>int</code> Number of dense layers. Allowed values: $0 &lt;= x $</p></dd>
+<dd><p><code>int</code> Number of dense layers. Allowed values: 0 &lt;= x</p></dd>
 
 
 <dt><code>dense_dropout</code></dt>
-<dd><p><code>double</code> determining the dropout between dense layers. Allowed values: $0 &lt;= x &lt;= 0.6$</p></dd>
+<dd><p><code>double</code> determining the dropout between dense layers. Allowed values: 0 &lt;= x &lt;= 0.6</p></dd>
 
 
 <dt><code>dense_bias</code></dt>
@@ -512,7 +512,7 @@ indicating a higher category/class. For nominal data the order does not matter.<
 
 
 <dt><code>rec_n_layers</code></dt>
-<dd><p><code>int</code> Number of recurrent layers. Allowed values: $0 &lt;= x $</p></dd>
+<dd><p><code>int</code> Number of recurrent layers. Allowed values: 0 &lt;= x</p></dd>
 
 
 <dt><code>rec_type</code></dt>
@@ -524,7 +524,7 @@ indicating a higher category/class. For nominal data the order does not matter.<
 
 
 <dt><code>rec_dropout</code></dt>
-<dd><p><code>double</code> determining the dropout between recurrent layers. Allowed values: $0 &lt;= x &lt;= 0.6$</p></dd>
+<dd><p><code>double</code> determining the dropout between recurrent layers. Allowed values: 0 &lt;= x &lt;= 0.6</p></dd>
 
 
 <dt><code>rec_bias</code></dt>
@@ -548,19 +548,19 @@ indicating a higher category/class. For nominal data the order does not matter.<
 
 
 <dt><code>tf_dense_dim</code></dt>
-<dd><p><code>int</code> determining the size of the projection layer within a each transformer encoder. Allowed values: $1 &lt;= x $</p></dd>
+<dd><p><code>int</code> determining the size of the projection layer within a each transformer encoder. Allowed values: 1 &lt;= x</p></dd>
 
 
 <dt><code>tf_n_layers</code></dt>
-<dd><p><code>int</code> determining how many times the encoder should be added to the network. Allowed values: $0 &lt;= x $</p></dd>
+<dd><p><code>int</code> determining how many times the encoder should be added to the network. Allowed values: 0 &lt;= x</p></dd>
 
 
 <dt><code>tf_dropout_rate_1</code></dt>
-<dd><p><code>double</code> determining the dropout after the attention mechanism within the transformer encoder layers. Allowed values: $0 &lt;= x &lt;= 0.6$</p></dd>
+<dd><p><code>double</code> determining the dropout after the attention mechanism within the transformer encoder layers. Allowed values: 0 &lt;= x &lt;= 0.6</p></dd>
 
 
 <dt><code>tf_dropout_rate_2</code></dt>
-<dd><p><code>double</code> determining the dropout for the dense projection within the transformer encoder layers. Allowed values: $0 &lt;= x &lt;= 0.6$</p></dd>
+<dd><p><code>double</code> determining the dropout for the dense projection within the transformer encoder layers. Allowed values: 0 &lt;= x &lt;= 0.6</p></dd>
 
 
 <dt><code>tf_attention_type</code></dt>
@@ -572,7 +572,7 @@ indicating a higher category/class. For nominal data the order does not matter.<
 
 
 <dt><code>tf_num_heads</code></dt>
-<dd><p><code>int</code> determining the number of attention heads for a self-attention layer. Only relevant if <code>attention_type='multihead'</code> Allowed values: $0 &lt;= x $</p></dd>
+<dd><p><code>int</code> determining the number of attention heads for a self-attention layer. Only relevant if <code>attention_type='multihead'</code> Allowed values: 0 &lt;= x</p></dd>
 
 
 <dt><code>tf_bias</code></dt>
@@ -596,7 +596,7 @@ indicating a higher category/class. For nominal data the order does not matter.<
 
 
 <dt><code>embedding_dim</code></dt>
-<dd><p><code>int</code>  determining the number of dimensions for the embedding. Allowed values: $2 &lt;= x $</p></dd>
+<dd><p><code>int</code>  determining the number of dimensions for the embedding. Allowed values: 2 &lt;= x</p></dd>
 
 
 </dl><p></p></div>

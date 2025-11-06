@@ -1399,8 +1399,8 @@ classifier$configure(
   ng_conv_normalization_type = "LayerNorm",
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "ELU",
-  dense_n_layers = 1,
-  dense_dropout = 0.0,
+  dense_n_layers = 2,
+  dense_dropout = 0.5,
   dense_bias = FALSE,
   dense_parametrizations = "None",
   dense_normalization_type = "LayerNorm",
@@ -1416,7 +1416,7 @@ classifier$configure(
   rec_residual_type = "ResidualGate",
   tf_act_fct = "ELU",
   tf_dense_dim = 512,
-  tf_n_layers = 1,
+  tf_n_layers = 2,
   tf_dropout_rate_1 = 0.1,
   tf_dropout_rate_2 = 0.3,
   tf_attention_type = "MultiHead",
@@ -1473,8 +1473,9 @@ for classification. Thus, this value acts as a filter.
 > The vignette [04 Model configuration](model_configuration.html)
 > provides details on how to configure a classifier.
 
-In our example we use only one encoder layer (`tf_n_layers=1`). All other layers are omitted from the model
-by setting the number of layers to zero (`dense_n_layers=0`,`conv_n_layers=0`,`rec_n_layers=0`).
+In our example we use only two encoder layers (`tf_n_layers=2`) and 
+two dense layers (`dense_n_layers=0`). All other layers are omitted from the model
+by setting the number of layers to zero (`conv_n_layers=0`,`rec_n_layers=0`).
 
 As pooling method we use minimum and maximum (`cls_pooling_type="MinMax"`). 
 That is, the 25 highest and the 25 lowest features are used for calculating
@@ -1524,8 +1525,8 @@ classifier$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
-  epochs = 2000,
-  batch_size = 32,
+  epochs = 1000,
+  batch_size = 16,
   trace = TRUE,
   ml_trace = 0,
   log_dir = NULL,
@@ -1585,7 +1586,7 @@ left empty.
 In order to visualize the progress of training you can request a plot 
 which shows how important performance measures develop over epochs.
 You can choose between classifier's loss (`"loss"`), accuracy (`"accuracy"`),  
-balanced accuracy(`"balanced_accuracy"`), and average iota(`"avg_iota"`). Set 
+balanced accuracy (`"balanced_accuracy"`), and average iota(`"avg_iota"`). Set 
 `final_training=FALSE` to request mean values of all folds used during the performance estimation phase.
 
 ```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier during Performance Estimation Stage (loss)"),fig.align="center"}
@@ -1610,7 +1611,8 @@ running_num_figures <- running_num_figures + 1
 
 Figure `r running_num_figures-1` shows the development of the loss as a mean of all folds. In general
 the curve for training should decrease to zero. The curves for the validation and
-test sample should decrease and start increasing after a certain point. 
+test sample should decrease and start increasing after a certain point. The 
+rectangles indicate the state of the model that was selected as the best state during a fold.
 
 Since the there are some measures which provide a better interpretation as the loss you can request further plots.
 The following plot shows the development of average iota for all categories/classes. 
@@ -1636,7 +1638,7 @@ running_num_figures <- running_num_figures + 1
 ```
 
 Average iota ranges between `0`and `1` and indicates how good the 
-predictions represent the true values.
+predictions represent the true values. Higher values indicate a better performance.
 
 To see the training process of the final training stage you have to set 
 `final_training=TRUE` as shown in the two following Figures. 
@@ -1660,6 +1662,12 @@ classifier$plot_training_history(
 ```{r, include = FALSE}
 running_num_figures <- running_num_figures + 1
 ```
+
+The dotted line indicates the final model state. Please note that in many times
+this state is not the state with the lowest value on the validation loss because
+the best model is selected by applying several criteria in a hierarchical order. 
+The first criterion is model's performance on average iota, the second it`s performance
+on balanced accuracy, and the third critertion is the loss.
 
 ```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier during Final Training Stage (iota)"),fig.align="center"}
 classifier$plot_training_history(
@@ -1707,8 +1715,7 @@ You can access the concrete values as mean values across all folds
 via `reliability$test_metric_mean`. In our example this would be:
 
 ```{r, include = TRUE, eval = TRUE}
-# We use t() to improve the readability of the table
-t(classifier$reliability$test_metric_mean)
+classifier$reliability$test_metric_mean
 ```
 
 An addition, standard measures from machine learning are reported. These
@@ -1721,8 +1728,7 @@ are
 You can access these values as follows:
 
 ```{r, include = TRUE, eval = TRUE}
-# We use t() to improve the readability of the table
-t(classifier$reliability$standard_measures_mean)
+classifier$reliability$standard_measures_mean
 ```
 
 Finally, you can plot a coding stream scheme showing how the cases of
@@ -1911,8 +1917,8 @@ classifier_prototype$configure(
   ng_conv_normalization_type = "LayerNorm",
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "ELU",
-  dense_n_layers = 1,
-  dense_dropout = 0.0,
+  dense_n_layers = 2,
+  dense_dropout = 0.5,
   dense_bias = FALSE,
   dense_parametrizations = "None",
   dense_normalization_type = "LayerNorm",
@@ -1928,12 +1934,12 @@ classifier_prototype$configure(
   rec_residual_type = "ResidualGate",
   tf_act_fct = "ELU",
   tf_dense_dim = 512,
-  tf_n_layers = 1,
+  tf_n_layers = 2,
   tf_dropout_rate_1 = 0.1,
-  tf_dropout_rate_2 = 0.3,
+  tf_dropout_rate_2 = 0.5,
   tf_attention_type = "MultiHead",
   tf_positional_type = "absolute",
-  tf_num_heads = 2,
+  tf_num_heads = 1,
   tf_bias = FALSE,
   tf_parametrizations = "None",
   tf_normalization_type = "LayerNorm",
@@ -1989,7 +1995,7 @@ classifier_prototype$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
-  epochs = 2000,
+  epochs = 1000,
   batch_size = 32,
   Ns = 5,
   Nq = 3,
@@ -2097,7 +2103,7 @@ Figures.
 
 ```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Prototypes during Final Training Stage (loss)"),fig.align="center"}
 classifier_prototype$plot_training_history(
-  final_training = FALSE,
+  final_training = TRUE,
   pl_step = NULL,
   measure = "loss",
   ind_best_model = TRUE,
@@ -2117,7 +2123,7 @@ running_num_figures <- running_num_figures + 1
 
 ```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Prototypes during Final Training Stage (iota)"),fig.align="center"}
 classifier_prototype$plot_training_history(
-  final_training = FALSE,
+  final_training = TRUE,
   pl_step = NULL,
   measure = "avg_iota",
   ind_best_model = FALSE,
@@ -2188,13 +2194,11 @@ plot_trained_2
 Finally, let us report the reliability of this classifier.
 
 ```{r, include = TRUE, eval=TRUE}
-# We use t() to improve the readability of the table
-t(classifier_prototype$reliability$test_metric_mean)
+classifier_prototype$reliability$test_metric_mean
 ```
 
 ```{r, include = TRUE, eval=TRUE}
-# We use t() to improve the readability of the table
-t(classifier_prototype$reliability$standard_measures_mean)
+classifier_prototype$reliability$standard_measures_mean
 ```
 
 ### 7.5 Application with Sample Data
@@ -2321,7 +2325,7 @@ information from the compressed information of the latent space (Frochte
 After training, the hidden representation of the latent space is used as
 a compression of the original input.
 
-# 7.2 Creation
+## 8.2 Creation
 
 You can create a feature extractor as follows. In this example we use the
 text embeddings from section 4.
@@ -2375,7 +2379,7 @@ With `noise_factor` you can add some noise during training making the
 feature extractor perform a denoising auto-encoder, which can provide
 more robust generalizations.
 
-## 7.3 Training
+## 8.3 Training
 
 Training the extractor is identical to the other models in
 *aifeducation*. Please note that the text embeddings provided to
@@ -2416,7 +2420,7 @@ feature_extractor$plot_training_history(
 running_num_figures <- running_num_figures + 1
 ```
 
-## 7.4 Application
+## 8.4 Application
 
 After you have trained your feature extractor, you can use it for every
 classifier. Just pass the feature extractor to `feature_extractor`
@@ -2455,8 +2459,8 @@ classifier_with_fe$configure(
   ng_conv_normalization_type = "LayerNorm",
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "ELU",
-  dense_n_layers = 1,
-  dense_dropout = 0.0,
+  dense_n_layers = 2,
+  dense_dropout = 0.5,
   dense_bias = FALSE,
   dense_parametrizations = "None",
   dense_normalization_type = "LayerNorm",
@@ -2472,7 +2476,7 @@ classifier_with_fe$configure(
   rec_residual_type = "ResidualGate",
   tf_act_fct = "ELU",
   tf_dense_dim = 512,
-  tf_n_layers = 1,
+  tf_n_layers = 2,
   tf_dropout_rate_1 = 0.1,
   tf_dropout_rate_2 = 0.3,
   tf_attention_type = "MultiHead",
@@ -2509,7 +2513,7 @@ classifier_with_fe$train(
   sustain_region = NULL,
   sustain_interval = 15,
   epochs = 1000,
-  batch_size = 32,
+  batch_size = 16,
   trace = TRUE,
   ml_trace = 0,
   log_dir = NULL,
@@ -2528,25 +2532,23 @@ feature extractor manually. This is done automatically for all classifiers.
 For example, let us explore the performance of the classifier.
 
 ```{r, include = TRUE, eval=TRUE}
-# We use t() to improve the readability of the table
-t(classifier_with_fe$reliability$test_metric_mean)
+classifier_with_fe$reliability$test_metric_mean
 ```
 
 ```{r, include = TRUE, eval=TRUE}
-# We use t() to improve the readability of the table
-t(classifier_with_fe$reliability$standard_measures_mean)
+classifier_with_fe$reliability$standard_measures_mean
 ```
 
-# 7.5. Saving and Loading
+## 8.5. Saving and Loading
 
 If you would like to save and load a `TEFeatureExtractor` independently from a classifier
 you can use the function pair `save_to_disk` and `load_from_disk` as with the other objects
 of this package. This is useful if you would like to use the `TEFeatureExtractor`
 at a later time point in combination with other models. 
 
-# 8 Plots for Training History
+# 9 Plots for Training History
 
-## 8.1 BaseModels
+## 9.1 BaseModels
 
 BaseModels, TEFeatureExtractors, and classifiers allow you to create plots showing 
 your model's training process. The process of requesting these plots is similar for all objects. 
@@ -2577,7 +2579,7 @@ base_model$plot_training_history(
 running_num_figures <- running_num_figures + 1
 ```
 
-## 8.2 Classifiers
+## 9.2 Classifiers
 
 Classifiers offer a greater variety of options. With the `x_min`, `x_max`, `y_min` and `y_max` arguments, 
 you can define the area that the plot should show. Setting these arguments to `NULL` 

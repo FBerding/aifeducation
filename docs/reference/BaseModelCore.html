@@ -177,7 +177,7 @@ Objects of class <code>TokenizerBase</code>.</p></dd>
 
 
 <dt><code>p_mask</code></dt>
-<dd><p><code>double</code> Ratio that determines the number of tokens used for masking. Allowed values: $0.05 &lt;= x &lt;= 0.6$</p></dd>
+<dd><p><code>double</code> Ratio that determines the number of tokens used for masking. Allowed values: 0.05 &lt;= x &lt;= 0.6</p></dd>
 
 
 <dt><code>whole_word</code></dt>
@@ -188,19 +188,19 @@ Objects of class <code>TokenizerBase</code>.</p></dd>
 <dt><code>val_size</code></dt>
 <dd><p><code>double</code> between 0 and 1, indicating the proportion of cases which should be
 used for the validation sample during the estimation of the model.
-The remaining cases are part of the training data. Allowed values: $0 &lt; x &lt; 1$</p></dd>
+The remaining cases are part of the training data. Allowed values: 0 &lt; x &lt; 1</p></dd>
 
 
 <dt><code>n_epoch</code></dt>
-<dd><p><code>int</code> Number of training epochs. Allowed values: $1 &lt;= x $</p></dd>
+<dd><p><code>int</code> Number of training epochs. Allowed values: 1 &lt;= x</p></dd>
 
 
 <dt><code>batch_size</code></dt>
-<dd><p><code>int</code> Size of the batches for training. Allowed values: $1 &lt;= x $</p></dd>
+<dd><p><code>int</code> Size of the batches for training. Allowed values: 1 &lt;= x</p></dd>
 
 
 <dt><code>max_sequence_length</code></dt>
-<dd><p><code>int</code> Maximal number of tokens for every sequence. Allowed values: $20 &lt;= x $</p></dd>
+<dd><p><code>int</code> Maximal number of tokens for every sequence. Allowed values: 20 &lt;= x</p></dd>
 
 
 <dt><code>full_sequences_only</code></dt>
@@ -209,11 +209,11 @@ The remaining cases are part of the training data. Allowed values: $0 &lt; x &lt
 
 <dt><code>min_seq_len</code></dt>
 <dd><p><code>int</code> Only relevant if <code>full_sequences_only = FALSE</code>. Value determines the minimal sequence length included in
-training process.  Allowed values: $10 &lt;= x $</p></dd>
+training process.  Allowed values: 10 &lt;= x</p></dd>
 
 
 <dt><code>learning_rate</code></dt>
-<dd><p><code>double</code> Initial learning rate for the training. Allowed values: $0 &lt; x &lt;= 1$</p></dd>
+<dd><p><code>double</code> Initial learning rate for the training. Allowed values: 0 &lt; x &lt;= 1</p></dd>
 
 
 <dt><code>sustain_track</code></dt>
@@ -232,7 +232,7 @@ codecarbon for more information. <a href="https://mlco2.github.io/codecarbon/par
 
 
 <dt><code>sustain_interval</code></dt>
-<dd><p><code>int</code> Interval in seconds for measuring power usage. Allowed values: $1 &lt;= x $</p></dd>
+<dd><p><code>int</code> Interval in seconds for measuring power usage. Allowed values: 1 &lt;= x</p></dd>
 
 
 <dt><code>sustain_log_level</code></dt>
@@ -244,7 +244,7 @@ codecarbon for more information. <a href="https://mlco2.github.io/codecarbon/par
 
 
 <dt><code>pytorch_trace</code></dt>
-<dd><p><code>int</code> <code>ml_trace=0</code> does not print any information about the training process from pytorch on the console. Allowed values: $0 &lt;= x &lt;= 1$</p></dd>
+<dd><p><code>int</code> <code>ml_trace=0</code> does not print any information about the training process from pytorch on the console. Allowed values: 0 &lt;= x &lt;= 1</p></dd>
 
 
 <dt><code>log_dir</code></dt>
@@ -254,7 +254,7 @@ If no logging is desired set this argument to <code>NULL</code>. Allowed values:
 
 <dt><code>log_write_interval</code></dt>
 <dd><p><code>int</code> Time in seconds determining the interval in which the logger should try to update
-the log files. Only relevant if <code>log_dir</code> is not <code>NULL</code>. Allowed values: $1 &lt;= x $</p></dd>
+the log files. Only relevant if <code>log_dir</code> is not <code>NULL</code>. Allowed values: 1 &lt;= x</p></dd>
 
 
 </dl><p></p></div>
@@ -294,19 +294,19 @@ This method requires the <em>R</em> package 'ggplot2' to work.</p><div class="se
 <div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>x_min</code></dt>
-<dd><p><code>int</code> Minimal value for x-axis. Set to <code>NULL</code> for an automatic adjustment. Allowed values: $ x $</p></dd>
+<dd><p><code>int</code> Minimal value for x-axis. Set to <code>NULL</code> for an automatic adjustment. Allowed values:  x</p></dd>
 
 
 <dt><code>x_max</code></dt>
-<dd><p><code>int</code> Maximal value for x-axis. Set to <code>NULL</code> for an automatic adjustment. Allowed values: $ x $</p></dd>
+<dd><p><code>int</code> Maximal value for x-axis. Set to <code>NULL</code> for an automatic adjustment. Allowed values:  x</p></dd>
 
 
 <dt><code>y_min</code></dt>
-<dd><p><code>int</code> Minimal value for y-axis. Set to <code>NULL</code> for an automatic adjustment. Allowed values: $ x $</p></dd>
+<dd><p><code>int</code> Minimal value for y-axis. Set to <code>NULL</code> for an automatic adjustment. Allowed values:  x</p></dd>
 
 
 <dt><code>y_max</code></dt>
-<dd><p><code>int</code> Maximal value for y-axis. Set to <code>NULL</code> for an automatic adjustment. Allowed values: $ x $</p></dd>
+<dd><p><code>int</code> Maximal value for y-axis. Set to <code>NULL</code> for an automatic adjustment. Allowed values:  x</p></dd>
 
 
 <dt><code>ind_best_model</code></dt>
@@ -314,7 +314,7 @@ This method requires the <em>R</em> package 'ggplot2' to work.</p><div class="se
 
 
 <dt><code>text_size</code></dt>
-<dd><p><code>int</code> Size of text elements. Allowed values: $1 &lt;= x $</p></dd>
+<dd><p><code>int</code> Size of text elements. Allowed values: 1 &lt;= x</p></dd>
 
 
 </dl><p></p></div>
@@ -363,7 +363,7 @@ and their type, token, and id in the columns.</p>
 
 
 <dt><code>n_solutions</code></dt>
-<dd><p><code>int</code> Number of solutions the model should predict. Allowed values: $1 &lt;= x $</p></dd>
+<dd><p><code>int</code> Number of solutions the model should predict. Allowed values: 1 &lt;= x</p></dd>
 
 
 </dl><p></p></div>
@@ -538,7 +538,7 @@ members for publication information of the model.</p>
 
 
 <dt><code>n_samples</code></dt>
-<dd><p><code>int</code> Number of samples. Allowed values: $1 &lt;= x $</p></dd>
+<dd><p><code>int</code> Number of samples. Allowed values: 1 &lt;= x</p></dd>
 
 
 <dt><code>sustain_iso_code</code></dt>
@@ -553,7 +553,7 @@ codecarbon for more information. <a href="https://mlco2.github.io/codecarbon/par
 
 
 <dt><code>sustain_interval</code></dt>
-<dd><p><code>int</code> Interval in seconds for measuring power usage. Allowed values: $1 &lt;= x $</p></dd>
+<dd><p><code>int</code> Interval in seconds for measuring power usage. Allowed values: 1 &lt;= x</p></dd>
 
 
 <dt><code>sustain_log_level</code></dt>
@@ -582,15 +582,15 @@ The statistics can be accessed with the method <code>get_sustainability_data("in
 <div class="section">
 <h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>batch_size</code></dt>
-<dd><p><code>int</code> Size of the batches for training. Allowed values: $1 &lt;= x $</p></dd>
+<dd><p><code>int</code> Size of the batches for training. Allowed values: 1 &lt;= x</p></dd>
 
 
 <dt><code>n_batches</code></dt>
-<dd><p><code>int</code> Number of batches. Allowed values: $1 &lt;= x $</p></dd>
+<dd><p><code>int</code> Number of batches. Allowed values: 1 &lt;= x</p></dd>
 
 
 <dt><code>n_epoch</code></dt>
-<dd><p><code>int</code> Number of training epochs. Allowed values: $1 &lt;= x $</p></dd>
+<dd><p><code>int</code> Number of training epochs. Allowed values: 1 &lt;= x</p></dd>
 
 
 </dl><p></p></div>
