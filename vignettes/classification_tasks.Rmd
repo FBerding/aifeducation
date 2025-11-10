@@ -1388,7 +1388,7 @@ classifier$configure(
   feat_parametrizations = "None",
   feat_normalization_type = "LayerNorm",
   ng_conv_act_fct = "ELU",
-  ng_conv_n_layers = 0,
+  ng_conv_n_layers = 2,
   ng_conv_ks_min = 2,
   ng_conv_ks_max = 4,
   ng_conv_bias = FALSE,
@@ -1398,7 +1398,7 @@ classifier$configure(
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "ELU",
   dense_n_layers = 1,
-  dense_dropout = 0.2,
+  dense_dropout = 0.5,
   dense_bias = FALSE,
   dense_parametrizations = "None",
   dense_normalization_type = "LayerNorm",
@@ -1414,7 +1414,7 @@ classifier$configure(
   rec_residual_type = "ResidualGate",
   tf_act_fct = "ELU",
   tf_dense_dim = 400,
-  tf_n_layers = 2,
+  tf_n_layers = 0,
   tf_dropout_rate_1 = 0.1,
   tf_dropout_rate_2 = 0.3,
   tf_attention_type = "MultiHead",
@@ -1460,10 +1460,14 @@ this would be:
 bert_modeling$get_n_features()
 ```
 
-The number for `feat_size` should be equal or lesser as this value since this layer
-tries to compress the text embeddings to a lower number of dimensions. While this reduces the number
-of parameters for all following layers and decreases the time to train and use the model it can cost information.
-You can experiment with this value to find a good balance between speed and performance. 
+The number for `feat_size` should be equal to or less than this value, since this layer
+tries to compress the text embeddings into fewer dimensions. While this reduces the number of
+of parameters for all subsequent layers and decreases training and usage time, it may result in information loss.
+You can experiment with this value to strike a balance between speed and performance. 
+A study by Takeshita et al. (2025) shows that randomly dropping 50% of the dimensions
+leads only to a minor drop in performance in classification tasks. Thus, this value can serve as
+a rule of thumb for determining this parameter.
+
 In addition, the parameter `cls_pooling_features` should be equal or less the number you used
 for `feat_size`. With `cls_pooling_features` you determine how many of the resulting features should be used
 for classification. Thus, this value acts as a filter.
@@ -1471,9 +1475,9 @@ for classification. Thus, this value acts as a filter.
 > The vignette [04 Model configuration](model_configuration.html)
 > provides details on how to configure a classifier.
 
-In our example we use only two encoder layers (`tf_n_layers=2`) and 
-two dense layers (`dense_n_layers=0`). All other layers are omitted from the model
-by setting the number of layers to zero (`conv_n_layers=0`,`rec_n_layers=0`).
+In our example we use only two n-gram layers (`ng_conv_n_layers=2`) and 
+one dense layers (`dense_n_layers=1`). All other layers are omitted from the model
+by setting the number of layers to zero (`tf_n_layers=0`,`rec_n_layers=0`).
 
 As pooling method we use minimum and maximum (`cls_pooling_type="MinMax"`). 
 That is, the 25 highest and the 25 lowest features are used for calculating
@@ -1551,8 +1555,18 @@ the absolute frequencies of length of your texts according to the
 `epochs` determines the maximal number of epochs. During training, the
 model with the best balanced accuracy is saved and used.
 
-`batch_size`sets the number of cases that should be processed
-simultaneously. Please adjust this value to your machine's capacities.
+`batch_size` sets the number of cases to be processed
+simultaneously. It is a very important parameter with a significant impact
+on the model's performance due to the generalisation gap (Keskar et al., 2017 p. 2).
+The generalisation gap describes the observation that large batch sizes tend
+to poor generalisation performance on test datasets compared to models trained
+with a small batch size (Keskar et al., 2017 p. 3). 
+A study conducted by Masters and Luschi (2018) suggests ways to achieve good
+batch size. Their study shows that smaller batch sizes
+offer more stable and reliable training. Batch sizes
+between 4 and 32 lead to the best performance.
+
+Please adjust this value to your machine's capacities.
 Please note that the batch size can have an impact on the classifier's
 performance.
 
@@ -1906,7 +1920,7 @@ classifier_prototype$configure(
   feat_parametrizations = "None",
   feat_normalization_type = "LayerNorm",
   ng_conv_act_fct = "ELU",
-  ng_conv_n_layers = 0,
+  ng_conv_n_layers = 2,
   ng_conv_ks_min = 2,
   ng_conv_ks_max = 4,
   ng_conv_bias = FALSE,
@@ -1916,7 +1930,7 @@ classifier_prototype$configure(
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "ELU",
   dense_n_layers = 1,
-  dense_dropout = 0.2,
+  dense_dropout = 0.5,
   dense_bias = FALSE,
   dense_parametrizations = "None",
   dense_normalization_type = "LayerNorm",
@@ -2334,7 +2348,7 @@ feature_extractor$configure(
   name = "feature_extractor_bert_movie_reviews",
   label = "Feature extractor for Text Embeddings via BERT",
   text_embeddings = review_embeddings,
-  features = 576,
+  features = 384,
   method = "Dense",
   noise_factor = 0.0
 )
@@ -2359,7 +2373,11 @@ embedding model. You can request this value by calling the method `get_n_feature
 bert_modeling$get_n_features()
 ```
 
-In our example we reduce the number of dimensions by 75 %. 
+A study by Takeshita et al. (2025) shows that randomly dropping 50% of the dimensions
+leads only to a minor drop in performance in classification tasks. Thus, this value can serve as
+a rule of thumb for determining this parameter. Thus we reduce the number of features
+to 50 % or to `r floor(bert_modeling$get_n_features()/2)`.
+
 
 With `method` you determine the type of layer the feature extractor
 should use. If set `method="LSTM"`, all layers of the model are long
@@ -2392,8 +2410,8 @@ feature_extractor$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
-  epochs = 350,
-  batch_size = 256,
+  epochs = 500,
+  batch_size = 32,
   lr_rate = 1e-3,
   trace = TRUE,
   ml_trace = 0,
@@ -2448,7 +2466,7 @@ classifier_with_fe$configure(
   feat_parametrizations = "None",
   feat_normalization_type = "LayerNorm",
   ng_conv_act_fct = "ELU",
-  ng_conv_n_layers = 0,
+  ng_conv_n_layers = 2,
   ng_conv_ks_min = 2,
   ng_conv_ks_max = 4,
   ng_conv_bias = FALSE,
@@ -2458,7 +2476,7 @@ classifier_with_fe$configure(
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "ELU",
   dense_n_layers = 1,
-  dense_dropout = 0.2,
+  dense_dropout = 0.5,
   dense_bias = FALSE,
   dense_parametrizations = "None",
   dense_normalization_type = "LayerNorm",
@@ -2474,7 +2492,7 @@ classifier_with_fe$configure(
   rec_residual_type = "ResidualGate",
   tf_act_fct = "ELU",
   tf_dense_dim = 256,
-  tf_n_layers = 2,
+  tf_n_layers = 0,
   tf_dropout_rate_1 = 0.1,
   tf_dropout_rate_2 = 0.3,
   tf_attention_type = "MultiHead",
@@ -2916,6 +2934,10 @@ Kaya, Y. B., & Tantuğ, A. C. (2024). Effect of tokenization granularity
 for Turkish large language models. Intelligent Systems with
 Applications, 21, 200335. <https://doi.org/10.1016/j.iswa.2024.200335>
 
+Keskar, N. S., Mudigere, D., Nocedal, J., Smelyanskiy, M. & Tang, P. T. P. (2017). 
+On Large-Batch Training for Deep Learning: Generalization Gap and Sharp Minima.
+<http://arxiv.org/pdf/1609.04836v2> 
+
 Krippendorff, K. (2019). Content Analysis: An Introduction to Its
 Methodology (4th ed.). Los Angeles: SAGE.
 
@@ -2951,6 +2973,9 @@ of the Association for Computational Linguistics: Human Language
 Technologies (pp. 142–150). Association for Computational Linguistics.
 <https://aclanthology.org/P11-1015>
 
+Masters, D. & Luschi, C. (2018). Revisiting Small Batch Training for Deep Neural Networks.
+<https://doi.org/10.48550/arXiv.1804.07612>
+
 Oreshkin, B. N., Rodriguez, P., & Lacoste, A. (2018). TADAM: Task
 dependent adaptive metric for improved few-shot learning. Advance online
 publication. <https://doi.org/10.48550/arXiv.1805.10123>
@@ -2983,6 +3008,10 @@ Song, K., Tan, X., Qin, T., Lu, J. & Liu, T.‑Y. (2020). MPNet: Masked
 and Permuted Pre-training for Language Understanding.
 <https://doi.org/10.48550/arXiv.2004.09297>
 
+Takeshita, S., Takeshita, Y., Ruffinelli, D. & Ponzetto, S. P. (2025). Randomly 
+Removing 50% of Dimensions in Text Embeddings has Minimal Impact on Retrieval and 
+Classification Tasks. <https://doi.org/10.48550/arXiv.2508.17744>
+
 Tunstall, L., Werra, L. von, Wolf, T., & Géron, A. (2022). Natural
 language processing with transformers: Building language applications
 with hugging face (Revised edition). Heidelberg: O'Reilly.
@@ -3013,6 +3042,9 @@ International Publishing. <https://doi.org/10.1007/978-3-030-16145-3_24>
 ou, L. (2023). Meta-Learning: Theory, Algorithms and Applications.
 Elsevier Science & Technology.
 <https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=7134465>
+
+
+
 
 
 

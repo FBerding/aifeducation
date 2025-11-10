@@ -215,7 +215,7 @@ Their central findings are
 -   that fine-tuning a transformer with only a few training examples
     (10,000) results in a lower performance than using a not fine-tuned
     transformer (Ganesan et al. 2021, p. 4519).
--   Principal component analysis performed best, but multi-layer
+-   Principal component analysis performed best, but multy-layer
     non-linear auto-encoders (NLAE) are also a good choice (Ganesan et
     al. 2021, p. 4520).
 -   that the number of dimensions depends on the specific task. However,
@@ -223,13 +223,21 @@ Their central findings are
     some cases, about $1/12$ to $1/6$ of the dimensions were sufficient
     (Ganesan et al. 2021, p. 4522).
 
-Ganesan et al. (2021) work shows that a reduction of the dimensions is
-necessary in case that the transformer model uses a large hidden size.
-Since most models in *aifeducation* work with sequential data, the
-package contains an LSTM (`fe_method="LSTM"`) and a dense feature
-extractor (`fe_method="Dense"`). To use it for classifier training, create a
-`TEFeatureExtractor` and provide the trained extractor during the 
-configuration of the classifier. See section "Extension" in vignette [03 Using R
+The work of Ganesan et al. (2021) shows that reducing the dimensions is
+is a good choice when the transformer model uses a large hidden size. 
+A similar finding was reported in a study by Takeshita et al. (2025). Their study shows 
+that randomly dropping 50% of the dimensions
+leads only to a minor decrease in performance in classification tasks.
+
+You can apply these findings to a classification model using either of the following methods:
+
+- the parameter `feat_size` during model configuration; or
+- train and use a feature extractor. Since most models in *aifeducation* work with sequential data, 
+  the package contains an LSTM (`fe_method="LSTM"`), as well as a 
+  dense feature extractor (`fe_method="Dense"`). To use it for a classifier, create a
+  `TEFeatureExtractor` and provide the trained extractor when configuring the model.
+
+See section vignette [03 Using R
 syntax](classification_tasks.html) or [02 Using the graphical user interface
 Aifeducation - Studio](gui_aife_studio.html) for more details.
 
@@ -307,6 +315,10 @@ Rogers, A., Kovaleva, O., & Rumshisky, A. (2020). A Primer in BERTology:
 What We Know About How BERT Works. Transactions of the Association for
 Computational Linguistics, 8, 842–866.
 <https://doi.org/10.1162/tacl_a_00349>
+
+Takeshita, S., Takeshita, Y., Ruffinelli, D. & Ponzetto, S. P. (2025). Randomly 
+Removing 50% of Dimensions in Text Embeddings has Minimal Impact on Retrieval and 
+Classification Tasks. <https://doi.org/10.48550/arXiv.2508.17744>
 
 Tanaka, H., Shinnou, H., Cao, R., Bai, J., & Ma, W. (2020). Document
 Classification by Word Embeddings of BERT. In L.-M. Nguyen, X.-H. Phan,
