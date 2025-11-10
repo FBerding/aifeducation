@@ -143,7 +143,7 @@ TEClassifierSequentialPrototype <- R6::R6Class(
                          tf_bias = FALSE,
                          tf_parametrizations = "None",
                          tf_normalization_type = "LayerNorm",
-                         tf_normalization_position = "pre",
+                         tf_normalization_position = "Pre",
                          tf_residual_type = "ResidualGate",
                          embedding_dim = 2L) {
       arguments <- get_called_args(n = 1L)

@@ -1224,9 +1224,7 @@ Please note that this plot is not available for this example since the necessary
 data is not directly available for this model on Hugging Face. If you train a 
 model with this package the training history is always saved.
 
-# 5 Classifiers
-
-## 5.1 Overview
+# 5 Overview Classifiers
 
 Classifiers are built on top of a `TextEmbeddingModel`. They use the embedded texts
 produced by these models and predict classes/categories. You can build your classifier
@@ -1384,7 +1382,7 @@ classifier$configure(
   cls_pooling_type = "MinMax",
   cls_head_type = "PairwiseOrthogonal",
   feat_act_fct = "ELU",
-  feat_size = 128,
+  feat_size = 384,
   feat_bias = TRUE,
   feat_dropout = 0.0,
   feat_parametrizations = "None",
@@ -1399,8 +1397,8 @@ classifier$configure(
   ng_conv_normalization_type = "LayerNorm",
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "ELU",
-  dense_n_layers = 2,
-  dense_dropout = 0.5,
+  dense_n_layers = 1,
+  dense_dropout = 0.2,
   dense_bias = FALSE,
   dense_parametrizations = "None",
   dense_normalization_type = "LayerNorm",
@@ -1415,7 +1413,7 @@ classifier$configure(
   rec_normalization_type = "LayerNorm",
   rec_residual_type = "ResidualGate",
   tf_act_fct = "ELU",
-  tf_dense_dim = 512,
+  tf_dense_dim = 400,
   tf_n_layers = 2,
   tf_dropout_rate_1 = 0.1,
   tf_dropout_rate_2 = 0.3,
@@ -1525,8 +1523,8 @@ classifier$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
-  epochs = 1000,
-  batch_size = 16,
+  epochs = 500,
+  batch_size = 4,
   trace = TRUE,
   ml_trace = 0,
   log_dir = NULL,
@@ -1902,7 +1900,7 @@ classifier_prototype$configure(
   projection_type = "Regular",
   metric_type = "Euclidean",
   feat_act_fct = "ELU",
-  feat_size = 128,
+  feat_size = 384,
   feat_bias = TRUE,
   feat_dropout = 0.0,
   feat_parametrizations = "None",
@@ -1917,14 +1915,14 @@ classifier_prototype$configure(
   ng_conv_normalization_type = "LayerNorm",
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "ELU",
-  dense_n_layers = 2,
-  dense_dropout = 0.5,
+  dense_n_layers = 1,
+  dense_dropout = 0.2,
   dense_bias = FALSE,
   dense_parametrizations = "None",
   dense_normalization_type = "LayerNorm",
   dense_residual_type = "ResidualGate",
   rec_act_fct = "Tanh",
-  rec_n_layers = 0,
+  rec_n_layers = 2,
   rec_type = "GRU",
   rec_bidirectional = FALSE,
   rec_dropout = 0.2,
@@ -1933,10 +1931,10 @@ classifier_prototype$configure(
   rec_normalization_type = "LayerNorm",
   rec_residual_type = "ResidualGate",
   tf_act_fct = "ELU",
-  tf_dense_dim = 512,
-  tf_n_layers = 2,
+  tf_dense_dim = 400,
+  tf_n_layers = 0,
   tf_dropout_rate_1 = 0.1,
-  tf_dropout_rate_2 = 0.5,
+  tf_dropout_rate_2 = 0.3,
   tf_attention_type = "MultiHead",
   tf_positional_type = "absolute",
   tf_num_heads = 1,
@@ -1995,8 +1993,8 @@ classifier_prototype$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
-  epochs = 1000,
-  batch_size = 32,
+  epochs = 1500,
+  batch_size = 4,
   Ns = 5,
   Nq = 3,
   loss_alpha = 0.5,
@@ -2394,7 +2392,7 @@ feature_extractor$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
-  epochs = 500,
+  epochs = 350,
   batch_size = 256,
   lr_rate = 1e-3,
   trace = TRUE,
@@ -2459,8 +2457,8 @@ classifier_with_fe$configure(
   ng_conv_normalization_type = "LayerNorm",
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "ELU",
-  dense_n_layers = 2,
-  dense_dropout = 0.5,
+  dense_n_layers = 1,
+  dense_dropout = 0.2,
   dense_bias = FALSE,
   dense_parametrizations = "None",
   dense_normalization_type = "LayerNorm",
@@ -2475,7 +2473,7 @@ classifier_with_fe$configure(
   rec_normalization_type = "LayerNorm",
   rec_residual_type = "ResidualGate",
   tf_act_fct = "ELU",
-  tf_dense_dim = 512,
+  tf_dense_dim = 256,
   tf_n_layers = 2,
   tf_dropout_rate_1 = 0.1,
   tf_dropout_rate_2 = 0.3,
@@ -2489,6 +2487,10 @@ classifier_with_fe$configure(
   tf_residual_type = "ResidualGate"
 )
 ```
+
+That is all. Now you can use and train the classifier in the same way as
+you did without a feature extractor. You even do not need to save and load the 
+feature extractor manually. This is done automatically for all classifiers.
 
 ```{r, include = TRUE, eval=TRUE}
 classifier_with_fe$train(
@@ -2513,7 +2515,7 @@ classifier_with_fe$train(
   sustain_region = NULL,
   sustain_interval = 15,
   epochs = 1000,
-  batch_size = 16,
+  batch_size = 4,
   trace = TRUE,
   ml_trace = 0,
   log_dir = NULL,
@@ -2525,9 +2527,90 @@ classifier_with_fe$train(
 )
 ```
 
-That is all. Now you can use and train the classifier in the same way as
-you did without a feature extractor. You even do not need to save and load the 
-feature extractor manually. This is done automatically for all classifiers.
+First we can analyze the training history of the performance estimation stage.
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Feature Extractor during Performance Estimation Stage (loss)"),fig.align="center"}
+classifier_with_fe$plot_training_history(
+  final_training = FALSE,
+  pl_step = NULL,
+  measure = "loss",
+  ind_best_model = FALSE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = 1,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Feature Extractor during Performance Estimation Stage (iota)"),fig.align="center"}
+classifier_with_fe$plot_training_history(
+  final_training = FALSE,
+  pl_step = NULL,
+  measure = "avg_iota",
+  ind_best_model = FALSE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = NULL,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+The training history of the final training stage is displayed in the following
+two Figures.
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Feature Extractor during Final Training Stage (loss)"),fig.align="center"}
+classifier_with_fe$plot_training_history(
+  final_training = TRUE,
+  pl_step = NULL,
+  measure = "loss",
+  ind_best_model = FALSE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = 1,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Feature Extractor during Final Training Stage (iota)"),fig.align="center"}
+classifier_with_fe$plot_training_history(
+  final_training = TRUE,
+  pl_step = NULL,
+  measure = "avg_iota",
+  ind_best_model = FALSE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = NULL,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
 
 For example, let us explore the performance of the classifier.
 

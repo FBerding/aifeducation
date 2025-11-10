@@ -131,7 +131,7 @@ TEClassifierSequential <- R6::R6Class(
                          tf_bias = FALSE,
                          tf_parametrizations = "None",
                          tf_normalization_type = "LayerNorm",
-                         tf_normalization_position = "pre",
+                         tf_normalization_position = "Pre",
                          tf_residual_type = "ResidualGate") {
       private$do_configuration(args = get_called_args(n = 1L))
     }
