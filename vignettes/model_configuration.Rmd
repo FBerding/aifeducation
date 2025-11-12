@@ -269,6 +269,13 @@ like to use a prototype-based classifier, the rules for contrastive learning sho
 be applied, since these models use a contrastive loss function. In this case, 
 the batch size is determined by two parameters: `Ns` and `Nq.` Set these two parameters to high values.
 
+*learning rate*
+
+Another important parameter that correlates with batch size is the learning rate (`lr_rate`). The study reported 
+by He, Liu et al. (2019) indicates that
+that the ratio of batch size to learning rate $(batch size)/(learning rate)$ should be as small as possible in order
+to achieve good generalisation performance. If you use `batch_size=4` we recommend to set `lr_rate=1e-1`.
+
 *Epochs*
 
 The number of epochs determines how many times the model goes through the complete training data.

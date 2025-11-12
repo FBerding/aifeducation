@@ -1534,7 +1534,7 @@ classifier$train(
   log_dir = NULL,
   log_write_interval = 10,
   n_cores = auto_n_cores(),
-  lr_rate = 1e-3,
+  lr_rate = 1e-1,
   lr_warm_up_ratio = 0.02,
   optimizer = "AdamW"
 )
@@ -1565,6 +1565,12 @@ A study conducted by Masters and Luschi (2018) suggests ways to achieve good
 batch size. Their study shows that smaller batch sizes
 offer more stable and reliable training. Batch sizes
 between 4 and 32 lead to the best performance.
+
+Another important parameter that correlates with batch size is the learning rate (`lr_rate`). The study reported 
+by He, Liu et al. (2019) indicates that
+that the ratio of batch size to learning rate $(batch size)/(learning rate)$ should be as small as possible in order
+to achieve good generalisation performance. 
+
 Please note that there are exceptions to this rule. In the context of contrastive
 learning, higher batch sizes tend to generate better generalisation performance 
 (Chen et al., 2020).
@@ -2401,6 +2407,8 @@ Training the extractor is identical to the other models in
 `data_embeddings` must be generated with the same `TextEmbeddingModel` as
 the embeddings provided during the configuration of your model.
 
+We set `batch_size = 32` and `lr_rate=1e-1` based on the work of He, Liu et al. (2019).
+
 ```{r feature_extractor$train, include = TRUE, eval=TRUE, results='hide'}
 feature_extractor$train(
   data_embeddings = review_embeddings,
@@ -2410,7 +2418,7 @@ feature_extractor$train(
   sustain_region = NULL,
   sustain_interval = 15,
   epochs = 500,
-  batch_size = 256,
+  batch_size = 32,
   lr_rate = 1e-3,
   trace = TRUE,
   ml_trace = 0,
@@ -2538,7 +2546,7 @@ classifier_with_fe$train(
   log_dir = NULL,
   log_write_interval = 10,
   n_cores = auto_n_cores(),
-  lr_rate = 1e-3,
+  lr_rate = 1e-1,
   lr_warm_up_ratio = 0.02,
   optimizer = "AdamW"
 )
@@ -2919,6 +2927,11 @@ edition). Gaithersburg: STATAXIS.
 He, P., Liu, X., Gao, J. & Chen, W. (2020). DeBERTa: Decoding-enhanced
 BERT with Disentangled Attention.
 <https://doi.org/10.48550/arXiv.2006.03654>
+
+He, F., Liu, T. & Tao, D. (2019). Control Batch Size and Learning Rate to Generalize 
+Well: Theoretical and Empirical Evidence. In Advances in neural information 
+processing systems: Bd. 32. 32nd Conference on Neural Information Processing 
+Systems (NeurIPS 2019): Vancouver, Canada, 8-14 December 2019. Curran Associates Inc.
 
 Islam, A., Belhaouari, S. B., Rehman, A. U. & Bensmail, H. (2022). 
 KNNOR: An oversampling technique for imbalanced datasets. 
