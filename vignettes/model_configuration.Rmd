@@ -1,9 +1,9 @@
 ---
-title: "04 Model configuration"
+title: "04 Model and training configuration"
 author: "Florian Berding, Julia Pargmann, Andreas Slopinski, Elisabeth Riebenbauer, Karin Rebmann"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{04 Model configuration}
+  %\VignetteIndexEntry{04 Model configuration and training}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
@@ -241,7 +241,43 @@ See section vignette [03 Using R
 syntax](classification_tasks.html) or [02 Using the graphical user interface
 Aifeducation - Studio](gui_aife_studio.html) for more details.
 
-# 5 Limitations
+# 5 Training
+
+After deciding about the configuration of a model finding good training settings
+is the next step. 
+
+
+*batch_size*
+
+A very important hyperparameter is `batch_size`. It sets the number of cases to be processed
+simultaneously. It is a very important parameter with a significant impact
+on the model's performance due to the generalisation gap (Keskar et al., 2017 p. 2).
+The generalisation gap describes the observation that large batch sizes tend
+to poor generalisation performance on test datasets compared to models trained
+with a small batch size (Keskar et al., 2017 p. 3). 
+A study conducted by Masters and Luschi (2018) suggests ways to achieve good
+batch size. Their study shows that smaller batch sizes
+offer more stable and reliable training. Batch sizes
+between 4 and 32 lead to the best performance.
+
+Please note that there are exceptions to this rule. In the context of contrastive
+learning, higher batch sizes tend to generate better generalisation performance 
+(Chen et al., 2020). 
+
+Therefore, we recommend using low batch sizes when training a model. If you would 
+like to use a prototype-based classifier, the rules for contrastive learning should 
+be applied, since these models use a contrastive loss function. In this case, 
+the batch size is determined by two parameters: `Ns` and `Nq.` Set these two parameters to high values.
+
+*Epochs*
+
+The number of epochs determines how many times the model goes through the complete training data.
+If you are unsure about the required number of epochs, set a high value.
+The best-generalisation state is determined automatically. All models except `BaseModel`s
+have an early stop rule to prevent unnecessary computations during training.
+
+
+# 6 Limitations
 
 Please note that the findings presented in this vignette refer to
 different architectures of AI models. In general, the results cannot be
@@ -249,6 +285,10 @@ transferred directly to other model architectures. Thus, all
 recommendations can only serve as a rule of thumb.
 
 # References
+
+Chen, T., Kornblith, S., Norouzi, M. & Hinton, G. (2020). A Simple Framework 
+for Contrastive Learning of Visual Representations. 
+<https://doi.org/10.48550/arXiv.2002.05709>
 
 Chen, W., Su, Y., Shen, Y., Chen, Z., Yan, X., & Wang, W. Y. (2019). How
 Large a Vocabulary Does Text Classification Need? A Variational Approach
@@ -308,6 +348,9 @@ Ma, X., Wang, Z., Ng, P., Nallapati, R., & Xiang, B. (2019). Universal
 Text Representation from BERT: An Empirical Study.
 <https://doi.org/10.48550/arXiv.1910.07973>
 
+Masters, D. & Luschi, C. (2018). Revisiting Small Batch Training for
+Deep Neural Networks. <https://doi.org/10.48550/arXiv.1804.07612>
+
 Michel, P., Levy, O., & Neubig, G. (2019). Are Sixteen Heads Really
 Better than One? <https://doi.org/10.48550/arXiv.1905.10650>
 
@@ -347,3 +390,8 @@ self-attention. <https://doi.org/10.48550/arXiv.2105.03928>
 Zhao, S., Gupta, R., Song, Y., & Zhou, D. (2019). Extremely Small BERT
 Models from Mixed-Vocabulary Training.
 <https://doi.org/10.48550/arXiv.1909.11687>
+
+
+
+
+

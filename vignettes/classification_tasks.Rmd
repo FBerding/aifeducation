@@ -636,7 +636,7 @@ we have only two options. The first, `vocab_size` determines how many tokens the
 tokenizer should know. The second determines if all words should be transformed to lower case 
 before tokenization. since we use only a very small data set for illustrating the usage of the
 package we set `vocab_size = 200`. In real case applications this value should be larger.
-You can find more information on this topic in vignette [04 Model configuration](model_configuration.html).
+You can find more information on this topic in vignette [04 Model configuration and training](model_configuration.html).
 
 ```{r, include = TRUE, eval = TRUE}
 tokenizer$configure(
@@ -804,7 +804,7 @@ chunks is supported by *aifedcuation* for all models.
 The parameter `tokenizer` requires an tokenizer object. Here we use the model
 created in section 3.2.
 
-> The vignette [04 Model configuration](model_configuration.html)
+> The vignette [04 Model configuration and training](model_configuration.html)
 > provides details on how to configure a base model.
 
 Now your model is ready. You can save it with the function `save_to_disk` or continue
@@ -1109,7 +1109,7 @@ within every layer. In the case of `emb_pool_type="CLS",` only the cls
 token is used. In the case of `emb_pool_type="Average"` all tokens
 within a layer are averaged except padding tokens.
 
-> The vignette [04 Model configuration](model_configuration.html)
+> The vignette [04 Model configuration and training](model_configuration.html)
 > provides details on how to configure a text embedding model.
 
 After deciding about the configuration, you can use your model.
@@ -1472,7 +1472,7 @@ In addition, the parameter `cls_pooling_features` should be equal or less the nu
 for `feat_size`. With `cls_pooling_features` you determine how many of the resulting features should be used
 for classification. Thus, this value acts as a filter.
 
-> The vignette [04 Model configuration](model_configuration.html)
+> The vignette [04 Model configuration and training](model_configuration.html)
 > provides details on how to configure a classifier.
 
 In our example we use only two n-gram layers (`ng_conv_n_layers=2`) and 
@@ -1565,10 +1565,9 @@ A study conducted by Masters and Luschi (2018) suggests ways to achieve good
 batch size. Their study shows that smaller batch sizes
 offer more stable and reliable training. Batch sizes
 between 4 and 32 lead to the best performance.
-
-Please adjust this value to your machine's capacities.
-Please note that the batch size can have an impact on the classifier's
-performance.
+Please note that there are exceptions to this rule. In the context of contrastive
+learning, higher batch sizes tend to generate better generalisation performance 
+(Chen et al., 2020).
 
 Since training a neural net is energy consuming, *aifeducation* allows
 you to estimate its ecological impact with the help of the python
@@ -2884,6 +2883,10 @@ Developers. Mercury Learning & Information.
 Cascante-Bonilla, P., Tan, F., Qi, Y. & Ordonez, V. (2020). Curriculum
 Labeling: Revisiting Pseudo-Labeling for Semi-Supervised Learning.
 <https://doi.org/10.48550/arXiv.2001.06001>
+
+Chen, T., Kornblith, S., Norouzi, M. & Hinton, G. (2020). 
+A Simple Framework for Contrastive Learning of Visual Representations. 
+<https://doi.org/10.48550/arXiv.2002.05709>
 
 Chollet, F., Kalinowski, T., & Allaire, J. J. (2022). Deep learning with
 R (Second edition). Manning Publications Co.

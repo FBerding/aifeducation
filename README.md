@@ -139,8 +139,8 @@ Funnel-Transformer (Dai et al. 2020).
 *aifeducation* supports the use of pre-trained transformer models
 provided by [Hugging Face](https://huggingface.co/) and the creation of
 new transformers, allowing educators and researchers to develop
-specialized and domain-specific models. See [04 Model
-configuration](https://fberding.github.io/aifeducation/articles/model_configuration.html)
+specialized and domain-specific models. See [04 Model configuration and
+training](https://fberding.github.io/aifeducation/articles/model_configuration.html)
 for details about the configuration of a new model.
 
 The package supports the analysis of long texts. Depending on the
@@ -275,8 +275,8 @@ you can find a detailed guide on how to document and share your models.
   syntax](https://fberding.github.io/aifeducation/articles/classification_tasks.html):
   A short introduction into using the package with *R* syntax with
   examples for classification tasks.
-- [04 Model
-  configuration](https://fberding.github.io/aifeducation/articles/model_configuration.html):
+- [04 Model configuration and
+  training](https://fberding.github.io/aifeducation/articles/model_configuration.html):
   Summary of some studies for finding a good configuration for a model.
 - [05 Sharing and Using Trained
   AI/Models](https://fberding.github.io/aifeducation/articles/sharing_and_publishing.html):
