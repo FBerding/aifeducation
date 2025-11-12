@@ -816,7 +816,7 @@ If you would like to train a new base model (see section 3.2) for the
 first time or want to adapt a pre-trained model to a domain-specific
 language or task, you can call the corresponding `train`-method. 
 
-```{r, include = TRUE, eval = TRUE}
+```{r base_model$train, include = TRUE, eval = TRUE}
 base_model$train(
   text_dataset = data_set_reviews_text,
   p_mask = 0.30,
@@ -1505,7 +1505,7 @@ expects a **named** factor where the names correspond to the IDs of the
 corresponding text embeddings. Text embeddings and target data that
 cannot be matched are omitted from training.
 
-```{r, include = TRUE, eval = TRUE}
+```{r classifier$train, include = TRUE, eval = TRUE}
 classifier$train(
   data_embeddings = review_embeddings,
   data_targets = review_labels,
@@ -1936,7 +1936,7 @@ classifier_prototype$configure(
   dense_normalization_type = "LayerNorm",
   dense_residual_type = "ResidualGate",
   rec_act_fct = "Tanh",
-  rec_n_layers = 2,
+  rec_n_layers = 0,
   rec_type = "GRU",
   rec_bidirectional = FALSE,
   rec_dropout = 0.2,
@@ -1987,7 +1987,7 @@ structure. Let us see how this changes when we train the model.
 
 ## 7.3 Training
 
-```{r, include = TRUE, eval=TRUE}
+```{r classifier_prototype$train, include = TRUE, eval=TRUE}
 classifier_prototype$train(
   data_embeddings = review_embeddings,
   data_targets = review_labels,
@@ -2009,8 +2009,8 @@ classifier_prototype$train(
   sustain_interval = 15,
   epochs = 1500,
   batch_size = 4,
-  Ns = 5,
-  Nq = 3,
+  Ns = 10,
+  Nq = 10,
   loss_alpha = 0.5,
   loss_margin = 0.05,
   sampling_separate = FALSE,
@@ -2402,7 +2402,7 @@ Training the extractor is identical to the other models in
 `data_embeddings` must be generated with the same `TextEmbeddingModel` as
 the embeddings provided during the configuration of your model.
 
-```{r, include = TRUE, eval=TRUE, results='hide'}
+```{r feature_extractor$train, include = TRUE, eval=TRUE, results='hide'}
 feature_extractor$train(
   data_embeddings = review_embeddings,
   data_val_size = 0.25,
@@ -2411,7 +2411,7 @@ feature_extractor$train(
   sustain_region = NULL,
   sustain_interval = 15,
   epochs = 500,
-  batch_size = 32,
+  batch_size = 256,
   lr_rate = 1e-3,
   trace = TRUE,
   ml_trace = 0,
