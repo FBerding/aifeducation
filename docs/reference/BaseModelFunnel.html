@@ -144,12 +144,12 @@ guidelines:</p><ul><li><p>hidden_size is a multiple of num_attention_heads.</p><
 
 <dt><code>max_position_embeddings</code></dt>
 <dd><p><code>int</code> Number of maximum position embeddings. This parameter also determines the maximum length of a sequence which
-can be processed with the model. Allowed values: 10 &lt;= x &lt;= 4048</p></dd>
+can be processed with the model. Allowed values: \(10 &lt;= x &lt;= 4048\)</p></dd>
 
 
 <dt><code>hidden_size</code></dt>
 <dd><p><code>int</code> Number of neurons in each layer. This parameter determines the dimensionality of the resulting text
-embedding. Allowed values: 1 &lt;= x &lt;= 2048</p></dd>
+embedding. Allowed values: \(1 &lt;= x &lt;= 2048\)</p></dd>
 
 
 <dt><code>block_sizes</code></dt>
@@ -157,19 +157,19 @@ embedding. Allowed values: 1 &lt;= x &lt;= 2048</p></dd>
 
 
 <dt><code>num_attention_heads</code></dt>
-<dd><p><code>int</code> determining the number of attention heads for a self-attention layer. Only relevant if <code>attention_type='multihead'</code> Allowed values: 0 &lt;= x</p></dd>
+<dd><p><code>int</code> determining the number of attention heads for a self-attention layer. Only relevant if <code>attention_type='multihead'</code> Allowed values: \(0 &lt;= x \)</p></dd>
 
 
 <dt><code>intermediate_size</code></dt>
-<dd><p><code>int</code> determining the size of the projection layer within a each transformer encoder. Allowed values: 1 &lt;= x</p></dd>
+<dd><p><code>int</code> determining the size of the projection layer within a each transformer encoder. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 <dt><code>num_decoder_layers</code></dt>
-<dd><p><code>int</code> Number of decoding layers. Allowed values: 1 &lt;= x</p></dd>
+<dd><p><code>int</code> Number of decoding layers. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 <dt><code>d_head</code></dt>
-<dd><p><code>int</code> Number of neurons of the final layer. Allowed values: 1 &lt;= x</p></dd>
+<dd><p><code>int</code> Number of neurons of the final layer. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 <dt><code>funnel_pooling_type</code></dt>
@@ -181,19 +181,19 @@ embedding. Allowed values: 1 &lt;= x &lt;= 2048</p></dd>
 
 
 <dt><code>hidden_dropout_prob</code></dt>
-<dd><p><code>double</code> Ratio of dropout. Allowed values: 0 &lt;= x &lt;= 0.6</p></dd>
+<dd><p><code>double</code> Ratio of dropout. Allowed values: \(0 &lt;= x &lt;= 0.6\)</p></dd>
 
 
 <dt><code>attention_probs_dropout_prob</code></dt>
-<dd><p><code>double</code> Ratio of dropout for attention probabilities. Allowed values: 0 &lt;= x &lt;= 0.6</p></dd>
+<dd><p><code>double</code> Ratio of dropout for attention probabilities. Allowed values: \(0 &lt;= x &lt;= 0.6\)</p></dd>
 
 
 <dt><code>activation_dropout</code></dt>
-<dd><p><code>double</code> Dropout probability between the layers of the feed-forward blocks. Allowed values: 0 &lt;= x &lt;= 0.6</p></dd>
+<dd><p><code>double</code> Dropout probability between the layers of the feed-forward blocks. Allowed values: \(0 &lt;= x &lt;= 0.6\)</p></dd>
 
 
 <dt><code>num_hidden_layers</code></dt>
-<dd><p><code>int</code> Number of hidden layers. Allowed values: 1 &lt;= x</p></dd>
+<dd><p><code>int</code> Number of hidden layers. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 </dl><p></p></div>

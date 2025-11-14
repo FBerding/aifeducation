@@ -148,23 +148,23 @@ is generated automatically. Allowed values: any</p></dd>
 
 <dt><code>max_length</code></dt>
 <dd><p><code>int</code> Maximal number of token per chunks. Must be equal or lower
-as the maximal postional embeddings for the model. Allowed values: 20 &lt;= x</p></dd>
+as the maximal postional embeddings for the model. Allowed values: \(20 &lt;= x \)</p></dd>
 
 
 <dt><code>chunks</code></dt>
-<dd><p><code>int</code> Maximal number chunks. Allowed values: 2 &lt;= x</p></dd>
+<dd><p><code>int</code> Maximal number chunks. Allowed values: \(2 &lt;= x \)</p></dd>
 
 
 <dt><code>overlap</code></dt>
-<dd><p><code>int</code> Number of tokens from the previous chunk that should be added at the beginng of the next chunk. Allowed values: 0 &lt;= x</p></dd>
+<dd><p><code>int</code> Number of tokens from the previous chunk that should be added at the beginng of the next chunk. Allowed values: \(0 &lt;= x \)</p></dd>
 
 
 <dt><code>emb_layer_min</code></dt>
-<dd><p><code>int</code> Minimal layer from which the embeddings should be calculated. Allowed values: 1 &lt;= x</p></dd>
+<dd><p><code>int</code> Minimal layer from which the embeddings should be calculated. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 <dt><code>emb_layer_max</code></dt>
-<dd><p><code>int</code> Maximal layer from which the embeddings should be calculated. Allowed values: 1 &lt;= x</p></dd>
+<dd><p><code>int</code> Maximal layer from which the embeddings should be calculated. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 <dt><code>emb_pool_type</code></dt>
@@ -177,7 +177,7 @@ Please note that BaseModelFunnel allows only 'CLS'. Allowed values: 'CLS', 'Aver
 <dt><code>pad_value</code></dt>
 <dd><p><code>int</code> Value indicating padding. This value should no be in the range of
 regluar values for computations. Thus it is not recommended to chance this value.
-Default is <code>-100</code>. Allowed values:  x &lt;= -1</p></dd>
+Default is <code>-100</code>. Allowed values: \( x &lt;= -1\)</p></dd>
 
 
 <dt><code>base_model</code></dt>
@@ -335,7 +335,7 @@ into text embeddings. For a large number of texts please use the method <code>em
 
 
 <dt><code>batch_size</code></dt>
-<dd><p><code>int</code> Size of the batches for training. Allowed values: 1 &lt;= x</p></dd>
+<dd><p><code>int</code> Size of the batches for training. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 <dt><code>trace</code></dt>
@@ -375,7 +375,7 @@ model creating the embeddings.</p>
 
 
 <dt><code>batch_size</code></dt>
-<dd><p><code>int</code> Size of the batches for training. Allowed values: 1 &lt;= x</p></dd>
+<dd><p><code>int</code> Size of the batches for training. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 <dt><code>trace</code></dt>
@@ -389,7 +389,7 @@ If no logging is desired set this argument to <code>NULL</code>. Allowed values:
 
 <dt><code>log_write_interval</code></dt>
 <dd><p><code>int</code> Time in seconds determining the interval in which the logger should try to update
-the log files. Only relevant if <code>log_dir</code> is not <code>NULL</code>. Allowed values: 1 &lt;= x</p></dd>
+the log files. Only relevant if <code>log_dir</code> is not <code>NULL</code>. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 </dl><p></p></div>
@@ -502,7 +502,7 @@ tracker used, and technical information on the training infrastructure.</p>
 
 
 <dt><code>batch_size</code></dt>
-<dd><p><code>int</code> Size of the batches for training. Allowed values: 1 &lt;= x</p></dd>
+<dd><p><code>int</code> Size of the batches for training. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 <dt><code>sustain_iso_code</code></dt>
@@ -517,7 +517,7 @@ codecarbon for more information. <a href="https://mlco2.github.io/codecarbon/par
 
 
 <dt><code>sustain_interval</code></dt>
-<dd><p><code>int</code> Interval in seconds for measuring power usage. Allowed values: 1 &lt;= x</p></dd>
+<dd><p><code>int</code> Interval in seconds for measuring power usage. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 <dt><code>sustain_log_level</code></dt>

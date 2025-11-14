@@ -247,34 +247,33 @@ After deciding about the configuration of a model finding good training settings
 is the next step. 
 
 
-*batch_size*
+*batch size* and *learning rate* 
 
-A very important hyperparameter is `batch_size`. It sets the number of cases to be processed
+`batch_size` sets the number of cases to be processed
 simultaneously. It is a very important parameter with a significant impact
 on the model's performance due to the generalisation gap (Keskar et al., 2017 p. 2).
 The generalisation gap describes the observation that large batch sizes tend
 to poor generalisation performance on test datasets compared to models trained
 with a small batch size (Keskar et al., 2017 p. 3). 
+
 A study conducted by Masters and Luschi (2018) suggests ways to achieve good
-batch size. Their study shows that smaller batch sizes
-offer more stable and reliable training. Batch sizes
-between 4 and 32 lead to the best performance.
+batch size for using `"SGD"` as optimizer. Their study shows that smaller batch sizes
+offer more stable and reliable training and at the same time achieve better
+generalisation performance. Batch sizes
+between 4 and 32 lead to the best performance. Increasing the batch size also 
+reduces the range of learning rates that provide stable convergence (Masters & Luschi 2018, p. 18).
+Good values for the base learning rate for batch sizes between 4 and 32 are in the range of 
+$2^{-6}$ and $2^{-10}$ (Masters & Luschi 2018, p. 15). Similar results report He, Liu et al. (2019) showing that 
+the ratio of batch size to learning rate $(batch size)/(learning rate)$ should be 
+as small as possible in order to achieve good generalisation performance. 
+
+
+
+Based on these results we recommend to start with `batch_size=32` and `lr_rate=3e-2`.
 
 Please note that there are exceptions to this rule. In the context of contrastive
 learning, higher batch sizes tend to generate better generalisation performance 
-(Chen et al., 2020). 
-
-Therefore, we recommend using low batch sizes when training a model. If you would 
-like to use a prototype-based classifier, the rules for contrastive learning should 
-be applied, since these models use a contrastive loss function. In this case, 
-the batch size is determined by two parameters: `Ns` and `Nq.` Set these two parameters to high values.
-
-*learning rate*
-
-Another important parameter that correlates with batch size is the learning rate (`lr_rate`). The study reported 
-by He, Liu et al. (2019) indicates that
-that the ratio of batch size to learning rate $(batch size)/(learning rate)$ should be as small as possible in order
-to achieve good generalisation performance. If you use `batch_size=4` we recommend to set `lr_rate=1e-1`.
+(Chen et al., 2020).
 
 *Epochs*
 
@@ -329,6 +328,11 @@ Neural Machine Translation. In T. Cohn, Y. He, & Y. Liu (Eds.), Findings
 of the Association for Computational Linguistics: EMNLP 2020 (pp.
 3955–3964). Association for Computational Linguistics.
 <https://doi.org/10.18653/v1/2020.findings-emnlp.352>
+
+He, F., Liu, T. & Tao, D. (2019). Control Batch Size and Learning Rate to Generalize 
+Well: Theoretical and Empirical Evidence. In Advances in neural information 
+processing systems: Bd. 32. 32nd Conference on Neural Information Processing 
+Systems (NeurIPS 2019): Vancouver, Canada, 8-14 December 2019. Curran Associates Inc.
 
 Kaya, Y. B., & Tantuğ, A. C. (2024). Effect of tokenization granularity
 for Turkish large language models. Intelligent Systems with

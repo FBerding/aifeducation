@@ -170,19 +170,19 @@ indicating a higher category/class. For nominal data the order does not matter.<
 
 
 <dt><code>folds</code></dt>
-<dd><p><code>int</code> determining the number of cross-fold samples. Allowed values: 1 &lt;= x</p></dd>
+<dd><p><code>int</code> determining the number of cross-fold samples. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 <dt><code>val_size</code></dt>
 <dd><p><code>double</code> between 0 and 1, indicating the proportion of cases which should be
 used for the validation sample during the estimation of the model.
-The remaining cases are part of the training data. Allowed values: 0 &lt; x &lt; 1</p></dd>
+The remaining cases are part of the training data. Allowed values: \(0 &lt; x &lt; 1\)</p></dd>
 
 
 <dt><code>pad_value</code></dt>
 <dd><p><code>int</code> Value indicating padding. This value should no be in the range of
 regluar values for computations. Thus it is not recommended to chance this value.
-Default is <code>-100</code>. Allowed values:  x &lt;= -1</p></dd>
+Default is <code>-100</code>. Allowed values: \( x &lt;= -1\)</p></dd>
 
 
 <dt><code>one_hot_encoding</code></dt>
@@ -199,11 +199,11 @@ The number of rows equals the number of cases. The number of columns equals <cod
 
 
 <dt><code>sc_min_k</code></dt>
-<dd><p><code>int</code> determining the minimal number of k which is used for creating synthetic units. Allowed values: 1 &lt;= x</p></dd>
+<dd><p><code>int</code> determining the minimal number of k which is used for creating synthetic units. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 <dt><code>sc_max_k</code></dt>
-<dd><p><code>int</code> determining the maximal number of k which is used for creating synthetic units. Allowed values: 1 &lt;= x</p></dd>
+<dd><p><code>int</code> determining the maximal number of k which is used for creating synthetic units. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 <dt><code>trace</code></dt>
@@ -211,7 +211,7 @@ The number of rows equals the number of cases. The number of columns equals <cod
 
 
 <dt><code>n_cores</code></dt>
-<dd><p><code>int</code> Number of cores which should be used during the calculation of synthetic cases. Only relevant if <code>use_sc=TRUE</code>. Allowed values: 1 &lt;= x</p></dd>
+<dd><p><code>int</code> Number of cores which should be used during the calculation of synthetic cases. Only relevant if <code>use_sc=TRUE</code>. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 </dl><p></p></div>

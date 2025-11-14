@@ -1527,14 +1527,14 @@ classifier$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
-  epochs = 500,
-  batch_size = 4,
+  epochs = 800,
+  batch_size = 32,
   trace = TRUE,
   ml_trace = 0,
   log_dir = NULL,
   log_write_interval = 10,
   n_cores = auto_n_cores(),
-  lr_rate = 1e-1,
+  lr_rate = 3e-2,
   lr_warm_up_ratio = 0.02,
   optimizer = "AdamW"
 )
@@ -1562,18 +1562,14 @@ The generalisation gap describes the observation that large batch sizes tend
 to poor generalisation performance on test datasets compared to models trained
 with a small batch size (Keskar et al., 2017 p. 3). 
 A study conducted by Masters and Luschi (2018) suggests ways to achieve good
-batch size. Their study shows that smaller batch sizes
-offer more stable and reliable training. Batch sizes
-between 4 and 32 lead to the best performance.
+batch size for using `"SGD"` as optimizer. Their study shows that smaller batch sizes
+offer more stable and reliable training and at the same time achieve better
+generalisation performance. Batch sizes between 4 and 32 lead to the best performance.
 
-Another important parameter that correlates with batch size is the learning rate (`lr_rate`). The study reported 
-by He, Liu et al. (2019) indicates that
-that the ratio of batch size to learning rate $(batch size)/(learning rate)$ should be as small as possible in order
-to achieve good generalisation performance. 
-
-Please note that there are exceptions to this rule. In the context of contrastive
+Please note that there are 
+exceptions to this rule. In the context of contrastive
 learning, higher batch sizes tend to generate better generalisation performance 
-(Chen et al., 2020).
+(Chen et al., 2020). For more details please refer to the vignette [04 Model configuration and training](model_configuration.html)
 
 Since training a neural net is energy consuming, *aifeducation* allows
 you to estimate its ecological impact with the help of the python
@@ -2013,7 +2009,7 @@ classifier_prototype$train(
   sustain_region = NULL,
   sustain_interval = 15,
   epochs = 1500,
-  batch_size = 4,
+  batch_size = 32,
   Ns = 10,
   Nq = 10,
   loss_alpha = 0.5,
@@ -2025,7 +2021,7 @@ classifier_prototype$train(
   log_dir = NULL,
   log_write_interval = 10,
   n_cores = auto_n_cores(),
-  lr_rate = 1e-3,
+  lr_rate = 3e-2,
   lr_warm_up_ratio = 0.02,
   optimizer = "AdamW"
 )
@@ -2407,8 +2403,6 @@ Training the extractor is identical to the other models in
 `data_embeddings` must be generated with the same `TextEmbeddingModel` as
 the embeddings provided during the configuration of your model.
 
-We set `batch_size = 32` and `lr_rate=1e-1` based on the work of He, Liu et al. (2019).
-
 ```{r feature_extractor$train, include = TRUE, eval=TRUE, results='hide'}
 feature_extractor$train(
   data_embeddings = review_embeddings,
@@ -2417,9 +2411,9 @@ feature_extractor$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
-  epochs = 500,
-  batch_size = 32,
-  lr_rate = 1e-3,
+  epochs = 800,
+  batch_size = 256,
+  lr_rate = 2.5e-1,
   trace = TRUE,
   ml_trace = 0,
   optimizer = "AdamW"
@@ -2517,7 +2511,7 @@ That is all. Now you can use and train the classifier in the same way as
 you did without a feature extractor. You even do not need to save and load the 
 feature extractor manually. This is done automatically for all classifiers.
 
-```{r, include = TRUE, eval=TRUE}
+```{r classifier_with_fe$train, include = TRUE, eval=TRUE}
 classifier_with_fe$train(
   data_embeddings = review_embeddings,
   data_targets = review_labels,
@@ -2539,14 +2533,14 @@ classifier_with_fe$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
-  epochs = 1000,
-  batch_size = 4,
+  epochs = 800,
+  batch_size = 32,
   trace = TRUE,
   ml_trace = 0,
   log_dir = NULL,
   log_write_interval = 10,
   n_cores = auto_n_cores(),
-  lr_rate = 1e-1,
+  lr_rate = 3e-2,
   lr_warm_up_ratio = 0.02,
   optimizer = "AdamW"
 )

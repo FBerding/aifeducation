@@ -168,13 +168,13 @@ named and has to use the same names as used in in the embeddings. .</p></dd>
 
 
 <dt><code>data_folds</code></dt>
-<dd><p><code>int</code> determining the number of cross-fold samples. Allowed values: 1 &lt;= x</p></dd>
+<dd><p><code>int</code> determining the number of cross-fold samples. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 <dt><code>data_val_size</code></dt>
 <dd><p><code>double</code> between 0 and 1, indicating the proportion of cases which should be
 used for the validation sample during the estimation of the model.
-The remaining cases are part of the training data. Allowed values: 0 &lt; x &lt; 1</p></dd>
+The remaining cases are part of the training data. Allowed values: \(0 &lt; x &lt; 1\)</p></dd>
 
 
 <dt><code>loss_balance_class_weights</code></dt>
@@ -201,11 +201,11 @@ If <code>FALSE</code> each sequences length has the weight 1.</p></dd>
 
 
 <dt><code>sc_min_k</code></dt>
-<dd><p><code>int</code> determining the minimal number of k which is used for creating synthetic units. Allowed values: 1 &lt;= x</p></dd>
+<dd><p><code>int</code> determining the minimal number of k which is used for creating synthetic units. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 <dt><code>sc_max_k</code></dt>
-<dd><p><code>int</code> determining the maximal number of k which is used for creating synthetic units. Allowed values: 1 &lt;= x</p></dd>
+<dd><p><code>int</code> determining the maximal number of k which is used for creating synthetic units. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 <dt><code>use_pl</code></dt>
@@ -213,19 +213,19 @@ If <code>FALSE</code> each sequences length has the weight 1.</p></dd>
 
 
 <dt><code>pl_max_steps</code></dt>
-<dd><p><code>int</code> determining the maximum number of steps during pseudo-labeling. Allowed values: 1 &lt;= x</p></dd>
+<dd><p><code>int</code> determining the maximum number of steps during pseudo-labeling. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 <dt><code>pl_max</code></dt>
-<dd><p><code>double</code> setting the maximal level of confidence for considering a case for pseudo-labeling. Allowed values: 0 &lt; x &lt;= 1</p></dd>
+<dd><p><code>double</code> setting the maximal level of confidence for considering a case for pseudo-labeling. Allowed values: \(0 &lt; x &lt;= 1\)</p></dd>
 
 
 <dt><code>pl_anchor</code></dt>
-<dd><p><code>double</code> indicating the reference point for sorting the new cases of every label. Allowed values: 0 &lt;= x &lt;= 1</p></dd>
+<dd><p><code>double</code> indicating the reference point for sorting the new cases of every label. Allowed values: \(0 &lt;= x &lt;= 1\)</p></dd>
 
 
 <dt><code>pl_min</code></dt>
-<dd><p><code>double</code> setting the mnimal level of confidence for considering a case for pseudo-labeling. Allowed values: 0 &lt;= x &lt; 1</p></dd>
+<dd><p><code>double</code> setting the mnimal level of confidence for considering a case for pseudo-labeling. Allowed values: \(0 &lt;= x &lt; 1\)</p></dd>
 
 
 <dt><code>sustain_track</code></dt>
@@ -244,7 +244,7 @@ codecarbon for more information. <a href="https://mlco2.github.io/codecarbon/par
 
 
 <dt><code>sustain_interval</code></dt>
-<dd><p><code>int</code> Interval in seconds for measuring power usage. Allowed values: 1 &lt;= x</p></dd>
+<dd><p><code>int</code> Interval in seconds for measuring power usage. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 <dt><code>sustain_log_level</code></dt>
@@ -252,11 +252,11 @@ codecarbon for more information. <a href="https://mlco2.github.io/codecarbon/par
 
 
 <dt><code>epochs</code></dt>
-<dd><p><code>int</code> Number of training epochs. Allowed values: 1 &lt;= x</p></dd>
+<dd><p><code>int</code> Number of training epochs. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 <dt><code>batch_size</code></dt>
-<dd><p><code>int</code> Size of the batches for training. Allowed values: 1 &lt;= x</p></dd>
+<dd><p><code>int</code> Size of the batches for training. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 <dt><code>trace</code></dt>
@@ -264,7 +264,7 @@ codecarbon for more information. <a href="https://mlco2.github.io/codecarbon/par
 
 
 <dt><code>ml_trace</code></dt>
-<dd><p><code>int</code> <code>ml_trace=0</code> does not print any information about the training process from pytorch on the console. Allowed values: 0 &lt;= x &lt;= 1</p></dd>
+<dd><p><code>int</code> <code>ml_trace=0</code> does not print any information about the training process from pytorch on the console. Allowed values: \(0 &lt;= x &lt;= 1\)</p></dd>
 
 
 <dt><code>log_dir</code></dt>
@@ -274,19 +274,19 @@ If no logging is desired set this argument to <code>NULL</code>. Allowed values:
 
 <dt><code>log_write_interval</code></dt>
 <dd><p><code>int</code> Time in seconds determining the interval in which the logger should try to update
-the log files. Only relevant if <code>log_dir</code> is not <code>NULL</code>. Allowed values: 1 &lt;= x</p></dd>
+the log files. Only relevant if <code>log_dir</code> is not <code>NULL</code>. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 <dt><code>n_cores</code></dt>
-<dd><p><code>int</code> Number of cores which should be used during the calculation of synthetic cases. Only relevant if <code>use_sc=TRUE</code>. Allowed values: 1 &lt;= x</p></dd>
+<dd><p><code>int</code> Number of cores which should be used during the calculation of synthetic cases. Only relevant if <code>use_sc=TRUE</code>. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 <dt><code>lr_rate</code></dt>
-<dd><p><code>double</code> Initial learning rate for the training. Allowed values: 0 &lt; x &lt;= 1</p></dd>
+<dd><p><code>double</code> Initial learning rate for the training. Allowed values: \(0 &lt; x &lt;= 1\)</p></dd>
 
 
 <dt><code>lr_warm_up_ratio</code></dt>
-<dd><p><code>double</code> Number of epochs used for warm up. Allowed values: 0 &lt; x &lt; 0.5</p></dd>
+<dd><p><code>double</code> Number of epochs used for warm up. Allowed values: \(0 &lt; x &lt; 0.5\)</p></dd>
 
 
 <dt><code>optimizer</code></dt>
