@@ -250,10 +250,14 @@ is the next step.
 *batch size* and *learning rate* 
 
 `batch_size` sets the number of cases to be processed
-simultaneously. It is a very important parameter with a significant impact
-on the model's performance due to the generalisation gap (Keskar et al., 2017 p. 2).
+simultaneously. Large batch sizes make use of the capacity of modern machines.
+This makes it possible to effectively train large models with large data sets, while saving computational time. 
+The `batch_size` is closely related to the learning rate as several studies shows.
+
+Although large batch sizes seem preferable for saving computational time, small batch sizes 
+lead to better performance due to the generalisation gap (Keskar et al., 2017 p. 2).
 The generalisation gap describes the observation that large batch sizes tend
-to poor generalisation performance on test datasets compared to models trained
+to poor generalisation performance on test data sets compared to models trained
 with a small batch size (Keskar et al., 2017 p. 3). 
 
 A study conducted by Masters and Luschi (2018) suggests ways to achieve good
@@ -262,14 +266,31 @@ offer more stable and reliable training and at the same time achieve better
 generalisation performance. Batch sizes
 between 4 and 32 lead to the best performance. Increasing the batch size also 
 reduces the range of learning rates that provide stable convergence (Masters & Luschi 2018, p. 18).
-Good values for the base learning rate for batch sizes between 4 and 32 are in the range of 
+Good values for the *base* learning rate ($\eta_{Base}$) for batch sizes between 4 and 32 are in the range of 
 $2^{-6}$ and $2^{-10}$ (Masters & Luschi 2018, p. 15). Similar results report He, Liu et al. (2019) showing that 
 the ratio of batch size to learning rate $(batch size)/(learning rate)$ should be 
 as small as possible in order to achieve good generalisation performance. 
 
+Goyal et al. (2017, p. 7) demonstrate that gradually increasing the learning rate at the beginning of training
+can help achieve the performance of training with small batch sizes, even when 
+using large batch sizes. In this approach, training begins with a small learning 
+rate that increases steadily until it reaches the target learning rate at a specific epoch. 
+After this, the regular learning rate scheduler is applied. 
+Masters and Luschi (2018, p. 11) corroborate this finding, 
+yet assert that optimal performance is still attained with small batch sizes. 
+They use about 5% of the epochs for the warm-up. 
 
+Marek et al. (2025, p. 6) demonstrate that small batch sizes are more robust to all of
+Adam's hyperparameters. 
 
-Based on these results we recommend to start with `batch_size=32` and `lr_rate=3e-2`.
+Based on these results we recommend to start with `batch_size=32`. For calculating
+the corresponding learning rate you first have to choose a base learning rate $\eta_{Base}$. Based 
+on the work by Masters and Luschi (2018) we recommend to set $\eta_{Base}=2^{-10}$.
+The learning rate to apply can now be calculated as $\eta=\eta_{Base}*batchsize$.
+For a batch size of 32 this is $\eta=2^{-10}*32=0.03125$. We set `lr_rate=3e-2`.
+Based on the work of Goyal et al. (2017), we recommend using the first 
+5% (`lr_warm_up_ratio = 0.05`) to 10 % (`lr_warm_up_ratio = 0.1`)
+of epochs for warum-up. 
 
 Please note that there are exceptions to this rule. In the context of contrastive
 learning, higher batch sizes tend to generate better generalisation performance 
@@ -322,6 +343,10 @@ P., Chen, D., & Winslett, M. (2021). Compressing Large-Scale
 Transformer-Based Models: A Case Study on BERT. Transactions of the
 Association for Computational Linguistics, 9, 1061–1080.
 <https://doi.org/10.1162/tacl_a_00413>
+
+Goyal, P., Dollár, P., Girshick, R., Noordhuis, P., Wesolowski, L., Kyrola, A., 
+Tulloch, A., Jia, Y. & He, K. (2017, 8. Juni). Accurate, Large Minibatch SGD:
+Training ImageNet in 1 Hour.
 
 Gowda, T., & May, J. (2020). Finding the Optimal Vocabulary Size for
 Neural Machine Translation. In T. Cohn, Y. He, & Y. Liu (Eds.), Findings

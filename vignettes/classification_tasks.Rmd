@@ -2010,8 +2010,8 @@ classifier_prototype$train(
   sustain_interval = 15,
   epochs = 1500,
   batch_size = 32,
-  Ns = 10,
-  Nq = 10,
+  Ns = 5,
+  Nq = 3,
   loss_alpha = 0.5,
   loss_margin = 0.05,
   sampling_separate = FALSE,
@@ -2412,11 +2412,12 @@ feature_extractor$train(
   sustain_region = NULL,
   sustain_interval = 15,
   epochs = 800,
-  batch_size = 256,
-  lr_rate = 2.5e-1,
+  batch_size = 32,
+  lr_rate = 3e-2,
   trace = TRUE,
   ml_trace = 0,
-  optimizer = "AdamW"
+  optimizer = "AdamW",
+  lr_warm_up_ratio = 0.10
 )
 ```
 
