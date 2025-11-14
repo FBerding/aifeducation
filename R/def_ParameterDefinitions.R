@@ -1070,7 +1070,7 @@ get_param_dict <- function() {
     allow_null = FALSE,
     min = NULL,
     max = NULL,
-    allowed_values = c("Adam", "RMSprop", "AdamW", "SGD"),
+    allowed_values = c("Adam", "RMSprop", "AdamW", "SGD","Muon"),
     desc = "determining the optimizer used for training.",
     gui_box = "General Settings",
     gui_label = "Optimizer",
