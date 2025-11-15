@@ -325,20 +325,27 @@ interface Aifeducation - Studio</a> for more details.</p>
 training settings is the next step.</p>
 <p><em>batch size</em> and <em>learning rate</em></p>
 <p><code>batch_size</code> sets the number of cases to be processed
-simultaneously. It is a very important parameter with a significant
-impact on the model’s performance due to the generalisation gap (Keskar
-et al., 2017 p. 2). The generalisation gap describes the observation
-that large batch sizes tend to poor generalisation performance on test
-datasets compared to models trained with a small batch size (Keskar et
-al., 2017 p. 3). A study conducted by Masters and Luschi (2018) suggests
-ways to achieve good batch size for using <code>"SGD"</code> as
-optimizer. Their study shows that smaller batch sizes offer more stable
-and reliable training and at the same time achieve better generalisation
-performance. Batch sizes between 4 and 32 lead to the best performance.
-Increasing the batch size also reduces the range of learning rates that
-provide stable convergence (Masters &amp; Luschi 2018, p. 18). Good
-values for the base learning rate for batch sizes between 4 and 32 are
-in the range of
+simultaneously. Large batch sizes make use of the capacity of modern
+machines. This makes it possible to effectively train large models with
+large data sets, while saving computational time. The
+<code>batch_size</code> is closely related to the learning rate as
+several studies shows.</p>
+<p>Although large batch sizes seem preferable for saving computational
+time, small batch sizes lead to better performance due to the
+generalisation gap (Keskar et al., 2017 p. 2). The generalisation gap
+describes the observation that large batch sizes tend to poor
+generalisation performance on test data sets compared to models trained
+with a small batch size (Keskar et al., 2017 p. 3).</p>
+<p>A study conducted by Masters and Luschi (2018) suggests ways to
+achieve good batch size for using <code>"SGD"</code> as optimizer. Their
+study shows that smaller batch sizes offer more stable and reliable
+training and at the same time achieve better generalisation performance.
+Batch sizes between 4 and 32 lead to the best performance. Increasing
+the batch size also reduces the range of learning rates that provide
+stable convergence (Masters &amp; Luschi 2018, p. 18). Good values for
+the <em>base</em> learning rate
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>η</mi><mrow><mi>B</mi><mi>a</mi><mi>s</mi><mi>e</mi></mrow></msub><annotation encoding="application/x-tex">\eta_{Base}</annotation></semantics></math>)
+for batch sizes between 4 and 32 are in the range of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>2</mn><mrow><mi>−</mi><mn>6</mn></mrow></msup><annotation encoding="application/x-tex">2^{-6}</annotation></semantics></math>
 and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>2</mn><mrow><mi>−</mi><mn>10</mn></mrow></msup><annotation encoding="application/x-tex">2^{-10}</annotation></semantics></math>
@@ -346,8 +353,32 @@ and
 al. (2019) showing that the ratio of batch size to learning rate
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>b</mi><mi>a</mi><mi>t</mi><mi>c</mi><mi>h</mi><mi>s</mi><mi>i</mi><mi>z</mi><mi>e</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>/</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>l</mi><mi>e</mi><mi>a</mi><mi>r</mi><mi>n</mi><mi>i</mi><mi>n</mi><mi>g</mi><mi>r</mi><mi>a</mi><mi>t</mi><mi>e</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">(batch size)/(learning rate)</annotation></semantics></math>
 should be as small as possible in order to achieve good generalisation
-performance. Based on these results we recommend to start with
-<code>batch_size=32</code> and <code>lr_rate=3e-2</code>.</p>
+performance.</p>
+<p>Goyal et al. (2017, p. 7) demonstrate that gradually increasing the
+learning rate at the beginning of training can help achieve the
+performance of training with small batch sizes, even when using large
+batch sizes. In this approach, training begins with a small learning
+rate that increases steadily until it reaches the target learning rate
+at a specific epoch. After this, the regular learning rate scheduler is
+applied. Masters and Luschi (2018, p. 11) corroborate this finding, yet
+assert that optimal performance is still attained with small batch
+sizes. They use about 5% of the epochs for the warm-up.</p>
+<p>Marek et al. (2025, p. 6) demonstrate that small batch sizes are more
+robust to all of Adam’s hyperparameters.</p>
+<p>Based on these results we recommend to start with
+<code>batch_size=32</code>. For calculating the corresponding learning
+rate you first have to choose a base learning rate
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>η</mi><mrow><mi>B</mi><mi>a</mi><mi>s</mi><mi>e</mi></mrow></msub><annotation encoding="application/x-tex">\eta_{Base}</annotation></semantics></math>.
+Based on the work by Masters and Luschi (2018) we recommend to set
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>η</mi><mrow><mi>B</mi><mi>a</mi><mi>s</mi><mi>e</mi></mrow></msub><mo>=</mo><msup><mn>2</mn><mrow><mi>−</mi><mn>10</mn></mrow></msup></mrow><annotation encoding="application/x-tex">\eta_{Base}=2^{-10}</annotation></semantics></math>.
+The learning rate to apply can now be calculated as
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>η</mi><mo>=</mo><msub><mi>η</mi><mrow><mi>B</mi><mi>a</mi><mi>s</mi><mi>e</mi></mrow></msub><mo>*</mo><mi>b</mi><mi>a</mi><mi>t</mi><mi>c</mi><mi>h</mi><mi>s</mi><mi>i</mi><mi>z</mi><mi>e</mi></mrow><annotation encoding="application/x-tex">\eta=\eta_{Base}*batchsize</annotation></semantics></math>.
+For a batch size of 32 this is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>η</mi><mo>=</mo><msup><mn>2</mn><mrow><mi>−</mi><mn>10</mn></mrow></msup><mo>*</mo><mn>32</mn><mo>=</mo><mn>0.03125</mn></mrow><annotation encoding="application/x-tex">\eta=2^{-10}*32=0.03125</annotation></semantics></math>.
+We set <code>lr_rate=3e-2</code>. Based on the work of Goyal et
+al. (2017), we recommend using the first 5%
+(<code>lr_warm_up_ratio = 0.05</code>) to 10 %
+(<code>lr_warm_up_ratio = 0.1</code>) of epochs for warum-up.</p>
 <p>Please note that there are exceptions to this rule. In the context of
 contrastive learning, higher batch sizes tend to generate better
 generalisation performance (Chen et al., 2020).</p>
@@ -390,6 +421,9 @@ American Chapter. Meeting, 2021, 4515–4532. <a href="https://doi.org/10.18653/
 Nakov, P., Chen, D., &amp; Winslett, M. (2021). Compressing Large-Scale
 Transformer-Based Models: A Case Study on BERT. Transactions of the
 Association for Computational Linguistics, 9, 1061–1080. <a href="https://doi.org/10.1162/tacl_a_00413" class="external-link uri">https://doi.org/10.1162/tacl_a_00413</a></p>
+<p>Goyal, P., Dollár, P., Girshick, R., Noordhuis, P., Wesolowski, L.,
+Kyrola, A., Tulloch, A., Jia, Y. &amp; He, K. (2017, 8. Juni). Accurate,
+Large Minibatch SGD: Training ImageNet in 1 Hour.</p>
 <p>Gowda, T., &amp; May, J. (2020). Finding the Optimal Vocabulary Size
 for Neural Machine Translation. In T. Cohn, Y. He, &amp; Y. Liu (Eds.),
 Findings of the Association for Computational Linguistics: EMNLP 2020

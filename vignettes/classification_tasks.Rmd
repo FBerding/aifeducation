@@ -1535,7 +1535,7 @@ classifier$train(
   log_write_interval = 10,
   n_cores = auto_n_cores(),
   lr_rate = 3e-2,
-  lr_warm_up_ratio = 0.02,
+  lr_warm_up_ratio = 0.10,
   optimizer = "AdamW"
 )
 ```
@@ -2008,7 +2008,7 @@ classifier_prototype$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
-  epochs = 1500,
+  epochs = 800,
   batch_size = 32,
   Ns = 5,
   Nq = 3,
@@ -2022,7 +2022,7 @@ classifier_prototype$train(
   log_write_interval = 10,
   n_cores = auto_n_cores(),
   lr_rate = 3e-2,
-  lr_warm_up_ratio = 0.02,
+  lr_warm_up_ratio = 0.10,
   optimizer = "AdamW"
 )
 ```
@@ -2412,8 +2412,8 @@ feature_extractor$train(
   sustain_region = NULL,
   sustain_interval = 15,
   epochs = 800,
-  batch_size = 32,
-  lr_rate = 3e-2,
+  batch_size = 64,
+  lr_rate = 6e-2,
   trace = TRUE,
   ml_trace = 0,
   optimizer = "AdamW",
@@ -2542,7 +2542,7 @@ classifier_with_fe$train(
   log_write_interval = 10,
   n_cores = auto_n_cores(),
   lr_rate = 3e-2,
-  lr_warm_up_ratio = 0.02,
+  lr_warm_up_ratio = 0.10,
   optimizer = "AdamW"
 )
 ```

@@ -303,14 +303,14 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     optimizer=torch.optim.AdamW(lr=lr_rate,params=model.parameters())
   elif optimizer_method=="SGD":
     optimizer=torch.optim.SGD(params=model.parameters(), lr=lr_rate, momentum=0.90, dampening=0, weight_decay=0, nesterov=False, maximize=False, foreach=None, differentiable=False, fused=None)
-  elif optimizer_method="Muon":
+  elif optimizer_method=="Muon":
     optimizer=torch.optim.Muon(params==model.parameters(), lr=lr_rate, weight_decay=0.1, momentum=0.95, nesterov=True, ns_coefficients=(3.4445, -4.775, 2.0315), eps=1e-07, ns_steps=5, adjust_lr_fn=None)
 
   warm_up_steps=math.floor(epochs*lr_warm_up_ratio)
   main_steps=epochs-warm_up_steps
   scheduler_warm_up = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1e-9,end_factor=1, total_iters=warm_up_steps)
-  #scheduler_main=torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1,end_factor=0, total_iters=main_steps)
-  scheduler_main=torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.95,last_epoch=-1)
+  scheduler_main=torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1,end_factor=0.90, total_iters=main_steps)
+  #scheduler_main=torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.95,last_epoch=-1)
   scheduler = torch.optim.lr_scheduler.SequentialLR(schedulers = [scheduler_warm_up, scheduler_main], optimizer=optimizer,milestones=[warm_up_steps])
  
   loss_fct=torch.nn.MSELoss()
