@@ -775,8 +775,8 @@ documentation of <code>codecarbon</code> for more information.</p>
 <span>  sustain_interval <span class="op">=</span> <span class="fl">15</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:12:26 Start Sustainability Tracking</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:12:29 Stop Sustainability Tracking</span></span></code></pre></div>
+<span><span class="co">#&gt; 2025-11-15 11:06:22 Start Sustainability Tracking</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:06:25 Stop Sustainability Tracking</span></span></code></pre></div>
 <p>Training a tokenizer is a very fast process. Thus, even for a huge
 number of texts the computations should take only some minutes.</p>
 <p>Now the model is ready to use. At the beginning we can explore some
@@ -786,7 +786,7 @@ tokenizer statistics.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">tokenizer</span><span class="op">$</span><span class="fu">get_tokenizer_statistics</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                   [,1]                 </span></span>
 <span><span class="co">#&gt; step              "creation"           </span></span>
-<span><span class="co">#&gt; date              "2025-11-15 07:12:29"</span></span>
+<span><span class="co">#&gt; date              "2025-11-15 11:06:25"</span></span>
 <span><span class="co">#&gt; max_tokens_length "512"                </span></span>
 <span><span class="co">#&gt; n_sequences       "653"                </span></span>
 <span><span class="co">#&gt; n_words           "90195"              </span></span>
@@ -891,7 +891,7 @@ tokens and adds some special tokens.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span>
 <span><span class="co">#&gt; [[1]][[1]]</span></span>
-<span><span class="co">#&gt;   [1]   0  53 110 174 188  61  67 101 101 100  73 101 113 105  96  17   1   3</span></span>
+<span><span class="co">#&gt;   [1]   0  53 106 174 188  61  67 105 105 107  73 105 116 102  96  17   1   3</span></span>
 <span><span class="co">#&gt;  [19]   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3</span></span>
 <span><span class="co">#&gt;  [37]   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3</span></span>
 <span><span class="co">#&gt;  [55]   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3</span></span>
@@ -934,7 +934,7 @@ tokens belong to these numbers you can call the method
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span>
 <span><span class="co">#&gt; [[1]][[1]]</span></span>
-<span><span class="co">#&gt; [1] "[CLS] T ##g ##is is a g ##a ##a ##s m ##a ##h ##t ##o . [SEP]"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "[CLS] T ##f ##is is a g ##m ##m ##l m ##m ##w ##r ##t . [SEP]"</span></span></code></pre></div>
 <p>If you would like to analyse the ecological impact of training the
 tokenizer you can get an estimation of energy consumption and
 CO2-emission.</p>
@@ -943,14 +943,14 @@ CO2-emission.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">tokenizer</span><span class="op">$</span><span class="fu">get_sustainability_data</span><span class="op">(</span><span class="st">"training"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                                      [,1]                                  </span></span>
 <span><span class="co">#&gt; sustainability_tracked               "TRUE"                                </span></span>
-<span><span class="co">#&gt; date                                 "2025-11-15 07:12:29"                 </span></span>
+<span><span class="co">#&gt; date                                 "2025-11-15 11:06:25"                 </span></span>
 <span><span class="co">#&gt; task                                 "Create tokenizer"                    </span></span>
-<span><span class="co">#&gt; sustainability_data.duration_sec     "1.76349"                             </span></span>
-<span><span class="co">#&gt; sustainability_data.co2eq_kg         "1.254212e-05"                        </span></span>
-<span><span class="co">#&gt; sustainability_data.cpu_energy_kwh   "2.080319e-05"                        </span></span>
-<span><span class="co">#&gt; sustainability_data.gpu_energy_kwh   "7.225561e-06"                        </span></span>
-<span><span class="co">#&gt; sustainability_data.ram_energy_kwh   "4.894526e-06"                        </span></span>
-<span><span class="co">#&gt; sustainability_data.total_energy_kwh "3.292328e-05"                        </span></span>
+<span><span class="co">#&gt; sustainability_data.duration_sec     "1.719763"                            </span></span>
+<span><span class="co">#&gt; sustainability_data.co2eq_kg         "1.211127e-05"                        </span></span>
+<span><span class="co">#&gt; sustainability_data.cpu_energy_kwh   "2.028717e-05"                        </span></span>
+<span><span class="co">#&gt; sustainability_data.gpu_energy_kwh   "6.73195e-06"                         </span></span>
+<span><span class="co">#&gt; sustainability_data.ram_energy_kwh   "4.773161e-06"                        </span></span>
+<span><span class="co">#&gt; sustainability_data.total_energy_kwh "3.179228e-05"                        </span></span>
 <span><span class="co">#&gt; technical.tracker                    "codecarbon"                          </span></span>
 <span><span class="co">#&gt; technical.py_package_version         "3.0.7"                               </span></span>
 <span><span class="co">#&gt; technical.cpu_count                  "12"                                  </span></span>
@@ -1053,15 +1053,15 @@ language or task, you can call the corresponding
 <span>  log_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  log_write_interval <span class="op">=</span> <span class="fl">2</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:12:30 Start Sustainability Tracking</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:12:32 Prepare Data for Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:12:32 Calculate Flops Based on Architecture</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:12:33 Create Data Collator</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:12:33 Create Trainer</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:12:33 Using Whole Word Masking</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:12:33 Start Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:13:01 Stop Sustainability Tracking</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:13:01 Finish</span></span></code></pre></div>
+<span><span class="co">#&gt; 2025-11-15 11:06:26 Start Sustainability Tracking</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:06:27 Prepare Data for Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:06:28 Calculate Flops Based on Architecture</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:06:28 Create Data Collator</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:06:28 Create Trainer</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:06:28 Using Whole Word Masking</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:06:28 Start Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:06:59 Stop Sustainability Tracking</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:06:59 Finish</span></span></code></pre></div>
 <p>The data for training must be passed to <code>text_dataset</code>.
 This object should be of class <code>LargeDataSetForText</code> as
 described in section 2.2.2. In this example we use the text from the
@@ -1115,11 +1115,11 @@ memory capacity, please reduce the batch size significantly.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span>
 <span><span class="co">#&gt;        score token token_str</span></span>
-<span><span class="co">#&gt; 1 0.07007907    96       ##e</span></span>
-<span><span class="co">#&gt; 2 0.03411167    99       ##t</span></span>
-<span><span class="co">#&gt; 3 0.03394995   112       ##s</span></span>
-<span><span class="co">#&gt; 4 0.03302523   101       ##o</span></span>
-<span><span class="co">#&gt; 5 0.02860533   105       ##i</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 0.06152016    96       ##e</span></span>
+<span><span class="co">#&gt; 2 0.03680748   101       ##t</span></span>
+<span><span class="co">#&gt; 3 0.03289335   100       ##s</span></span>
+<span><span class="co">#&gt; 4 0.03154407   105       ##o</span></span>
+<span><span class="co">#&gt; 5 0.02799465   106       ##h</span></span></code></pre></div>
 <p>Here you can provide a text with a mask token indicating the gab the
 model should close. As a result you get the logits, the token id and the
 concrete token the model suggests to replace the mask token with.</p>
@@ -1149,14 +1149,14 @@ model you can call <code>get_sustainability_data("training")</code>.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">base_model</span><span class="op">$</span><span class="fu">get_sustainability_data</span><span class="op">(</span><span class="st">"training"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                                      [,1]                                  </span></span>
 <span><span class="co">#&gt; sustainability_tracked               "TRUE"                                </span></span>
-<span><span class="co">#&gt; date                                 "2025-11-15 07:13:01"                 </span></span>
+<span><span class="co">#&gt; date                                 "2025-11-15 11:06:59"                 </span></span>
 <span><span class="co">#&gt; task                                 "training"                            </span></span>
-<span><span class="co">#&gt; sustainability_data.duration_sec     "29.80563"                            </span></span>
-<span><span class="co">#&gt; sustainability_data.co2eq_kg         "0.0002610271"                        </span></span>
-<span><span class="co">#&gt; sustainability_data.cpu_energy_kwh   "0.000351843"                         </span></span>
-<span><span class="co">#&gt; sustainability_data.gpu_energy_kwh   "0.0002505716"                        </span></span>
-<span><span class="co">#&gt; sustainability_data.ram_energy_kwh   "8.278592e-05"                        </span></span>
-<span><span class="co">#&gt; sustainability_data.total_energy_kwh "0.0006852005"                        </span></span>
+<span><span class="co">#&gt; sustainability_data.duration_sec     "31.8707"                             </span></span>
+<span><span class="co">#&gt; sustainability_data.co2eq_kg         "0.00026111"                          </span></span>
+<span><span class="co">#&gt; sustainability_data.cpu_energy_kwh   "0.0003762074"                        </span></span>
+<span><span class="co">#&gt; sustainability_data.gpu_energy_kwh   "0.000220693"                         </span></span>
+<span><span class="co">#&gt; sustainability_data.ram_energy_kwh   "8.851774e-05"                        </span></span>
+<span><span class="co">#&gt; sustainability_data.total_energy_kwh "0.0006854181"                        </span></span>
 <span><span class="co">#&gt; technical.tracker                    "codecarbon"                          </span></span>
 <span><span class="co">#&gt; technical.py_package_version         "3.0.7"                               </span></span>
 <span><span class="co">#&gt; technical.cpu_count                  "12"                                  </span></span>
@@ -1183,10 +1183,10 @@ estimate the ecological impact by calling the method
 <span>  sustain_interval <span class="op">=</span> <span class="fl">15</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:13:02 Prepare Data</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:13:02 Add Masking Token</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:13:02 Start Sustainability Tracking</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:13:04 Stop Sustainability Tracking</span></span></code></pre></div>
+<span><span class="co">#&gt; 2025-11-15 11:07:00 Prepare Data</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:07:00 Add Masking Token</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:07:00 Start Sustainability Tracking</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:07:02 Stop Sustainability Tracking</span></span></code></pre></div>
 <p>Here can you provide a text data set which forms the base for
 estimating the energy conspumtion during a fill-mask task. With
 <code>n</code> you determine the number of texts to be used.</p>
@@ -1197,14 +1197,14 @@ estimating the energy conspumtion during a fill-mask task. With
 <span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">base_model</span><span class="op">$</span><span class="fu">get_sustainability_data</span><span class="op">(</span><span class="st">"inference"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                                      [,1]                                  </span></span>
 <span><span class="co">#&gt; sustainability_tracked               "TRUE"                                </span></span>
-<span><span class="co">#&gt; date                                 "2025-11-15 07:13:04"                 </span></span>
+<span><span class="co">#&gt; date                                 "2025-11-15 11:07:02"                 </span></span>
 <span><span class="co">#&gt; task                                 "FillMask"                            </span></span>
-<span><span class="co">#&gt; sustainability_data.duration_sec     "0.5821151"                           </span></span>
-<span><span class="co">#&gt; sustainability_data.co2eq_kg         "4.329985e-06"                        </span></span>
-<span><span class="co">#&gt; sustainability_data.cpu_energy_kwh   "6.857485e-06"                        </span></span>
-<span><span class="co">#&gt; sustainability_data.gpu_energy_kwh   "2.895558e-06"                        </span></span>
-<span><span class="co">#&gt; sustainability_data.ram_energy_kwh   "1.613239e-06"                        </span></span>
-<span><span class="co">#&gt; sustainability_data.total_energy_kwh "1.136628e-05"                        </span></span>
+<span><span class="co">#&gt; sustainability_data.duration_sec     "0.5512352"                           </span></span>
+<span><span class="co">#&gt; sustainability_data.co2eq_kg         "4.112369e-06"                        </span></span>
+<span><span class="co">#&gt; sustainability_data.cpu_energy_kwh   "6.4931e-06"                          </span></span>
+<span><span class="co">#&gt; sustainability_data.gpu_energy_kwh   "2.774447e-06"                        </span></span>
+<span><span class="co">#&gt; sustainability_data.ram_energy_kwh   "1.527489e-06"                        </span></span>
+<span><span class="co">#&gt; sustainability_data.total_energy_kwh "1.079504e-05"                        </span></span>
 <span><span class="co">#&gt; technical.tracker                    "codecarbon"                          </span></span>
 <span><span class="co">#&gt; technical.py_package_version         "3.0.7"                               </span></span>
 <span><span class="co">#&gt; technical.cpu_count                  "12"                                  </span></span>
@@ -1230,7 +1230,7 @@ These are estimated during every training run. With
 <code class="sourceCode R"><span><span class="co"># We use t() to improve the readability of the table</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">base_model</span><span class="op">$</span><span class="fu">get_flops_estimates</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;               [,1]                 </span></span>
-<span><span class="co">#&gt; date          "2025-11-15 07:12:33"</span></span>
+<span><span class="co">#&gt; date          "2025-11-15 11:06:28"</span></span>
 <span><span class="co">#&gt; approach      "architecture-based" </span></span>
 <span><span class="co">#&gt; package       "calflops"           </span></span>
 <span><span class="co">#&gt; version       "0.3.2"              </span></span>
@@ -1416,16 +1416,16 @@ we can use the movie reviews as raw texts.</p>
 <span>  text_dataset <span class="op">=</span> <span class="va">data_set_reviews_text</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:13:06 Batch 1 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 07:13:07 Batch 2 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 07:13:08 Batch 3 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 07:13:08 Batch 4 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 07:13:09 Batch 5 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 07:13:10 Batch 6 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 07:13:10 Batch 7 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 07:13:11 Batch 8 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 07:13:12 Batch 9 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 07:13:12 Batch 10 / 10 done</span></span></code></pre></div>
+<span><span class="co">#&gt; 2025-11-15 11:07:03 Batch 1 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:07:04 Batch 2 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:07:04 Batch 3 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:07:05 Batch 4 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:07:06 Batch 5 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:07:07 Batch 6 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:07:07 Batch 7 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:07:08 Batch 8 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:07:09 Batch 9 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:07:09 Batch 10 / 10 done</span></span></code></pre></div>
 <p>The method <code>embed_large</code>creates an object of class
 <code>LargeDataSetForTextEmbeddings</code>. This is just a data set
 consisting of the embeddings of every text. The embeddings are an array,
@@ -1684,7 +1684,7 @@ of a new classifier may look like:</p>
 <span>  ng_conv_residual_type <span class="op">=</span> <span class="st">"ResidualGate"</span>,</span>
 <span>  dense_act_fct <span class="op">=</span> <span class="st">"ELU"</span>,</span>
 <span>  dense_n_layers <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  dense_dropout <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  dense_dropout <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  dense_bias <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  dense_parametrizations <span class="op">=</span> <span class="st">"None"</span>,</span>
 <span>  dense_normalization_type <span class="op">=</span> <span class="st">"LayerNorm"</span>,</span>
@@ -1832,33 +1832,33 @@ training.</p>
 <span>  lr_warm_up_ratio <span class="op">=</span> <span class="fl">0.10</span>,</span>
 <span>  optimizer <span class="op">=</span> <span class="st">"AdamW"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:13:17 Total Cases: 300 Unique Cases: 300 Labeled Cases: 225</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:13:17 Start</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:13:17 Start Sustainability Tracking</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:13:19 | Iteration 1 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:13:19 | Iteration 1 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:13:46 | Iteration 2 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:13:46 | Iteration 2 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:14:04 | Iteration 3 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:14:04 | Iteration 3 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:14:24 | Iteration 4 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:14:24 | Iteration 4 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:14:43 | Iteration 5 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:14:43 | Iteration 5 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:15:15 | Iteration 6 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:15:15 | Iteration 6 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:15:36 | Iteration 7 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:15:36 | Iteration 7 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:16:07 | Iteration 8 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:16:07 | Iteration 8 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:16:34 | Iteration 9 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:16:34 | Iteration 9 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:16:58 | Iteration 10 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:16:58 | Iteration 10 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:17:24 | Final training</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:17:24 | Final training | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:17:58 Stop Sustainability Tracking</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:17:58 Training Complete</span></span></code></pre></div>
+<span><span class="co">#&gt; 2025-11-15 11:07:11 Total Cases: 300 Unique Cases: 300 Labeled Cases: 225</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:07:11 Start</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:07:11 Start Sustainability Tracking</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:07:12 | Iteration 1 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:07:12 | Iteration 1 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:07:35 | Iteration 2 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:07:35 | Iteration 2 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:08:04 | Iteration 3 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:08:04 | Iteration 3 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:08:23 | Iteration 4 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:08:23 | Iteration 4 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:08:39 | Iteration 5 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:08:39 | Iteration 5 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:09:12 | Iteration 6 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:09:12 | Iteration 6 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:09:33 | Iteration 7 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:09:33 | Iteration 7 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:09:49 | Iteration 8 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:09:49 | Iteration 8 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:10:08 | Iteration 9 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:10:08 | Iteration 9 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:10:51 | Iteration 10 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:10:51 | Iteration 10 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:11:10 | Final training</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:11:10 | Final training | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:12:20 Stop Sustainability Tracking</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:12:20 Training Complete</span></span></code></pre></div>
 <p>You can further modify the training process with different arguments.
 With <code>loss_balance_class_weights=TRUE</code> the absolute
 frequencies of the classes/categories are adjusted according to the
@@ -2051,21 +2051,21 @@ be:</p>
 <div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">classifier</span><span class="op">$</span><span class="va">reliability</span><span class="op">$</span><span class="va">test_metric_mean</span></span>
 <span><span class="co">#&gt;           iota_index            min_iota2            avg_iota2 </span></span>
-<span><span class="co">#&gt;            0.5689723            0.5259740            0.6197816 </span></span>
+<span><span class="co">#&gt;            0.5731225            0.5213853            0.6203203 </span></span>
 <span><span class="co">#&gt;            max_iota2            min_alpha            avg_alpha </span></span>
-<span><span class="co">#&gt;            0.7135892            0.6700000            0.7611310 </span></span>
+<span><span class="co">#&gt;            0.7192552            0.6627381            0.7579762 </span></span>
 <span><span class="co">#&gt;            max_alpha    static_iota_index   dynamic_iota_index </span></span>
-<span><span class="co">#&gt;            0.8522619            0.2210749            0.4835479 </span></span>
+<span><span class="co">#&gt;            0.8532143            0.2139127            0.4848832 </span></span>
 <span><span class="co">#&gt;       kalpha_nominal       kalpha_ordinal              kendall </span></span>
-<span><span class="co">#&gt;            0.5156794            0.5156794            0.7597964 </span></span>
+<span><span class="co">#&gt;            0.5195264            0.5195264            0.7599044 </span></span>
 <span><span class="co">#&gt;   c_kappa_unweighted       c_kappa_linear      c_kappa_squared </span></span>
-<span><span class="co">#&gt;            0.5094739            0.5094739            0.5094739 </span></span>
+<span><span class="co">#&gt;            0.5116398            0.5116398            0.5116398 </span></span>
 <span><span class="co">#&gt;         kappa_fleiss percentage_agreement    balanced_accuracy </span></span>
-<span><span class="co">#&gt;            0.5046725            0.7778656            0.7611310 </span></span>
+<span><span class="co">#&gt;            0.5085811            0.7820158            0.7579762 </span></span>
 <span><span class="co">#&gt;     gwet_ac1_nominal      gwet_ac2_linear   gwet_ac2_quadratic </span></span>
-<span><span class="co">#&gt;            0.5951573            0.5951573            0.5951573 </span></span>
+<span><span class="co">#&gt;            0.6059171            0.6059171            0.6059171 </span></span>
 <span><span class="co">#&gt;        avg_precision           avg_recall               avg_f1 </span></span>
-<span><span class="co">#&gt;            0.7606214            0.7611310            0.7523362</span></span></code></pre></div>
+<span><span class="co">#&gt;            0.7648241            0.7579762            0.7542905</span></span></code></pre></div>
 <p>An addition, standard measures from machine learning are reported.
 These are</p>
 <ul>
@@ -2077,8 +2077,8 @@ These are</p>
 <div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">classifier</span><span class="op">$</span><span class="va">reliability</span><span class="op">$</span><span class="va">standard_measures_mean</span></span>
 <span><span class="co">#&gt;     precision    recall        f1</span></span>
-<span><span class="co">#&gt; neg 0.6670491 0.7089286 0.6755469</span></span>
-<span><span class="co">#&gt; pos 0.8541938 0.8133333 0.8291255</span></span></code></pre></div>
+<span><span class="co">#&gt; neg 0.6819697 0.6892857 0.6745681</span></span>
+<span><span class="co">#&gt; pos 0.8476786 0.8266667 0.8340130</span></span></code></pre></div>
 <p>Finally, you can plot a coding stream scheme showing how the cases of
 different classes are labeled.</p>
 <div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
@@ -2104,14 +2104,14 @@ tracker, you can receive information on sustainability by calling
 <span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">classifier</span><span class="op">$</span><span class="fu">get_sustainability_data</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                                      [,1]                                  </span></span>
 <span><span class="co">#&gt; sustainability_tracked               "TRUE"                                </span></span>
-<span><span class="co">#&gt; date                                 "2025-11-15 07:17:58"                 </span></span>
+<span><span class="co">#&gt; date                                 "2025-11-15 11:12:20"                 </span></span>
 <span><span class="co">#&gt; task                                 NA                                    </span></span>
-<span><span class="co">#&gt; sustainability_data.duration_sec     "279.1397"                            </span></span>
-<span><span class="co">#&gt; sustainability_data.co2eq_kg         "0.003518853"                         </span></span>
-<span><span class="co">#&gt; sustainability_data.cpu_energy_kwh   "0.003295147"                         </span></span>
-<span><span class="co">#&gt; sustainability_data.gpu_energy_kwh   "0.005166577"                         </span></span>
-<span><span class="co">#&gt; sustainability_data.ram_energy_kwh   "0.0007753221"                        </span></span>
-<span><span class="co">#&gt; sustainability_data.total_energy_kwh "0.009237046"                         </span></span>
+<span><span class="co">#&gt; sustainability_data.duration_sec     "308.2946"                            </span></span>
+<span><span class="co">#&gt; sustainability_data.co2eq_kg         "0.003930137"                         </span></span>
+<span><span class="co">#&gt; sustainability_data.cpu_energy_kwh   "0.003639278"                         </span></span>
+<span><span class="co">#&gt; sustainability_data.gpu_energy_kwh   "0.005821102"                         </span></span>
+<span><span class="co">#&gt; sustainability_data.ram_energy_kwh   "0.0008562935"                        </span></span>
+<span><span class="co">#&gt; sustainability_data.total_energy_kwh "0.01031667"                          </span></span>
 <span><span class="co">#&gt; technical.tracker                    "codecarbon"                          </span></span>
 <span><span class="co">#&gt; technical.py_package_version         "3.0.7"                               </span></span>
 <span><span class="co">#&gt; technical.cpu_count                  "12"                                  </span></span>
@@ -2158,16 +2158,16 @@ our example classifier, we use our BERT model.</p>
 <span>  text_dataset <span class="op">=</span> <span class="va">data_set_reviews_text</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:18:02 Batch 1 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 07:18:03 Batch 2 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 07:18:03 Batch 3 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 07:18:04 Batch 4 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 07:18:05 Batch 5 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 07:18:05 Batch 6 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 07:18:06 Batch 7 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 07:18:07 Batch 8 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 07:18:07 Batch 9 / 10 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 07:18:08 Batch 10 / 10 done</span></span></code></pre></div>
+<span><span class="co">#&gt; 2025-11-15 11:12:24 Batch 1 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:12:25 Batch 2 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:12:26 Batch 3 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:12:27 Batch 4 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:12:27 Batch 5 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:12:28 Batch 6 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:12:29 Batch 7 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:12:30 Batch 8 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:12:30 Batch 9 / 10 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:12:31 Batch 10 / 10 done</span></span></code></pre></div>
 <p>To transform raw texts into a numeric representation just pass the
 raw texts to the method <code>embed_large</code> of the loaded model.
 The raw texts should be an object of class
@@ -2188,19 +2188,19 @@ together with an estimate of certainty for each class/category.</p>
 <span></span>
 <span><span class="co"># Show predicted categories</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">predicted_categories</span><span class="op">)</span></span>
-<span><span class="co">#&gt;             neg         pos expected_category</span></span>
-<span><span class="co">#&gt; 11329 0.7732341 0.226765929               neg</span></span>
-<span><span class="co">#&gt; 10460 0.9932501 0.006749931               neg</span></span>
-<span><span class="co">#&gt; 10536 0.9845950 0.015405047               neg</span></span>
-<span><span class="co">#&gt; 12035 0.8344927 0.165507291               neg</span></span>
-<span><span class="co">#&gt; 7267  0.2157525 0.784247546               pos</span></span>
-<span><span class="co">#&gt; 4761  0.9413051 0.058694948               neg</span></span>
+<span><span class="co">#&gt;             neg       pos expected_category</span></span>
+<span><span class="co">#&gt; 11329 0.5244889 0.4755111               neg</span></span>
+<span><span class="co">#&gt; 10460 0.6778606 0.3221394               neg</span></span>
+<span><span class="co">#&gt; 10536 0.6850005 0.3149995               neg</span></span>
+<span><span class="co">#&gt; 12035 0.5356404 0.4643596               neg</span></span>
+<span><span class="co">#&gt; 7267  0.5236436 0.4763564               neg</span></span>
+<span><span class="co">#&gt; 4761  0.6880851 0.3119149               neg</span></span>
 <span></span>
 <span><span class="co"># Count frequencies</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">predicted_categories</span><span class="op">$</span><span class="va">expected_category</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; neg pos </span></span>
-<span><span class="co">#&gt;  97 203</span></span></code></pre></div>
+<span><span class="co">#&gt; 122 178</span></span></code></pre></div>
 <p>After the classifier finishes the prediction, the estimated
 categories/classes are stored as <code>predicted_categories</code>. This
 object is a <code>data.frame</code> containing texts’ IDs in the rows
@@ -2297,7 +2297,7 @@ classifier.</p>
 <span>  ng_conv_residual_type <span class="op">=</span> <span class="st">"ResidualGate"</span>,</span>
 <span>  dense_act_fct <span class="op">=</span> <span class="st">"ELU"</span>,</span>
 <span>  dense_n_layers <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  dense_dropout <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  dense_dropout <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  dense_bias <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  dense_parametrizations <span class="op">=</span> <span class="st">"None"</span>,</span>
 <span>  dense_normalization_type <span class="op">=</span> <span class="st">"LayerNorm"</span>,</span>
@@ -2393,33 +2393,33 @@ structure. Let us see how this changes when we train the model.</p>
 <span>  lr_warm_up_ratio <span class="op">=</span> <span class="fl">0.10</span>,</span>
 <span>  optimizer <span class="op">=</span> <span class="st">"AdamW"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:18:09 Total Cases: 300 Unique Cases: 300 Labeled Cases: 225</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:18:09 Start</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:18:09 Start Sustainability Tracking</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:18:11 | Iteration 1 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:18:11 | Iteration 1 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:22:15 | Iteration 2 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:22:15 | Iteration 2 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:30:34 | Iteration 3 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:30:34 | Iteration 3 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:33:10 | Iteration 4 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:33:10 | Iteration 4 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:41:23 | Iteration 5 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:41:23 | Iteration 5 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:46:02 | Iteration 6 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:46:02 | Iteration 6 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:50:58 | Iteration 7 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:50:58 | Iteration 7 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:55:40 | Iteration 8 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 07:55:40 | Iteration 8 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 08:03:49 | Iteration 9 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 08:03:49 | Iteration 9 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 08:06:08 | Iteration 10 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 08:06:08 | Iteration 10 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 08:14:21 | Final training</span></span>
-<span><span class="co">#&gt; 2025-11-15 08:14:21 | Final training | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 08:23:23 Stop Sustainability Tracking</span></span>
-<span><span class="co">#&gt; 2025-11-15 08:23:23 Training Complete</span></span></code></pre></div>
+<span><span class="co">#&gt; 2025-11-15 11:12:32 Total Cases: 300 Unique Cases: 300 Labeled Cases: 225</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:12:32 Start</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:12:32 Start Sustainability Tracking</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:12:34 | Iteration 1 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:12:34 | Iteration 1 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:12:57 | Iteration 2 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:12:57 | Iteration 2 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:13:22 | Iteration 3 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:13:22 | Iteration 3 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:13:42 | Iteration 4 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:13:42 | Iteration 4 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:14:08 | Iteration 5 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:14:08 | Iteration 5 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:14:30 | Iteration 6 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:14:30 | Iteration 6 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:14:48 | Iteration 7 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:14:48 | Iteration 7 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:15:15 | Iteration 8 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:15:15 | Iteration 8 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:15:37 | Iteration 9 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:15:37 | Iteration 9 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:16:03 | Iteration 10 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:16:03 | Iteration 10 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:24:17 | Final training</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:24:17 | Final training | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:24:35 Stop Sustainability Tracking</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:24:35 Training Complete</span></span></code></pre></div>
 <p>While there are no arguments for requesting a balance of the class
 weights (<code>loss_balance_class_weights</code>) or balancing the
 sequence length (<code>loss_balance_sequence_length</code>), four new
@@ -2601,26 +2601,26 @@ including unlabeled cases
 <div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">classifier_prototype</span><span class="op">$</span><span class="va">reliability</span><span class="op">$</span><span class="va">test_metric_mean</span></span>
 <span><span class="co">#&gt;           iota_index            min_iota2            avg_iota2 </span></span>
-<span><span class="co">#&gt;            0.4818182            0.4827704            0.5593440 </span></span>
+<span><span class="co">#&gt;            0.5557312            0.5356838            0.6208484 </span></span>
 <span><span class="co">#&gt;            max_iota2            min_alpha            avg_alpha </span></span>
-<span><span class="co">#&gt;            0.6359176            0.6084524            0.7198214 </span></span>
+<span><span class="co">#&gt;            0.7060131            0.7044048            0.7707738 </span></span>
 <span><span class="co">#&gt;            max_alpha    static_iota_index   dynamic_iota_index </span></span>
-<span><span class="co">#&gt;            0.8311905            0.1710170            0.4186663 </span></span>
+<span><span class="co">#&gt;            0.8371429            0.1775034            0.4691479 </span></span>
 <span><span class="co">#&gt;       kalpha_nominal       kalpha_ordinal              kendall </span></span>
-<span><span class="co">#&gt;            0.4065457            0.4065457            0.7154418 </span></span>
+<span><span class="co">#&gt;            0.5278355            0.5278355            0.7652353 </span></span>
 <span><span class="co">#&gt;   c_kappa_unweighted       c_kappa_linear      c_kappa_squared </span></span>
-<span><span class="co">#&gt;            0.4189849            0.4189849            0.4189849 </span></span>
+<span><span class="co">#&gt;            0.5213015            0.5213015            0.5213015 </span></span>
 <span><span class="co">#&gt;         kappa_fleiss percentage_agreement    balanced_accuracy </span></span>
-<span><span class="co">#&gt;            0.3929811            0.7183794            0.7198214 </span></span>
+<span><span class="co">#&gt;            0.5171027            0.7778656            0.7707738 </span></span>
 <span><span class="co">#&gt;     gwet_ac1_nominal      gwet_ac2_linear   gwet_ac2_quadratic </span></span>
-<span><span class="co">#&gt;            0.4707648            0.4707648            0.4707648 </span></span>
+<span><span class="co">#&gt;            0.5876742            0.5876742            0.5876742 </span></span>
 <span><span class="co">#&gt;        avg_precision           avg_recall               avg_f1 </span></span>
-<span><span class="co">#&gt;            0.7121123            0.7198214            0.6964906</span></span></code></pre></div>
+<span><span class="co">#&gt;            0.7605746            0.7707738            0.7585514</span></span></code></pre></div>
 <div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">classifier_prototype</span><span class="op">$</span><span class="va">reliability</span><span class="op">$</span><span class="va">standard_measures_mean</span></span>
 <span><span class="co">#&gt;     precision    recall        f1</span></span>
-<span><span class="co">#&gt; neg 0.5583802 0.6642857 0.5955709</span></span>
-<span><span class="co">#&gt; pos 0.8146431 0.7200000 0.7557105</span></span></code></pre></div>
+<span><span class="co">#&gt; neg 0.6552381 0.7482143 0.6922292</span></span>
+<span><span class="co">#&gt; pos 0.8659112 0.7933333 0.8248735</span></span></code></pre></div>
 <div class="section level4">
 <h4 id="application-with-sample-data">7.5 Application with Sample Data<a class="anchor" aria-label="anchor" href="#application-with-sample-data"></a>
 </h4>
@@ -2677,22 +2677,22 @@ the classifier.</p>
 <span>  text_dataset <span class="op">=</span> <span class="va">sample_texts</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2025-11-15 08:23:28 Batch 1 / 8 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 08:23:28 Batch 2 / 8 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 08:23:29 Batch 3 / 8 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 08:23:30 Batch 4 / 8 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 08:23:30 Batch 5 / 8 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 08:23:31 Batch 6 / 8 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 08:23:32 Batch 7 / 8 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 08:23:32 Batch 8 / 8 done</span></span></code></pre></div>
+<span><span class="co">#&gt; 2025-11-15 11:24:40 Batch 1 / 8 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:24:41 Batch 2 / 8 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:24:41 Batch 3 / 8 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:24:42 Batch 4 / 8 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:24:43 Batch 5 / 8 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:24:44 Batch 6 / 8 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:24:44 Batch 7 / 8 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:24:45 Batch 8 / 8 done</span></span></code></pre></div>
 <div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">query_embeddings</span> <span class="op">&lt;-</span> <span class="va">bert_modeling</span><span class="op">$</span><span class="fu">embed_large</span><span class="op">(</span></span>
 <span>  text_dataset <span class="op">=</span> <span class="va">query_texts</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2025-11-15 08:23:33 Batch 1 / 3 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 08:23:33 Batch 2 / 3 done </span></span>
-<span><span class="co">#&gt; 2025-11-15 08:23:34 Batch 3 / 3 done</span></span></code></pre></div>
+<span><span class="co">#&gt; 2025-11-15 11:24:45 Batch 1 / 3 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:24:46 Batch 2 / 3 done </span></span>
+<span><span class="co">#&gt; 2025-11-15 11:24:46 Batch 3 / 3 done</span></span></code></pre></div>
 <p>Now we are ready to use our classifier. First, we predict the classes
 of the query sample.</p>
 <div class="sourceCode" id="cb78"><pre class="downlit sourceCode r">
@@ -2703,16 +2703,16 @@ of the query sample.</p>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">new_predictions</span><span class="op">)</span></span>
 <span><span class="co">#&gt;            neg       pos very negative very positive expected_category</span></span>
-<span><span class="co">#&gt; 8016 0.2500053 0.2499962     0.2499975     0.2500009               neg</span></span>
-<span><span class="co">#&gt; 9118 0.2500051 0.2499966     0.2499965     0.2500018               neg</span></span>
-<span><span class="co">#&gt; 6376 0.2500051 0.2499966     0.2499966     0.2500018               neg</span></span>
-<span><span class="co">#&gt; 5766 0.2500004 0.2499999     0.2499901     0.2500097     very positive</span></span>
-<span><span class="co">#&gt; 5942 0.2500043 0.2499972     0.2499949     0.2500035     very positive</span></span>
-<span><span class="co">#&gt; 478  0.2500050 0.2499967     0.2499962     0.2500021               neg</span></span>
+<span><span class="co">#&gt; 8016 0.2537269 0.2455277     0.2553664     0.2453790     very negative</span></span>
+<span><span class="co">#&gt; 9118 0.2540149 0.2457661     0.2545934     0.2456255     very negative</span></span>
+<span><span class="co">#&gt; 6376 0.2530770 0.2478229     0.2514379     0.2476621               neg</span></span>
+<span><span class="co">#&gt; 5766 0.2537454 0.2455131     0.2553770     0.2453645     very negative</span></span>
+<span><span class="co">#&gt; 5942 0.2537190 0.2455405     0.2553505     0.2453900     very negative</span></span>
+<span><span class="co">#&gt; 478  0.2539560 0.2468965     0.2523883     0.2467591               neg</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">new_predictions</span><span class="op">$</span><span class="va">expected_category</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;           neg           pos very negative very positive </span></span>
-<span><span class="co">#&gt;            21             0             9            45</span></span></code></pre></div>
+<span><span class="co">#&gt;            23            23             9            20</span></span></code></pre></div>
 <p>Although we trained our classifier for two classes we can now use it
 to predict other classes. Next, we plot the results.</p>
 <div class="sourceCode" id="cb79"><pre class="downlit sourceCode r">
@@ -2840,10 +2840,10 @@ configuration of your model.</p>
 <span>  optimizer <span class="op">=</span> <span class="st">"AdamW"</span>,</span>
 <span>  lr_warm_up_ratio <span class="op">=</span> <span class="fl">0.10</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2025-11-15 08:23:35 Start</span></span>
-<span><span class="co">#&gt; 2025-11-15 08:23:35 Start Sustainability Tracking</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:35:37 Stop Sustainability Tracking</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:35:38 Training finished</span></span></code></pre></div>
+<span><span class="co">#&gt; 2025-11-15 11:24:48 Start</span></span>
+<span><span class="co">#&gt; 2025-11-15 11:24:48 Start Sustainability Tracking</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:37:06 Stop Sustainability Tracking</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:37:06 Training finished</span></span></code></pre></div>
 <blockquote>
 <p>In this example we use the same text embeddings as we use to train
 the classifier. It can be beneficial if you use a larger sample of texts
@@ -2904,7 +2904,7 @@ described in section 6 this would look like:</p>
 <span>  ng_conv_residual_type <span class="op">=</span> <span class="st">"ResidualGate"</span>,</span>
 <span>  dense_act_fct <span class="op">=</span> <span class="st">"ELU"</span>,</span>
 <span>  dense_n_layers <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  dense_dropout <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  dense_dropout <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  dense_bias <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  dense_parametrizations <span class="op">=</span> <span class="st">"None"</span>,</span>
 <span>  dense_normalization_type <span class="op">=</span> <span class="st">"LayerNorm"</span>,</span>
@@ -2969,43 +2969,43 @@ classifiers.</p>
 <span>  lr_warm_up_ratio <span class="op">=</span> <span class="fl">0.10</span>,</span>
 <span>  optimizer <span class="op">=</span> <span class="st">"AdamW"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:35:38 Compress Embeddings - Batch 1 / 10 done</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:35:39 Compress Embeddings - Batch 2 / 10 done</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:35:39 Compress Embeddings - Batch 3 / 10 done</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:35:39 Compress Embeddings - Batch 4 / 10 done</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:35:40 Compress Embeddings - Batch 5 / 10 done</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:35:40 Compress Embeddings - Batch 6 / 10 done</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:35:40 Compress Embeddings - Batch 7 / 10 done</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:35:40 Compress Embeddings - Batch 8 / 10 done</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:35:41 Compress Embeddings - Batch 9 / 10 done</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:35:41 Compress Embeddings - Batch 10 / 10 done</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:35:41 Total Cases: 300 Unique Cases: 300 Labeled Cases: 225</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:35:41 Start</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:35:41 Start Sustainability Tracking</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:35:43 | Iteration 1 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:35:43 | Iteration 1 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:37:32 | Iteration 2 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:37:32 | Iteration 2 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:38:51 | Iteration 3 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:38:51 | Iteration 3 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:40:40 | Iteration 4 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:40:40 | Iteration 4 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:42:10 | Iteration 5 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:42:10 | Iteration 5 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:43:59 | Iteration 6 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:43:59 | Iteration 6 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:45:25 | Iteration 7 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:45:25 | Iteration 7 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:46:37 | Iteration 8 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:46:37 | Iteration 8 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:47:17 | Iteration 9 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:47:17 | Iteration 9 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:48:41 | Iteration 10 from 10</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:48:41 | Iteration 10 from 10 | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:50:19 | Final training</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:50:19 | Final training | Training</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:52:13 Stop Sustainability Tracking</span></span>
-<span><span class="co">#&gt; 2025-11-15 09:52:13 Training Complete</span></span></code></pre></div>
+<span><span class="co">#&gt; 2025-11-15 12:37:07 Compress Embeddings - Batch 1 / 10 done</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:37:07 Compress Embeddings - Batch 2 / 10 done</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:37:08 Compress Embeddings - Batch 3 / 10 done</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:37:08 Compress Embeddings - Batch 4 / 10 done</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:37:08 Compress Embeddings - Batch 5 / 10 done</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:37:09 Compress Embeddings - Batch 6 / 10 done</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:37:09 Compress Embeddings - Batch 7 / 10 done</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:37:10 Compress Embeddings - Batch 8 / 10 done</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:37:10 Compress Embeddings - Batch 9 / 10 done</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:37:10 Compress Embeddings - Batch 10 / 10 done</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:37:11 Total Cases: 300 Unique Cases: 300 Labeled Cases: 225</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:37:11 Start</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:37:11 Start Sustainability Tracking</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:37:12 | Iteration 1 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:37:12 | Iteration 1 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:37:57 | Iteration 2 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:37:57 | Iteration 2 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:39:46 | Iteration 3 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:39:46 | Iteration 3 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:40:51 | Iteration 4 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:40:51 | Iteration 4 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:41:31 | Iteration 5 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:41:31 | Iteration 5 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:43:16 | Iteration 6 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:43:16 | Iteration 6 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:44:27 | Iteration 7 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:44:27 | Iteration 7 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:45:45 | Iteration 8 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:45:45 | Iteration 8 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:47:33 | Iteration 9 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:47:33 | Iteration 9 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:48:48 | Iteration 10 from 10</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:48:48 | Iteration 10 from 10 | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:50:37 | Final training</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:50:37 | Final training | Training</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:51:58 Stop Sustainability Tracking</span></span>
+<span><span class="co">#&gt; 2025-11-15 12:51:58 Training Complete</span></span></code></pre></div>
 <p>First we can analyze the training history of the performance
 estimation stage.</p>
 <div class="sourceCode" id="cb86"><pre class="downlit sourceCode r">
@@ -3094,26 +3094,26 @@ during Final Training Stage (iota)
 <div class="sourceCode" id="cb90"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">classifier_with_fe</span><span class="op">$</span><span class="va">reliability</span><span class="op">$</span><span class="va">test_metric_mean</span></span>
 <span><span class="co">#&gt;           iota_index            min_iota2            avg_iota2 </span></span>
-<span><span class="co">#&gt;            0.5503953            0.4947222            0.5987924 </span></span>
+<span><span class="co">#&gt;            0.5545455            0.5198624            0.6045262 </span></span>
 <span><span class="co">#&gt;            max_iota2            min_alpha            avg_alpha </span></span>
-<span><span class="co">#&gt;            0.7028625            0.6352381            0.7385714 </span></span>
+<span><span class="co">#&gt;            0.6891900            0.6489286            0.7697024 </span></span>
 <span><span class="co">#&gt;            max_alpha    static_iota_index   dynamic_iota_index </span></span>
-<span><span class="co">#&gt;            0.8419048            0.2188505            0.4687174 </span></span>
+<span><span class="co">#&gt;            0.8904762            0.2494822            0.4693070 </span></span>
 <span><span class="co">#&gt;       kalpha_nominal       kalpha_ordinal              kendall </span></span>
-<span><span class="co">#&gt;            0.4786562            0.4786562            0.7415062 </span></span>
+<span><span class="co">#&gt;            0.4990219            0.4990219            0.7671368 </span></span>
 <span><span class="co">#&gt;   c_kappa_unweighted       c_kappa_linear      c_kappa_squared </span></span>
-<span><span class="co">#&gt;            0.4732873            0.4732873            0.4732873 </span></span>
+<span><span class="co">#&gt;            0.5053903            0.5053903            0.5053903 </span></span>
 <span><span class="co">#&gt;         kappa_fleiss percentage_agreement    balanced_accuracy </span></span>
-<span><span class="co">#&gt;            0.4667950            0.7642292            0.7385714 </span></span>
+<span><span class="co">#&gt;            0.4876291            0.7685771            0.7697024 </span></span>
 <span><span class="co">#&gt;     gwet_ac1_nominal      gwet_ac2_linear   gwet_ac2_quadratic </span></span>
-<span><span class="co">#&gt;            0.5743868            0.5743868            0.5743868 </span></span>
+<span><span class="co">#&gt;            0.5709925            0.5709925            0.5709925 </span></span>
 <span><span class="co">#&gt;        avg_precision           avg_recall               avg_f1 </span></span>
-<span><span class="co">#&gt;            0.7475479            0.7385714            0.7333975</span></span></code></pre></div>
+<span><span class="co">#&gt;            0.7768643            0.7697024            0.7438146</span></span></code></pre></div>
 <div class="sourceCode" id="cb91"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">classifier_with_fe</span><span class="op">$</span><span class="va">reliability</span><span class="op">$</span><span class="va">standard_measures_mean</span></span>
-<span><span class="co">#&gt;     precision    recall       f1</span></span>
-<span><span class="co">#&gt; neg 0.6641667 0.6571429 0.645995</span></span>
-<span><span class="co">#&gt; pos 0.8309290 0.8200000 0.820800</span></span></code></pre></div>
+<span><span class="co">#&gt;     precision    recall        f1</span></span>
+<span><span class="co">#&gt; neg 0.6691270 0.7660714 0.6743243</span></span>
+<span><span class="co">#&gt; pos 0.8846016 0.7733333 0.8133048</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="saving-and-loading">8.5. Saving and Loading<a class="anchor" aria-label="anchor" href="#saving-and-loading"></a>

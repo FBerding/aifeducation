@@ -6,6 +6,10 @@ editor_options:
 
 # aifeducation 1.1.3
 
+**General**
+
+- Add support for PyTorch's Muon-optimizer.
+
 **BaseModels**
 
 - Fixed the not displayed documentation for BaseModelCore and MPNet.
