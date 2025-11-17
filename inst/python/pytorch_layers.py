@@ -120,11 +120,12 @@ def apply_weights_pair_orth_dense(x, weights):
 #OSLNet: Deep Small-Sample Classification With an Orthogonal Softmax Layer. 
 #IEEE Transactions on Image Processing, 29, 6482–6495. https://doi.org/10.1109/TIP.2020.2990277
 class pairwise_orthogonal_dense(torch.nn.Module):
-  def __init__(self,input_size,output_size,bias=False,device=None,dtype=None):
+  def __init__(self,input_size,output_size,bias=False,pre_dense=False,device=None,dtype=None):
     super().__init__()
     self.input_size=input_size
     self.output_size=output_size
     self.bias=bias
+    self.pre_dense=pre_dense
     
     self.n_params_ratio=math.floor(self.input_size/self.output_size)
     self.n_params=self.n_params_ratio*self.output_size
@@ -134,6 +135,14 @@ class pairwise_orthogonal_dense(torch.nn.Module):
     self.weight=torch.nn.parameter.Parameter(torch.rand(1,self.n_params)).to(device)
     if self.bias:
       self.beta=torch.nn.parameter.Parameter(torch.zeros(1,self.output_size)).to(device)
+    
+    if self.pre_dense==True:
+      self.dense_layer=torch.nn.Linear(
+        in_features=self.input_size, 
+        out_features=self.input_size, 
+        bias=self.bias, 
+        device=device, dtype=dtype
+      )
 
     self.design_matrix=torch.zeros((self.input_size,self.output_size)).to(device)
     self.unit_matrix=torch.zeros((self.input_size,self.input_size)).fill_diagonal_(1).to(device)
@@ -152,6 +161,8 @@ class pairwise_orthogonal_dense(torch.nn.Module):
     self.apply_weights_vmap=torch.vmap(func=apply_weights_pair_orth_dense, in_dims=(-2,None), out_dims=-2, randomness='error', chunk_size=None)
     
   def forward(self,x):
+    if self.pre_dense:
+      x=self.dense_layer(x)
     weights_design=self.weight.expand(self.n_params,self.n_params)*self.unit_matrix.to(self.weight.device)
     weights_design=torch.matmul(weights_design,self.design_matrix.to(dtype=weights_design.dtype,device=weights_design.device))
     if x.dim()>2:

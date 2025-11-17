@@ -18,7 +18,7 @@ import math
 import safetensors
 
 class TEClassifierSequential(torch.nn.Module):
-  def __init__(self,times, features, cls_pooling_features, pad_value,n_target_levels,inc_cls_head=True,skip_connection_type="ResidualGate",cls_type="regular",cls_pooling_type="MinMax", 
+  def __init__(self,times, features, cls_pooling_features, pad_value,n_target_levels,inc_cls_head=True,skip_connection_type="ResidualGate",cls_type="Regular",cls_pooling_type="MinMax", 
               feat_act_fct="ELU",feat_size=50,feat_bias=True,feat_dropout=0.0,feat_parametrizations="None",feat_normalization_type="LayerNorm",
               ng_conv_act_fct="ELU",ng_conv_n_layers=0,ng_conv_ks_min=2, ng_conv_ks_max=4,ng_conv_dropout=0.1, ng_conv_bias=False, ng_conv_parametrizations="None", ng_conv_residual_type="ResidualGate",ng_conv_normalization_type="LayerNorm",
               dense_act_fct="ELU",dense_n_layers=0,dense_dropout=0.0,dense_bias=False,dense_parametrizations="None", dense_residual_type="ResidualGate",dense_normalization_type="LayerNorm",
@@ -155,6 +155,15 @@ class TEClassifierSequential(torch.nn.Module):
                 input_size=cls_pooling_features,
                 output_size=n_target_levels,
                 bias=False,
+                pre_dense=False,
+                device=device, 
+                dtype=dtype)
+        elif cls_type=="PairwiseOrthogonalDense":
+          self.classification_head=pairwise_orthogonal_dense(
+                input_size=cls_pooling_features,
+                output_size=n_target_levels,
+                bias=False,
+                pre_dense=True,
                 device=device, 
                 dtype=dtype)
 
@@ -409,6 +418,15 @@ class TEClassifierParallel(torch.nn.Module):
                 input_size=merge_pooling_features,
                 output_size=n_target_levels,
                 bias=False,
+                pre_dense=False,
+                device=device, 
+                dtype=dtype)
+        elif cls_type=="PairwiseOrthogonalDense":
+          self.classification_head=pairwise_orthogonal_dense(
+                input_size=merge_pooling_features,
+                output_size=n_target_levels,
+                bias=False,
+                pre_dense=True,
                 device=device, 
                 dtype=dtype)
 
@@ -618,12 +636,27 @@ class TEClassifierPrototype(torch.nn.Module):
         self.embedding_head=pairwise_orthogonal_dense(
           input_size=cls_pooling_features,
           output_size=self.embedding_dim,
+          pre_dense=False,
           bias=True)
       elif core_net_type=="parallel":
         self.embedding_head=pairwise_orthogonal_dense(
           input_size=merge_pooling_features,
           output_size=self.embedding_dim,
+          pre_dense=False,
           bias=True)
+    elif self.projection_type=="PairwiseOrthogonalDense":
+      if core_net_type=="sequential":
+        self.embedding_head=pairwise_orthogonal_dense(
+          input_size=cls_pooling_features,
+          output_size=self.embedding_dim,
+          pre_dense=True,
+          bias=True)
+      elif core_net_type=="parallel":
+        self.embedding_head=pairwise_orthogonal_dense(
+          input_size=merge_pooling_features,
+          output_size=self.embedding_dim,
+          pre_dense=True,
+          bias=True)          
     
     self.class_mean=layer_class_mean()
     self.metric=layer_protonet_metric(metric_type=metric_type)

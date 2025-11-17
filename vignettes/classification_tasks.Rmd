@@ -1388,7 +1388,7 @@ classifier$configure(
   feat_parametrizations = "None",
   feat_normalization_type = "LayerNorm",
   ng_conv_act_fct = "ELU",
-  ng_conv_n_layers = 2,
+  ng_conv_n_layers = 1,
   ng_conv_ks_min = 2,
   ng_conv_ks_max = 4,
   ng_conv_bias = FALSE,
@@ -1398,7 +1398,7 @@ classifier$configure(
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "ELU",
   dense_n_layers = 1,
-  dense_dropout = 0.05,
+  dense_dropout = 0.00,
   dense_bias = FALSE,
   dense_parametrizations = "None",
   dense_normalization_type = "LayerNorm",
@@ -1475,9 +1475,9 @@ for classification. Thus, this value acts as a filter.
 > The vignette [04 Model configuration and training](model_configuration.html)
 > provides details on how to configure a classifier.
 
-In our example we use only two n-gram layers (`ng_conv_n_layers=2`) and 
-one dense layers (`dense_n_layers=1`). All other layers are omitted from the model
-by setting the number of layers to zero (`tf_n_layers=0`,`rec_n_layers=0`).
+In our example we use only two n-gram layers (`ng_conv_n_layers = 1`) and 
+one dense layers (`dense_n_layers = 1`). All other layers are omitted from the model
+by setting the number of layers to zero (`tf_n_layers = 0`,`rec_n_layers = 0`).
 
 As pooling method we use minimum and maximum (`cls_pooling_type="MinMax"`). 
 That is, the 25 highest and the 25 lowest features are used for calculating
@@ -1912,7 +1912,7 @@ classifier_prototype$configure(
   skip_connection_type = "ResidualGate",
   cls_pooling_features = 50,
   cls_pooling_type = "MinMax",
-  projection_type = "Regular",
+  projection_type = "PairwiseOrthogonalDense",
   metric_type = "Euclidean",
   feat_act_fct = "ELU",
   feat_size = 384,
@@ -1921,7 +1921,7 @@ classifier_prototype$configure(
   feat_parametrizations = "None",
   feat_normalization_type = "LayerNorm",
   ng_conv_act_fct = "ELU",
-  ng_conv_n_layers = 2,
+  ng_conv_n_layers = 1,
   ng_conv_ks_min = 2,
   ng_conv_ks_max = 4,
   ng_conv_bias = FALSE,
@@ -1931,7 +1931,7 @@ classifier_prototype$configure(
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "ELU",
   dense_n_layers = 1,
-  dense_dropout = 0.05,
+  dense_dropout = 0.00,
   dense_bias = FALSE,
   dense_parametrizations = "None",
   dense_normalization_type = "LayerNorm",
@@ -2010,8 +2010,8 @@ classifier_prototype$train(
   sustain_interval = 15,
   epochs = 800,
   batch_size = 32,
-  Ns = 5,
-  Nq = 3,
+  Ns = 20,
+  Nq = 5,
   loss_alpha = 0.5,
   loss_margin = 0.05,
   sampling_separate = FALSE,
@@ -2468,7 +2468,7 @@ classifier_with_fe$configure(
   feat_parametrizations = "None",
   feat_normalization_type = "LayerNorm",
   ng_conv_act_fct = "ELU",
-  ng_conv_n_layers = 2,
+  ng_conv_n_layers = 1,
   ng_conv_ks_min = 2,
   ng_conv_ks_max = 4,
   ng_conv_bias = FALSE,
@@ -2478,7 +2478,7 @@ classifier_with_fe$configure(
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "ELU",
   dense_n_layers = 1,
-  dense_dropout = 0.05,
+  dense_dropout = 0.00,
   dense_bias = FALSE,
   dense_parametrizations = "None",
   dense_normalization_type = "LayerNorm",

@@ -1070,7 +1070,7 @@ get_param_dict <- function() {
     allow_null = FALSE,
     min = NULL,
     max = NULL,
-    allowed_values = c("Adam", "RMSprop", "AdamW", "SGD","Muon"),
+    allowed_values = c("Adam", "RMSprop", "AdamW", "SGD"),
     desc = "determining the optimizer used for training.",
     gui_box = "General Settings",
     gui_label = "Optimizer",
@@ -1490,11 +1490,12 @@ get_param_dict <- function() {
     min = NULL,
     max = NULL,
     allow_null = FALSE,
-    allowed_values = c("Regular", "PairwiseOrthogonal"),
+    allowed_values = c("Regular", "PairwiseOrthogonal","PairwiseOrthogonalDense"),
     values_desc = list(
       Regular = "Applies a fully connected dense layer between the network and the
       final layer that calculates the classes.",
-      PairwiseOrthogonal = "Applies a pairwise orthogonal layer as classification head as described by [Li et al. 2020](https://doi.org/10.1109/TIP.2020.2990277)."
+      PairwiseOrthogonal = "Applies a pairwise orthogonal layer as classification head as described by [Li et al. 2020](https://doi.org/10.1109/TIP.2020.2990277).",
+      PairwiseOrthogonalDense="Same as 'PairwiseOrthogonal' but with an additional dense layer before the head."
     ),
     desc = "Type of classification head.",
     gui_box = "Classifiction Pooling Layer",
@@ -1509,13 +1510,14 @@ get_param_dict <- function() {
     min = NULL,
     max = NULL,
     allow_null = FALSE,
-    allowed_values = c("Regular", "PairwiseOrthogonal"),
+    allowed_values = c("Regular", "PairwiseOrthogonal","PairwiseOrthogonalDense"),
     values_desc = list(
       Regular = "Applies a fully connected dense layer for calculating the position of a point on all axes. That is,
       all neurons can contribute to every axes.",
       PairwiseOrthogonal = "Applies a pairwise orthogonal layer without activation for calculating the position of a point. That is,
       a neuron contributes only to one specific axis and an axis is influenced only by a disjoint Subsample of all neurons. The layer is described by
-       [Li et al. 2020](https://doi.org/10.1109/TIP.2020.2990277) in the context of classification heads."
+       [Li et al. 2020](https://doi.org/10.1109/TIP.2020.2990277) in the context of classification heads.",
+      PairwiseOrthogonalDense="Same as 'PairwiseOrthogonal' but with an additional dense layer before the head."
     ),
     desc = "Type of projection.",
     gui_box = "General Settings",

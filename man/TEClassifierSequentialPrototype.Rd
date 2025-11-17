@@ -263,7 +263,7 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{cls_pooling_type}}{\code{string} Type of extracting intermediate features. Allowed values: 'Max', 'Min', 'MinMax'}
 
-\item{\code{projection_type}}{\code{string} Type of projection. Allowed values: 'Regular', 'PairwiseOrthogonal'}
+\item{\code{projection_type}}{\code{string} Type of projection. Allowed values: 'Regular', 'PairwiseOrthogonal', 'PairwiseOrthogonalDense'}
 
 \item{\code{metric_type}}{\code{string} Type of metric used for calculating the distance. Allowed values: 'Euclidean', 'CosineDistance'}
 

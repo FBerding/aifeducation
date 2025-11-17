@@ -260,7 +260,7 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{shared_feat_layer}}{\code{bool} If \code{TRUE} all streams use the same feature layer. If \code{FALSE} all streams use their own feature layer.}
 
-\item{\code{projection_type}}{\code{string} Type of projection. Allowed values: 'Regular', 'PairwiseOrthogonal'}
+\item{\code{projection_type}}{\code{string} Type of projection. Allowed values: 'Regular', 'PairwiseOrthogonal', 'PairwiseOrthogonalDense'}
 
 \item{\code{feat_act_fct}}{\code{string} Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
 

@@ -243,7 +243,7 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{cls_pooling_type}}{\code{string} Type of extracting intermediate features. Allowed values: 'Max', 'Min', 'MinMax'}
 
-\item{\code{cls_head_type}}{\code{string} Type of classification head. Allowed values: 'Regular', 'PairwiseOrthogonal'}
+\item{\code{cls_head_type}}{\code{string} Type of classification head. Allowed values: 'Regular', 'PairwiseOrthogonal', 'PairwiseOrthogonalDense'}
 
 \item{\code{feat_act_fct}}{\code{string} Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
 
