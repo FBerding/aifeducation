@@ -1536,7 +1536,7 @@ classifier$train(
   log_write_interval = 10,
   n_cores = auto_n_cores(),
   lr_rate = 3e-2,
-  lr_warm_up_ratio = 0.10,
+  lr_warm_up_ratio = 0.05,
   optimizer = "AdamW"
 )
 ```
@@ -2011,10 +2011,10 @@ classifier_prototype$train(
   sustain_interval = 15,
   epochs = 800,
   batch_size = 32,
-  Ns = 4,
-  Nq = 2,
+  Ns = 20,
+  Nq = 5,
   loss_alpha = 0.5,
-  loss_margin = 0.05,
+  loss_margin = 0.10,
   sampling_separate = FALSE,
   sampling_shuffle = TRUE,
   trace = TRUE,
@@ -2023,7 +2023,7 @@ classifier_prototype$train(
   log_write_interval = 10,
   n_cores = auto_n_cores(),
   lr_rate = 3e-2,
-  lr_warm_up_ratio = 0.10,
+  lr_warm_up_ratio = 0.05,
   optimizer = "AdamW"
 )
 ```
@@ -2543,7 +2543,7 @@ classifier_with_fe$train(
   log_write_interval = 10,
   n_cores = auto_n_cores(),
   lr_rate = 3e-2,
-  lr_warm_up_ratio = 0.10,
+  lr_warm_up_ratio = 0.05,
   optimizer = "AdamW"
 )
 ```

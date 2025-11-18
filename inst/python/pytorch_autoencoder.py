@@ -319,8 +319,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   warm_up_steps=math.floor(epochs*lr_warm_up_ratio)
   main_steps=epochs-warm_up_steps
   scheduler_warm_up = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1e-9,end_factor=1, total_iters=warm_up_steps)
-  scheduler_main=torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1,end_factor=0.1, total_iters=main_steps)
-  #scheduler_main=torch.optim.lr_scheduler.CyclicLR(optimizer, base_lr=lr_rate/10, max_lr=lr_rate*10, step_size_up=10*len(trainloader))
+  scheduler_main=torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1,end_factor=0.01, total_iters=main_steps)
+  #scheduler_main=torch.optim.lr_scheduler.CyclicLR(optimizer, base_lr=lr_rate*1e-3, max_lr=lr_rate, step_size_up=5*len(trainloader))
   #scheduler_main=torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.95,last_epoch=-1)
   scheduler = torch.optim.lr_scheduler.SequentialLR(schedulers = [scheduler_warm_up, scheduler_main], optimizer=optimizer,milestones=[warm_up_steps])    
     
