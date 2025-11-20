@@ -17,6 +17,7 @@ Named \code{list} containing all available types of data sets as a string.
 Other Parameter Dictionary: 
 \code{\link{BaseModelsIndex}},
 \code{\link{TokenizerIndex}},
+\code{\link{doc_formula}()},
 \code{\link{get_TEClassifiers_class_names}()},
 \code{\link{get_called_args}()},
 \code{\link{get_depr_obj_names}()},

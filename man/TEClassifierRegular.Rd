@@ -148,21 +148,21 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
 
-\item{\code{dense_size}}{\code{int} Number of neurons for each dense layer. Allowed values: \code{1 <= x }}
+\item{\code{dense_size}}{\code{int} Number of neurons for each dense layer. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
-\item{\code{dense_layers}}{\code{int} Number of dense layers. Allowed values: \code{0 <= x }}
+\item{\code{dense_layers}}{\code{int} Number of dense layers. Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
 
-\item{\code{rec_size}}{\code{int} Number of neurons for each recurrent layer. Allowed values: \code{1 <= x }}
+\item{\code{rec_size}}{\code{int} Number of neurons for each recurrent layer. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
-\item{\code{rec_layers}}{\code{int} Number of recurrent layers. Allowed values: \code{0 <= x }}
+\item{\code{rec_layers}}{\code{int} Number of recurrent layers. Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
 
 \item{\code{rec_type}}{\code{string} Type of the recurrent layers. \code{rec_type='GRU'} for Gated Recurrent Unit and \code{rec_type='LSTM'} for Long Short-Term Memory. Allowed values: 'GRU', 'LSTM'}
 
 \item{\code{rec_bidirectional}}{\code{bool} If \code{TRUE} a bidirectional version of the recurrent layers is used.}
 
-\item{\code{self_attention_heads}}{\code{int} determining the number of attention heads for a self-attention layer. Only relevant if \code{attention_type='multihead'} Allowed values: \code{0 <= x }}
+\item{\code{self_attention_heads}}{\code{int} determining the number of attention heads for a self-attention layer. Only relevant if \code{attention_type='multihead'} Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
 
-\item{\code{intermediate_size}}{\code{int} determining the size of the projection layer within a each transformer encoder. Allowed values: \code{1 <= x }}
+\item{\code{intermediate_size}}{\code{int} determining the size of the projection layer within a each transformer encoder. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
 \item{\code{attention_type}}{\code{string} Choose the attention type. Allowed values: 'Fourier', 'MultiHead'}
 
@@ -172,13 +172,13 @@ indicating a higher category/class. For nominal data the order does not matter.}
 
 \item{\code{parametrizations}}{\code{string} Re-Parametrizations of the weights of layers. Allowed values: 'None', 'OrthogonalWeights', 'WeightNorm', 'SpectralNorm'}
 
-\item{\code{rec_dropout}}{\code{double} determining the dropout between recurrent layers. Allowed values: \verb{0 <= x <= 0.6}}
+\item{\code{rec_dropout}}{\code{double} determining the dropout between recurrent layers. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{\eqn{0 <= x <= 0.6}}{`0 <= x <= 0.6`}}}
 
-\item{\code{repeat_encoder}}{\code{int} determining how many times the encoder should be added to the network. Allowed values: \code{0 <= x }}
+\item{\code{repeat_encoder}}{\code{int} determining how many times the encoder should be added to the network. Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
 
-\item{\code{dense_dropout}}{\code{double} determining the dropout between dense layers. Allowed values: \verb{0 <= x <= 0.6}}
+\item{\code{dense_dropout}}{\code{double} determining the dropout between dense layers. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{\eqn{0 <= x <= 0.6}}{`0 <= x <= 0.6`}}}
 
-\item{\code{encoder_dropout}}{\code{double} determining the dropout for the dense projection within the transformer encoder layers. Allowed values: \verb{0 <= x <= 0.6}}
+\item{\code{encoder_dropout}}{\code{double} determining the dropout for the dense projection within the transformer encoder layers. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{\eqn{0 <= x <= 0.6}}{`0 <= x <= 0.6`}}}
 }
 \if{html}{\out{</div>}}
 }

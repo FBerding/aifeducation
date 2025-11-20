@@ -5,6 +5,9 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
+# Start time
+test_time_start <- Sys.time()
+
 # Config transformer library
 transformers$utils$logging$set_verbosity_error()
 os$environ$setdefault("TOKENIZERS_PARALLELISM", "false")
@@ -51,17 +54,6 @@ for (object_class_name in object_class_names) {
     var_objects = list(),
     necessary_objects = list(
       text_dataset = raw_texts_training
-    ),
-    var_override = list(
-      sustain_interval = 30,
-      sustain_iso_code = "DEU",
-      sustain_log_level = "error",
-      n_epoch = 2,
-      max_sequence_length = 32,
-      min_seq_len = 16,
-      val_size = 0.25,
-      learning_rate = 3e-3,
-      pytorch_trace = 0L
     )
   )
 
@@ -250,3 +242,9 @@ for (object_class_name in object_class_names) {
   # Clear directory for next test
   unlink(paste0(tmp_dir), recursive = TRUE)
 }
+
+# Monitor test time
+monitor_test_time_on_CI(
+  start_time = test_time_start,
+  test_name = "02_07_BaseModels_from_hf"
+)

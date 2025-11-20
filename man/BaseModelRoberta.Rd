@@ -60,6 +60,7 @@ Other Base Model:
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_flops_estimates"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_flops_estimates'><code>aifeducation::BaseModelCore$get_flops_estimates()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_model"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_model'><code>aifeducation::BaseModelCore$get_model()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_model_type"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_model_type'><code>aifeducation::BaseModelCore$get_model_type()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_n_layers"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_n_layers'><code>aifeducation::BaseModelCore$get_n_layers()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_special_tokens"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_special_tokens'><code>aifeducation::BaseModelCore$get_special_tokens()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_tokenizer_statistics"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_tokenizer_statistics'><code>aifeducation::BaseModelCore$get_tokenizer_statistics()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="load_from_disk"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-load_from_disk'><code>aifeducation::BaseModelCore$load_from_disk()</code></a></span></li>
@@ -75,6 +76,11 @@ Other Base Model:
 \if{latex}{\out{\hypertarget{method-BaseModelRoberta-configure}{}}}
 \subsection{Method \code{configure()}}{
 Configures a new object of this class.
+Please ensure that your chosen configuration comply with the following
+guidelines:
+\itemize{
+\item hidden_size is a multiple of num_attention_heads.
+}
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{BaseModelRoberta$configure(
   tokenizer,
@@ -95,22 +101,22 @@ Configures a new object of this class.
 \item{\code{tokenizer}}{\code{TokenizerBase} Tokenizer for the model.}
 
 \item{\code{max_position_embeddings}}{\code{int} Number of maximum position embeddings. This parameter also determines the maximum length of a sequence which
-can be processed with the model. Allowed values: \verb{10 <= x <= 4048}}
+can be processed with the model. Allowed values: \ifelse{latex}{$10 <= x <= 4048$}{\ifelse{html}{\eqn{10 <= x <= 4048}}{`10 <= x <= 4048`}}}
 
 \item{\code{hidden_size}}{\code{int} Number of neurons in each layer. This parameter determines the dimensionality of the resulting text
-embedding. Allowed values: \verb{1 <= x <= 2048}}
+embedding. Allowed values: \ifelse{latex}{$1 <= x <= 2048$}{\ifelse{html}{\eqn{1 <= x <= 2048}}{`1 <= x <= 2048`}}}
 
-\item{\code{num_hidden_layers}}{\code{int} Number of hidden layers. Allowed values: \code{1 <= x }}
+\item{\code{num_hidden_layers}}{\code{int} Number of hidden layers. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
-\item{\code{num_attention_heads}}{\code{int} determining the number of attention heads for a self-attention layer. Only relevant if \code{attention_type='multihead'} Allowed values: \code{0 <= x }}
+\item{\code{num_attention_heads}}{\code{int} determining the number of attention heads for a self-attention layer. Only relevant if \code{attention_type='multihead'} Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
 
-\item{\code{intermediate_size}}{\code{int} determining the size of the projection layer within a each transformer encoder. Allowed values: \code{1 <= x }}
+\item{\code{intermediate_size}}{\code{int} determining the size of the projection layer within a each transformer encoder. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
 \item{\code{hidden_act}}{\code{string} Name of the activation function. Allowed values: 'GELU', 'relu', 'silu', 'gelu_new'}
 
-\item{\code{hidden_dropout_prob}}{\code{double} Ratio of dropout. Allowed values: \verb{0 <= x <= 0.6}}
+\item{\code{hidden_dropout_prob}}{\code{double} Ratio of dropout. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{\eqn{0 <= x <= 0.6}}{`0 <= x <= 0.6`}}}
 
-\item{\code{attention_probs_dropout_prob}}{\code{double} Ratio of dropout for attention probabilities. Allowed values: \verb{0 <= x <= 0.6}}
+\item{\code{attention_probs_dropout_prob}}{\code{double} Ratio of dropout for attention probabilities. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{\eqn{0 <= x <= 0.6}}{`0 <= x <= 0.6`}}}
 }
 \if{html}{\out{</div>}}
 }

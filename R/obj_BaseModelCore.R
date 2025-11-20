@@ -93,9 +93,7 @@ BaseModelCore <- R6::R6Class(
       self$Tokenizer <- load_from_disk(load_location)
     },
     #--------------------------------------------------------------------------
-    load_BaseModel = function(dir_path) {
-
-    },
+    load_BaseModel = function(dir_path) {},
     #--------------------------------------------------------------------------
     set_model_config_from_hf = function() {
       tmp_args <- rlang::fn_fmls_names(self$configure)
@@ -315,7 +313,7 @@ BaseModelCore <- R6::R6Class(
       results <- self$calc_flops_architecture_based(
         batch_size = batch_size,
         n_batches = n_batches,
-        n_epochs = n_epochs
+        n_epoch = n_epochs
       )
 
       private$flops_estimates <- rbind(
@@ -465,7 +463,6 @@ BaseModelCore <- R6::R6Class(
     }
   ),
   public = list(
-
     #' @field Tokenizer ('TokenizerBase')\cr
     #' Objects of class `TokenizerBase`.
     Tokenizer = NULL,
@@ -515,25 +512,25 @@ BaseModelCore <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     #' @description Traines a BaseModel
-    #' @param text_dataset `r get_description("text_dataset")`
-    #' @param p_mask `r get_description("p_mask")`
-    #' @param whole_word `r get_description("whole_word")`
-    #' @param val_size `r get_description("val_size")`
-    #' @param n_epoch `r get_description("n_epoch")`
-    #' @param batch_size `r get_description("batch_size")`
-    #' @param max_sequence_length `r get_description("max_sequence_length")`
-    #' @param full_sequences_only `r get_description("full_sequences_only")`
-    #' @param min_seq_len `r get_description("min_seq_len")`
-    #' @param learning_rate `r get_description("learning_rate")`
-    #' @param sustain_track `r get_description("sustain_track")`
-    #' @param sustain_iso_code `r get_description("sustain_iso_code")`
-    #' @param sustain_region `r get_description("sustain_region")`
-    #' @param sustain_interval `r get_description("sustain_interval")`
-    #' @param sustain_log_level `r get_description("sustain_log_level")`
-    #' @param trace `r get_description("trace")`
-    #' @param pytorch_trace `r get_description("pytorch_trace")`
-    #' @param log_dir `r get_description("log_dir")`
-    #' @param log_write_interval `r get_description("log_write_interval")`
+    #' @param text_dataset `r get_param_doc_desc("text_dataset")`
+    #' @param p_mask `r get_param_doc_desc("p_mask")`
+    #' @param whole_word `r get_param_doc_desc("whole_word")`
+    #' @param val_size `r get_param_doc_desc("val_size")`
+    #' @param n_epoch `r get_param_doc_desc("n_epoch")`
+    #' @param batch_size `r get_param_doc_desc("batch_size")`
+    #' @param max_sequence_length `r get_param_doc_desc("max_sequence_length")`
+    #' @param full_sequences_only `r get_param_doc_desc("full_sequences_only")`
+    #' @param min_seq_len `r get_param_doc_desc("min_seq_len")`
+    #' @param learning_rate `r get_param_doc_desc("learning_rate")`
+    #' @param sustain_track `r get_param_doc_desc("sustain_track")`
+    #' @param sustain_iso_code `r get_param_doc_desc("sustain_iso_code")`
+    #' @param sustain_region `r get_param_doc_desc("sustain_region")`
+    #' @param sustain_interval `r get_param_doc_desc("sustain_interval")`
+    #' @param sustain_log_level `r get_param_doc_desc("sustain_log_level")`
+    #' @param trace `r get_param_doc_desc("trace")`
+    #' @param pytorch_trace `r get_param_doc_desc("pytorch_trace")`
+    #' @param log_dir `r get_param_doc_desc("log_dir")`
+    #' @param log_write_interval `r get_param_doc_desc("log_write_interval")`
     #' @return `r get_description("return_nothing")`
     train = function(text_dataset,
                      p_mask = 0.15,
@@ -578,50 +575,74 @@ BaseModelCore <- R6::R6Class(
     #--------------------------------------------------------------------------
     #' @description Method for requesting a plot of the training history.
     #' This method requires the *R* package 'ggplot2' to work.
-    #' @param y_min `r get_description("y_min")`
-    #' @param y_max `r get_description("y_max")`
-    #' @param text_size `r get_description("y_max")`
+    #' @param x_min `r get_param_doc_desc("x_min")`
+    #' @param x_max `r get_param_doc_desc("x_max")`
+    #' @param y_min `r get_param_doc_desc("y_min")`
+    #' @param y_max `r get_param_doc_desc("y_max")`
+    #' @param ind_best_model `r get_param_doc_desc("ind_best_model")`
+    #' @param text_size `r get_param_doc_desc("text_size")`
     #' @return Returns a plot of class `ggplot` visualizing the training process.
-    plot_training_history = function(y_min = NULL, y_max = NULL, text_size = 10L) {
+    plot_training_history = function(x_min = NULL, x_max = NULL, y_min = NULL, y_max = NULL, ind_best_model = TRUE, text_size = 10L) {
       requireNamespace("ggplot2")
       plot_data <- self$last_training$history
 
-      if (is.null(y_min)) {
-        y_min <- min(self$last_training$history[, c("loss", "val_loss")])
+      if (is.null_or_na(x_min)) {
+        x_min <- 1L
+      }
+      if (is.null_or_na(x_max)) {
+        x_max <- nrow(plot_data)
       }
 
-      if (is.null(y_max)) {
-        y_max <- max(self$last_training$history[, c("loss", "val_loss")])
+      if (is.null_or_na(y_min)) {
+        y_min <- min(plot_data[, c("loss", "val_loss")])
+      }
+      if (is.null_or_na(y_max)) {
+        y_max <- max(plot_data[, c("loss", "val_loss")])
       }
 
       tmp_colnames <- c("epoch", "val_loss", "loss")
       cols_exist <- sum(tmp_colnames %in% colnames(plot_data)) == length(tmp_colnames)
 
       if (cols_exist) {
-        val_loss_min <- min(plot_data$val_loss)
-        best_model_epoch <- which(x = (plot_data$val_loss) == val_loss_min)
-
         tmp_plot <- ggplot2::ggplot(data = plot_data) +
           ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$loss, color = "train")) +
-          ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$val_loss, color = "validation")) +
-          ggplot2::geom_vline(
-            xintercept = best_model_epoch,
-            linetype = "dashed"
+          ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$val_loss, color = "validation"))
+
+        if (ind_best_model) {
+          best_state_point <- get_best_state_point(
+            plot_data = plot_data,
+            measure = "loss"
           )
+          tmp_plot <- add_point(
+            plot_object = tmp_plot,
+            x = best_state_point$epoch,
+            y = best_state_point$value,
+            type = "segment",
+            state = "best"
+          )
+        }
 
         tmp_plot <- tmp_plot + ggplot2::theme_classic() +
           ggplot2::ylab("value") +
-          ggplot2::coord_cartesian(ylim = c(y_min, y_max)) +
           ggplot2::xlab("epoch") +
-          ggplot2::scale_color_manual(values = c(
-            train = "red",
-            validation = "blue",
-            test = "darkgreen"
-          )) +
+          ggplot2::coord_cartesian(ylim = c(y_min, y_max), xlim = c(x_min, x_max)) +
+          ggplot2::scale_color_manual(
+            values = c(
+              train = "red",
+              validation = "blue",
+              test = "darkgreen"
+            )
+          ) +
           ggplot2::theme(
             text = ggplot2::element_text(size = text_size),
             legend.position = "bottom"
           )
+
+        if (ind_best_model) {
+          tmp_plot <- tmp_plot + ggplot2::scale_linetype_manual(
+            values = c(best = 5L, final = 3L)
+          )
+        }
         return(tmp_plot)
       } else {
         warning("Data for the training history is not available.")
@@ -643,8 +664,8 @@ BaseModelCore <- R6::R6Class(
     },
     # Fill Mask------------------------------------------------------------------
     #' @description Method for calculating tokens behind mask tokens.
-    #' @param masked_text `r get_description("masked_text")`
-    #' @param n_solutions `r get_description("n_solutions")`
+    #' @param masked_text `r get_param_doc_desc("masked_text")`
+    #' @param n_solutions `r get_param_doc_desc("n_solutions")`
     #' @return Returns a `list` containing a `data.frame` for every
     #' mask. The `data.frame` contains the solutions in the rows and reports
     #' the score, token id, and token string in the columns.
@@ -822,6 +843,13 @@ BaseModelCore <- R6::R6Class(
       return(private$model$config$hidden_size)
     },
     #--------------------------------------------------------------------------
+    #' @description Number of layers.
+    #' @return Returns an `int` describing the number of layers available for
+    #' embedding.
+    get_n_layers = function() {
+      return(private$model$config$num_hidden_layers)
+    },
+    #--------------------------------------------------------------------------
     #' @description Flop estimates
     #' @return Returns a `data.frame` containing statistics about the flops.
     get_flops_estimates = function() {
@@ -852,17 +880,17 @@ BaseModelCore <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     #' @description Calculates the energy consumption for inference of the given task.
-    #' @param text_dataset `r get_description("text_dataset")`
-    #' @param n `r get_description("n")`
-    #' @param sustain_iso_code `r get_description("sustain_iso_code")`
-    #' @param sustain_region `r get_description("sustain_region")`
-    #' @param sustain_interval `r get_description("sustain_interval")`
-    #' @param sustain_log_level `r get_description("sustain_log_level")`
-    #' @param trace `r get_description("trace")`
+    #' @param text_dataset `r get_param_doc_desc("text_dataset")`
+    #' @param n_samples `r get_param_doc_desc("n_samples")`
+    #' @param sustain_iso_code `r get_param_doc_desc("sustain_iso_code")`
+    #' @param sustain_region `r get_param_doc_desc("sustain_region")`
+    #' @param sustain_interval `r get_param_doc_desc("sustain_interval")`
+    #' @param sustain_log_level `r get_param_doc_desc("sustain_log_level")`
+    #' @param trace `r get_param_doc_desc("trace")`
     #' @return Returns nothing. Method saves the statistics internally.
     #' The statistics can be accessed with the method `get_sustainability_data("inference")`
     estimate_sustainability_inference_fill_mask = function(text_dataset = NULL,
-                                                           n = NULL,
+                                                           n_samples = NULL,
                                                            sustain_iso_code = NULL,
                                                            sustain_region = NULL,
                                                            sustain_interval = 15L,
@@ -875,7 +903,7 @@ BaseModelCore <- R6::R6Class(
       )
 
       n_cases <- text_dataset$n_rows()
-      sample_size <- min(n_cases, n)
+      sample_size <- min(n_cases, n_samples)
       random_sample <- sample(
         x = seq.int(from = 1L, to = n_cases),
         size = sample_size,
@@ -932,11 +960,11 @@ BaseModelCore <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     #' @description Calculates FLOPS based on model's architecture.
-    #' @param batch_size `r get_description("batch_size")`
-    #' @param n_batches `r get_description("n_batches")`
-    #' @param n_epochs `r get_description("n_epochs")`
+    #' @param batch_size `r get_param_doc_desc("batch_size")`
+    #' @param n_batches `r get_param_doc_desc("n_batches")`
+    #' @param n_epoch `r get_param_doc_desc("n_epoch")`
     #' @return Returns a `data.frame` storing the estimates.
-    calc_flops_architecture_based = function(batch_size, n_batches, n_epochs) {
+    calc_flops_architecture_based = function(batch_size, n_batches, n_epoch) {
       tokenizer <- self$Tokenizer$get_tokenizer()
       max_seq_len <- self$get_model_config()$max_position_embeddings
 
@@ -995,15 +1023,19 @@ BaseModelCore <- R6::R6Class(
 
         results[1L, "n_parameter"] <- est_flops[[3L]]
         results[1L, "batch_size"] <- batch_size
-        results[1L, paste0("flops_bp_", bp_factor)] <- est_flops[[1L]] * n_batches * n_epochs
+        results[1L, paste0("flops_bp_", bp_factor)] <- est_flops[[1L]] * n_batches * n_epoch
       }
       results[1L, "approach"] <- "architecture-based"
 
       results[1L, "n_batches"] <- n_batches
-      results[1L, "n_epochs"] <- n_epochs
+      results[1L, "n_epochs"] <- n_epoch
 
       results[1L, "package"] <- "calflops"
-      results[1L, "version"] <- get_py_package_version("calflops")
+      if(is_venv()){
+        results[1L, "version"] <- get_py_package_version("calflops")
+      } else {
+        results[1L, "version"] <- NA
+      }
 
       results[1L, "date"] <- get_time_stamp()
 

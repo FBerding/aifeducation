@@ -4,6 +4,45 @@ editor_options:
     wrap: 72
 ---
 
+# aifeducation 1.1.3
+
+**BaseModels**
+
+- Fixed the not displayed documentation for BaseModelCore and MPNet.
+- Added new options for plotting training history.
+- Added improved error messages for BaseModelModernBert.
+
+**Classifiers**
+
+- Add the possibility to apply Pre-Layer-Normalization as described by
+  [Xiong et al. (2020)](https://doi.org/10.48550/arXiv.2002.04745) for
+  transformer encoder layers.
+- Added new options for plotting training history.
+- Fixed an errors causing pseudo labeling to crash in some cases.
+- Added a new type of classification head: OLS-Layer described by 
+  [Li et al. 2020](https://doi.org/10.1109/TIP.2020.2990277). The new head
+  is available for TEClassifierSequential and TEClassifierParallel. For the
+  classifiers working with prototypes the layer can be used to change the
+  projection into the embedding space (parameter projection_type).
+
+**FeatureExtractor**
+
+- Added new options for plotting training history.
+
+**Graphical User Interface Aifeducation Studio**
+
+- Added new controlling widgets for the new options for plotting training history.
+- Reduced the number of columns for sustainability data for more transparency (BaseModels and TextEmbeddingModels).
+- Added a calculation of the total number of words a TextEmbeddingModel can maximal use.
+
+**Cache and Memory Management**
+
+- Added a function to monitor temporary files. 
+
+**DataManagerClassifier**
+
+- Optimized cache. Now unnecessary temporary files are removed after training a classifier correctly. 
+
 # aifeducation 1.1.2
 
 **Major Changes**
@@ -52,6 +91,10 @@ editor_options:
 **Documentation**
 
 - The documentation was updated to the new structure and objects. 
+
+# aifeducation 1.1.1
+
+- Fixed a problem with the function that converts classes to one hot encoding.
 
 # aifeducation 1.1.0
 

@@ -31,80 +31,86 @@ generate_args_for_tests <- function(object_name,
                                     method,
                                     var_objects = list(),
                                     necessary_objects = list(),
-                                    var_override = list(
-                                      sustain_interval = 30L,
-                                      trace = FALSE,
-                                      epochs = 50L,
-                                      batch_size = 20L,
-                                      ml_trace = 0L,
-                                      n_cores = 2L,
-                                      data_folds = 2L,
-                                      pl_max_steps = 2L,
-                                      pl_max = 1L,
-                                      pl_anchor = 1L,
-                                      pl_min = 0L,
-                                      sustain_track = TRUE,
-                                      sustain_iso_code = "DEU",
-                                      sustain_log_level = "error",
-                                      data_val_size = 0.25,
-                                      lr_rate = 1e-3,
-                                      lr_warm_up_ratio = 0.01
-                                    )) {
+                                    var_override = list()) {
   object <- create_object(object_name)
   arg_list <- rlang::fn_fmls(object[[method]])
   arg_names <- names(arg_list)
   param_dict <- get_param_dict()
+
+  #Check var_override for NULL entries and remove null entries
+  not_null_indices=c()
+  for(i in seq_along(var_override)){
+    if(!is.null(var_override[[i]])){
+      not_null_indices=append(not_null_indices,i)
+    }
+  }
+  if(length(not_null_indices)>0){
+    var_override=var_override[not_null_indices]
+  } else {
+    var_override=list()
+  }
 
   # Generate list of values for every parameter that can vary
   arg_value_list <- NULL
   for (param in arg_names) {
     current_entry <- param_dict[[param]]
     if (is_valid_and_exportable_param(param, param_dict) && !(param %in% c(names(var_override), names(necessary_objects)))) {
-      if (current_entry$type == "string") {
-        if (!is.null(current_entry$allowed_values)) {
-          arg_value_list[param] <- list(current_entry$allowed_values)
+      if (is.null(current_entry$test_values)) {
+        # Choose a value that is determined by chance
+        if (current_entry$type == "string") {
+          if (!is.null(current_entry$allowed_values)) {
+            arg_value_list[param] <- list(sample(x = current_entry$allowed_values, size = 1L))
+          }
+        } else if (current_entry$type == "bool") {
+          arg_value_list[param] <- list(sample(x = c(FALSE, TRUE), size = 1L))
+        } else {
+          if (current_entry$min == -Inf) {
+            tmp_min <- -100L
+          } else {
+            tmp_min <- current_entry$min
+          }
+
+          if (current_entry$max == Inf) {
+            tmp_max <- 3L
+          } else {
+            tmp_max <- current_entry$max
+          }
         }
-      } else if (current_entry$type == "bool") {
-        arg_value_list[param] <- list(c(FALSE, TRUE))
+
+        if (current_entry$type == "int") {
+          arg_value_list[param] <- list(sample(x = seq(from = tmp_min, to = tmp_max, by = 1L), size = 1L))
+        } else if (current_entry$type == "double") {
+          arg_value_list[param] <- list(sample(x = c(tmp_min, tmp_max, 0.5 * tmp_min + 0.5 * tmp_max), size = 1L))
+        } else if (current_entry$type == "(double") {
+          arg_value_list[param] <- list(sample(x = c(0.99 * tmp_min, tmp_max, 0.5 * tmp_min + 0.5 * tmp_max), size = 1L))
+        } else if (current_entry$type == "double)") {
+          arg_value_list[param] <- list(sample(x = c(tmp_min, 0.99 * tmp_max, 0.5 * tmp_min + 0.5 * tmp_max), size = 1L))
+        } else if (current_entry$type == "(double)") {
+          arg_value_list[param] <- list(sample(x = c(0.99 * tmp_min, 0.99 * tmp_max, 0.5 * tmp_min + 0.5 * tmp_max), size = 1L))
+        }
       } else {
-        if (current_entry$min == -Inf) {
-          tmp_min <- -1L
+        # Choose a value from the explicitly determined test values for that param
+        random_index <- sample(
+          x = seq.int(from = 1L, to = length(current_entry$test_values)),
+          size = 1L,
+          replace = FALSE
+        )
+        if (is.list(current_entry$test_values)) {
+          arg_value_list[param] <- list(
+            current_entry$test_values[[random_index]]
+          )
         } else {
-          tmp_min <- current_entry$min
+          arg_value_list[param] <- list(
+            current_entry$test_values[random_index]
+          )
         }
-
-        if (current_entry$max == Inf) {
-          tmp_max <- 3L
-        } else {
-          tmp_max <- current_entry$max
-        }
-      }
-
-      if (current_entry$type == "int") {
-        arg_value_list[param] <- list(seq(from = tmp_min, to = tmp_max, by = 1L))
-      } else if (current_entry$type == "double") {
-        arg_value_list[param] <- list(c(tmp_min, tmp_max, 0.5 * tmp_min + 0.5 * tmp_max))
-      } else if (current_entry$type == "(double") {
-        arg_value_list[param] <- list(c(0.99 * tmp_min, tmp_max, 0.5 * tmp_min + 0.5 * tmp_max))
-      } else if (current_entry$type == "double)") {
-        arg_value_list[param] <- list(c(tmp_min, 0.99 * tmp_max, 0.5 * tmp_min + 0.5 * tmp_max))
-      } else if (current_entry$type == "(double)") {
-        arg_value_list[param] <- list(c(0.99 * tmp_min, 0.99 * tmp_max, 0.5 * tmp_min + 0.5 * tmp_max))
       }
     }
   }
 
   # Add var objects
   for (var_object in names(var_objects)) {
-    arg_value_list[var_object] <- list(c(FALSE, TRUE))
-  }
-
-  # create a combination
-  arg_comb <- list()
-  for (i in seq_along(arg_value_list)) {
-    arg_comb[names(arg_value_list)[i]] <- list(sample(
-      x = arg_value_list[[i]], size = 1L
-    ))
+    arg_value_list[var_object] <- sample(x = c(FALSE, TRUE), size = 1L)
   }
 
   # Convert combinations to list and add override parameters and add necessary parameters
@@ -112,7 +118,15 @@ generate_args_for_tests <- function(object_name,
   override_subset <- intersect(arg_names, names(var_override))
   necessary_subset <- intersect(arg_names, names(necessary_objects))
 
-  arg_comb_list <- append(x = arg_comb, values = var_override[override_subset])
+  arg_comb_list=arg_value_list
+  #for(param in names(override_subset)){
+  #  arg_comb_list[param]=list(override_subset[[param]])
+  #}
+  #for(param in names(necessary_subset)){
+  #  arg_comb_list[param]=list(necessary_subset[[param]])
+  #}
+
+  arg_comb_list <- append(x = arg_value_list, values = var_override[override_subset])
   arg_comb_list <- append(x = arg_comb_list, values = necessary_objects[necessary_subset])
 
   # add var objects
@@ -169,7 +183,6 @@ get_test_data_for_classifiers <- function(class_range = c(2L, 3L),
   test_embeddings_single_case <- test_embeddings$clone(deep = TRUE)
   test_embeddings_single_case$embeddings <- test_embeddings_single_case$embeddings[1L, , , drop = FALSE]
   test_embeddings_single_case_LD <- test_embeddings_single_case$convert_to_LargeDataSetForTextEmbeddings()
-
 
 
   # Prepare data for different classification types---------------------------
@@ -332,9 +345,8 @@ get_fixed_test_tensor <- function(pad_value) {
 
 #' @title Test if running on Continuous Integration (CI)
 #' @description Function checks if it is called on CI.
-#' @returns Returns `TRUE` if the following variables are set to "true"
+#' @returns Returns `TRUE` if one of the following variables are set to "true"
 #' * `"CI"`
-#' * `"NOT_CRAN"`
 #' * `"_R_CHECK_LIMIT_CORES_"`
 #' @family Utils TestThat Developers
 #' @noRd
@@ -342,7 +354,7 @@ get_fixed_test_tensor <- function(pad_value) {
 is_on_CI <- function() {
   if (
     Sys.getenv("CI") == "true" ||
-      Sys.getenv("NOT_CRAN") == "true" ||
+      #Sys.getenv("NOT_CRAN") == "true" ||
       Sys.getenv("_R_CHECK_LIMIT_CORES_") == "true"
   ) {
     return(TRUE)
@@ -367,5 +379,19 @@ random_bool_on_CI <- function() {
     }
   } else {
     return(FALSE)
+  }
+}
+
+#' @title Print duration of a test on CI
+#' @description Function prints the duration of a test to console if the test is
+#' running on CI. If not no output appears in console.
+#' @param test_name `string` Name of the test to print.
+#' @param start_time `POSIXct` Start time of the test.
+#' @return Returns nothing.
+#' @family Utils TestThat Developers
+#' @export
+monitor_test_time_on_CI <- function(start_time, test_name) {
+  if (is_on_CI()) {
+    print(paste(test_name, "Duration:", format(Sys.time() - start_time)))
   }
 }

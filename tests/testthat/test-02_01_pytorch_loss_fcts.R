@@ -4,6 +4,9 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
+# Start time
+test_time_start <- Sys.time()
+
 # Load python scripts
 load_all_py_scripts()
 
@@ -73,3 +76,9 @@ test_that("Multi-way contrastive loss", {
   loss <- layer(classes_q = test_classes, distance_matrix = distance_matrix, metric_scale_factor = 1L)
   expect_equal(object = as.vector(loss$numpy()), expected = 0.438978706, tolerance = 1e-4)
 })
+
+# Monitor test time
+monitor_test_time_on_CI(
+  start_time = test_time_start,
+  test_name = "02_01_pytorch_loss_fcts"
+)

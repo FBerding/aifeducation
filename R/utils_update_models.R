@@ -48,7 +48,8 @@ update_values_to_new_1.1.0 <- function(value) {
       "fourier", "Fourier",
       "cls", "CLS",
       "average", "Average",
-      "mean", "Mean"
+      "mean", "Mean",
+      "regular", "Regular"
     )
 
     value_table <- matrix(

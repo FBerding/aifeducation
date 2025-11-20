@@ -4,6 +4,9 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
+# Start time
+test_time_start <- Sys.time()
+
 # Load python scripts
 load_all_py_scripts()
 
@@ -269,6 +272,7 @@ test_that("DenseLayer with Mask", {
   device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
   normalization_types <- c("None", "LayerNorm")
   residual_types <- c("None", "Addition", "ResidualGate")
+  connection_types <- c("Regular", "PairwiseOrthogonal")
   pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
   times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
   features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
@@ -288,22 +292,114 @@ test_that("DenseLayer with Mask", {
     sample(x = seq(from = 1, to = (features - 1)), size = 1),
     sample(x = seq(from = (features + 1), to = 2 * features), size = 1)
   )
-  for (norm_types in normalization_types) {
-    for (res_types in residual_types) {
-      for (target_features in features_output) {
+  for (connection_type in connection_types) {
+    for (norm_types in normalization_types) {
+      for (res_types in residual_types) {
+        for (target_features in features_output) {
+          # Create layer
+          layer <- py$dense_layer_with_mask(
+            input_size = as.integer(features),
+            output_size = as.integer(target_features),
+            times = as.integer(times),
+            pad_value = as.integer(pad_value),
+            connection_type = connection_type,
+            act_fct = "ELU",
+            dropout = 0.3,
+            bias = TRUE,
+            parametrizations = "None",
+            dtype = values[[1]]$dtype,
+            residual_type = "None",
+            normalization_type = norm_types
+          )$to(device)
+          layer$eval()
+
+          y <- layer(
+            x = values[[1]],
+            seq_len = values[[2]],
+            mask_times = values[[3]],
+            mask_features = values[[4]]
+          )
+
+          # Test that masking values are the same
+          expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(values[[2]]))
+          expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(values[[3]]))
+
+          # Test the correct size of the new masking on feature level
+          expect_equal(dim(tensor_to_numpy(y[[4]]))[3], target_features)
+
+          # Test that padding is not destroyed
+          y_2 <- masking_layer(y[[1]])
+          expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(y_2[[2]]))
+          expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(y_2[[3]]))
+          expect_equal(tensor_to_numpy(y[[4]]), tensor_to_numpy(y_2[[4]]))
+
+          # Test that values do not change at random for same input
+          y_1 <- layer(
+            x = values[[1]],
+            seq_len = values[[2]],
+            mask_times = values[[3]],
+            mask_features = values[[4]]
+          )
+          y_2 <- layer(
+            x = values[[1]],
+            seq_len = values[[2]],
+            mask_times = values[[3]],
+            mask_features = values[[4]]
+          )
+          expect_equal(tensor_to_numpy(y_1[[1]]), tensor_to_numpy(y_2[[1]]))
+        }
+      }
+    }
+  }
+})
+
+# layer_tf_encoder-------------------------------------------------------
+test_that("layer_tf_encoder", {
+  device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
+  attention_types <- c("MultiHead", "Fourier")
+  normalization_types <- c("None", "LayerNorm")
+  normalization_positions <- c("Post", "Pre")
+
+  pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
+  times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
+  features <- sample(x = seq(from = 4, to = 1024, by = 2), size = 1)
+  sequence_length <- sample(x = seq(from = 1, to = times, by = 1), size = 30, replace = TRUE)
+  example_tensor <- generate_tensors(
+    times = times,
+    features = features,
+    seq_len = sequence_length,
+    pad_value = pad_value
+  )$to(device)
+  masking_layer <- py$masking_layer(pad_value)$to(device)
+  values <- masking_layer(example_tensor)
+
+  # Test for equal, more, and fewer features as input size
+  features_output <- c(
+    features,
+    sample(x = seq(from = 1, to = (features - 1)), size = 1),
+    sample(x = seq(from = (features + 1), to = 2 * features), size = 1)
+  )
+
+  for (attention_type in attention_types) {
+    for (normalization_type in normalization_types) {
+      for (normalization_position in normalization_positions) {
         # Create layer
-        layer <- py$dense_layer_with_mask(
-          input_size = as.integer(features),
-          output_size = as.integer(target_features),
+        layer <- py$layer_tf_encoder(
+          dense_dim = 38L,
           times = as.integer(times),
           pad_value = as.integer(pad_value),
+          attention_type = attention_type,
+          features = as.integer(features),
+          normalization_type = normalization_type,
+          normalization_position = normalization_position,
+          residual_type = "ResidualGate",
+          num_heads = as.integer(2),
           act_fct = "ELU",
-          dropout = 0.3,
+          dropout_rate_1 = 0.3,
+          dropout_rate_2 = 0.3,
           bias = TRUE,
           parametrizations = "None",
           dtype = values[[1]]$dtype,
-          residual_type = "None",
-          normalization_type = norm_types
         )$to(device)
         layer$eval()
 
@@ -317,9 +413,6 @@ test_that("DenseLayer with Mask", {
         # Test that masking values are the same
         expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(values[[2]]))
         expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(values[[3]]))
-
-        # Test the correct size of the new masking on feature level
-        expect_equal(dim(tensor_to_numpy(y[[4]]))[3], target_features)
 
         # Test that padding is not destroyed
         y_2 <- masking_layer(y[[1]])
@@ -343,85 +436,6 @@ test_that("DenseLayer with Mask", {
         expect_equal(tensor_to_numpy(y_1[[1]]), tensor_to_numpy(y_2[[1]]))
       }
     }
-  }
-})
-
-# layer_tf_encoder-------------------------------------------------------
-test_that("layer_tf_encoder", {
-  device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
-  attention_types <- c("MultiHead", "Fourier")
-
-  pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
-  times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
-  features <- sample(x = seq(from = 4, to = 1024, by = 2), size = 1)
-  sequence_length <- sample(x = seq(from = 1, to = times, by = 1), size = 30, replace = TRUE)
-  example_tensor <- generate_tensors(
-    times = times,
-    features = features,
-    seq_len = sequence_length,
-    pad_value = pad_value
-  )$to(device)
-  masking_layer <- py$masking_layer(pad_value)$to(device)
-  values <- masking_layer(example_tensor)
-
-  # Test for equal, more, and fewer features as input size
-  features_output <- c(
-    features,
-    sample(x = seq(from = 1, to = (features - 1)), size = 1),
-    sample(x = seq(from = (features + 1), to = 2 * features), size = 1)
-  )
-
-  for (attention_type in attention_types) {
-    # Create layer
-    layer <- py$layer_tf_encoder(
-      dense_dim = 38L,
-      times = as.integer(times),
-      pad_value = as.integer(pad_value),
-      attention_type = attention_type,
-      features = as.integer(features),
-      normalization_type = "LayerNorm",
-      residual_type = "ResidualGate",
-      num_heads = as.integer(2),
-      act_fct = "ELU",
-      dropout_rate_1 = 0.3,
-      dropout_rate_2 = 0.3,
-      bias = TRUE,
-      parametrizations = "None",
-      dtype = values[[1]]$dtype,
-    )$to(device)
-    layer$eval()
-
-    y <- layer(
-      x = values[[1]],
-      seq_len = values[[2]],
-      mask_times = values[[3]],
-      mask_features = values[[4]]
-    )
-
-    # Test that masking values are the same
-    expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(values[[2]]))
-    expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(values[[3]]))
-
-    # Test that padding is not destroyed
-    y_2 <- masking_layer(y[[1]])
-    expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(y_2[[2]]))
-    expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(y_2[[3]]))
-    expect_equal(tensor_to_numpy(y[[4]]), tensor_to_numpy(y_2[[4]]))
-
-    # Test that values do not change at random for same input
-    y_1 <- layer(
-      x = values[[1]],
-      seq_len = values[[2]],
-      mask_times = values[[3]],
-      mask_features = values[[4]]
-    )
-    y_2 <- layer(
-      x = values[[1]],
-      seq_len = values[[2]],
-      mask_times = values[[3]],
-      mask_features = values[[4]]
-    )
-    expect_equal(tensor_to_numpy(y_1[[1]]), tensor_to_numpy(y_2[[1]]))
   }
 })
 
@@ -828,3 +842,9 @@ test_that("layer_global_average_pooling_1d", {
     tolerance = 1e-7
   )
 })
+
+# Monitor test time
+monitor_test_time_on_CI(
+  start_time = test_time_start,
+  test_name = "02_02_pytorch_layers"
+)

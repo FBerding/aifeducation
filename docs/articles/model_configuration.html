@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>04 Model configuration • aifeducation</title>
+<title>04 Model and training configuration • aifeducation</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
@@ -15,7 +15,7 @@
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="04 Model configuration">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="04 Model and training configuration">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,7 +54,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/cran/aifeducation/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/FBerding/aifeducation/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -68,13 +68,13 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>04 Model configuration</h1>
+      <h1>04 Model and training configuration</h1>
                         <h4 data-toc-skip class="author">Florian
 Berding, Julia Pargmann, Andreas Slopinski, Elisabeth Riebenbauer, Karin
 Rebmann</h4>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cran/aifeducation/blob/HEAD/vignettes/model_configuration.Rmd" class="external-link"><code>vignettes/model_configuration.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/FBerding/aifeducation/blob/HEAD/vignettes/model_configuration.Rmd" class="external-link"><code>vignettes/model_configuration.Rmd</code></a></small>
       <div class="d-none name"><code>model_configuration.Rmd</code></div>
     </div>
 
@@ -286,7 +286,7 @@ calculating the mean over all tokens of the second to last layer
 <li>that fine-tuning a transformer with only a few training examples
 (10,000) results in a lower performance than using a not fine-tuned
 transformer (Ganesan et al. 2021, p. 4519).</li>
-<li>Principal component analysis performed best, but multi-layer
+<li>Principal component analysis performed best, but multy-layer
 non-linear auto-encoders (NLAE) are also a good choice (Ganesan et
 al. 2021, p. 4520).</li>
 <li>that the number of dimensions depends on the specific task. However,
@@ -297,18 +297,100 @@ to
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi>/</mi><mn>6</mn></mrow><annotation encoding="application/x-tex">1/6</annotation></semantics></math>
 of the dimensions were sufficient (Ganesan et al. 2021, p. 4522).</li>
 </ul>
-<p>Ganesan et al. (2021) work shows that a reduction of the dimensions
-is necessary in case that the transformer model uses a large hidden
-size. Since most models in <em>aifeducation</em> work with sequential
-data, the package contains an LSTM (<code>fe_method="LSTM"</code>) and a
-dense feature extractor (<code>fe_method="Dense"</code>). To use it for
-classifier training, create a <code>TEFeatureExtractor</code> and
-provide the trained extractor during the configuration of the
-classifier. See section “Extension” in vignette <a href="classification_tasks.html">03 Using R syntax</a> or <a href="gui_aife_studio.html">02 Using the graphical user interface
-Aifeducation - Studio</a> for more details.</p>
+<p>The work of Ganesan et al. (2021) shows that reducing the dimensions
+is is a good choice when the transformer model uses a large hidden size.
+A similar finding was reported in a study by Takeshita et al. (2025).
+Their study shows that randomly dropping 50% of the dimensions leads
+only to a minor decrease in performance in classification tasks.</p>
+<p>You can apply these findings to a classification model using either
+of the following methods:</p>
+<ul>
+<li>the parameter <code>feat_size</code> during model configuration;
+or</li>
+<li>train and use a feature extractor. Since most models in
+<em>aifeducation</em> work with sequential data, the package contains an
+LSTM (<code>fe_method="LSTM"</code>), as well as a dense feature
+extractor (<code>fe_method="Dense"</code>). To use it for a classifier,
+create a <code>TEFeatureExtractor</code> and provide the trained
+extractor when configuring the model.</li>
+</ul>
+<p>See section vignette <a href="classification_tasks.html">03 Using R
+syntax</a> or <a href="gui_aife_studio.html">02 Using the graphical user
+interface Aifeducation - Studio</a> for more details.</p>
 </div>
 <div class="section level2">
-<h2 id="limitations">5 Limitations<a class="anchor" aria-label="anchor" href="#limitations"></a>
+<h2 id="training">5 Training<a class="anchor" aria-label="anchor" href="#training"></a>
+</h2>
+<p>After deciding about the configuration of a model finding good
+training settings is the next step.</p>
+<p><em>batch size</em> and <em>learning rate</em></p>
+<p><code>batch_size</code> sets the number of cases to be processed
+simultaneously. Large batch sizes make use of the capacity of modern
+machines. This makes it possible to effectively train large models with
+large data sets, while saving computational time. The
+<code>batch_size</code> is closely related to the learning rate as
+several studies shows.</p>
+<p>Although large batch sizes seem preferable for saving computational
+time, small batch sizes lead to better performance due to the
+generalisation gap (Keskar et al., 2017 p. 2). The generalisation gap
+describes the observation that large batch sizes tend to poor
+generalisation performance on test data sets compared to models trained
+with a small batch size (Keskar et al., 2017 p. 3).</p>
+<p>A study conducted by Masters and Luschi (2018) suggests ways to
+achieve good batch size for using <code>"SGD"</code> as optimizer. Their
+study shows that smaller batch sizes offer more stable and reliable
+training and at the same time achieve better generalisation performance.
+Batch sizes between 4 and 32 lead to the best performance. Increasing
+the batch size also reduces the range of learning rates that provide
+stable convergence (Masters &amp; Luschi 2018, p. 18). Good values for
+the <em>base</em> learning rate
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>η</mi><mrow><mi>B</mi><mi>a</mi><mi>s</mi><mi>e</mi></mrow></msub><annotation encoding="application/x-tex">\eta_{Base}</annotation></semantics></math>)
+for batch sizes between 4 and 32 are in the range of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>2</mn><mrow><mi>−</mi><mn>6</mn></mrow></msup><annotation encoding="application/x-tex">2^{-6}</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>2</mn><mrow><mi>−</mi><mn>10</mn></mrow></msup><annotation encoding="application/x-tex">2^{-10}</annotation></semantics></math>
+(Masters &amp; Luschi 2018, p. 15). Similar results report He, Liu et
+al. (2019) showing that the ratio of batch size to learning rate
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>b</mi><mi>a</mi><mi>t</mi><mi>c</mi><mi>h</mi><mi>s</mi><mi>i</mi><mi>z</mi><mi>e</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>/</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>l</mi><mi>e</mi><mi>a</mi><mi>r</mi><mi>n</mi><mi>i</mi><mi>n</mi><mi>g</mi><mi>r</mi><mi>a</mi><mi>t</mi><mi>e</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">(batch size)/(learning rate)</annotation></semantics></math>
+should be as small as possible in order to achieve good generalisation
+performance.</p>
+<p>Goyal et al. (2017, p. 7) demonstrate that gradually increasing the
+learning rate at the beginning of training can help achieve the
+performance of training with small batch sizes, even when using large
+batch sizes. In this approach, training begins with a small learning
+rate that increases steadily until it reaches the target learning rate
+at a specific epoch. After this, the regular learning rate scheduler is
+applied. Masters and Luschi (2018, p. 11) corroborate this finding, yet
+assert that optimal performance is still attained with small batch
+sizes. They use about 5% of the epochs for the warm-up.</p>
+<p>Marek et al. (2025, p. 6) demonstrate that small batch sizes are more
+robust to all of Adam’s hyperparameters.</p>
+<p>Based on these results we recommend to start with
+<code>batch_size=32</code>. For calculating the corresponding learning
+rate you first have to choose a base learning rate
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>η</mi><mrow><mi>B</mi><mi>a</mi><mi>s</mi><mi>e</mi></mrow></msub><annotation encoding="application/x-tex">\eta_{Base}</annotation></semantics></math>.
+Based on the work by Masters and Luschi (2018) we recommend to set
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>η</mi><mrow><mi>B</mi><mi>a</mi><mi>s</mi><mi>e</mi></mrow></msub><mo>=</mo><msup><mn>2</mn><mrow><mi>−</mi><mn>10</mn></mrow></msup></mrow><annotation encoding="application/x-tex">\eta_{Base}=2^{-10}</annotation></semantics></math>.
+The learning rate to apply can now be calculated as
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>η</mi><mo>=</mo><msub><mi>η</mi><mrow><mi>B</mi><mi>a</mi><mi>s</mi><mi>e</mi></mrow></msub><mo>*</mo><mi>b</mi><mi>a</mi><mi>t</mi><mi>c</mi><mi>h</mi><mi>s</mi><mi>i</mi><mi>z</mi><mi>e</mi></mrow><annotation encoding="application/x-tex">\eta=\eta_{Base}*batchsize</annotation></semantics></math>.
+For a batch size of 32 this is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>η</mi><mo>=</mo><msup><mn>2</mn><mrow><mi>−</mi><mn>10</mn></mrow></msup><mo>*</mo><mn>32</mn><mo>=</mo><mn>0.03125</mn></mrow><annotation encoding="application/x-tex">\eta=2^{-10}*32=0.03125</annotation></semantics></math>.
+We set <code>lr_rate=3e-2</code>. Based on the work of Goyal et
+al. (2017), we recommend using the first 5%
+(<code>lr_warm_up_ratio = 0.05</code>) to 10 %
+(<code>lr_warm_up_ratio = 0.1</code>) of epochs for warum-up.</p>
+<p>Please note that there are exceptions to this rule. In the context of
+contrastive learning, higher batch sizes tend to generate better
+generalisation performance (Chen et al., 2020).</p>
+<p><em>Epochs</em></p>
+<p>The number of epochs determines how many times the model goes through
+the complete training data. If you are unsure about the required number
+of epochs, set a high value. The best-generalisation state is determined
+automatically. All models except <code>BaseModel</code>s have an early
+stop rule to prevent unnecessary computations during training.</p>
+</div>
+<div class="section level2">
+<h2 id="limitations">6 Limitations<a class="anchor" aria-label="anchor" href="#limitations"></a>
 </h2>
 <p>Please note that the findings presented in this vignette refer to
 different architectures of AI models. In general, the results cannot be
@@ -318,6 +400,8 @@ recommendations can only serve as a rule of thumb.</p>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
+<p>Chen, T., Kornblith, S., Norouzi, M. &amp; Hinton, G. (2020). A
+Simple Framework for Contrastive Learning of Visual Representations. <a href="https://doi.org/10.48550/arXiv.2002.05709" class="external-link uri">https://doi.org/10.48550/arXiv.2002.05709</a></p>
 <p>Chen, W., Su, Y., Shen, Y., Chen, Z., Yan, X., &amp; Wang, W. Y.
 (2019). How Large a Vocabulary Does Text Classification Need? A
 Variational Approach to Vocabulary Selection. In J. Burstein, C. Doran,
@@ -337,10 +421,18 @@ American Chapter. Meeting, 2021, 4515–4532. <a href="https://doi.org/10.18653/
 Nakov, P., Chen, D., &amp; Winslett, M. (2021). Compressing Large-Scale
 Transformer-Based Models: A Case Study on BERT. Transactions of the
 Association for Computational Linguistics, 9, 1061–1080. <a href="https://doi.org/10.1162/tacl_a_00413" class="external-link uri">https://doi.org/10.1162/tacl_a_00413</a></p>
+<p>Goyal, P., Dollár, P., Girshick, R., Noordhuis, P., Wesolowski, L.,
+Kyrola, A., Tulloch, A., Jia, Y. &amp; He, K. (2017, 8. Juni). Accurate,
+Large Minibatch SGD: Training ImageNet in 1 Hour.</p>
 <p>Gowda, T., &amp; May, J. (2020). Finding the Optimal Vocabulary Size
 for Neural Machine Translation. In T. Cohn, Y. He, &amp; Y. Liu (Eds.),
 Findings of the Association for Computational Linguistics: EMNLP 2020
 (pp. 3955–3964). Association for Computational Linguistics. <a href="https://doi.org/10.18653/v1/2020.findings-emnlp.352" class="external-link uri">https://doi.org/10.18653/v1/2020.findings-emnlp.352</a></p>
+<p>He, F., Liu, T. &amp; Tao, D. (2019). Control Batch Size and Learning
+Rate to Generalize Well: Theoretical and Empirical Evidence. In Advances
+in neural information processing systems: Bd. 32. 32nd Conference on
+Neural Information Processing Systems (NeurIPS 2019): Vancouver, Canada,
+8-14 December 2019. Curran Associates Inc.</p>
 <p>Kaya, Y. B., &amp; Tantuğ, A. C. (2024). Effect of tokenization
 granularity for Turkish large language models. Intelligent Systems with
 Applications, 21, 200335. <a href="https://doi.org/10.1016/j.iswa.2024.200335" class="external-link uri">https://doi.org/10.1016/j.iswa.2024.200335</a></p>
@@ -358,11 +450,16 @@ Proceedings of the 2019 Conference of the North (pp. 1073–1094).
 Association for Computational Linguistics. <a href="https://doi.org/10.18653/v1/N19-1112" class="external-link uri">https://doi.org/10.18653/v1/N19-1112</a></p>
 <p>Ma, X., Wang, Z., Ng, P., Nallapati, R., &amp; Xiang, B. (2019).
 Universal Text Representation from BERT: An Empirical Study. <a href="https://doi.org/10.48550/arXiv.1910.07973" class="external-link uri">https://doi.org/10.48550/arXiv.1910.07973</a></p>
+<p>Masters, D. &amp; Luschi, C. (2018). Revisiting Small Batch Training
+for Deep Neural Networks. <a href="https://doi.org/10.48550/arXiv.1804.07612" class="external-link uri">https://doi.org/10.48550/arXiv.1804.07612</a></p>
 <p>Michel, P., Levy, O., &amp; Neubig, G. (2019). Are Sixteen Heads
 Really Better than One? <a href="https://doi.org/10.48550/arXiv.1905.10650" class="external-link uri">https://doi.org/10.48550/arXiv.1905.10650</a></p>
 <p>Rogers, A., Kovaleva, O., &amp; Rumshisky, A. (2020). A Primer in
 BERTology: What We Know About How BERT Works. Transactions of the
 Association for Computational Linguistics, 8, 842–866. <a href="https://doi.org/10.1162/tacl_a_00349" class="external-link uri">https://doi.org/10.1162/tacl_a_00349</a></p>
+<p>Takeshita, S., Takeshita, Y., Ruffinelli, D. &amp; Ponzetto, S. P.
+(2025). Randomly Removing 50% of Dimensions in Text Embeddings has
+Minimal Impact on Retrieval and Classification Tasks. <a href="https://doi.org/10.48550/arXiv.2508.17744" class="external-link uri">https://doi.org/10.48550/arXiv.2508.17744</a></p>
 <p>Tanaka, H., Shinnou, H., Cao, R., Bai, J., &amp; Ma, W. (2020).
 Document Classification by Word Embeddings of BERT. In L.-M. Nguyen,
 X.-H. Phan, K. Hasida, &amp; S. Tojo (Eds.), Communications in Computer

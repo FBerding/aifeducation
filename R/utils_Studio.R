@@ -1243,7 +1243,6 @@ create_widget_card <- function(id,
   }
 
 
-
   # Create Main Card
   main_card <- bslib::card(
     bslib::card_header(box_title),

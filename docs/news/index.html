@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -30,7 +30,7 @@
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/cran/aifeducation/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/FBerding/aifeducation/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -40,11 +40,33 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/cran/aifeducation/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/FBerding/aifeducation/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="1.1.2" id="aifeducation-112">aifeducation 1.1.2<a class="anchor" aria-label="anchor" href="#aifeducation-112"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.1.3" id="aifeducation-113">aifeducation 1.1.3<a class="anchor" aria-label="anchor" href="#aifeducation-113"></a></h2>
+<p><strong>BaseModels</strong></p>
+<ul><li>Fixed the not displayed documentation for BaseModelCore and MPNet.</li>
+<li>Added new options for plotting training history.</li>
+<li>Added improved error messages for BaseModelModernBert.</li>
+</ul><p><strong>Classifiers</strong></p>
+<ul><li>Add the possibility to apply Pre-Layer-Normalization as described by <a href="https://doi.org/10.48550/arXiv.2002.04745" class="external-link">Xiong et al. (2020)</a> for transformer encoder layers.</li>
+<li>Added new options for plotting training history.</li>
+<li>Fixed an errors causing pseudo labeling to crash in some cases.</li>
+<li>Added a new type of classification head: OLS-Layer described by <a href="https://doi.org/10.1109/TIP.2020.2990277" class="external-link">Li et al. 2020</a>. The new head is available for TEClassifierSequential and TEClassifierParallel. For the classifiers working with prototypes the layer can be used to change the projection into the embedding space (parameter projection_type).</li>
+</ul><p><strong>FeatureExtractor</strong></p>
+<ul><li>Added new options for plotting training history.</li>
+</ul><p><strong>Graphical User Interface Aifeducation Studio</strong></p>
+<ul><li>Added new controlling widgets for the new options for plotting training history.</li>
+<li>Reduced the number of columns for sustainability data for more transparency (BaseModels and TextEmbeddingModels).</li>
+<li>Added a calculation of the total number of words a TextEmbeddingModel can maximal use.</li>
+</ul><p><strong>Cache and Memory Management</strong></p>
+<ul><li>Added a function to monitor temporary files.</li>
+</ul><p><strong>DataManagerClassifier</strong></p>
+<ul><li>Optimized cache. Now unnecessary temporary files are removed after training a classifier correctly.</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.1.2" id="aifeducation-112">aifeducation 1.1.2<a class="anchor" aria-label="anchor" href="#aifeducation-112"></a></h2><p class="text-muted">CRAN release: 2025-10-14</p>
 <p><strong>Major Changes</strong></p>
 <ul><li>Introduction of two new classes: one for tokenizers and one for base models. This allows us a more specialized implementation of new methods (e.g. for estimating FLOPS) and a unified handling for all classes in this packages (e.g. saving and loading).</li>
 <li>Re-implement DeBERTa version 2.</li>
@@ -67,6 +89,10 @@
 <li>Fixed a bug in calculating the mean values for precision, recall, and f1.</li>
 </ul><p><strong>Documentation</strong></p>
 <ul><li>The documentation was updated to the new structure and objects.</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.1.1" id="aifeducation-111">aifeducation 1.1.1<a class="anchor" aria-label="anchor" href="#aifeducation-111"></a></h2><p class="text-muted">CRAN release: 2025-08-23</p>
+<ul><li>Fixed a problem with the function that converts classes to one hot encoding.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.1.0" id="aifeducation-110">aifeducation 1.1.0<a class="anchor" aria-label="anchor" href="#aifeducation-110"></a></h2><p class="text-muted">CRAN release: 2025-08-19</p>

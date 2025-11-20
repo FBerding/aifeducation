@@ -78,6 +78,10 @@ BaseModelMPNet <- R6::R6Class(
   public = list(
     #---------------------------------------------------------------------------
     #' @description Configures a new object of this class.
+    #' Please ensure that your chosen configuration comply with the following
+    #' guidelines:
+    #' * hidden_size is a multiple of num_attention_heads.
+    #'
     #' @param tokenizer `r get_param_doc_desc("tokenizer")`
     #' @param max_position_embeddings `r get_param_doc_desc("max_position_embeddings")`
     #' @param hidden_size `r get_param_doc_desc("hidden_size")`
@@ -102,26 +106,26 @@ BaseModelMPNet <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     #' @description Traines a BaseModel
-    #' @param text_dataset `r get_description("text_dataset")`
-    #' @param p_mask `r get_description("p_mask")`
-    #' @param p_perm `r get_description("p_perm")`
-    #' @param whole_word `r get_description("whole_word")`
-    #' @param val_size `r get_description("val_size")`
-    #' @param n_epoch `r get_description("n_epoch")`
-    #' @param batch_size `r get_description("batch_size")`
-    #' @param max_sequence_length `r get_description("max_sequence_length")`
-    #' @param full_sequences_only `r get_description("full_sequences_only")`
-    #' @param min_seq_len `r get_description("min_seq_len")`
-    #' @param learning_rate `r get_description("learning_rate")`
-    #' @param sustain_track `r get_description("sustain_track")`
-    #' @param sustain_iso_code `r get_description("sustain_iso_code")`
-    #' @param sustain_region `r get_description("sustain_region")`
-    #' @param sustain_interval `r get_description("sustain_interval")`
-    #' @param sustain_log_level `r get_description("sustain_log_level")`
-    #' @param trace `r get_description("trace")`
-    #' @param pytorch_trace `r get_description("pytorch_trace")`
-    #' @param log_dir `r get_description("log_dir")`
-    #' @param log_write_interval `r get_description("log_write_interval")`
+    #' @param text_dataset `r get_param_doc_desc("text_dataset")`
+    #' @param p_mask `r get_param_doc_desc("p_mask")`
+    #' @param p_perm `r get_param_doc_desc("p_perm")`
+    #' @param whole_word `r get_param_doc_desc("whole_word")`
+    #' @param val_size `r get_param_doc_desc("val_size")`
+    #' @param n_epoch `r get_param_doc_desc("n_epoch")`
+    #' @param batch_size `r get_param_doc_desc("batch_size")`
+    #' @param max_sequence_length `r get_param_doc_desc("max_sequence_length")`
+    #' @param full_sequences_only `r get_param_doc_desc("full_sequences_only")`
+    #' @param min_seq_len `r get_param_doc_desc("min_seq_len")`
+    #' @param learning_rate `r get_param_doc_desc("learning_rate")`
+    #' @param sustain_track `r get_param_doc_desc("sustain_track")`
+    #' @param sustain_iso_code `r get_param_doc_desc("sustain_iso_code")`
+    #' @param sustain_region `r get_param_doc_desc("sustain_region")`
+    #' @param sustain_interval `r get_param_doc_desc("sustain_interval")`
+    #' @param sustain_log_level `r get_param_doc_desc("sustain_log_level")`
+    #' @param trace `r get_param_doc_desc("trace")`
+    #' @param pytorch_trace `r get_param_doc_desc("pytorch_trace")`
+    #' @param log_dir `r get_param_doc_desc("log_dir")`
+    #' @param log_write_interval `r get_param_doc_desc("log_write_interval")`
     #' @return `r get_description("return_nothing")`
     train = function(text_dataset,
                      p_mask = 0.15,

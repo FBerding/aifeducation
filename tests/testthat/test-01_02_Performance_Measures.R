@@ -1,3 +1,6 @@
+# Start time
+test_time_start <- Sys.time()
+
 test_that("Krippendorff's Alpha", {
   # Values taken from
   # Krippendorff, K. (2019). Content Analysis: An Introduction to
@@ -301,3 +304,9 @@ test_that("Gwet's AC1 and AC2", {
   expect_equal(results$ac2_linear, 1, tolerance = 1e-4)
   expect_equal(results$ac2_quadratic, 1, tolerance = 1e-4)
 })
+
+# Monitor test time
+monitor_test_time_on_CI(
+  start_time = test_time_start,
+  test_name = "01_02_performance_measures"
+)

@@ -126,11 +126,11 @@ is used as the final model.
 \item{\code{data_targets}}{\code{factor} containing the labels for cases stored in embeddings. Factor must be
 named and has to use the same names as used in in the embeddings. .}
 
-\item{\code{data_folds}}{\code{int} determining the number of cross-fold samples. Allowed values: \code{1 <= x }}
+\item{\code{data_folds}}{\code{int} determining the number of cross-fold samples. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
 \item{\code{data_val_size}}{\code{double} between 0 and 1, indicating the proportion of cases which should be
 used for the validation sample during the estimation of the model.
-The remaining cases are part of the training data. Allowed values: \verb{0 < x < 1}}
+The remaining cases are part of the training data. Allowed values: \ifelse{latex}{$0 < x < 1$}{\ifelse{html}{\eqn{0 < x < 1}}{`0 < x < 1`}}}
 
 \item{\code{loss_balance_class_weights}}{\code{bool} If \code{TRUE} class weights are generated based on the frequencies of the
 training data with the method Inverse Class Frequency. If \code{FALSE} each class has the weight 1.}
@@ -145,19 +145,19 @@ If \code{FALSE} each sequences length has the weight 1.}
 
 \item{\code{sc_method}}{\code{string} containing the method for generating synthetic cases. Allowed values: 'knnor'}
 
-\item{\code{sc_min_k}}{\code{int} determining the minimal number of k which is used for creating synthetic units. Allowed values: \code{1 <= x }}
+\item{\code{sc_min_k}}{\code{int} determining the minimal number of k which is used for creating synthetic units. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
-\item{\code{sc_max_k}}{\code{int} determining the maximal number of k which is used for creating synthetic units. Allowed values: \code{1 <= x }}
+\item{\code{sc_max_k}}{\code{int} determining the maximal number of k which is used for creating synthetic units. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
 \item{\code{use_pl}}{\code{bool} \code{TRUE} if the estimation should integrate pseudo-labeling. \code{FALSE} if not.}
 
-\item{\code{pl_max_steps}}{\code{int} determining the maximum number of steps during pseudo-labeling. Allowed values: \code{1 <= x }}
+\item{\code{pl_max_steps}}{\code{int} determining the maximum number of steps during pseudo-labeling. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
-\item{\code{pl_max}}{\code{double} setting the maximal level of confidence for considering a case for pseudo-labeling. Allowed values: \verb{0 < x <= 1}}
+\item{\code{pl_max}}{\code{double} setting the maximal level of confidence for considering a case for pseudo-labeling. Allowed values: \ifelse{latex}{$0 < x <= 1$}{\ifelse{html}{\eqn{0 < x <= 1}}{`0 < x <= 1`}}}
 
-\item{\code{pl_anchor}}{\code{double} indicating the reference point for sorting the new cases of every label. Allowed values: \verb{0 <= x <= 1}}
+\item{\code{pl_anchor}}{\code{double} indicating the reference point for sorting the new cases of every label. Allowed values: \ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
 
-\item{\code{pl_min}}{\code{double} setting the mnimal level of confidence for considering a case for pseudo-labeling. Allowed values: \verb{0 <= x < 1}}
+\item{\code{pl_min}}{\code{double} setting the mnimal level of confidence for considering a case for pseudo-labeling. Allowed values: \ifelse{latex}{$0 <= x < 1$}{\ifelse{html}{\eqn{0 <= x < 1}}{`0 <= x < 1`}}}
 
 \item{\code{sustain_track}}{\code{bool} If \code{TRUE} energy consumption is tracked during training via the python library 'codecarbon'.}
 
@@ -168,29 +168,29 @@ sustainability should be tracked. A list can be found on Wikipedia:
 \item{\code{sustain_region}}{\code{string} Region within a country. Only available for USA and Canada See the documentation of
 codecarbon for more information. \url{https://mlco2.github.io/codecarbon/parameters.html} Allowed values: any}
 
-\item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage. Allowed values: \code{1 <= x }}
+\item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
-\item{\code{sustain_log_level}}{}
+\item{\code{sustain_log_level}}{\code{string} Level for printing information to the console. Allowed values: 'debug', 'info', 'warning', 'error', 'critical'}
 
-\item{\code{epochs}}{\code{int} Number of training epochs. Allowed values: \code{1 <= x }}
+\item{\code{epochs}}{\code{int} Number of training epochs. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
-\item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \code{1 <= x }}
+\item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
 \item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
 
-\item{\code{ml_trace}}{\code{int} \code{ml_trace=0} does not print any information about the training process from pytorch on the console. Allowed values: \verb{0 <= x <= 1}}
+\item{\code{ml_trace}}{\code{int} \code{ml_trace=0} does not print any information about the training process from pytorch on the console. Allowed values: \ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
 
 \item{\code{log_dir}}{\code{string} Path to the directory where the log files should be saved.
 If no logging is desired set this argument to \code{NULL}. Allowed values: any}
 
 \item{\code{log_write_interval}}{\code{int} Time in seconds determining the interval in which the logger should try to update
-the log files. Only relevant if \code{log_dir} is not \code{NULL}. Allowed values: \code{1 <= x }}
+the log files. Only relevant if \code{log_dir} is not \code{NULL}. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
-\item{\code{n_cores}}{\code{int} Number of cores which should be used during the calculation of synthetic cases. Only relevant if \code{use_sc=TRUE}. Allowed values: \code{1 <= x }}
+\item{\code{n_cores}}{\code{int} Number of cores which should be used during the calculation of synthetic cases. Only relevant if \code{use_sc=TRUE}. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
-\item{\code{lr_rate}}{\code{double} Initial learning rate for the training. Allowed values: \verb{0 < x <= 1}}
+\item{\code{lr_rate}}{\code{double} Initial learning rate for the training. Allowed values: \ifelse{latex}{$0 < x <= 1$}{\ifelse{html}{\eqn{0 < x <= 1}}{`0 < x <= 1`}}}
 
-\item{\code{lr_warm_up_ratio}}{\code{double} Number of epochs used for warm up. Allowed values: \verb{0 < x < 0.5}}
+\item{\code{lr_warm_up_ratio}}{\code{double} Number of epochs used for warm up. Allowed values: \ifelse{latex}{$0 < x < 0.5$}{\ifelse{html}{\eqn{0 < x < 0.5}}{`0 < x < 0.5`}}}
 
 \item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values: 'Adam', 'RMSprop', 'AdamW', 'SGD'}
 }

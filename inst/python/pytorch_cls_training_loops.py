@@ -32,21 +32,6 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     current_dtype=torch.double
     model.to(device,dtype=current_dtype)
   
-  if optimizer_method=="Adam":
-    optimizer=torch.optim.Adam(lr=lr_rate,params=model.parameters(),weight_decay=1e-3)
-  elif optimizer_method=="RMSprop":
-    optimizer=torch.optim.RMSprop(lr=lr_rate,params=model.parameters(),momentum=0.90)
-  elif optimizer_method=="AdamW":
-    optimizer=torch.optim.AdamW(lr=lr_rate,params=model.parameters())
-  elif optimizer_method=="SGD":
-    optimizer=torch.optim.SGD(params=model.parameters(), lr=lr_rate, momentum=0.90, dampening=0, weight_decay=0, nesterov=False, maximize=False, foreach=None, differentiable=False, fused=None)
-  
-  warm_up_steps=math.floor(epochs*lr_warm_up_ratio)
-  main_steps=epochs-warm_up_steps
-  scheduler_warm_up = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1e-9,end_factor=1, total_iters=warm_up_steps)
-  scheduler_main=torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1,end_factor=0, total_iters=main_steps)
-  scheduler = torch.optim.lr_scheduler.SequentialLR(schedulers = [scheduler_warm_up, scheduler_main], optimizer=optimizer,milestones=[warm_up_steps])
- 
   class_weights=class_weights.clone()
   class_weights=class_weights.to(device)
   
@@ -75,6 +60,24 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       test_data,
       batch_size=batch_size,
       shuffle=False)
+      
+  if optimizer_method=="Adam":
+    optimizer=torch.optim.Adam(lr=lr_rate,params=model.parameters(),weight_decay=1e-3)
+  elif optimizer_method=="RMSprop":
+    optimizer=torch.optim.RMSprop(lr=lr_rate,params=model.parameters(),momentum=0.90)
+  elif optimizer_method=="AdamW":
+    optimizer=torch.optim.AdamW(lr=lr_rate,params=model.parameters())
+  elif optimizer_method=="SGD":
+    optimizer=torch.optim.SGD(params=model.parameters(), lr=lr_rate, momentum=0.90, dampening=0, weight_decay=0, nesterov=False, maximize=False, foreach=None, differentiable=False, fused=None)
+  
+  warm_up_steps=math.floor(epochs*lr_warm_up_ratio)
+  main_steps=epochs-warm_up_steps
+  scheduler_warm_up = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1e-9,end_factor=1, total_iters=warm_up_steps)
+  scheduler_main=torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1,end_factor=0.01, total_iters=main_steps)
+  #scheduler_main=torch.optim.lr_scheduler.CyclicLR(optimizer, base_lr=lr_rate*1e-3, max_lr=lr_rate, step_size_up=5*len(trainloader))
+  #scheduler_main=torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.95,last_epoch=-1)
+  scheduler = torch.optim.lr_scheduler.SequentialLR(schedulers = [scheduler_warm_up, scheduler_main], optimizer=optimizer,milestones=[warm_up_steps])
+     
       
   #Tensor for Saving Training History
   if not (test_data is None):
@@ -354,7 +357,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   
     #Check if there are furhter information for training-----------------------
     # If there are no addtiononal information. Stop training and continue
-    if train_loss/len(trainloader)<0.0001 and acc_train==1 and bacc_train==1:
+    if train_loss/len(trainloader)<1e-6 and acc_train==1 and bacc_train==1 and avg_iota_train==1:
       break
   
   #Finalize--------------------------------------------------------------------
@@ -383,22 +386,6 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   else:
     dtype=torch.double
     model.to(device,dtype=dtype)
-  
-  if optimizer_method=="Adam":
-    optimizer=torch.optim.Adam(lr=lr_rate,params=model.parameters(),weight_decay=1e-3)
-  elif optimizer_method=="RMSprop":
-    optimizer=torch.optim.RMSprop(lr=lr_rate,params=model.parameters())
-  elif optimizer_method=="AdamW":
-    optimizer=torch.optim.AdamW(lr=lr_rate,params=model.parameters())
-  elif optimizer_method=="SGD":
-    optimizer=torch.optim.SGD(params=model.parameters(), lr=lr_rate, momentum=0.90, dampening=0, weight_decay=0, nesterov=False, maximize=False, foreach=None, differentiable=False, fused=None)
-  
-  warm_up_steps=math.floor(epochs*lr_warm_up_ratio)
-  main_steps=epochs-warm_up_steps
-  scheduler_warm_up = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1e-9,end_factor=1, total_iters=warm_up_steps)
-  scheduler_main=torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1,end_factor=0, total_iters=main_steps)
-  scheduler = torch.optim.lr_scheduler.SequentialLR(schedulers = [scheduler_warm_up, scheduler_main], optimizer=optimizer,milestones=[warm_up_steps])
-     
     
   if loss_pt_fct_name =="MultiWayContrastiveLoss":
     loss_fct=multi_way_contrastive_loss(
@@ -448,7 +435,23 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   #loader_for_trained_prototpyes=torch.utils.data.DataLoader(
   #  train_data,
   #  batch_size=Ns+Nq,
-  #  shuffle=False)    
+  #  shuffle=False) 
+  if optimizer_method=="Adam":
+    optimizer=torch.optim.Adam(lr=lr_rate,params=model.parameters(),weight_decay=1e-3)
+  elif optimizer_method=="RMSprop":
+    optimizer=torch.optim.RMSprop(lr=lr_rate,params=model.parameters())
+  elif optimizer_method=="AdamW":
+    optimizer=torch.optim.AdamW(lr=lr_rate,params=model.parameters())
+  elif optimizer_method=="SGD":
+    optimizer=torch.optim.SGD(params=model.parameters(), lr=lr_rate, momentum=0.90, dampening=0, weight_decay=0, nesterov=False, maximize=False, foreach=None, differentiable=False, fused=None)
+  
+  warm_up_steps=math.floor(epochs*lr_warm_up_ratio)
+  main_steps=epochs-warm_up_steps
+  scheduler_warm_up = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1e-9,end_factor=1, total_iters=warm_up_steps)
+  scheduler_main=torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1,end_factor=0.01, total_iters=main_steps)
+  #scheduler_main=torch.optim.lr_scheduler.CyclicLR(optimizer, base_lr=lr_rate*1e-3, max_lr=lr_rate, step_size_up=2*len(trainloader))
+  #scheduler_main=torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.95,last_epoch=-1)
+  scheduler = torch.optim.lr_scheduler.SequentialLR(schedulers = [scheduler_warm_up, scheduler_main], optimizer=optimizer,milestones=[warm_up_steps])  
   
   #Log file
   if not (log_dir is None):
@@ -743,7 +746,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
           
     #Check if there are furhter information for training-----------------------
     # If there are no addtiononal information. Stop training and continue
-    if train_loss/len(trainloader)<0.0001 and acc_train==1 and bacc_train==1:
+    if train_loss/len(trainloader)<1e-6 and acc_train==1 and bacc_train==1 and avg_iota_train==1:
       break
   
   #Finalize--------------------------------------------------------------------

@@ -61,6 +61,7 @@ Other Base Model:
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_flops_estimates"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_flops_estimates'><code>aifeducation::BaseModelCore$get_flops_estimates()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_model"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_model'><code>aifeducation::BaseModelCore$get_model()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_model_type"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_model_type'><code>aifeducation::BaseModelCore$get_model_type()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_n_layers"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_n_layers'><code>aifeducation::BaseModelCore$get_n_layers()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_special_tokens"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_special_tokens'><code>aifeducation::BaseModelCore$get_special_tokens()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_tokenizer_statistics"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_tokenizer_statistics'><code>aifeducation::BaseModelCore$get_tokenizer_statistics()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="load_from_disk"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-load_from_disk'><code>aifeducation::BaseModelCore$load_from_disk()</code></a></span></li>
@@ -75,6 +76,11 @@ Other Base Model:
 \if{latex}{\out{\hypertarget{method-BaseModelMPNet-configure}{}}}
 \subsection{Method \code{configure()}}{
 Configures a new object of this class.
+Please ensure that your chosen configuration comply with the following
+guidelines:
+\itemize{
+\item hidden_size is a multiple of num_attention_heads.
+}
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{BaseModelMPNet$configure(
   tokenizer,
@@ -95,22 +101,22 @@ Configures a new object of this class.
 \item{\code{tokenizer}}{\code{TokenizerBase} Tokenizer for the model.}
 
 \item{\code{max_position_embeddings}}{\code{int} Number of maximum position embeddings. This parameter also determines the maximum length of a sequence which
-can be processed with the model. Allowed values: \verb{10 <= x <= 4048}}
+can be processed with the model. Allowed values: \ifelse{latex}{$10 <= x <= 4048$}{\ifelse{html}{\eqn{10 <= x <= 4048}}{`10 <= x <= 4048`}}}
 
 \item{\code{hidden_size}}{\code{int} Number of neurons in each layer. This parameter determines the dimensionality of the resulting text
-embedding. Allowed values: \verb{1 <= x <= 2048}}
+embedding. Allowed values: \ifelse{latex}{$1 <= x <= 2048$}{\ifelse{html}{\eqn{1 <= x <= 2048}}{`1 <= x <= 2048`}}}
 
-\item{\code{num_hidden_layers}}{\code{int} Number of hidden layers. Allowed values: \code{1 <= x }}
+\item{\code{num_hidden_layers}}{\code{int} Number of hidden layers. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
-\item{\code{num_attention_heads}}{\code{int} determining the number of attention heads for a self-attention layer. Only relevant if \code{attention_type='multihead'} Allowed values: \code{0 <= x }}
+\item{\code{num_attention_heads}}{\code{int} determining the number of attention heads for a self-attention layer. Only relevant if \code{attention_type='multihead'} Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
 
-\item{\code{intermediate_size}}{\code{int} determining the size of the projection layer within a each transformer encoder. Allowed values: \code{1 <= x }}
+\item{\code{intermediate_size}}{\code{int} determining the size of the projection layer within a each transformer encoder. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
 \item{\code{hidden_act}}{\code{string} Name of the activation function. Allowed values: 'GELU', 'relu', 'silu', 'gelu_new'}
 
-\item{\code{hidden_dropout_prob}}{\code{double} Ratio of dropout. Allowed values: \verb{0 <= x <= 0.6}}
+\item{\code{hidden_dropout_prob}}{\code{double} Ratio of dropout. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{\eqn{0 <= x <= 0.6}}{`0 <= x <= 0.6`}}}
 
-\item{\code{attention_probs_dropout_prob}}{\code{double} Ratio of dropout for attention probabilities. Allowed values: \verb{0 <= x <= 0.6}}
+\item{\code{attention_probs_dropout_prob}}{\code{double} Ratio of dropout for attention probabilities. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{\eqn{0 <= x <= 0.6}}{`0 <= x <= 0.6`}}}
 }
 \if{html}{\out{</div>}}
 }
@@ -151,45 +157,56 @@ Traines a BaseModel
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{text_dataset}}{}
+\item{\code{text_dataset}}{\code{LargeDataSetForText} \link{LargeDataSetForText} Object storing textual data.}
 
-\item{\code{p_mask}}{}
+\item{\code{p_mask}}{\code{double} Ratio that determines the number of tokens used for masking. Allowed values: \ifelse{latex}{$0.05 <= x <= 0.6$}{\ifelse{html}{\eqn{0.05 <= x <= 0.6}}{`0.05 <= x <= 0.6`}}}
 
-\item{\code{p_perm}}{}
+\item{\code{p_perm}}{\code{double} Ratio that determines the number of tokens used for permutation. Allowed values: \ifelse{latex}{$0.05 <= x <= 0.6$}{\ifelse{html}{\eqn{0.05 <= x <= 0.6}}{`0.05 <= x <= 0.6`}}}
 
-\item{\code{whole_word}}{}
+\item{\code{whole_word}}{\code{bool} * \code{TRUE}: whole word masking should be applied. Only relevant if a \code{WordPieceTokenizer} is used.
+\itemize{
+\item \code{FALSE}: token masking is used.
+}}
 
-\item{\code{val_size}}{}
+\item{\code{val_size}}{\code{double} between 0 and 1, indicating the proportion of cases which should be
+used for the validation sample during the estimation of the model.
+The remaining cases are part of the training data. Allowed values: \ifelse{latex}{$0 < x < 1$}{\ifelse{html}{\eqn{0 < x < 1}}{`0 < x < 1`}}}
 
-\item{\code{n_epoch}}{}
+\item{\code{n_epoch}}{\code{int} Number of training epochs. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
-\item{\code{batch_size}}{}
+\item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
-\item{\code{max_sequence_length}}{}
+\item{\code{max_sequence_length}}{\code{int} Maximal number of tokens for every sequence. Allowed values: \ifelse{latex}{$20 <= x $}{\ifelse{html}{\eqn{20 <= x }}{`20 <= x `}}}
 
-\item{\code{full_sequences_only}}{}
+\item{\code{full_sequences_only}}{\code{bool} \code{TRUE} for using only chunks with a sequence length equal to \code{chunk_size}.}
 
-\item{\code{min_seq_len}}{}
+\item{\code{min_seq_len}}{\code{int} Only relevant if \code{full_sequences_only = FALSE}. Value determines the minimal sequence length included in
+training process.  Allowed values: \ifelse{latex}{$10 <= x $}{\ifelse{html}{\eqn{10 <= x }}{`10 <= x `}}}
 
-\item{\code{learning_rate}}{}
+\item{\code{learning_rate}}{\code{double} Initial learning rate for the training. Allowed values: \ifelse{latex}{$0 < x <= 1$}{\ifelse{html}{\eqn{0 < x <= 1}}{`0 < x <= 1`}}}
 
-\item{\code{sustain_track}}{}
+\item{\code{sustain_track}}{\code{bool} If \code{TRUE} energy consumption is tracked during training via the python library 'codecarbon'.}
 
-\item{\code{sustain_iso_code}}{}
+\item{\code{sustain_iso_code}}{\code{string} ISO code (Alpha-3-Code) for the country. This variable must be set if
+sustainability should be tracked. A list can be found on Wikipedia:
+\url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}. Allowed values: any}
 
-\item{\code{sustain_region}}{}
+\item{\code{sustain_region}}{\code{string} Region within a country. Only available for USA and Canada See the documentation of
+codecarbon for more information. \url{https://mlco2.github.io/codecarbon/parameters.html} Allowed values: any}
 
-\item{\code{sustain_interval}}{}
+\item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
-\item{\code{sustain_log_level}}{}
+\item{\code{sustain_log_level}}{\code{string} Level for printing information to the console. Allowed values: 'debug', 'info', 'warning', 'error', 'critical'}
 
-\item{\code{trace}}{}
+\item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
 
-\item{\code{pytorch_trace}}{}
+\item{\code{pytorch_trace}}{\code{int} \code{ml_trace=0} does not print any information about the training process from pytorch on the console. Allowed values: \ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
 
-\item{\code{log_dir}}{}
+\item{\code{log_dir}}{\code{string} Path to the directory where the log files should be saved.
+If no logging is desired set this argument to \code{NULL}. Allowed values: any}
 
-\item{\code{log_write_interval}}{}
+\item{\code{log_write_interval}}{\code{int} Time in seconds determining the interval in which the logger should try to update
+the log files. Only relevant if \code{log_dir} is not \code{NULL}. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 }
 \if{html}{\out{</div>}}
 }

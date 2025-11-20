@@ -167,6 +167,10 @@ This method requires the \emph{R} package 'ggplot2' to work.
   final_training = FALSE,
   pl_step = NULL,
   measure = "loss",
+  ind_best_model = TRUE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
   y_min = NULL,
   y_max = NULL,
   add_min_max = TRUE,
@@ -185,14 +189,21 @@ with active pseudo labeling.}
 
 \item{\code{measure}}{Measure to plot.}
 
-\item{\code{y_min}}{Minimal value for the y-axis. Set to \code{NULL} for an automatic adjustment.}
+\item{\code{ind_best_model}}{\code{bool} If \code{TRUE} the plot indicates the best states of the model according to the chosen measure.}
 
-\item{\code{y_max}}{Maximal value for the y-axis. Set to \code{NULL} for an automatic adjustment.}
+\item{\code{ind_selected_model}}{\code{bool} If \code{TRUE} the plot indicates the states of the model which are used after training. These are the final states of the fold or the final state of the last training loop.}
 
-\item{\code{add_min_max}}{\code{bool} If \code{TRUE} the minimal and maximal values during performance estimation are port of the plot.
-If \code{FALSE} only the mean values are shown. Parameter is ignored if \code{final_training=TRUE}.}
+\item{\code{x_min}}{\code{int} Minimal value for x-axis. Set to \code{NULL} for an automatic adjustment. Allowed values: \ifelse{latex}{$ x $}{\ifelse{html}{\eqn{ x }}{` x `}}}
 
-\item{\code{text_size}}{Size of the text.}
+\item{\code{x_max}}{\code{int} Maximal value for x-axis. Set to \code{NULL} for an automatic adjustment. Allowed values: \ifelse{latex}{$ x $}{\ifelse{html}{\eqn{ x }}{` x `}}}
+
+\item{\code{y_min}}{\code{int} Minimal value for y-axis. Set to \code{NULL} for an automatic adjustment. Allowed values: \ifelse{latex}{$ x $}{\ifelse{html}{\eqn{ x }}{` x `}}}
+
+\item{\code{y_max}}{\code{int} Maximal value for y-axis. Set to \code{NULL} for an automatic adjustment. Allowed values: \ifelse{latex}{$ x $}{\ifelse{html}{\eqn{ x }}{` x `}}}
+
+\item{\code{add_min_max}}{\code{bool} If \code{TRUE} the minimal and maximal values during performance estimation are port of the plot. If \code{FALSE} only the mean values are shown. Parameter is ignored if \code{final_training=TRUE}.}
+
+\item{\code{text_size}}{\code{int} Size of text elements. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 }
 \if{html}{\out{</div>}}
 }

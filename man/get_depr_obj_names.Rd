@@ -17,6 +17,7 @@ Other Parameter Dictionary:
 \code{\link{BaseModelsIndex}},
 \code{\link{DataSetsIndex}},
 \code{\link{TokenizerIndex}},
+\code{\link{doc_formula}()},
 \code{\link{get_TEClassifiers_class_names}()},
 \code{\link{get_called_args}()},
 \code{\link{get_magnitude_values}()},

@@ -110,14 +110,14 @@ is generated automatically. Allowed values: any}
 
 \item{\code{text_embeddings}}{\verb{EmbeddedText, LargeDataSetForTextEmbeddings} Object of class \link{EmbeddedText} or \link{LargeDataSetForTextEmbeddings}.}
 
-\item{\code{features}}{\code{int} Number of features the model should use. Allowed values: \code{1 <= x }}
+\item{\code{features}}{\code{int} Number of features the model should use. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
 \item{\code{method}}{\code{string} Method to use for the feature extraction. \code{'lstm'} for an extractor based on LSTM-layers or \code{'Dense'} for dense layers. Allowed values: 'Dense', 'LSTM'}
 
 \item{\code{orthogonal_method}}{\code{string} Method to use for the feature extraction. \code{'lstm'} for an extractor based on LSTM-layers or \code{'Dense'} for dense layers. Allowed values: 'Dense', 'LSTM'}
 
 \item{\code{noise_factor}}{\code{double} Value between 0 and a value lower 1 indicating how much noise should
-be added to the input during training. Allowed values: \verb{0 <= x <= 1}}
+be added to the input during training. Allowed values: \ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
 }
 \if{html}{\out{</div>}}
 }
@@ -158,7 +158,7 @@ Method for training a neural net.
 
 \item{\code{data_val_size}}{\code{double} between 0 and 1, indicating the proportion of cases which should be
 used for the validation sample during the estimation of the model.
-The remaining cases are part of the training data. Allowed values: \verb{0 < x < 1}}
+The remaining cases are part of the training data. Allowed values: \ifelse{latex}{$0 < x < 1$}{\ifelse{html}{\eqn{0 < x < 1}}{`0 < x < 1`}}}
 
 \item{\code{sustain_track}}{\code{bool} If \code{TRUE} energy consumption is tracked during training via the python library 'codecarbon'.}
 
@@ -169,27 +169,27 @@ sustainability should be tracked. A list can be found on Wikipedia:
 \item{\code{sustain_region}}{\code{string} Region within a country. Only available for USA and Canada See the documentation of
 codecarbon for more information. \url{https://mlco2.github.io/codecarbon/parameters.html} Allowed values: any}
 
-\item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage. Allowed values: \code{1 <= x }}
+\item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
 \item{\code{sustain_log_level}}{\code{string} Level for printing information to the console. Allowed values: 'debug', 'info', 'warning', 'error', 'critical'}
 
-\item{\code{epochs}}{\code{int} Number of training epochs. Allowed values: \code{1 <= x }}
+\item{\code{epochs}}{\code{int} Number of training epochs. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
-\item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \code{1 <= x }}
+\item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
 \item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
 
-\item{\code{ml_trace}}{\code{int} \code{ml_trace=0} does not print any information about the training process from pytorch on the console. Allowed values: \verb{0 <= x <= 1}}
+\item{\code{ml_trace}}{\code{int} \code{ml_trace=0} does not print any information about the training process from pytorch on the console. Allowed values: \ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
 
 \item{\code{log_dir}}{\code{string} Path to the directory where the log files should be saved.
 If no logging is desired set this argument to \code{NULL}. Allowed values: any}
 
 \item{\code{log_write_interval}}{\code{int} Time in seconds determining the interval in which the logger should try to update
-the log files. Only relevant if \code{log_dir} is not \code{NULL}. Allowed values: \code{1 <= x }}
+the log files. Only relevant if \code{log_dir} is not \code{NULL}. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
-\item{\code{lr_rate}}{\code{double} Initial learning rate for the training. Allowed values: \verb{0 < x <= 1}}
+\item{\code{lr_rate}}{\code{double} Initial learning rate for the training. Allowed values: \ifelse{latex}{$0 < x <= 1$}{\ifelse{html}{\eqn{0 < x <= 1}}{`0 < x <= 1`}}}
 
-\item{\code{lr_warm_up_ratio}}{\code{double} Number of epochs used for warm up. Allowed values: \verb{0 < x < 0.5}}
+\item{\code{lr_warm_up_ratio}}{\code{double} Number of epochs used for warm up. Allowed values: \ifelse{latex}{$0 < x < 0.5$}{\ifelse{html}{\eqn{0 < x < 0.5}}{`0 < x < 0.5`}}}
 
 \item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values: 'Adam', 'RMSprop', 'AdamW', 'SGD'}
 }
@@ -264,8 +264,11 @@ Method for requesting a plot of the training history.
 This method requires the \emph{R} package 'ggplot2' to work.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TEFeatureExtractor$plot_training_history(
+  x_min = NULL,
+  x_max = NULL,
   y_min = NULL,
   y_max = NULL,
+  ind_best_model = TRUE,
   text_size = 10L
 )}\if{html}{\out{</div>}}
 }
@@ -273,11 +276,17 @@ This method requires the \emph{R} package 'ggplot2' to work.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{y_min}}{Minimal value for the y-axis. Set to \code{NULL} for an automatic adjustment.}
+\item{\code{x_min}}{\code{int} Minimal value for x-axis. Set to \code{NULL} for an automatic adjustment. Allowed values: \ifelse{latex}{$ x $}{\ifelse{html}{\eqn{ x }}{` x `}}}
 
-\item{\code{y_max}}{Maximal value for the y-axis. Set to \code{NULL} for an automatic adjustment.}
+\item{\code{x_max}}{\code{int} Maximal value for x-axis. Set to \code{NULL} for an automatic adjustment. Allowed values: \ifelse{latex}{$ x $}{\ifelse{html}{\eqn{ x }}{` x `}}}
 
-\item{\code{text_size}}{Size of the text.}
+\item{\code{y_min}}{\code{int} Minimal value for y-axis. Set to \code{NULL} for an automatic adjustment. Allowed values: \ifelse{latex}{$ x $}{\ifelse{html}{\eqn{ x }}{` x `}}}
+
+\item{\code{y_max}}{\code{int} Maximal value for y-axis. Set to \code{NULL} for an automatic adjustment. Allowed values: \ifelse{latex}{$ x $}{\ifelse{html}{\eqn{ x }}{` x `}}}
+
+\item{\code{ind_best_model}}{\code{bool} If \code{TRUE} the plot indicates the best states of the model according to the chosen measure.}
+
+\item{\code{text_size}}{\code{int} Size of text elements. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 }
 \if{html}{\out{</div>}}
 }

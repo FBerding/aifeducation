@@ -168,7 +168,6 @@ TextEmbeddingModel <- R6::R6Class(
     }
   ),
   public = list(
-
     #' @field BaseModel ('BaseModelCore')\cr
     #' Object of class `BaseModelCore`.
     BaseModel = NULL,
@@ -195,7 +194,7 @@ TextEmbeddingModel <- R6::R6Class(
     configure = function(model_name = NULL,
                          model_label = NULL,
                          model_language = NULL,
-                         max_length = 0L,
+                         max_length = 512L,
                          chunks = 2L,
                          overlap = 0L,
                          emb_layer_min = 1L,
@@ -631,7 +630,7 @@ TextEmbeddingModel <- R6::R6Class(
     #' @param sustain_iso_code `r get_param_doc_desc("sustain_iso_code")`
     #' @param sustain_region `r get_param_doc_desc("sustain_region")`
     #' @param sustain_interval `r get_param_doc_desc("sustain_interval")`
-    #' @param sustain_log_level `r get_description("sustain_log_level")`
+    #' @param sustain_log_level `r get_param_doc_desc("sustain_log_level")`
     #' @param trace `r get_param_doc_desc("trace")`
     #' @return Returns nothing. Method saves the statistics internally.
     #' The statistics can be accessed with the method `get_sustainability_data("inference")`

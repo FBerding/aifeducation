@@ -1,3 +1,6 @@
+# Start time
+test_time_start <- Sys.time()
+
 test_that("get_n_chunks", {
   times <- sample(x = seq.int(from = 2, to = 100, by = 1), size = 1)
   seq_len <- sample(x = seq.int(from = 1, to = times, by = 1), size = 10, replace = TRUE)
@@ -60,3 +63,109 @@ test_that("tmp_dir", {
 test_that("get_alpha_3_codes", {
   expect_vector(get_alpha_3_codes())
 })
+
+test_that("check_class", {
+  expect_no_error(
+    check_class(
+      object = factor(x = c("a", "b", "b")),
+      object_name = NULL,
+      classes = "factor",
+      allow_NULL = FALSE
+    )
+  )
+  expect_error(
+    check_class(
+      object = factor(x = c("a", "b", "b")),
+      object_name = NULL,
+      classes = "BaseModelCore",
+      allow_NULL = FALSE
+    )
+  )
+  expect_no_error(
+    check_class(
+      object = NULL,
+      object_name = NULL,
+      classes = "BaseModelCore",
+      allow_NULL = TRUE
+    )
+  )
+  expect_error(
+    check_class(
+      object = NULL,
+      object_name = NULL,
+      classes = "BaseModelCore",
+      allow_NULL = FALSE
+    )
+  )
+})
+
+test_that("check_type", {
+  types <- c("bool", "int", "double", "(double", "double)", "(double)", "string", "vector", "list")
+  objects <- list(
+    "bool" = TRUE,
+    "int" = 2L,
+    "double" = 0.5,
+    "(double" = 0.5,
+    "double)" = 0.5,
+    "(double)" = 0.5,
+    "string" = "test_string",
+    "vector" = c(1L, 0.5),
+    "list" = list(a = 5, b = 10)
+  )
+  allow_null_vars <- c(TRUE, FALSE)
+  for (type in types) {
+    for (allow_null in allow_null_vars) {
+      expect_no_error(
+        check_type(
+          object = objects[[type]],
+          object_name = "test_object",
+          type = type,
+          allow_NULL = allow_null,
+          min = 0L,
+          max = 2L,
+          allowed_values = NULL
+        )
+      )
+
+      if (allow_null) {
+        expect_no_error(
+          check_type(
+            object = NULL,
+            object_name = "test_object",
+            type = type,
+            allow_NULL = allow_null,
+            min = 0L,
+            max = 2L,
+            allowed_values = NULL
+          )
+        )
+      } else {
+        expect_error(
+          check_type(
+            object = NULL,
+            object_name = "test_object",
+            type = type,
+            allow_NULL = allow_null,
+            min = 0L,
+            max = 2L,
+            allowed_values = NULL
+          )
+        )
+      }
+    }
+  }
+})
+
+test_that("inspect_tmp_dir", {
+  suppressMessages({
+    results <- inspect_tmp_dir()
+  })
+  expect_type(object = results, type = "list")
+  expect_gte(results$cum_size, 0L)
+})
+
+# Monitor test time
+monitor_test_time_on_CI(
+  start_time = test_time_start,
+  test_name = "00_01_03_R_utils"
+)

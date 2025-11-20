@@ -57,7 +57,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
     #' @param sustain_iso_code `r get_param_doc_desc("sustain_iso_code")`
     #' @param sustain_region `r get_param_doc_desc("sustain_region")`
     #' @param sustain_interval `r get_param_doc_desc("sustain_interval")`
-    #' @param sustain_log_level `r get_description("sustain_log_level")`
+    #' @param sustain_log_level `r get_param_doc_desc("sustain_log_level")`
     #' @param epochs `r get_param_doc_desc("epochs")`
     #' @param batch_size `r get_param_doc_desc("batch_size")`
     #' @param log_dir `r get_param_doc_desc("log_dir")`
@@ -338,8 +338,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
             shape = type,
             size = type,
             alpha = type
-          ) # ,
-          # position = ggplot2::position_jitter(h = 0.1, w = 0.1)
+          )
         ) +
         ggplot2::scale_size_manual(values = c(
           prototype = size_points_prototypes,
@@ -366,13 +365,51 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         margin <- self$last_training$config$loss_margin
         # scaled_margin=margin*self$get_metric_scale_factor()
         if (!is.null(margin)) {
-          for (i in seq_len(nrow(prototypes))) {
-            current_proto <- prototypes[i, ]
-            tmp_plot <- tmp_plot + ggplot2::annotate(
-              geom = "point",
-              x = current_proto$x + margin * cos(seq(from = 0L, to = 2L * base::pi, length.out = 1000L)),
-              y = current_proto$y + margin * sin(seq(from = 0L, to = 2L * base::pi, length.out = 1000L))
-            )
+          if (private$model_config$metric_type == "Euclidean") {
+            for (i in seq_len(nrow(prototypes))) {
+              current_proto <- prototypes[i, ]
+              tmp_plot <- tmp_plot + ggplot2::annotate(
+                geom = "point",
+                x = current_proto$x + margin * cos(seq(from = 0L, to = 2L * base::pi, length.out = 1000L)),
+                y = current_proto$y + margin * sin(seq(from = 0L, to = 2L * base::pi, length.out = 1000L)),
+              )
+            }
+          } else if (private$model_config$metric_type == "CosineDistance") {
+            for (i in seq_len(nrow(prototypes))) {
+              current_proto <- prototypes[i, ]
+
+              # Transform to polar coordinates
+              radius_r <- sqrt(current_proto$x^2 + current_proto$y^2)
+              if (current_proto$y >= 0) {
+                theta <- acos(current_proto$x / radius_r)
+              } else {
+                theta <- -acos(current_proto$x / radius_r)
+              }
+
+              # Find new theta
+              # Margin of 2 correspondents to radian pi
+              # Margin of 1 correspondents to radian pi/2
+              # Margin of 0 correspondents to radian 0
+              theta_new_upper <- theta + margin / 2 * pi
+              theta_new_lower <- theta - margin / 2 * pi
+
+              # Convert back to cartesian
+              x_upper <- radius_r * cos(theta_new_upper)
+              y_upper <- radius_r * sin(theta_new_upper)
+
+              x_lower <- radius_r * cos(theta_new_lower)
+              y_lower <- radius_r * sin(theta_new_lower)
+
+              tmp_plot <- tmp_plot + ggplot2::annotate(
+                geom = "segment",
+                x = c(0.0, 0.0),
+                y = c(0.0, 0.0),
+                xend = c(x_upper, x_lower),
+                yend = c(y_upper, y_lower)
+              )
+            }
+          } else {
+            warning("Margin for the metric type ", private$model_config$metric_type, " not implemented. Creating plot without margin.")
           }
         } else {
           warning("Last training has not provided a valid margin. Creating plot without margin.")

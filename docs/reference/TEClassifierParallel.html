@@ -123,7 +123,7 @@ created with the same TextEmbeddingModel as for training."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -142,14 +142,11 @@ created with the same TextEmbeddingModel as for training."></head><body>
     <li><a class="dropdown-item" href="../articles/model_configuration.html">04 Model configuration</a></li>
     <li><a class="dropdown-item" href="../articles/sharing_and_publishing.html">05 Sharing and Using Trained AI/Models</a></li>
     <li><a class="dropdown-item" href="../articles/a01_layers_stacks.html">Appendix 01 Layers and Stacks</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>For developers</h6></li>
-    <li><a class="dropdown-item" href="../articles/transformers.html">01 Transformers</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/cran/aifeducation/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/FBerding/aifeducation/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -159,7 +156,7 @@ created with the same TextEmbeddingModel as for training."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Text embedding classifier with a neural net</h1>
-      <small class="dont-index">Source: <a href="https://github.com/cran/aifeducation/blob/HEAD/R/obj_TEClassifierParallel.R" class="external-link"><code>R/obj_TEClassifierParallel.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/FBerding/aifeducation/blob/HEAD/R/obj_TEClassifierParallel.R" class="external-link"><code>R/obj_TEClassifierParallel.R</code></a></small>
       <div class="d-none name"><code>TEClassifierParallel.Rd</code></div>
     </div>
 
@@ -293,6 +290,7 @@ a saved classifier.</p>
 <span>  feature_extractor <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  target_levels <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  shared_feat_layer <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  cls_head_type <span class="op">=</span> <span class="st">"Regular"</span>,</span>
 <span>  feat_act_fct <span class="op">=</span> <span class="st">"ELU"</span>,</span>
 <span>  feat_size <span class="op">=</span> <span class="fl">50L</span>,</span>
 <span>  feat_bias <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -335,6 +333,7 @@ a saved classifier.</p>
 <span>  tf_bias <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  tf_parametrizations <span class="op">=</span> <span class="st">"None"</span>,</span>
 <span>  tf_normalization_type <span class="op">=</span> <span class="st">"LayerNorm"</span>,</span>
+<span>  tf_normalization_position <span class="op">=</span> <span class="st">"Pre"</span>,</span>
 <span>  tf_residual_type <span class="op">=</span> <span class="st">"ResidualGate"</span>,</span>
 <span>  merge_attention_type <span class="op">=</span> <span class="st">"multi_head"</span>,</span>
 <span>  merge_num_heads <span class="op">=</span> <span class="fl">1L</span>,</span>
@@ -375,12 +374,16 @@ indicating a higher category/class. For nominal data the order does not matter.<
 <dd><p><code>bool</code> If <code>TRUE</code> all streams use the same feature layer. If <code>FALSE</code> all streams use their own feature layer.</p></dd>
 
 
+<dt><code>cls_head_type</code></dt>
+<dd><p><code>string</code> Type of classification head. Allowed values: 'Regular', 'PairwiseOrthogonal', 'PairwiseOrthogonalDense'</p></dd>
+
+
 <dt><code>feat_act_fct</code></dt>
 <dd><p><code>string</code> Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'</p></dd>
 
 
 <dt><code>feat_size</code></dt>
-<dd><p><code>int</code> Number of neurons for each dense layer. Allowed values: <code>2 &lt;= x </code></p></dd>
+<dd><p><code>int</code> Number of neurons for each dense layer. Allowed values: \(2 &lt;= x \)</p></dd>
 
 
 <dt><code>feat_bias</code></dt>
@@ -388,7 +391,7 @@ indicating a higher category/class. For nominal data the order does not matter.<
 
 
 <dt><code>feat_dropout</code></dt>
-<dd><p><code>double</code> determining the dropout for the dense projection of the feature layer. Allowed values: <code>0 &lt;= x &lt;= 0.6</code></p></dd>
+<dd><p><code>double</code> determining the dropout for the dense projection of the feature layer. Allowed values: \(0 &lt;= x &lt;= 0.6\)</p></dd>
 
 
 <dt><code>feat_parametrizations</code></dt>
@@ -404,15 +407,15 @@ indicating a higher category/class. For nominal data the order does not matter.<
 
 
 <dt><code>ng_conv_n_layers</code></dt>
-<dd><p><code>int</code> determining how many times the n-gram layers should be added to the network. Allowed values: <code>0 &lt;= x </code></p></dd>
+<dd><p><code>int</code> determining how many times the n-gram layers should be added to the network. Allowed values: \(0 &lt;= x \)</p></dd>
 
 
 <dt><code>ng_conv_ks_min</code></dt>
-<dd><p><code>int</code> determining the minimal window size for n-grams. Allowed values: <code>2 &lt;= x </code></p></dd>
+<dd><p><code>int</code> determining the minimal window size for n-grams. Allowed values: \(2 &lt;= x \)</p></dd>
 
 
 <dt><code>ng_conv_ks_max</code></dt>
-<dd><p><code>int</code> determining the maximal window size for n-grams. Allowed values: <code>2 &lt;= x </code></p></dd>
+<dd><p><code>int</code> determining the maximal window size for n-grams. Allowed values: \(2 &lt;= x \)</p></dd>
 
 
 <dt><code>ng_conv_bias</code></dt>
@@ -420,7 +423,7 @@ indicating a higher category/class. For nominal data the order does not matter.<
 
 
 <dt><code>ng_conv_dropout</code></dt>
-<dd><p><code>double</code> determining the dropout for n-gram convolution layers. Allowed values: <code>0 &lt;= x &lt;= 0.6</code></p></dd>
+<dd><p><code>double</code> determining the dropout for n-gram convolution layers. Allowed values: \(0 &lt;= x &lt;= 0.6\)</p></dd>
 
 
 <dt><code>ng_conv_parametrizations</code></dt>
@@ -440,11 +443,11 @@ indicating a higher category/class. For nominal data the order does not matter.<
 
 
 <dt><code>dense_n_layers</code></dt>
-<dd><p><code>int</code> Number of dense layers. Allowed values: <code>0 &lt;= x </code></p></dd>
+<dd><p><code>int</code> Number of dense layers. Allowed values: \(0 &lt;= x \)</p></dd>
 
 
 <dt><code>dense_dropout</code></dt>
-<dd><p><code>double</code> determining the dropout between dense layers. Allowed values: <code>0 &lt;= x &lt;= 0.6</code></p></dd>
+<dd><p><code>double</code> determining the dropout between dense layers. Allowed values: \(0 &lt;= x &lt;= 0.6\)</p></dd>
 
 
 <dt><code>dense_bias</code></dt>
@@ -468,7 +471,7 @@ indicating a higher category/class. For nominal data the order does not matter.<
 
 
 <dt><code>rec_n_layers</code></dt>
-<dd><p><code>int</code> Number of recurrent layers. Allowed values: <code>0 &lt;= x </code></p></dd>
+<dd><p><code>int</code> Number of recurrent layers. Allowed values: \(0 &lt;= x \)</p></dd>
 
 
 <dt><code>rec_type</code></dt>
@@ -480,7 +483,7 @@ indicating a higher category/class. For nominal data the order does not matter.<
 
 
 <dt><code>rec_dropout</code></dt>
-<dd><p><code>double</code> determining the dropout between recurrent layers. Allowed values: <code>0 &lt;= x &lt;= 0.6</code></p></dd>
+<dd><p><code>double</code> determining the dropout between recurrent layers. Allowed values: \(0 &lt;= x &lt;= 0.6\)</p></dd>
 
 
 <dt><code>rec_bias</code></dt>
@@ -504,19 +507,19 @@ indicating a higher category/class. For nominal data the order does not matter.<
 
 
 <dt><code>tf_dense_dim</code></dt>
-<dd><p><code>int</code> determining the size of the projection layer within a each transformer encoder. Allowed values: <code>1 &lt;= x </code></p></dd>
+<dd><p><code>int</code> determining the size of the projection layer within a each transformer encoder. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 <dt><code>tf_n_layers</code></dt>
-<dd><p><code>int</code> determining how many times the encoder should be added to the network. Allowed values: <code>0 &lt;= x </code></p></dd>
+<dd><p><code>int</code> determining how many times the encoder should be added to the network. Allowed values: \(0 &lt;= x \)</p></dd>
 
 
 <dt><code>tf_dropout_rate_1</code></dt>
-<dd><p><code>double</code> determining the dropout after the attention mechanism within the transformer encoder layers. Allowed values: <code>0 &lt;= x &lt;= 0.6</code></p></dd>
+<dd><p><code>double</code> determining the dropout after the attention mechanism within the transformer encoder layers. Allowed values: \(0 &lt;= x &lt;= 0.6\)</p></dd>
 
 
 <dt><code>tf_dropout_rate_2</code></dt>
-<dd><p><code>double</code> determining the dropout for the dense projection within the transformer encoder layers. Allowed values: <code>0 &lt;= x &lt;= 0.6</code></p></dd>
+<dd><p><code>double</code> determining the dropout for the dense projection within the transformer encoder layers. Allowed values: \(0 &lt;= x &lt;= 0.6\)</p></dd>
 
 
 <dt><code>tf_attention_type</code></dt>
@@ -528,7 +531,7 @@ indicating a higher category/class. For nominal data the order does not matter.<
 
 
 <dt><code>tf_num_heads</code></dt>
-<dd><p><code>int</code> determining the number of attention heads for a self-attention layer. Only relevant if <code>attention_type='multihead'</code> Allowed values: <code>0 &lt;= x </code></p></dd>
+<dd><p><code>int</code> determining the number of attention heads for a self-attention layer. Only relevant if <code>attention_type='multihead'</code> Allowed values: \(0 &lt;= x \)</p></dd>
 
 
 <dt><code>tf_bias</code></dt>
@@ -543,6 +546,10 @@ indicating a higher category/class. For nominal data the order does not matter.<
 <dd><p><code>string</code> Type of normalization applied to all layers and stack layers. Allowed values: 'LayerNorm', 'None'</p></dd>
 
 
+<dt><code>tf_normalization_position</code></dt>
+<dd><p><code>string</code> Position where the normalization should be applied. Allowed values: 'Pre', 'Post'</p></dd>
+
+
 <dt><code>tf_residual_type</code></dt>
 <dd><p><code>string</code> Type of residual connenction for all layers and stack of layers. Allowed values: 'ResidualGate', 'Addition', 'None'</p></dd>
 
@@ -552,7 +559,7 @@ indicating a higher category/class. For nominal data the order does not matter.<
 
 
 <dt><code>merge_num_heads</code></dt>
-<dd><p><code>int</code> determining the number of attention heads for a self-attention layer. Only relevant if <code>attention_type='multihead'</code> Allowed values: <code>0 &lt;= x </code></p></dd>
+<dd><p><code>int</code> determining the number of attention heads for a self-attention layer. Only relevant if <code>attention_type='multihead'</code> Allowed values: \(0 &lt;= x \)</p></dd>
 
 
 <dt><code>merge_normalization_type</code></dt>
@@ -560,7 +567,7 @@ indicating a higher category/class. For nominal data the order does not matter.<
 
 
 <dt><code>merge_pooling_features</code></dt>
-<dd><p><code>int</code> Number of features to be extracted at the end of the model. Allowed values: <code>1 &lt;= x </code></p></dd>
+<dd><p><code>int</code> Number of features to be extracted at the end of the model. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 <dt><code>merge_pooling_type</code></dt>

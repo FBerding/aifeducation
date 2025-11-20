@@ -78,7 +78,7 @@ Method for creating a new text embedding model
   model_name = NULL,
   model_label = NULL,
   model_language = NULL,
-  max_length = 0L,
+  max_length = 512L,
   chunks = 2L,
   overlap = 0L,
   emb_layer_min = 1L,
@@ -101,15 +101,15 @@ is generated automatically. Allowed values: any}
 \item{\code{model_language}}{\code{string} Languages that the models can work with. Allowed values: any}
 
 \item{\code{max_length}}{\code{int} Maximal number of token per chunks. Must be equal or lower
-as the maximal postional embeddings for the model. Allowed values: \code{20 <= x }}
+as the maximal postional embeddings for the model. Allowed values: \ifelse{latex}{$20 <= x $}{\ifelse{html}{\eqn{20 <= x }}{`20 <= x `}}}
 
-\item{\code{chunks}}{\code{int} Maximal number chunks. Allowed values: \code{2 <= x }}
+\item{\code{chunks}}{\code{int} Maximal number chunks. Allowed values: \ifelse{latex}{$2 <= x $}{\ifelse{html}{\eqn{2 <= x }}{`2 <= x `}}}
 
-\item{\code{overlap}}{\code{int} Number of tokens from the previous chunk that should be added at the beginng of the next chunk. Allowed values: \code{0 <= x }}
+\item{\code{overlap}}{\code{int} Number of tokens from the previous chunk that should be added at the beginng of the next chunk. Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
 
-\item{\code{emb_layer_min}}{\code{int} Minimal layer from which the embeddings should be calculated. Allowed values: \code{1 <= x }}
+\item{\code{emb_layer_min}}{\code{int} Minimal layer from which the embeddings should be calculated. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
-\item{\code{emb_layer_max}}{\code{int} Maximal layer from which the embeddings should be calculated. Allowed values: \code{1 <= x }}
+\item{\code{emb_layer_max}}{\code{int} Maximal layer from which the embeddings should be calculated. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
 \item{\code{emb_pool_type}}{\code{string} Method to summarize the embedding of single tokens into a text embedding.
 In the case of \code{'CLS'} all cls-tokens between \code{emb_layer_min} and \code{emb_layer_max} are averaged.
@@ -118,7 +118,7 @@ Please note that BaseModelFunnel allows only 'CLS'. Allowed values: 'CLS', 'Aver
 
 \item{\code{pad_value}}{\code{int} Value indicating padding. This value should no be in the range of
 regluar values for computations. Thus it is not recommended to chance this value.
-Default is \code{-100}. Allowed values: \code{ x <= -100}}
+Default is \code{-100}. Allowed values: \ifelse{latex}{$ x <= -1$}{\ifelse{html}{\eqn{ x <= -1}}{` x <= -1`}}}
 
 \item{\code{base_model}}{\code{BaseModelCore} BaseModels for processing raw texts.}
 
@@ -264,7 +264,7 @@ into text embeddings. For a large number of texts please use the method \code{em
 
 \item{\code{doc_id}}{\code{vector} Id for every text.}
 
-\item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \code{1 <= x }}
+\item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
 \item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
 
@@ -298,7 +298,7 @@ Method for creating text embeddings from raw texts.
 \describe{
 \item{\code{text_dataset}}{\code{LargeDataSetForText} \link{LargeDataSetForText} Object storing textual data.}
 
-\item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \code{1 <= x }}
+\item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
 \item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
 
@@ -306,7 +306,7 @@ Method for creating text embeddings from raw texts.
 If no logging is desired set this argument to \code{NULL}. Allowed values: any}
 
 \item{\code{log_write_interval}}{\code{int} Time in seconds determining the interval in which the logger should try to update
-the log files. Only relevant if \code{log_dir} is not \code{NULL}. Allowed values: \code{1 <= x }}
+the log files. Only relevant if \code{log_dir} is not \code{NULL}. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 }
 \if{html}{\out{</div>}}
 }
@@ -413,7 +413,7 @@ Calculates the energy consumption for inference of the given task.
 \describe{
 \item{\code{text_dataset}}{\code{LargeDataSetForText} \link{LargeDataSetForText} Object storing textual data.}
 
-\item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \code{1 <= x }}
+\item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
 \item{\code{sustain_iso_code}}{\code{string} ISO code (Alpha-3-Code) for the country. This variable must be set if
 sustainability should be tracked. A list can be found on Wikipedia:
@@ -422,9 +422,9 @@ sustainability should be tracked. A list can be found on Wikipedia:
 \item{\code{sustain_region}}{\code{string} Region within a country. Only available for USA and Canada See the documentation of
 codecarbon for more information. \url{https://mlco2.github.io/codecarbon/parameters.html} Allowed values: any}
 
-\item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage. Allowed values: \code{1 <= x }}
+\item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
-\item{\code{sustain_log_level}}{}
+\item{\code{sustain_log_level}}{\code{string} Level for printing information to the console. Allowed values: 'debug', 'info', 'warning', 'error', 'critical'}
 
 \item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
 }

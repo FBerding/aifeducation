@@ -54,10 +54,19 @@ TextEmbeddingModel_Create_UI <- function(id) {
       ),
       # Main Page---------------------------------------------------------------
       # Content depends in the selected base model
-      bslib::card(
-        bslib::card_header(shiny::textOutput(outputId = shiny::NS(id, "path_to_base_model"))),
-        bslib::card_body(
-          shiny::uiOutput(outputId = shiny::NS(id, "lm_interface_setting"))
+      bslib::layout_column_wrap(
+        bslib::card(
+          bslib::card_header(shiny::textOutput(outputId = shiny::NS(id, "path_to_base_model"))),
+          bslib::card_body(
+            shiny::uiOutput(outputId = shiny::NS(id, "lm_interface_setting"))
+          )
+        ),
+        bslib::card(
+          bslib::card_header("Embedding Proberties"),
+          bslib::card_body(
+            shiny::uiOutput(outputId = shiny::NS(id, "granularity_rate")),
+            shiny::uiOutput(outputId = shiny::NS(id, "total_words"))
+          )
         )
       )
     )
@@ -146,32 +155,41 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
     interface_architecture <- shiny::eventReactive(path_to_base_model(), {
       model_path <- path_to_base_model()
 
-      path_bin <- paste0(model_path, "/", "pytorch_model.bin")
-      path_safetensor <- paste0(model_path, "/", "model.safetensors")
+      if (file.exists(file.path(model_path, "r_config_state.rda"))) {
+        model <- load_from_disk(model_path)
 
-      if (file.exists(path_safetensor)) {
-        valid_path <- path_safetensor
-      } else if (file.exists(path_bin)) {
-        valid_path <- path_bin
+        model_architecture <- detect_base_model_type(model$get_model()$config)
+        max_position_embeddings <- model$get_model_config()$max_position_embeddings
+        max_layer <- model$get_n_layers()
+        toc_granularity <- model$get_tokenizer_statistics()
       } else {
-        valid_path <- NA
-      }
+        path_bin <- paste0(model_path, "/", "pytorch_model.bin")
+        path_safetensor <- paste0(model_path, "/", "model.safetensors")
 
-      if (!is.na(valid_path)) {
-        model <- transformers$AutoModel$from_pretrained(model_path)
-        model_architecture <- detect_base_model_type(model)
-        max_position_embeddings <- model$config$max_position_embeddings
-        if (model_architecture == "funnel") {
-          max_layer <- sum(model$config$block_repeats * model$config$block_sizes)
+        if (file.exists(path_safetensor)) {
+          valid_path <- path_safetensor
+        } else if (file.exists(path_bin)) {
+          valid_path <- path_bin
         } else {
-          max_layer <- model$config$num_hidden_layers
+          valid_path <- NA
         }
-      } else {
-        model_architecture <- NULL
-        max_position_embeddings <- NULL
-        max_layer <- NULL
+        if (!is.na(valid_path)) {
+          model <- transformers$AutoModel$from_pretrained(model_path)
+          model_architecture <- detect_base_model_type(model)
+          max_position_embeddings <- model$config$max_position_embeddings
+          if (model_architecture == "funnel") {
+            max_layer <- sum(model$config$block_repeats * model$config$block_sizes)
+          } else {
+            max_layer <- model$config$num_hidden_layers
+          }
+        } else {
+          model_architecture <- NULL
+          max_position_embeddings <- NULL
+          max_layer <- NULL
+          toc_granularity <- NULL
+        }
       }
-      return(list(model_architecture, max_position_embeddings, max_layer))
+      return(list(model_architecture, max_position_embeddings, max_layer, toc_granularity))
     })
 
     # Create UI Main Page-----------------------------------------------------------------
@@ -240,6 +258,52 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
       }
     })
 
+    # Embeddings Proberties
+    output$granularity_rate <- shiny::renderUI({
+      table <- interface_architecture()[[4]]
+      if (!is.null_or_na(table)) {
+        if (!is.na(table$mu_g)) {
+          return(
+            bslib::value_box(
+              title = "Tokens per Word",
+              value = table$mu_g
+            )
+          )
+        } else {
+          return(
+            bslib::value_box(
+              title = "Tokens per Word",
+              value = "Not Available"
+            )
+          )
+        }
+      } else {
+        return(NULL)
+      }
+    })
+    output$total_words <- shiny::renderUI({
+      table <- interface_architecture()[[4]]
+      if (!is.null_or_na(table)) {
+        if (!is.na(table$mu_g)) {
+          return(
+            bslib::value_box(
+              title = "Estimated Average Total Number of Words",
+              value = floor(((input$lm_max_length - input$lm_overlap) * (input$lm_chunks - 1) + input$lm_max_length) / table$mu_g)
+            )
+          )
+        } else {
+          return(
+            bslib::value_box(
+              title = "Estimated Average Total Number of Tokens",
+              value = floor((input$lm_max_length - input$lm_overlap) * (input$lm_chunks - 1) + input$lm_max_length)
+            )
+          )
+        }
+      } else {
+        return(NULL)
+      }
+    })
+
     # Save the model to disk----------------------------------------------------
     shiny::observeEvent(input$save_modal_button_continue, {
       # Remove Save Modal
@@ -262,6 +326,18 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
           type = "info"
         )
 
+        model_path <- path_to_base_model()
+
+        if (file.exists(file.path(model_path, "r_config_state.rda"))) {
+          base_model <- load_from_disk(model_path)
+        } else {
+          base_model <- create_object(model_architecture)
+          base_model$create_from_hf(
+            model_dir = model_path,
+            tokenizer_dir = model_path
+          )
+        }
+
         new_interface <- TextEmbeddingModel$new()
         new_interface$configure(
           model_name = NULL,
@@ -273,7 +349,7 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
           emb_layer_min = input$lm_emb_layers[1],
           emb_layer_max = input$lm_emb_layers[2],
           emb_pool_type = input$lm_emb_pool_type,
-          base_model = load_from_disk(path_to_base_model())
+          base_model = base_model
         )
 
         save_to_disk(

@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,7 +54,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/cran/aifeducation/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/FBerding/aifeducation/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -74,7 +74,7 @@ Berding, Julia Pargmann, Andreas Slopinski, Elisabeth Riebenbauer, Karin
 Rebmann</h4>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/cran/aifeducation/blob/HEAD/vignettes/gui_aife_studio.Rmd" class="external-link"><code>vignettes/gui_aife_studio.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/FBerding/aifeducation/blob/HEAD/vignettes/gui_aife_studio.Rmd" class="external-link"><code>vignettes/gui_aife_studio.Rmd</code></a></small>
       <div class="d-none name"><code>gui_aife_studio.Rmd</code></div>
     </div>
 
@@ -768,7 +768,12 @@ padding tokens.</p></li>
 downstream tasks can be calculated as</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi>o</mi><mi>k</mi><mi>e</mi><mi>n</mi><msub><mi>s</mi><mrow><mi>M</mi><mi>a</mi><mi>x</mi></mrow></msub><mo>=</mo><msub><mi>N</mi><mrow><mi>C</mi><mi>h</mi><mi>u</mi><mi>n</mi><mi>k</mi><mi>s</mi></mrow></msub><mo>*</mo><mi>M</mi><mi>a</mi><mi>x</mi><mi>i</mi><mi>m</mi><mi>a</mi><mi>l</mi><mi>S</mi><mi>e</mi><mi>q</mi><mi>u</mi><mi>e</mi><mi>n</mi><mi>c</mi><mi>e</mi><mi>L</mi><mi>e</mi><mi>n</mi><mi>g</mi><mi>t</mi><mi>h</mi><mo>−</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>N</mi><mrow><mi>C</mi><mi>h</mi><mi>u</mi><mi>n</mi><mi>k</mi><mi>s</mi></mrow></msub><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>*</mo><msub><mi>N</mi><mrow><mi>O</mi><mi>v</mi><mi>e</mi><mi>r</mi><mi>l</mi><mi>a</mi><mi>p</mi></mrow></msub></mrow><annotation encoding="application/x-tex">Tokens_{Max} = N_{Chunks}*MaximalSequenceLength-(N_{Chunks}-1)*N_{Overlap}</annotation></semantics></math></p>
 <p>If the text is longer, the remaining tokens are ignored and lost for
-further analysis.</p>
+further analysis. The result of this calculation is shown on the right
+side allowing you to experiment with different options. In the case that
+the base model comes with tokenizer statistics the number of tokens is
+replaced with an estimate of the total number of words for a simpler
+interpretation. All values are estimates. That is, the real number of
+words/tokens for a given text depends on the concrete text.</p>
 <blockquote>
 <p>Please note that you can create multiple text embedding models with a
 different configuration based on the same base model.</p>

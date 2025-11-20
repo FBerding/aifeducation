@@ -65,8 +65,6 @@ class layer_dropout_with_mask(torch.nn.Module):
     y=self.dropout_layer(x)
     y_padded=torch.where(condition=mask_features,input=self.pad_value,other=y)
     return y_padded,seq_len,mask_times,mask_features
-      
-      
 
 
 #Residual Connection layer----------------------------------------------------
@@ -110,6 +108,71 @@ class identity_layer(torch.nn.Module):
       x=torch.where(condition=mask_features,input=self.pad_value,other=x)
     return x,seq_len,mask_times,mask_features
 
+#Blockwise orthogonal dense layer----------------------------------------------
+#Function required for block_orth_dense to speed up comutations via vmap
+def apply_weights_pair_orth_dense(x, weights):
+  return torch.matmul(x,weights.to(x.device,x.dtype))
+
+# Input size must be equal or greater as output_size
+# Forward pass takes rensors of shape (any, input_size) and returns (any, output_size)
+# Layer is suggested in 
+#Li, X., Chang, D., Ma, Z., Tan, Z.‑H., Xue, J.‑H., Cao, J., Yu, J. & Guo, J. (2020). 
+#OSLNet: Deep Small-Sample Classification With an Orthogonal Softmax Layer. 
+#IEEE Transactions on Image Processing, 29, 6482–6495. https://doi.org/10.1109/TIP.2020.2990277
+class pairwise_orthogonal_dense(torch.nn.Module):
+  def __init__(self,input_size,output_size,bias=False,pre_dense=False,device=None,dtype=None):
+    super().__init__()
+    self.input_size=input_size
+    self.output_size=output_size
+    self.bias=bias
+    self.pre_dense=pre_dense
+    
+    self.n_params_ratio=math.floor(self.input_size/self.output_size)
+    self.n_params=self.n_params_ratio*self.output_size
+    self.n_params_residual=self.input_size-self.n_params
+    self.n_params=self.n_params+self.n_params_residual
+
+    self.weight=torch.nn.parameter.Parameter(torch.rand(1,self.n_params)).to(device)
+    if self.bias:
+      self.beta=torch.nn.parameter.Parameter(torch.zeros(1,self.output_size)).to(device)
+    
+    if self.pre_dense==True:
+      self.dense_layer=torch.nn.Linear(
+        in_features=self.input_size, 
+        out_features=self.input_size, 
+        bias=self.bias, 
+        device=device, dtype=dtype
+      )
+
+    self.design_matrix=torch.zeros((self.input_size,self.output_size)).to(device)
+    self.unit_matrix=torch.zeros((self.input_size,self.input_size)).fill_diagonal_(1).to(device)
+    
+    range_start=0
+    residual_counter=1
+    for j in range(0,self.output_size):
+      if residual_counter<=self.n_params_residual:
+        range_end=range_start+self.n_params_ratio+1
+        residual_counter=residual_counter+1
+      else:
+        range_end=range_start+self.n_params_ratio
+      for i in range(range_start,range_end):
+        self.design_matrix[i,j]=1
+      range_start=range_end
+    self.apply_weights_vmap=torch.vmap(func=apply_weights_pair_orth_dense, in_dims=(-2,None), out_dims=-2, randomness='error', chunk_size=None)
+    
+  def forward(self,x):
+    if self.pre_dense:
+      x=self.dense_layer(x)
+    weights_design=self.weight.expand(self.n_params,self.n_params)*self.unit_matrix.to(self.weight.device)
+    weights_design=torch.matmul(weights_design,self.design_matrix.to(dtype=weights_design.dtype,device=weights_design.device))
+    if x.dim()>2:
+      y=self.apply_weights_vmap(x,weights_design)
+    else:
+      y=torch.matmul(x,weights_design)
+    if self.bias:
+      y=y+self.beta
+    return y
+
 #DenseLayer_with_mask-----------------------------------------------------------
 #Dense layer that can handel masked sequences
 # Returns a list with the following tensors
@@ -120,11 +183,12 @@ class identity_layer(torch.nn.Module):
 # True indicates that the sequence or is padded. If True these values should not be part 
 # of further computations. mask_features is adapted to the new output size
 class dense_layer_with_mask(torch.nn.Module):
-  def __init__(self,input_size,output_size,times,pad_value,act_fct="ELU",normalization_type="LayerNorm",dropout=0.0,bias=True,parametrizations="None",device=None, dtype=None,residual_type="None"):
+  def __init__(self,input_size,output_size,times,pad_value,connection_type="Regular",act_fct="ELU",normalization_type="LayerNorm",dropout=0.0,bias=True,parametrizations="None",device=None, dtype=None,residual_type="None"):
     super().__init__()
     
     self.input_size=input_size
     self.output_size=output_size
+    self.connection_type=connection_type
     if isinstance(pad_value, torch.Tensor):
       self.pad_value=pad_value.detach()
     else:
@@ -140,13 +204,23 @@ class dense_layer_with_mask(torch.nn.Module):
       features=self.output_size,
       pad_value= self.pad_value,
       eps=1e-5)
-    self.dense=torch.nn.Linear(
-            in_features=self.input_size,
-            out_features=self.output_size,
-            bias=self.bias,
-            device=device, 
-            dtype=dtype
-            )
+    
+    if self.connection_type=="Regular":
+      self.dense=torch.nn.Linear(
+              in_features=self.input_size,
+              out_features=self.output_size,
+              bias=self.bias,
+              device=device, 
+              dtype=dtype
+              )
+    elif self.connection_type=="PairwiseOrthogonal":
+      self.dense=pairwise_orthogonal_dense(
+        input_size=self.input_size,
+        output_size=self.output_size,
+        bias=self.bias,
+        device=device, 
+        dtype=dtype
+        )
     if self.parametrizations=="OrthogonalWeights":
       torch.nn.utils.parametrizations.orthogonal(module=self.dense, name='weight',orthogonal_map="matrix_exp")
     elif self.parametrizations=="WeightNorm":
@@ -532,7 +606,7 @@ class layer_abs_positional_embedding(torch.nn.Module):
 
 #layer tf_encoder
 class layer_tf_encoder(torch.nn.Module):
-  def __init__(self, dense_dim,times, features,pad_value, dropout_rate_1,dropout_rate_2,attention_type="MultiHead",num_heads=2,act_fct="ELU",bias=True,parametrizations="None",normalization_type="LayerNorm",device=None, dtype=None,residual_type="None"):
+  def __init__(self, dense_dim,times, features,pad_value, dropout_rate_1,dropout_rate_2,attention_type="MultiHead",num_heads=2,act_fct="ELU",bias=True,parametrizations="None",normalization_type="LayerNorm",normalization_position="Pre",device=None, dtype=None,residual_type="None"):
     super().__init__()
     
     self.dense_dim=dense_dim
@@ -570,6 +644,7 @@ class layer_tf_encoder(torch.nn.Module):
     self.dropout_2=torch.nn.Dropout(p=self.dropout_rate_2)
     
     #Normalization Layer
+    self.normalization_position=normalization_position
     self.normalization_1=get_layer_normalization(
       name=self.normalization_type,
       times=self.times,
@@ -616,30 +691,58 @@ class layer_tf_encoder(torch.nn.Module):
     self.residual_connection_2=layer_residual_connection(residual_type,self.pad_value)
 
   def forward(self,x,seq_len,mask_times,mask_features):
-    #Sub-Layer 1
-    if self.attention_type=="Fourier":
-      y=self.attention(x*(~mask_features))
-    elif self.attention_type=="MultiHead":
-      y=self.attention(
-        query=x,
-        key=x,
-        value=x,
-        key_padding_mask=mask_times)[0]
-    y=self.dropout_1(y)
-    y=torch.where(mask_features,input=self.pad_value,other=y)
-    y=self.residual_connection_1(x=x,y=y,seq_len=seq_len,mask_times=mask_times,mask_features=mask_features)
-    y=self.normalization_1(y[0],y[1],y[2],y[3])
-
-    #Sub Layer 2    
-    proj_output=self.dense_1(y[0],y[1],y[2],y[3])
-    #Actvation function is part of dense_1. This it does not need a layer
-    proj_output=self.dense_2(proj_output[0],proj_output[1],proj_output[2],proj_output[3])
-    proj_dropout=self.dropout_2(proj_output[0])
-    proj_dropout=torch.where(mask_features,input=self.pad_value,other=proj_dropout)
+    #Post Layer Normalization
+    if self.normalization_position=="Post":
+      #Sub-Layer 1
+      if self.attention_type=="Fourier":
+        y=self.attention(x*(~mask_features))
+      elif self.attention_type=="MultiHead":
+        y=self.attention(
+          query=x,
+          key=x,
+          value=x,
+          key_padding_mask=mask_times)[0]
+      y=self.dropout_1(y)
+      y=torch.where(mask_features,input=self.pad_value,other=y)
+      y=self.residual_connection_1(x=x,y=y,seq_len=seq_len,mask_times=mask_times,mask_features=mask_features)
+      y=self.normalization_1(y[0],y[1],y[2],y[3])
+  
+      #Sub Layer 2    
+      proj_output=self.dense_1(y[0],y[1],y[2],y[3])
+      #Actvation function is part of dense_1. This it does not need a layer
+      proj_output=self.dense_2(proj_output[0],proj_output[1],proj_output[2],proj_output[3])
+      proj_dropout=self.dropout_2(proj_output[0])
+      proj_dropout=torch.where(mask_features,input=self.pad_value,other=proj_dropout)
+      
+      output=self.residual_connection_2(x=y[0],y=proj_dropout,seq_len=seq_len,mask_times=mask_times,mask_features=mask_features)
+      output=self.normalization_2(output[0],output[1],output[2],output[3])
     
-    output=self.residual_connection_2(x=y[0],y=proj_dropout,seq_len=seq_len,mask_times=mask_times,mask_features=mask_features)
-    output=self.normalization_2(output[0],output[1],output[2],output[3])
-    
+    #Pre-Layer-Normalization
+    if self.normalization_position=="Pre":
+      #Sub-Layer 1
+      xn=self.normalization_1(x,seq_len,mask_times,mask_features)[0]
+      if self.attention_type=="Fourier":
+        y=self.attention(xn*(~mask_features))
+      elif self.attention_type=="MultiHead":
+        y=self.attention(
+          query=xn,
+          key=xn,
+          value=xn,
+          key_padding_mask=mask_times)[0]
+      y=self.dropout_1(y)
+      y=torch.where(mask_features,input=self.pad_value,other=y)
+      y=self.residual_connection_1(x=x,y=y,seq_len=seq_len,mask_times=mask_times,mask_features=mask_features)
+  
+      #Sub Layer 2
+      yn=self.normalization_2(y[0],y[1],y[2],y[3]) 
+      proj_output=self.dense_1(yn[0],yn[1],yn[2],yn[3])
+      #Actvation function is part of dense_1. This it does not need a layer
+      proj_output=self.dense_2(proj_output[0],proj_output[1],proj_output[2],proj_output[3])
+      proj_dropout=self.dropout_2(proj_output[0])
+      proj_dropout=torch.where(mask_features,input=self.pad_value,other=proj_dropout)
+      
+      output=self.residual_connection_2(x=y[0],y=proj_dropout,seq_len=seq_len,mask_times=mask_times,mask_features=mask_features)
+           
     return output[0],output[1],output[2],output[3]
   
 
@@ -779,6 +882,12 @@ class layer_protonet_metric(torch.nn.Module):
         x1=x,
         x2=prototypes,
         p=2.0
+      )
+    elif self.metric_type=="CosineDistance":
+      distance_matrix=CosineDistance(
+        x=x,
+        y=prototypes,
+        eps=1e-8
       )
     return self.get_scaling_factor()*distance_matrix
   def get_scaling_factor(self):

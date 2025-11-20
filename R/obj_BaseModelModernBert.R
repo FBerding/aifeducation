@@ -53,18 +53,36 @@ BaseModelModernBert <- R6::R6Class(
       private$model <- transformers$ModernBertForMaskedLM$from_pretrained(dir_path)
     },
     check_arg_combinations = function(args) {
+      if (args$num_hidden_layers %% 2 != 0L) {
+        stop("num_hidden_layers must be a multiple of 2.")
+      }
+
       if (args$hidden_size %% args$num_attention_heads != 0L) {
         stop("hidden_size must be a multiple auf num_attention_heads.")
       }
 
+      if ((args$hidden_size / args$num_attention_heads) %% 2 != 0) {
+        stop("(hidden_size/num_attention_heads) must be a multiple of 2.")
+      }
+
       if (args$global_attn_every_n_layers > args$num_hidden_layers) {
-        stop("global_attn_every_n_layers must be equal or small num_hidden_layers.")
+        print("args$global_attn_every_n_layers")
+        print(args$global_attn_every_n_layers)
+        print("args$num_hidden_layers")
+        print(args$num_hidden_layers)
+        stop("global_attn_every_n_layers must be equal or smaller num_hidden_layers.")
       }
     }
   ),
   public = list(
     #---------------------------------------------------------------------------
     #' @description Configures a new object of this class.
+    #' Please ensure that your chosen configuration comply with the following
+    #' guidelines:
+    #' * hidden_size is a multiple of num_attention_heads.
+    #' * hidden_size/num_attention_heads must be a multiple of 2.
+    #' * global_attn_every_n_layers is equal or smaller as num_hidden_layers.
+    #'
     #' @param tokenizer `r get_param_doc_desc("tokenizer")`
     #' @param max_position_embeddings `r get_param_doc_desc("max_position_embeddings")`
     #' @param hidden_size `r get_param_doc_desc("hidden_size")`

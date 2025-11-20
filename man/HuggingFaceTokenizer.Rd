@@ -68,7 +68,7 @@ Creates a tokenizer from a pretrained model
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{model_dir}}{}
+\item{\code{model_dir}}{Path where the model is stored.}
 }
 \if{html}{\out{</div>}}
 }

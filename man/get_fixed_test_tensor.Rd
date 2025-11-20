@@ -24,6 +24,7 @@ Other Utils TestThat Developers:
 \code{\link{generate_tensors}()},
 \code{\link{get_current_args_for_print}()},
 \code{\link{get_test_data_for_classifiers}()},
+\code{\link{monitor_test_time_on_CI}()},
 \code{\link{random_bool_on_CI}()}
 }
 \concept{Utils TestThat Developers}

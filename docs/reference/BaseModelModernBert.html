@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,14 +26,11 @@
     <li><a class="dropdown-item" href="../articles/model_configuration.html">04 Model configuration</a></li>
     <li><a class="dropdown-item" href="../articles/sharing_and_publishing.html">05 Sharing and Using Trained AI/Models</a></li>
     <li><a class="dropdown-item" href="../articles/a01_layers_stacks.html">Appendix 01 Layers and Stacks</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>For developers</h6></li>
-    <li><a class="dropdown-item" href="../articles/transformers.html">01 Transformers</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/cran/aifeducation/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/FBerding/aifeducation/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -43,7 +40,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>ModernBert</h1>
-      <small class="dont-index">Source: <a href="https://github.com/cran/aifeducation/blob/HEAD/R/obj_BaseModelModernBert.R" class="external-link"><code>R/obj_BaseModelModernBert.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/FBerding/aifeducation/blob/HEAD/R/obj_BaseModelModernBert.R" class="external-link"><code>R/obj_BaseModelModernBert.R</code></a></small>
       <div class="d-none name"><code>BaseModelModernBert.Rd</code></div>
     </div>
 
@@ -108,6 +105,7 @@ Conference of the North (pp. 4171–4186). Association for Computational Linguis
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_flops_estimates"><a href="../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_flops_estimates"><code>aifeducation::BaseModelCore$get_flops_estimates()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_model"><a href="../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_model"><code>aifeducation::BaseModelCore$get_model()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_model_type"><a href="../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_model_type"><code>aifeducation::BaseModelCore$get_model_type()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_n_layers"><a href="../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_n_layers"><code>aifeducation::BaseModelCore$get_n_layers()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_special_tokens"><a href="../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_special_tokens"><code>aifeducation::BaseModelCore$get_special_tokens()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_tokenizer_statistics"><a href="../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_tokenizer_statistics"><code>aifeducation::BaseModelCore$get_tokenizer_statistics()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="load_from_disk"><a href="../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-load_from_disk"><code>aifeducation::BaseModelCore$load_from_disk()</code></a></span></li>
@@ -117,7 +115,12 @@ Conference of the North (pp. 4171–4186). Association for Computational Linguis
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="train"><a href="../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-train"><code>aifeducation::BaseModelCore$train()</code></a></span></li>
 </ul></details></p><hr><a id="method-BaseModelModernBert-configure"></a><div class="section">
 <h3 id="method-configure-">Method <code>configure()</code><a class="anchor" aria-label="anchor" href="#method-configure-"></a></h3>
-<p>Configures a new object of this class.</p><div class="section">
+<p>Configures a new object of this class.
+Please ensure that your chosen configuration comply with the following
+guidelines:</p><ul><li><p>hidden_size is a multiple of num_attention_heads.</p></li>
+<li><p>hidden_size/num_attention_heads must be a multiple of 2.</p></li>
+<li><p>global_attn_every_n_layers is equal or smaller as num_hidden_layers.</p></li>
+</ul><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BaseModelModernBert</span><span class="op">$</span><span class="fu">configure</span><span class="op">(</span></span>
 <span>  <span class="va">tokenizer</span>,</span>
@@ -142,28 +145,28 @@ Conference of the North (pp. 4171–4186). Association for Computational Linguis
 
 <dt><code>max_position_embeddings</code></dt>
 <dd><p><code>int</code> Number of maximum position embeddings. This parameter also determines the maximum length of a sequence which
-can be processed with the model. Allowed values: <code>10 &lt;= x &lt;= 4048</code></p></dd>
+can be processed with the model. Allowed values: \(10 &lt;= x &lt;= 4048\)</p></dd>
 
 
 <dt><code>hidden_size</code></dt>
 <dd><p><code>int</code> Number of neurons in each layer. This parameter determines the dimensionality of the resulting text
-embedding. Allowed values: <code>1 &lt;= x &lt;= 2048</code></p></dd>
+embedding. Allowed values: \(1 &lt;= x &lt;= 2048\)</p></dd>
 
 
 <dt><code>num_hidden_layers</code></dt>
-<dd><p><code>int</code> Number of hidden layers. Allowed values: <code>1 &lt;= x </code></p></dd>
+<dd><p><code>int</code> Number of hidden layers. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 <dt><code>num_attention_heads</code></dt>
-<dd><p><code>int</code> determining the number of attention heads for a self-attention layer. Only relevant if <code>attention_type='multihead'</code> Allowed values: <code>0 &lt;= x </code></p></dd>
+<dd><p><code>int</code> determining the number of attention heads for a self-attention layer. Only relevant if <code>attention_type='multihead'</code> Allowed values: \(0 &lt;= x \)</p></dd>
 
 
 <dt><code>global_attn_every_n_layers</code></dt>
-<dd><p><code>int</code> Number determining to use a global attention every x-th layer. Allowed values: <code>2 &lt;= x &lt;= 36</code></p></dd>
+<dd><p><code>int</code> Number determining to use a global attention every x-th layer. Allowed values: \(2 &lt;= x &lt;= 36\)</p></dd>
 
 
 <dt><code>intermediate_size</code></dt>
-<dd><p><code>int</code> determining the size of the projection layer within a each transformer encoder. Allowed values: <code>1 &lt;= x </code></p></dd>
+<dd><p><code>int</code> determining the size of the projection layer within a each transformer encoder. Allowed values: \(1 &lt;= x \)</p></dd>
 
 
 <dt><code>hidden_activation</code></dt>
@@ -171,15 +174,15 @@ embedding. Allowed values: <code>1 &lt;= x &lt;= 2048</code></p></dd>
 
 
 <dt><code>embedding_dropout</code></dt>
-<dd><p><code>double</code> Dropout chance for the embeddings. Allowed values: <code>0 &lt;= x &lt;= 0.6</code></p></dd>
+<dd><p><code>double</code> Dropout chance for the embeddings. Allowed values: \(0 &lt;= x &lt;= 0.6\)</p></dd>
 
 
 <dt><code>mlp_dropout</code></dt>
-<dd><p><code>double</code> Dropout rate for the mlp layer. Allowed values: <code>0 &lt;= x &lt;= 0.6</code></p></dd>
+<dd><p><code>double</code> Dropout rate for the mlp layer. Allowed values: \(0 &lt;= x &lt;= 0.6\)</p></dd>
 
 
 <dt><code>attention_dropout</code></dt>
-<dd><p><code>double</code> Ratio of dropout for attention probabilities. Allowed values: <code>0 &lt;= x &lt;= 0.6</code></p></dd>
+<dd><p><code>double</code> Ratio of dropout for attention probabilities. Allowed values: \(0 &lt;= x &lt;= 0.6\)</p></dd>
 
 
 </dl><p></p></div>

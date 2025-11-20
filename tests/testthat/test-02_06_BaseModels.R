@@ -5,6 +5,9 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
+# Start time
+test_time_start <- Sys.time()
+
 # Config transformer library
 transformers$utils$logging$set_verbosity_error()
 os$environ$setdefault("TOKENIZERS_PARALLELISM", "false")
@@ -41,7 +44,7 @@ object_class_names <- BaseModelsIndex
 #  "BaseModelMPNet"
 # )
 
-max_samples <- 1
+max_samples <- 4
 max_samples_CI <- 1
 
 
@@ -82,19 +85,6 @@ for (object_class_name in object_class_names) {
       necessary_objects = list(
         text_dataset = raw_texts_training,
         tokenizer = tokenizer
-      ),
-      var_override = list(
-        sustain_interval = 30,
-        sustain_iso_code = "DEU",
-        block_sizes = c(4, 4),
-        epochs = 2,
-        max_position_embeddings = 512,
-        hidden_size = 16,
-        num_hidden_layers = 3,
-        global_attn_every_n_layers = 2,
-        attention_window = 4,
-        num_attention_heads = 2,
-        intermediate_size = 32
       )
     )
     train_args <- generate_args_for_tests(
@@ -103,17 +93,6 @@ for (object_class_name in object_class_names) {
       var_objects = list(),
       necessary_objects = list(
         text_dataset = raw_texts_training
-      ),
-      var_override = list(
-        sustain_interval = 30,
-        sustain_iso_code = "DEU",
-        sustain_log_level = "error",
-        n_epoch = 2,
-        max_sequence_length = 32,
-        pytorch_trace = 0L,
-        min_seq_len = 16,
-        val_size = 0.25,
-        learning_rate = 3e-3
       )
     )
 
@@ -180,10 +159,15 @@ for (object_class_name in object_class_names) {
       expect_true("loss" %in% colnames(history))
       expect_true("val_loss" %in% colnames(history))
 
-      expect_s3_class(object = base_model$plot_training_history(y_min = NULL, y_max = NULL), class = "ggplot")
-      expect_s3_class(object = base_model$plot_training_history(y_min = 0, y_max = NULL), class = "ggplot")
-      expect_s3_class(object = base_model$plot_training_history(y_min = 0, y_max = 10), class = "ggplot")
-      expect_s3_class(object = base_model$plot_training_history(y_min = NULL, y_max = 10), class = "ggplot")
+      expect_s3_class(object = base_model$plot_training_history(y_min = NULL, y_max = NULL, x_min = NULL, x_max = NULL, ind_best_model = TRUE), class = "ggplot")
+      expect_s3_class(object = base_model$plot_training_history(y_min = 0, y_max = NULL, x_min = NULL, x_max = NULL, ind_best_model = FALSE), class = "ggplot")
+      expect_s3_class(object = base_model$plot_training_history(y_min = 0, y_max = 10, x_min = NULL, x_max = NULL, ind_best_model = TRUE), class = "ggplot")
+      expect_s3_class(object = base_model$plot_training_history(y_min = NULL, y_max = 10, x_min = NULL, x_max = NULL, ind_best_model = FALSE), class = "ggplot")
+
+      expect_s3_class(object = base_model$plot_training_history(y_min = NULL, y_max = NULL, x_min = 1L, x_max = NULL, ind_best_model = TRUE), class = "ggplot")
+      expect_s3_class(object = base_model$plot_training_history(y_min = 0, y_max = NULL, x_min = NULL, x_max = 2L, ind_best_model = FALSE), class = "ggplot")
+      expect_s3_class(object = base_model$plot_training_history(y_min = 0, y_max = 10, x_min = 1L, x_max = 2L, ind_best_model = TRUE), class = "ggplot")
+      expect_s3_class(object = base_model$plot_training_history(y_min = NULL, y_max = 10, x_min = NULL, x_max = NULL, ind_best_model = TRUE), class = "ggplot")
     })
 
     test_that(paste(
@@ -240,7 +224,7 @@ for (object_class_name in object_class_names) {
         suppressMessages(
           base_model$estimate_sustainability_inference_fill_mask(
             text_dataset = raw_texts_training,
-            n = 30,
+            n_samples = 30,
             sustain_iso_code = "DEU",
             sustain_region = NULL,
             sustain_interval = 15,
@@ -322,3 +306,9 @@ for (object_class_name in object_class_names) {
     unlink(paste0(tmp_dir), recursive = TRUE)
   }
 }
+
+# Monitor test time
+monitor_test_time_on_CI(
+  start_time = test_time_start,
+  test_name = "02_05_BaseModels"
+)

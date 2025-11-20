@@ -157,11 +157,11 @@ Method for encoding words of raw texts into integers.
 \describe{
 \item{\code{raw_text}}{\code{vector} Raw text.}
 
-\item{\code{token_overlap}}{\code{int} Number of tokens from the previous chunk that should be added at the beginng of the next chunk. Allowed values: \code{0 <= x }}
+\item{\code{token_overlap}}{\code{int} Number of tokens from the previous chunk that should be added at the beginng of the next chunk. Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
 
-\item{\code{max_token_sequence_length}}{\code{int} Maximal number of tokens per chunk. Allowed values: \code{20 <= x }}
+\item{\code{max_token_sequence_length}}{\code{int} Maximal number of tokens per chunk. Allowed values: \ifelse{latex}{$20 <= x $}{\ifelse{html}{\eqn{20 <= x }}{`20 <= x `}}}
 
-\item{\code{n_chunks}}{\code{int} Maximal number chunks. Allowed values: \code{1 <= x }}
+\item{\code{n_chunks}}{\code{int} Maximal number chunks. Allowed values: \ifelse{latex}{$2 <= x $}{\ifelse{html}{\eqn{2 <= x }}{`2 <= x `}}}
 
 \item{\code{token_encodings_only}}{\code{bool}
 \itemize{
@@ -264,7 +264,7 @@ Applications, 21, 200335.
 \describe{
 \item{\code{text_dataset}}{\code{LargeDataSetForText} \link{LargeDataSetForText} Object storing textual data.}
 
-\item{\code{statistics_max_tokens_length}}{\code{int} Maximum sequence length for calculating the statistics. Allowed values: \verb{20 <= x <= 8192}}
+\item{\code{statistics_max_tokens_length}}{\code{int} Maximum sequence length for calculating the statistics. Allowed values: \ifelse{latex}{$20 <= x <= 8192$}{\ifelse{html}{\eqn{20 <= x <= 8192}}{`20 <= x <= 8192`}}}
 
 \item{\code{step}}{\code{string} describing the context of the estimation.}
 }

@@ -5,6 +5,9 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
+# Start time
+test_time_start <- Sys.time()
+
 test_that("check_python_modules", {
   expect_type(
     check_aif_py_modules(trace = FALSE),
@@ -26,3 +29,8 @@ test_that("prepare_session", {
 test_that("get_recommended_py_versions", {
   expect_s3_class(get_recommended_py_versions(), "data.frame")
 })
+
+monitor_test_time_on_CI(
+  start_time = test_time_start,
+  test_name = "01_01_install_and_config"
+)

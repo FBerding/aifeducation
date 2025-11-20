@@ -1,7 +1,7 @@
 Type: Package
 Package: aifeducation
 Title: Artificial Intelligence for Education
-Version: 1.1.2
+Version: 1.1.3
 Authors@R: c(
     person("Berding", "Florian", , "florian.berding@uni-hamburg.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-3593-1695")),
@@ -42,7 +42,7 @@ Description: In social and educational settings, the use of Artificial
     share trained AI models with other people.
 License: GPL-3
 URL: https://fberding.github.io/aifeducation/
-BugReports: https://github.com/cran/aifeducation/issues
+BugReports: https://github.com/FBerding/aifeducation/issues
 Depends:
     R (>= 3.5.0)
 Imports: 

@@ -5,6 +5,9 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
+# Start time
+test_time_start <- Sys.time()
+
 # Config transformer library
 transformers$utils$logging$set_verbosity_error()
 os$environ$setdefault("TOKENIZERS_PARALLELISM", "false")
@@ -41,10 +44,6 @@ for (object_class_name in object_class_names) {
       var_objects = list(),
       necessary_objects = list(
         text_dataset = raw_texts
-      ),
-      var_override = list(
-        sustain_interval = 30,
-        sustain_iso_code = "DEU"
       )
     )
     training_args <- generate_args_for_tests(
@@ -53,11 +52,6 @@ for (object_class_name in object_class_names) {
       var_objects = list(),
       necessary_objects = list(
         text_dataset = raw_texts
-      ),
-      var_override = list(
-        sustain_interval = 30,
-        sustain_iso_code = "DEU",
-        sustain_log_level = "error"
       )
     )
 
@@ -135,3 +129,9 @@ if (dir.exists(test_art_tmp_path)) {
     recursive = TRUE
   )
 }
+
+# Monitor test time
+monitor_test_time_on_CI(
+  start_time = test_time_start,
+  test_name = "02_05_tokenizer"
+)

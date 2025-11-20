@@ -1,9 +1,9 @@
 ---
-title: "04 Model configuration"
+title: "04 Model and training configuration"
 author: "Florian Berding, Julia Pargmann, Andreas Slopinski, Elisabeth Riebenbauer, Karin Rebmann"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{04 Model configuration}
+  %\VignetteIndexEntry{04 Model and training configuration}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
@@ -215,7 +215,7 @@ Their central findings are
 -   that fine-tuning a transformer with only a few training examples
     (10,000) results in a lower performance than using a not fine-tuned
     transformer (Ganesan et al. 2021, p. 4519).
--   Principal component analysis performed best, but multi-layer
+-   Principal component analysis performed best, but multy-layer
     non-linear auto-encoders (NLAE) are also a good choice (Ganesan et
     al. 2021, p. 4520).
 -   that the number of dimensions depends on the specific task. However,
@@ -223,17 +223,88 @@ Their central findings are
     some cases, about $1/12$ to $1/6$ of the dimensions were sufficient
     (Ganesan et al. 2021, p. 4522).
 
-Ganesan et al. (2021) work shows that a reduction of the dimensions is
-necessary in case that the transformer model uses a large hidden size.
-Since most models in *aifeducation* work with sequential data, the
-package contains an LSTM (`fe_method="LSTM"`) and a dense feature
-extractor (`fe_method="Dense"`). To use it for classifier training, create a
-`TEFeatureExtractor` and provide the trained extractor during the 
-configuration of the classifier. See section "Extension" in vignette [03 Using R
+The work of Ganesan et al. (2021) shows that reducing the dimensions is
+is a good choice when the transformer model uses a large hidden size. 
+A similar finding was reported in a study by Takeshita et al. (2025). Their study shows 
+that randomly dropping 50% of the dimensions
+leads only to a minor decrease in performance in classification tasks.
+
+You can apply these findings to a classification model using either of the following methods:
+
+- the parameter `feat_size` during model configuration; or
+- train and use a feature extractor. Since most models in *aifeducation* work with sequential data, 
+  the package contains an LSTM (`fe_method="LSTM"`), as well as a 
+  dense feature extractor (`fe_method="Dense"`). To use it for a classifier, create a
+  `TEFeatureExtractor` and provide the trained extractor when configuring the model.
+
+See section vignette [03 Using R
 syntax](classification_tasks.html) or [02 Using the graphical user interface
 Aifeducation - Studio](gui_aife_studio.html) for more details.
 
-# 5 Limitations
+# 5 Training
+
+After deciding about the configuration of a model finding good training settings
+is the next step. 
+
+
+*batch size* and *learning rate* 
+
+`batch_size` sets the number of cases to be processed
+simultaneously. Large batch sizes make use of the capacity of modern machines.
+This makes it possible to effectively train large models with large data sets, while saving computational time. 
+The `batch_size` is closely related to the learning rate as several studies shows.
+
+Although large batch sizes seem preferable for saving computational time, small batch sizes 
+lead to better performance due to the generalisation gap (Keskar et al., 2017 p. 2).
+The generalisation gap describes the observation that large batch sizes tend
+to poor generalisation performance on test data sets compared to models trained
+with a small batch size (Keskar et al., 2017 p. 3). 
+
+A study conducted by Masters and Luschi (2018) suggests ways to achieve good
+batch size for using `"SGD"` as optimizer. Their study shows that smaller batch sizes
+offer more stable and reliable training and at the same time achieve better
+generalisation performance. Batch sizes
+between 4 and 32 lead to the best performance. Increasing the batch size also 
+reduces the range of learning rates that provide stable convergence (Masters & Luschi 2018, p. 18).
+Good values for the *base* learning rate ($\eta_{Base}$) for batch sizes between 4 and 32 are in the range of 
+$2^{-6}$ and $2^{-10}$ (Masters & Luschi 2018, p. 15). Similar results report He, Liu et al. (2019) showing that 
+the ratio of batch size to learning rate $(batch size)/(learning rate)$ should be 
+as small as possible in order to achieve good generalisation performance. 
+
+Goyal et al. (2017, p. 7) demonstrate that gradually increasing the learning rate at the beginning of training
+can help achieve the performance of training with small batch sizes, even when 
+using large batch sizes. In this approach, training begins with a small learning 
+rate that increases steadily until it reaches the target learning rate at a specific epoch. 
+After this, the regular learning rate scheduler is applied. 
+Masters and Luschi (2018, p. 11) corroborate this finding, 
+yet assert that optimal performance is still attained with small batch sizes. 
+They use about 5% of the epochs for the warm-up. 
+
+Marek et al. (2025, p. 6) demonstrate that small batch sizes are more robust to all of
+Adam's hyperparameters. 
+
+Based on these results we recommend to start with `batch_size=32`. For calculating
+the corresponding learning rate you first have to choose a base learning rate $\eta_{Base}$. Based 
+on the work by Masters and Luschi (2018) we recommend to set $\eta_{Base}=2^{-10}$.
+The learning rate to apply can now be calculated as $\eta=\eta_{Base}*batchsize$.
+For a batch size of 32 this is $\eta=2^{-10}*32=0.03125$. We set `lr_rate=3e-2`.
+Based on the work of Goyal et al. (2017), we recommend using the first 
+5% (`lr_warm_up_ratio = 0.05`) to 10 % (`lr_warm_up_ratio = 0.1`)
+of epochs for warum-up. 
+
+Please note that there are exceptions to this rule. In the context of contrastive
+learning, higher batch sizes tend to generate better generalisation performance 
+(Chen et al., 2020).
+
+*Epochs*
+
+The number of epochs determines how many times the model goes through the complete training data.
+If you are unsure about the required number of epochs, set a high value.
+The best-generalisation state is determined automatically. All models except `BaseModel`s
+have an early stop rule to prevent unnecessary computations during training.
+
+
+# 6 Limitations
 
 Please note that the findings presented in this vignette refer to
 different architectures of AI models. In general, the results cannot be
@@ -241,6 +312,10 @@ transferred directly to other model architectures. Thus, all
 recommendations can only serve as a rule of thumb.
 
 # References
+
+Chen, T., Kornblith, S., Norouzi, M. & Hinton, G. (2020). A Simple Framework 
+for Contrastive Learning of Visual Representations. 
+<https://doi.org/10.48550/arXiv.2002.05709>
 
 Chen, W., Su, Y., Shen, Y., Chen, Z., Yan, X., & Wang, W. Y. (2019). How
 Large a Vocabulary Does Text Classification Need? A Variational Approach
@@ -269,11 +344,20 @@ Transformer-Based Models: A Case Study on BERT. Transactions of the
 Association for Computational Linguistics, 9, 1061–1080.
 <https://doi.org/10.1162/tacl_a_00413>
 
+Goyal, P., Dollár, P., Girshick, R., Noordhuis, P., Wesolowski, L., Kyrola, A., 
+Tulloch, A., Jia, Y. & He, K. (2017, 8. Juni). Accurate, Large Minibatch SGD:
+Training ImageNet in 1 Hour.
+
 Gowda, T., & May, J. (2020). Finding the Optimal Vocabulary Size for
 Neural Machine Translation. In T. Cohn, Y. He, & Y. Liu (Eds.), Findings
 of the Association for Computational Linguistics: EMNLP 2020 (pp.
 3955–3964). Association for Computational Linguistics.
 <https://doi.org/10.18653/v1/2020.findings-emnlp.352>
+
+He, F., Liu, T. & Tao, D. (2019). Control Batch Size and Learning Rate to Generalize 
+Well: Theoretical and Empirical Evidence. In Advances in neural information 
+processing systems: Bd. 32. 32nd Conference on Neural Information Processing 
+Systems (NeurIPS 2019): Vancouver, Canada, 8-14 December 2019. Curran Associates Inc.
 
 Kaya, Y. B., & Tantuğ, A. C. (2024). Effect of tokenization granularity
 for Turkish large language models. Intelligent Systems with
@@ -300,6 +384,9 @@ Ma, X., Wang, Z., Ng, P., Nallapati, R., & Xiang, B. (2019). Universal
 Text Representation from BERT: An Empirical Study.
 <https://doi.org/10.48550/arXiv.1910.07973>
 
+Masters, D. & Luschi, C. (2018). Revisiting Small Batch Training for
+Deep Neural Networks. <https://doi.org/10.48550/arXiv.1804.07612>
+
 Michel, P., Levy, O., & Neubig, G. (2019). Are Sixteen Heads Really
 Better than One? <https://doi.org/10.48550/arXiv.1905.10650>
 
@@ -307,6 +394,10 @@ Rogers, A., Kovaleva, O., & Rumshisky, A. (2020). A Primer in BERTology:
 What We Know About How BERT Works. Transactions of the Association for
 Computational Linguistics, 8, 842–866.
 <https://doi.org/10.1162/tacl_a_00349>
+
+Takeshita, S., Takeshita, Y., Ruffinelli, D. & Ponzetto, S. P. (2025). Randomly 
+Removing 50% of Dimensions in Text Embeddings has Minimal Impact on Retrieval and 
+Classification Tasks. <https://doi.org/10.48550/arXiv.2508.17744>
 
 Tanaka, H., Shinnou, H., Cao, R., Bai, J., & Ma, W. (2020). Document
 Classification by Word Embeddings of BERT. In L.-M. Nguyen, X.-H. Phan,
@@ -335,3 +426,8 @@ self-attention. <https://doi.org/10.48550/arXiv.2105.03928>
 Zhao, S., Gupta, R., Song, Y., & Zhou, D. (2019). Extremely Small BERT
 Models from Mixed-Vocabulary Training.
 <https://doi.org/10.48550/arXiv.1909.11687>
+
+
+
+
+

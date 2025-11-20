@@ -160,7 +160,7 @@ TEClassifierRegular <- R6::R6Class(
 
       if (private$model_config$rec_layers == 1L && private$model_config$rec_dropout > 0.0) {
         print_message(
-          msg = "Dropout for recurrent requires at least two layers. Setting rec_dropout to 0.0.",
+          msg = "Dropout for recurrent layers requires at least two layers. Setting rec_dropout to 0.0.",
           trace = TRUE
         )
         private$model_config$rec_dropout <- 0.0

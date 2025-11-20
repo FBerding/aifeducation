@@ -218,7 +218,6 @@ get_dict_input_types <- function(input_type) {
 }
 
 
-
 # ===============================================================================
 #' @title Generate layer documentation
 #' @description Function for generating the documentation of a specific layer.
@@ -356,7 +355,6 @@ get_layer_documentation <- function(layer_name, title_format = "bold", subtitle_
   )
   return(markdown_doc)
 }
-
 
 
 #' @title Generate documentation for core models
@@ -557,6 +555,7 @@ build_aife_site <- function(clear_docs = FALSE) {
   pkgdown::build_reference()
   pkgdown::build_redirects()
 
+  #devtools::load_all()
   pkgdown::preview_site()
 }
 
@@ -577,5 +576,9 @@ get_description <- function(type) {
     return("Path to the directory where to save the object.")
   } else if (type == "load_dir") {
     return("Path where the object set is stored.")
+  } else if (type == "model_dir") {
+    return("Path where the model is stored.")
+  } else {
+    stop("Type ist not implemented.")
   }
 }

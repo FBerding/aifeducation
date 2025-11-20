@@ -242,7 +242,6 @@ check_errors_create_dataset_raw_texts <- function(source_path,
 }
 
 
-
 #' @title Check for input errors - feature extracotors create
 #' @description Functions check for input errors in AI for Education - Studio in the case of the creation of
 #'   classifiers.
@@ -283,7 +282,6 @@ check_errors_create_feature_extractor <- function(destination_path,
   }
 
 
-
   # Embeddings
   if (dir.exists(path_to_embeddings) == FALSE) {
     error_list[length(error_list) + 1] <- list(shiny::tags$p(
@@ -313,7 +311,6 @@ check_errors_create_feature_extractor <- function(destination_path,
   }
 
 
-
   # Model Label
   if (check_for_empty_input(model_label)) {
     error_list[length(error_list) + 1] <- list(shiny::tags$p(
@@ -333,7 +330,6 @@ check_errors_create_feature_extractor <- function(destination_path,
     return(NULL)
   }
 }
-
 
 
 #' @title Check for input errors - classifier predict
@@ -372,7 +368,6 @@ check_errors_predict_classifier <- function(embeddings,
       data are not the same."
     ))
   }
-
 
 
   if (length(error_list) > 0) {
@@ -448,7 +443,6 @@ check_errors_text_embedding_model_embed <- function(destination_path,
     return(NULL)
   }
 }
-
 
 
 #' @title Check for input errors - text embedding model embed

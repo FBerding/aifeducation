@@ -9,11 +9,7 @@ generate_args_for_tests(
   method,
   var_objects = list(),
   necessary_objects = list(),
-  var_override = list(sustain_interval = 30L, trace = FALSE, epochs = 50L, batch_size =
-    20L, ml_trace = 0L, n_cores = 2L, data_folds = 2L, pl_max_steps = 2L, pl_max = 1L,
-    pl_anchor = 1L, pl_min = 0L, sustain_track = TRUE, sustain_iso_code = "DEU",
-    sustain_log_level = "error", data_val_size = 0.25, lr_rate = 0.001, lr_warm_up_ratio
-    = 0.01)
+  var_override = list()
 )
 }
 \arguments{
@@ -48,6 +44,7 @@ Other Utils TestThat Developers:
 \code{\link{get_current_args_for_print}()},
 \code{\link{get_fixed_test_tensor}()},
 \code{\link{get_test_data_for_classifiers}()},
+\code{\link{monitor_test_time_on_CI}()},
 \code{\link{random_bool_on_CI}()}
 }
 \concept{Utils TestThat Developers}

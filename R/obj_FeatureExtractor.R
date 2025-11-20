@@ -402,27 +402,32 @@ TEFeatureExtractor <- R6::R6Class(
           # Add new data
           embedded_texts_large$add_embeddings_from_EmbeddedText(embeddings)
         }
-        if (trace) {
-          cat(paste(
-            get_time_stamp(),
-            "Batch", i, "/", total_number_of_bachtes, "done", "\n"
-          ))
-        }
+        print_message(
+          msg = paste("Compress Embeddings - Batch", i, "/", total_number_of_bachtes, "done"),
+          trace = trace
+        )
         gc()
       }
       return(embedded_texts_large)
     },
     #' @description Method for requesting a plot of the training history.
     #' This method requires the *R* package 'ggplot2' to work.
-    #' @param y_min Minimal value for the y-axis. Set to `NULL` for an automatic adjustment.
-    #' @param y_max Maximal value for the y-axis. Set to `NULL` for an automatic adjustment.
-    #' @param text_size Size of the text.
+    #' @param x_min `r get_param_doc_desc("x_min")`
+    #' @param x_max `r get_param_doc_desc("x_max")`
+    #' @param y_min `r get_param_doc_desc("y_min")`
+    #' @param y_max `r get_param_doc_desc("y_max")`
+    #' @param ind_best_model `r get_param_doc_desc("ind_best_model")`
+    #' @param text_size `r get_param_doc_desc("text_size")`
     #' @return Returns a plot of class `ggplot` visualizing the training process.
-    plot_training_history = function(y_min = NULL, y_max = NULL, text_size = 10L) {
+    plot_training_history = function(x_min = NULL, x_max = NULL, y_min = NULL, y_max = NULL, ind_best_model = TRUE, text_size = 10L) {
       tmp_plot <- super$plot_training_history(
-        final_training = FALSE,
+        final_training = TRUE,
         pl_step = NULL,
         measure = "loss",
+        ind_best_model = ind_best_model,
+        ind_selected_model = FALSE,
+        x_min = x_min,
+        x_max = x_max,
         y_min = y_min,
         y_max = y_max,
         add_min_max = FALSE,

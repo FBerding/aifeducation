@@ -8,7 +8,7 @@
 **GitHub** [![Project Status: Active - The project has reached a stable,
 usable state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![](https://img.shields.io/badge/devel%20version-1.1.2-green.svg)](https://github.com/fberding/aifeducation)
+[![](https://img.shields.io/badge/devel%20version-1.1.3-green.svg)](https://github.com/fberding/aifeducation)
 [![R-CMD-check](https://github.com/FBerding/aifeducation/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/FBerding/aifeducation/actions/workflows/R-CMD-check.yaml)
 [![CodeFactor](https://www.codefactor.io/repository/github/fberding/aifeducation/badge)](https://www.codefactor.io/repository/github/fberding/aifeducation)
 [![Codecov test
@@ -139,8 +139,8 @@ Funnel-Transformer (Dai et al. 2020).
 *aifeducation* supports the use of pre-trained transformer models
 provided by [Hugging Face](https://huggingface.co/) and the creation of
 new transformers, allowing educators and researchers to develop
-specialized and domain-specific models. See [04 Model
-configuration](https://fberding.github.io/aifeducation/articles/model_configuration.html)
+specialized and domain-specific models. See [04 Model configuration and
+training](https://fberding.github.io/aifeducation/articles/model_configuration.html)
 for details about the configuration of a new model.
 
 The package supports the analysis of long texts. Depending on the
@@ -275,8 +275,8 @@ you can find a detailed guide on how to document and share your models.
   syntax](https://fberding.github.io/aifeducation/articles/classification_tasks.html):
   A short introduction into using the package with *R* syntax with
   examples for classification tasks.
-- [04 Model
-  configuration](https://fberding.github.io/aifeducation/articles/model_configuration.html):
+- [04 Model configuration and
+  training](https://fberding.github.io/aifeducation/articles/model_configuration.html):
   Summary of some studies for finding a good configuration for a model.
 - [05 Sharing and Using Trained
   AI/Models](https://fberding.github.io/aifeducation/articles/sharing_and_publishing.html):

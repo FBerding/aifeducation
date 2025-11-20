@@ -20,7 +20,7 @@ tests/testthat/test_data/roberta/
 tests/testthat/test_data/longformer/
 
 trainer_output/
-
+New_Transformer.py
 vignettes/examples
 
 cran-comments.md

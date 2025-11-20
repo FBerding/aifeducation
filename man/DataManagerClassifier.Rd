@@ -112,15 +112,15 @@ named and has to use the same names as used in in the embeddings.}
 note that order matters. For ordinal data please ensure that the levels are sorted correctly with later levels
 indicating a higher category/class. For nominal data the order does not matter.}
 
-\item{\code{folds}}{\code{int} determining the number of cross-fold samples. Allowed values: \code{1 <= x }}
+\item{\code{folds}}{\code{int} determining the number of cross-fold samples. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
 \item{\code{val_size}}{\code{double} between 0 and 1, indicating the proportion of cases which should be
 used for the validation sample during the estimation of the model.
-The remaining cases are part of the training data. Allowed values: \verb{0 < x < 1}}
+The remaining cases are part of the training data. Allowed values: \ifelse{latex}{$0 < x < 1$}{\ifelse{html}{\eqn{0 < x < 1}}{`0 < x < 1`}}}
 
 \item{\code{pad_value}}{\code{int} Value indicating padding. This value should no be in the range of
 regluar values for computations. Thus it is not recommended to chance this value.
-Default is \code{-100}. Allowed values: \code{ x <= -100}}
+Default is \code{-100}. Allowed values: \ifelse{latex}{$ x <= -1$}{\ifelse{html}{\eqn{ x <= -1}}{` x <= -1`}}}
 
 \item{\code{one_hot_encoding}}{\code{bool} If \code{TRUE} all labels are converted to one hot encoding.}
 
@@ -129,13 +129,13 @@ The number of rows equals the number of cases. The number of columns equals \cod
 
 \item{\code{sc_methods}}{\code{string} containing the method for generating synthetic cases. Allowed values: 'knnor'}
 
-\item{\code{sc_min_k}}{\code{int} determining the minimal number of k which is used for creating synthetic units. Allowed values: \code{1 <= x }}
+\item{\code{sc_min_k}}{\code{int} determining the minimal number of k which is used for creating synthetic units. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
-\item{\code{sc_max_k}}{\code{int} determining the maximal number of k which is used for creating synthetic units. Allowed values: \code{1 <= x }}
+\item{\code{sc_max_k}}{\code{int} determining the maximal number of k which is used for creating synthetic units. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 
 \item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
 
-\item{\code{n_cores}}{\code{int} Number of cores which should be used during the calculation of synthetic cases. Only relevant if \code{use_sc=TRUE}. Allowed values: \code{1 <= x }}
+\item{\code{n_cores}}{\code{int} Number of cores which should be used during the calculation of synthetic cases. Only relevant if \code{use_sc=TRUE}. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
 }
 \if{html}{\out{</div>}}
 }

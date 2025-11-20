@@ -295,8 +295,6 @@ DataManagement_DataSetEditorServer <- function(id, log_dir, volumes) {
     })
 
 
-
-
     #--------------------------------------------------------------------------
   })
 }

@@ -4,6 +4,9 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
+# Start time
+test_time_start <- Sys.time()
+
 # SetUp-------------------------------------------------------------------------
 # Set paths
 root_path_general_data <- testthat::test_path("test_data/OldModels")
@@ -50,3 +53,9 @@ for (version in versions) {
     }
   })
 }
+
+# Monitor test time
+monitor_test_time_on_CI(
+  start_time = test_time_start,
+  test_name = "04_01_LoadOldModels"
+)

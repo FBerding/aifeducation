@@ -365,7 +365,6 @@ TokenizerBase <- R6::R6Class(
 )
 
 
-
 #' @title WordPieceTokenizer
 #' @description Tokenizer based on the WordPiece model (Wu et al. 2016).
 #' @return `r get_description("return_object")`
@@ -527,8 +526,6 @@ WordPieceTokenizer <- R6::R6Class(
 TokenizerIndex$WordPieceTokenizer <- ("WordPieceTokenizer")
 
 
-
-
 # ===============================================================================
 
 #' @title HuggingFaceTokenizer
@@ -540,9 +537,7 @@ HuggingFaceTokenizer <- R6::R6Class(
   classname = "HuggingFaceTokenizer",
   inherit = TokenizerBase,
   private = list(
-    load_config_file = function(dir_path) {
-
-    }
+    load_config_file = function(dir_path) {}
   ),
   public = list(
     #--------------------------------------------------------------------------

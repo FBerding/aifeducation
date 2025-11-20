@@ -13,7 +13,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 
-
 #' @title Base class for most objects
 #' @description
 #' Objects of this class containing fields and methods used in several other classes in 'AI for Education'.
@@ -26,7 +25,6 @@
 AIFEMaster <- R6::R6Class(
   classname = "AIFEMaster",
   public = list(
-
     #' @field last_training ('list()')\cr
     #'   List for storing the history, the configuration, and the results of the last
     #'   training. This information will be overwritten if a new training is started.

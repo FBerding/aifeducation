@@ -45,6 +45,22 @@ Training_UI <- function(id) {
           label = "Y Max",
           value = NA
         ),
+        shiny::numericInput(
+          inputId = shiny::NS(id, "x_min"),
+          label = "X Min",
+          value = NA
+        ),
+        shiny::numericInput(
+          inputId = shiny::NS(id, "x_max"),
+          label = "X Max",
+          value = NA
+        ),
+        shinyWidgets::materialSwitch(
+          inputId = shiny::NS(id, "ind_best_model"),
+          label = "Indicate Best States",
+          value = TRUE,
+          status = "primary"
+        ),
         shiny::uiOutput(
           outputId = shiny::NS(id, "classifier_specific")
         )
@@ -78,6 +94,12 @@ Training_Server <- function(id, model) {
     output$classifier_specific <- shiny::renderUI({
       if (inherits(model(), "ClassifiersBasedOnTextEmbeddings")) {
         ui <- shiny::tagList(
+          shinyWidgets::materialSwitch(
+            inputId = ns("ind_selected_model"),
+            label = "Indicate Final States",
+            value = FALSE,
+            status = "primary"
+          ),
           shinyWidgets::radioGroupButtons(
             inputId = ns("training_phase"),
             label = "Training Phase",
@@ -99,7 +121,7 @@ Training_Server <- function(id, model) {
           shinyWidgets::materialSwitch(
             inputId = ns("training_min_max"),
             label = "Add Min/Max",
-            value = TRUE,
+            value = FALSE,
             status = "primary"
           ),
           shiny::uiOutput(
@@ -115,12 +137,6 @@ Training_Server <- function(id, model) {
             choices = list(
               "Loss" = "loss"
             )
-          ),
-          shinyWidgets::materialSwitch(
-            inputId = ns("training_min_max"),
-            label = "Add Min/Max",
-            value = TRUE,
-            status = "primary"
           )
         )
       } else {
@@ -156,12 +172,18 @@ Training_Server <- function(id, model) {
           plot <- model()$BaseModel$plot_training_history(
             y_min = input$y_min,
             y_max = input$y_max,
+            x_min = input$x_min,
+            x_max = input$x_max,
+            ind_best_model = input$ind_best_model,
             text_size = input$text_size
           )
         } else if ((inherits(model(), "BaseModelCore"))) {
           plot <- model()$plot_training_history(
             y_min = input$y_min,
             y_max = input$y_max,
+            x_min = input$x_min,
+            x_max = input$x_max,
+            ind_best_model = input$ind_best_model,
             text_size = input$text_size
           )
         } else if (inherits(model(), "ClassifiersBasedOnTextEmbeddings")) {
@@ -177,6 +199,10 @@ Training_Server <- function(id, model) {
           plot <- model()$plot_training_history(
             y_min = input$y_min,
             y_max = input$y_max,
+            x_min = input$x_min,
+            x_max = input$x_max,
+            ind_best_model = input$ind_best_model,
+            ind_selected_model = input$ind_selected_model,
             final_training = bool_training_phase,
             pl_step = input$classifier_pl_step,
             measure = input$measure,
@@ -187,6 +213,9 @@ Training_Server <- function(id, model) {
           plot <- model()$plot_training_history(
             y_min = input$y_min,
             y_max = input$y_max,
+            x_min = input$x_min,
+            x_max = input$x_max,
+            ind_best_model = input$ind_best_model,
             text_size = input$text_size
           )
         }

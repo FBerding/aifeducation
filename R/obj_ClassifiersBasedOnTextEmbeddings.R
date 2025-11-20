@@ -353,26 +353,42 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     #---------------------------------------------------------------------------
     #' @description Method for requesting a plot of the training history.
     #' This method requires the *R* package 'ggplot2' to work.
-    #' @param final_training `bool` If `FALSE` the values of the performance estimation are used. If `TRUE` only
-    #' the epochs of the final training are used.
-    #' @param add_min_max `bool` If `TRUE` the minimal and maximal values during performance estimation are port of the plot.
-    #' If `FALSE` only the mean values are shown. Parameter is ignored if `final_training=TRUE`.
+    #' @param final_training `r get_param_doc_desc("final_training")`
+    #' @param add_min_max `r get_param_doc_desc("add_min_max")`
     #' @param pl_step `int` Number of the step during pseudo labeling to plot. Only relevant if the model was trained
     #' with active pseudo labeling.
-    #' @param y_min Minimal value for the y-axis. Set to `NULL` for an automatic adjustment.
-    #' @param y_max Maximal value for the y-axis. Set to `NULL` for an automatic adjustment.
-    #' @param text_size Size of the text.
+    #' @param x_min `r get_param_doc_desc("x_min")`
+    #' @param x_max `r get_param_doc_desc("x_max")`
+    #' @param y_min `r get_param_doc_desc("y_min")`
+    #' @param y_max `r get_param_doc_desc("y_max")`
+    #' @param ind_best_model `r get_param_doc_desc("ind_best_model")`
+    #' @param ind_selected_model `r get_param_doc_desc("ind_selected_model")`
+    #' @param text_size `r get_param_doc_desc("text_size")`
     #' @param measure `string` Measure to plot. Allowed values:
     #' * `"avg_iota"` = Average Iota
     #' * `"loss"` = Loss
     #' * `"accuracy"` = Accuracy
     #' * `"balanced_accuracy"` = Balanced Accuracy
     #' @return Returns a plot of class `ggplot` visualizing the training process.
-    plot_training_history = function(final_training = FALSE, pl_step = NULL, measure = "loss", y_min = NULL, y_max = NULL, add_min_max = TRUE, text_size = 10L) {
+    plot_training_history = function(final_training = FALSE,
+                                     pl_step = NULL,
+                                     measure = "loss",
+                                     ind_best_model = TRUE,
+                                     ind_selected_model = TRUE,
+                                     x_min = NULL,
+                                     x_max = NULL,
+                                     y_min = NULL,
+                                     y_max = NULL,
+                                     add_min_max = TRUE,
+                                     text_size = 10L) {
       tmp_plot <- super$plot_training_history(
         final_training = final_training,
         pl_step = pl_step,
         measure = measure,
+        ind_best_model = ind_best_model,
+        ind_selected_model = ind_selected_model,
+        x_min = x_min,
+        x_max = x_max,
         y_min = y_min,
         y_max = y_max,
         add_min_max = add_min_max,
@@ -833,7 +849,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
           test_data = test_data,
           reset_model = TRUE,
           use_callback = TRUE,
-          log_dir = private$log_config$log_state_file,
+          log_dir = private$log_config$log_dir,
           log_write_interval = private$log_config$log_write_interval,
           log_top_value = iteration,
           log_top_total = self$last_training$config$n_folds + 1L,
@@ -1309,6 +1325,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     load_reload_python_scripts = function() {
       load_py_scripts(c(
         "pytorch_act_fct.py",
+        "pytorch_distance_fun.py",
         "pytorch_loss_fct.py",
         "pytorch_layers.py",
         "pytorch_layers_normalization.py",

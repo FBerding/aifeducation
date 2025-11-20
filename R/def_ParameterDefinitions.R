@@ -51,7 +51,8 @@ get_param_dict <- function() {
     desc = "Name of the new model. Please refer to common name conventions.
     Free text can be used with parameter `label`. If set to `NULL` a unique ID
     is generated automatically.",
-    default_value = NULL
+    default_value = NULL,
+    test_values = NULL
   )
   param$model_name <- param$name
 
@@ -62,7 +63,8 @@ get_param_dict <- function() {
     max = NULL,
     allowed_values = NULL,
     desc = "Label for the new model. Here you can use free text.",
-    default_value = NULL
+    default_value = NULL,
+    test_values = NULL
   )
   param$model_label <- param$label
 
@@ -74,7 +76,8 @@ get_param_dict <- function() {
     max = NULL,
     allowed_values = NULL,
     desc = "Languages that the models can work with.",
-    default_value = NULL
+    default_value = NULL,
+    test_values = NULL
   )
 
   param$track_mode <- list(
@@ -84,7 +87,8 @@ get_param_dict <- function() {
     max = NULL,
     allowed_values = c("training", "inference"),
     desc = "Determines the stept to which the data refer.",
-    default_value = NULL
+    default_value = NULL,
+    test_values = NULL
   )
 
   param$token_overlap <- list(
@@ -97,7 +101,8 @@ get_param_dict <- function() {
     gui_box = NULL,
     gui_label = NULL,
     default_value = 0L,
-    default_historic = 0L
+    default_historic = 0L,
+    test_values = c(0L, 10L)
   )
   param$overlap <- param$token_overlap
 
@@ -111,16 +116,26 @@ get_param_dict <- function() {
     gui_box = NULL,
     gui_label = NULL,
     default_value = 20L,
-    default_historic = 20L
+    default_historic = 20L,
+    test_values = c(20L, 30L)
   )
 
   param$max_length <- param$max_token_sequence_length
+  param$max_length$test_values=400L
   param$max_length$desc <- "Maximal number of token per chunks. Must be equal or lower
   as the maximal postional embeddings for the model."
 
+  param$max_sequence_length <- param$max_token_sequence_length
+  param$max_sequence_length$desc <- "Maximal number of tokens for every sequence."
+  param$max_sequence_length$gui_box <- "Sequence Modeling"
+  param$max_sequence_length$gui_label <- "Max Sequence Length"
+  param$max_sequence_length$default_value <- 250L
+  param$max_sequence_length$default_historic <- 250L
+  param$max_sequence_length$test_values <- c(150L, 250L)
+
   param$n_chunks <- list(
     type = "int",
-    min = 1L,
+    min = 2L,
     max = Inf,
     allow_null = FALSE,
     allowed_values = NULL,
@@ -128,7 +143,8 @@ get_param_dict <- function() {
     gui_box = NULL,
     gui_label = NULL,
     default_value = 1L,
-    default_historic = 1L
+    default_historic = 1L,
+    test_values = c(4L, 7L)
   )
   param$chunks <- param$n_chunks
   param$chunks$min <- 2L
@@ -143,7 +159,8 @@ get_param_dict <- function() {
     gui_box = NULL,
     gui_label = NULL,
     default_value = 1L,
-    default_historic = 1L
+    default_historic = 1L,
+    test_values = 1L
   )
 
   param$emb_layer_max <- list(
@@ -156,7 +173,8 @@ get_param_dict <- function() {
     gui_box = NULL,
     gui_label = NULL,
     default_value = 1L,
-    default_historic = 1L
+    default_historic = 1L,
+    test_values =c(1L,2L)
   )
 
   param$emb_pool_type <- list(
@@ -169,7 +187,8 @@ get_param_dict <- function() {
     In the case of `'CLS'` all cls-tokens between `emb_layer_min` and `emb_layer_max` are averaged.
     In the case of `'Average'` the embeddings of all tokens are averaged.
     Please note that BaseModelFunnel allows only 'CLS'.",
-    default_value = NULL
+    default_value = NULL,
+    test_values = NULL
   )
 
   param$funnel_pooling_type <- list(
@@ -182,7 +201,8 @@ get_param_dict <- function() {
     default_value = "Mean",
     default_historic = "Mean",
     gui_box = "Transformer Encoder Layers",
-    gui_label = "Sequence Pooling"
+    gui_label = "Sequence Pooling",
+    test_values = NULL
   )
 
   param$global_attn_every_n_layers <- list(
@@ -195,9 +215,9 @@ get_param_dict <- function() {
     gui_box = NULL,
     gui_label = NULL,
     default_value = 3L,
-    default_historic = 3L
+    default_historic = 3L,
+    test_values = 2L
   )
-
 
   param$statistics_max_tokens_length <- list(
     type = "int",
@@ -209,7 +229,8 @@ get_param_dict <- function() {
     gui_box = NULL,
     gui_label = NULL,
     default_value = 20L,
-    default_historic = 20L
+    default_historic = 20L,
+    test_values = c(100L, 512L)
   )
 
   param$token_encodings_only <- list(
@@ -224,7 +245,8 @@ get_param_dict <- function() {
     the number potential number of chunks for each document/text.",
     gui_box = NULL,
     gui_label = NULL,
-    default_value = TRUE
+    default_value = TRUE,
+    test_values = NULL
   )
 
   param$token_to_int <- list(
@@ -238,7 +260,8 @@ get_param_dict <- function() {
   * `FALSE`: Returns the tokens as `string`s.",
     gui_box = NULL,
     gui_label = NULL,
-    default_value = TRUE
+    default_value = TRUE,
+    test_values = NULL
   )
 
   param$to_token <- list(
@@ -252,7 +275,8 @@ get_param_dict <- function() {
   * `TRUE`: Transforms the integers to a sequence of tokens.",
     gui_box = NULL,
     gui_label = NULL,
-    default_value = TRUE
+    default_value = TRUE,
+    test_values = NULL
   )
 
   param$return_token_type_ids <- list(
@@ -264,7 +288,8 @@ get_param_dict <- function() {
     desc = "If `TRUE` additionally returns the return_token_type_ids.",
     gui_box = NULL,
     gui_label = NULL,
-    default_value = TRUE
+    default_value = TRUE,
+    test_values = NULL
   )
 
   param$int_seqence <- list(
@@ -276,9 +301,9 @@ get_param_dict <- function() {
     desc = "`list` of integer sequence that should be converted to tokens.",
     gui_box = NULL,
     gui_label = NULL,
-    default_value = TRUE
+    default_value = TRUE,
+    test_values = NULL
   )
-
 
 
   # Transformer related---------------------------------------------------------
@@ -295,7 +320,8 @@ get_param_dict <- function() {
     gui_box = NULL,
     gui_label = NULL,
     default_value = NULL,
-    default_historic = NULL
+    default_historic = NULL,
+    test_values = NULL
   )
 
   param$base_model <- list(
@@ -310,13 +336,14 @@ get_param_dict <- function() {
     gui_box = NULL,
     gui_label = NULL,
     default_value = NULL,
-    default_historic = NULL
+    default_historic = NULL,
+    test_values = NULL
   )
 
   param$pad_value <- list(
     type = "int",
     min = -Inf,
-    max = -100L,
+    max = -1L,
     allow_null = FALSE,
     allowed_values = NULL,
     desc = "Value indicating padding. This value should no be in the range of
@@ -325,7 +352,8 @@ get_param_dict <- function() {
     gui_box = NULL,
     gui_label = NULL,
     default_value = -100L,
-    default_historic = 0L
+    default_historic = 0L,
+    test_values = NULL
   )
   param$param_pad_value <- param$pad_value
 
@@ -341,7 +369,8 @@ get_param_dict <- function() {
   * `FALSE` (or 'safetensors' is not available): model is saved in the standard pytorch format (.bin). ",
     gui_box = NULL,
     gui_label = NULL,
-    default_value = TRUE
+    default_value = TRUE,
+    test_values = NULL
   )
 
   param$model_dir <- list(
@@ -353,7 +382,8 @@ get_param_dict <- function() {
     desc = "Path to the directory where the model should be saved.",
     gui_box = NULL,
     gui_label = NULL,
-    default_value = NULL
+    default_value = NULL,
+    test_values = NULL
   )
   param$output_dir <- param$model_dir
   param$tokenizer_dir <- param$model_dir
@@ -368,7 +398,8 @@ get_param_dict <- function() {
     desc = "Name of the folder where the model should be saved.",
     gui_box = NULL,
     gui_label = NULL,
-    default_value = NULL
+    default_value = NULL,
+    test_values = NULL
   )
 
   param$model_dir_path <- list(
@@ -380,7 +411,8 @@ get_param_dict <- function() {
     desc = "Path to the directory where the original model is stored.",
     gui_box = NULL,
     gui_label = NULL,
-    default_value = NULL
+    default_value = NULL,
+    test_values = NULL
   )
 
   param$text_dataset <- list(
@@ -392,7 +424,8 @@ get_param_dict <- function() {
     desc = "[LargeDataSetForText] Object storing textual data.",
     gui_box = NULL,
     gui_label = "Text Collection",
-    default_value = NULL
+    default_value = NULL,
+    test_values = NULL
   )
 
   param$raw_text <- list(
@@ -404,7 +437,8 @@ get_param_dict <- function() {
     desc = "Raw text.",
     gui_box = NULL,
     gui_label = NULL,
-    default_value = NULL
+    default_value = NULL,
+    test_values = NULL
   )
 
   param$doc_id <- list(
@@ -416,7 +450,8 @@ get_param_dict <- function() {
     desc = "Id for every text.",
     gui_box = NULL,
     gui_label = NULL,
-    default_value = NULL
+    default_value = NULL,
+    test_values = NULL
   )
 
   param$return_large_dataset <- list(
@@ -428,7 +463,8 @@ get_param_dict <- function() {
     desc = "If `TRUE` a [LargeDataSetForTextEmbeddings] is returned. If `FALSE` an object if class [EmbeddedText] is returned.",
     gui_box = NULL,
     gui_label = NULL,
-    default_value = FALSE
+    default_value = FALSE,
+    test_values = NULL
   )
 
   param$vocab_size <- list(
@@ -440,7 +476,8 @@ get_param_dict <- function() {
     desc = "Size of the vocabulary.",
     gui_box = "Vocabulary",
     gui_label = "Vocabulary Size",
-    default_value = 30000L
+    default_value = 30000L,
+    test_values = c(500L, 10000L)
   )
 
   param$vocab_do_lower_case <- list(
@@ -452,7 +489,8 @@ get_param_dict <- function() {
     desc = "`TRUE` if all tokens should be lower case.",
     gui_box = "Vocabulary",
     gui_label = "Lower Case",
-    default_value = FALSE
+    default_value = FALSE,
+    test_values = NULL
   )
 
   param$add_prefix_space <- list(
@@ -464,7 +502,8 @@ get_param_dict <- function() {
     desc = "`TRUE` if an additional space should be inserted to the leading words.",
     gui_box = "Vocabulary",
     gui_label = "Add Prefix Space",
-    default_value = FALSE
+    default_value = FALSE,
+    test_values = NULL
   )
 
   param$trim_offsets <- list(
@@ -476,7 +515,8 @@ get_param_dict <- function() {
     desc = "`TRUE` trims the whitespaces from the produced offsets.",
     gui_box = "Vocabulary",
     gui_label = "Trim Offsets",
-    default_value = FALSE
+    default_value = FALSE,
+    test_values = NULL
   )
 
   param$whole_word <- list(
@@ -489,7 +529,8 @@ get_param_dict <- function() {
   * `FALSE`: token masking is used. ",
     gui_box = "Training Settings",
     gui_label = "Whole Word Masking",
-    default_value = TRUE
+    default_value = TRUE,
+    test_values = NULL
   )
 
   param$full_sequences_only <- list(
@@ -501,7 +542,8 @@ get_param_dict <- function() {
     desc = "`TRUE` for using only chunks with a sequence length equal to `chunk_size`.",
     gui_box = "Sequence Modeling",
     gui_label = "Full Sequences Only",
-    default_value = FALSE
+    default_value = FALSE,
+    test_values = NULL
   )
 
   param$max_position_embeddings <- list(
@@ -514,7 +556,8 @@ get_param_dict <- function() {
   can be processed with the model.",
     gui_box = "Sequence Modeling",
     gui_label = "Max Sequence Length",
-    default_value = 512L
+    default_value = 512L,
+    test_values = 512L
   )
 
   param$attention_window <- list(
@@ -526,7 +569,8 @@ get_param_dict <- function() {
     desc = "Size of the window around each token for attention mechanism in every layer.",
     gui_box = "Sequence Modeling",
     gui_label = "Attention Window",
-    default_value = 512L
+    default_value = 512L,
+    test_values = c(4L, 50L)
   )
 
   param$hidden_size <- list(
@@ -539,7 +583,8 @@ get_param_dict <- function() {
   embedding.",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Hidden Size",
-    default_value = 768L
+    default_value = 768L,
+    test_values = c(12L, 20L)
   )
   param$d_model <- param$hidden_size
 
@@ -552,7 +597,8 @@ get_param_dict <- function() {
     desc = "Name of the activation function.",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Hidden Activation Function",
-    default_value = "gelu"
+    default_value = "gelu",
+    test_values = NULL
   )
   param$hidden_activation <- param$hidden_act
 
@@ -565,7 +611,8 @@ get_param_dict <- function() {
     desc = "Number of hidden layers.",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Number of Hidden Layers",
-    default_value = 7L
+    default_value = 7L,
+    test_values = c(2L, 4L)
   )
   param$num_hidden_layer <- param$num_hidden_layers
 
@@ -578,7 +625,8 @@ get_param_dict <- function() {
     desc = "Number of decoding layers.",
     gui_box = "Decoder Layers",
     gui_label = "Number of Decoding Layers",
-    default_value = 7L
+    default_value = 7L,
+    test_values = c(1L, 2L)
   )
 
   param$target_hidden_size <- list(
@@ -591,7 +639,8 @@ get_param_dict <- function() {
   embedding.",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Target Hidden Size",
-    default_value = 768L
+    default_value = 768L,
+    test_values = c(64L)
   )
 
   param$d_head <- param$target_hidden_size
@@ -607,7 +656,8 @@ get_param_dict <- function() {
     desc = "Ratio of dropout.",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Hidden Dropout",
-    default_value = 0.5
+    default_value = 0.5,
+    test_values = NULL
   )
   param$embedding_dropout <- param$hidden_dropout_prob
   param$embedding_dropout$desc <- "Dropout chance for the embeddings."
@@ -624,7 +674,8 @@ get_param_dict <- function() {
     desc = "Dropout probability between the layers of the feed-forward blocks.",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Dropout between the layers of the feed-forward blocks",
-    default_value = 0.5
+    default_value = 0.5,
+    test_values = NULL
   )
 
   param$attention_probs_dropout_prob <- list(
@@ -636,32 +687,35 @@ get_param_dict <- function() {
     desc = "Ratio of dropout for attention probabilities.",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Dropout for Attention Probabilities",
-    default_value = 0.1
+    default_value = 0.1,
+    test_values = NULL
   )
   param$attention_dropout <- param$attention_probs_dropout_prob
 
   param$p_mask <- list(
-    type = "(double)",
+    type = "double",
     allow_null = FALSE,
-    min = 0L,
-    max = 1L,
+    min = 0.05,
+    max = 0.60,
     allowed_values = NULL,
     desc = "Ratio that determines the number of tokens used for masking.",
     gui_box = "Sequence Modeling",
     gui_label = "Masking Probability",
-    default_value = 0.4
+    default_value = 0.4,
+    test_values = NULL
   )
 
   param$p_perm <- list(
-    type = "(double)",
+    type = "double",
     allow_null = FALSE,
-    min = 0L,
-    max = 1L,
+    min = 0.05,
+    max = 0.60,
     allowed_values = NULL,
     desc = "Ratio that determines the number of tokens used for permutation.",
     gui_box = "Sequence Modeling",
     gui_label = "Permutation Probability",
-    default_value = 0.4
+    default_value = 0.4,
+    test_values = NULL
   )
 
   param$block_sizes <- list(
@@ -673,7 +727,8 @@ get_param_dict <- function() {
     desc = "`vector` of `int` determining the number and sizes of each block.",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Block Size",
-    default_value = 0.1
+    default_value = c(4L, 4L),
+    test_values = list(c(4, 4))
   )
 
   param$pooling_type <- list(
@@ -687,7 +742,8 @@ get_param_dict <- function() {
   * `\"max\"` for pooling with maximum values. ",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Pooling Type",
-    default_value = "Max"
+    default_value = "Max",
+    test_values = NULL
   )
 
   param$chunk_size <- list(
@@ -700,7 +756,8 @@ get_param_dict <- function() {
     allowed by the model.",
     gui_box = "Sequence Modeling",
     gui_label = "Max Sequence Length",
-    default_value = 256L
+    default_value = 256L,
+    test_values = c(50L, 100L)
   )
 
   param$min_seq_len <- list(
@@ -713,14 +770,16 @@ get_param_dict <- function() {
   training process. ",
     gui_box = "Sequence Modeling",
     gui_label = "Min Sequence Length",
-    default_value = 10L
+    default_value = 10L,
+    test_values = c(10L)
   )
 
   # Data related-----------------------------------------------------------------
   param$data_embeddings <- list(
     type = c("EmbeddedText", "LargeDataSetForTextEmbeddings"),
     allow_null = FALSE,
-    desc = "Object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings]."
+    desc = "Object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings].",
+    test_values = NULL
   )
   param$text_embeddings <- param$data_embeddings
 
@@ -728,7 +787,8 @@ get_param_dict <- function() {
     type = "factor",
     allow_null = FALSE,
     desc = "containing the labels for cases stored in embeddings. Factor must be
-      named and has to use the same names as used in in the embeddings."
+      named and has to use the same names as used in in the embeddings.",
+    test_values = NULL
   )
   param$target_levels <- list(
     type = "vector",
@@ -740,7 +800,8 @@ get_param_dict <- function() {
     note that order matters. For ordinal data please ensure that the levels are sorted correctly with later levels
     indicating a higher category/class. For nominal data the order does not matter.",
     gui_label = "Target Levels",
-    default_value = NULL
+    default_value = NULL,
+    test_values = NULL
   )
   param$class_levels <- param$target_levels
 
@@ -752,7 +813,8 @@ get_param_dict <- function() {
     desc = "determining the number of cross-fold samples.",
     gui_box = "General Settings",
     gui_label = "Number of Folds",
-    default_value = 5L
+    default_value = 5L,
+    test_values = 2L
   )
   param$folds <- param$data_folds
 
@@ -766,7 +828,8 @@ get_param_dict <- function() {
       The remaining cases are part of the training data.",
     gui_box = "General Settings",
     gui_label = "Size of Validation Data Set",
-    default_value = 0.1
+    default_value = 0.1,
+    test_values = 0.33
   )
   param$val_size <- param$data_val_size
 
@@ -777,7 +840,8 @@ get_param_dict <- function() {
       training data with the method Inverse Class Frequency. If `FALSE` each class has the weight 1.",
     gui_box = "Loss",
     gui_label = "Balance Class Weights",
-    default_value = TRUE
+    default_value = TRUE,
+    test_values = NULL
   )
   param$loss_balance_sequence_length <- list(
     type = "bool",
@@ -787,7 +851,8 @@ get_param_dict <- function() {
       If `FALSE` each sequences length has the weight 1.",
     gui_box = "Loss",
     gui_label = "Balance Sequence Length",
-    default_value = TRUE
+    default_value = TRUE,
+    test_values = NULL
   )
   param$one_hot_encoding <- list(
     type = "bool",
@@ -796,7 +861,8 @@ get_param_dict <- function() {
     max = NULL,
     allowed_values = NULL,
     desc = "If `TRUE` all labels are converted to one hot encoding.",
-    default_value = NULL
+    default_value = NULL,
+    test_values = NULL
   )
   param$add_matrix_map <- list(
     type = "bool",
@@ -806,7 +872,8 @@ get_param_dict <- function() {
     allowed_values = NULL,
     desc = "If `TRUE` all embeddings are transformed into a two dimensional matrix.
       The number of rows equals the number of cases. The number of columns equals `times*features`.",
-    default_value = NULL
+    default_value = NULL,
+    test_values = NULL
   )
 
   # Synthetic cases-------------------------------------------------------------
@@ -816,7 +883,8 @@ get_param_dict <- function() {
     desc = "`TRUE` if the estimation should integrate synthetic cases. `FALSE` if not.",
     gui_box = "Synthetic Cases",
     gui_label = "Use Synthetic Cases",
-    default_value = FALSE
+    default_value = FALSE,
+    test_values = NULL
   )
   param$sc_method <- list(
     type = "string",
@@ -825,7 +893,8 @@ get_param_dict <- function() {
     desc = "containing the method for generating synthetic cases.",
     gui_box = "Synthetic Cases",
     gui_label = "Method for Creating Synthetic Cases",
-    default_value = "knnor"
+    default_value = "knnor",
+    test_values = NULL
   )
   param$sc_methods <- param$sc_method
 
@@ -837,7 +906,8 @@ get_param_dict <- function() {
     desc = "determining the minimal number of k which is used for creating synthetic units.",
     gui_box = "Synthetic Cases",
     gui_label = "Min k",
-    default_value = 1L
+    default_value = 1L,
+    test_values = 1L
   )
   param$sc_max_k <- list(
     type = "int",
@@ -847,7 +917,8 @@ get_param_dict <- function() {
     desc = "determining the maximal number of k which is used for creating synthetic units.",
     gui_box = "Synthetic Cases",
     gui_label = "Max k",
-    default_value = 1L
+    default_value = 1L,
+    test_values = 3L
   )
 
   param$n_cores <- list(
@@ -856,7 +927,8 @@ get_param_dict <- function() {
     min = 1L,
     max = Inf,
     desc = "Number of cores which should be used during the calculation of synthetic cases. Only relevant if `use_sc=TRUE`.",
-    default_value = 1L
+    default_value = 1L,
+    test_values = 2L
   )
 
   # Pseudo labeling------------------------------------------------------------
@@ -866,7 +938,8 @@ get_param_dict <- function() {
     desc = "`TRUE` if the estimation should integrate pseudo-labeling. `FALSE` if not.",
     gui_box = "Pseudo Labeling",
     gui_label = "Use Pseudo Labeling",
-    default_value = FALSE
+    default_value = FALSE,
+    test_values = NULL
   )
   param$pl_max_steps <- list(
     type = "int",
@@ -876,7 +949,8 @@ get_param_dict <- function() {
     desc = "determining the maximum number of steps during pseudo-labeling.",
     gui_box = "Pseudo Labeling",
     gui_label = "Number of Steps",
-    default_value = 5L
+    default_value = 5L,
+    test_values = 2L
   )
   param$pl_anchor <- list(
     type = "double",
@@ -887,7 +961,8 @@ get_param_dict <- function() {
     desc = "indicating the reference point for sorting the new cases of every label.",
     gui_box = "Pseudo Labeling",
     gui_label = "Certainty Anchor Value",
-    default_value = 1L
+    default_value = 1L,
+    test_values = 1L
   )
   param$pl_max <- list(
     type = "(double",
@@ -897,7 +972,8 @@ get_param_dict <- function() {
     desc = "setting the maximal level of confidence for considering a case for pseudo-labeling.",
     gui_box = "Pseudo Labeling",
     gui_label = "Max Certainty",
-    default_value = 1L
+    default_value = 1L,
+    test_values = 1L
   )
   param$pl_min <- list(
     type = "double)",
@@ -907,7 +983,8 @@ get_param_dict <- function() {
     desc = "setting the mnimal level of confidence for considering a case for pseudo-labeling.",
     gui_box = "Pseudo Labeling",
     gui_label = "Min Certainty",
-    default_value = 0L
+    default_value = 0L,
+    test_values = 0L
   )
 
   # Sustainability--------------------------------------------------------------
@@ -916,7 +993,8 @@ get_param_dict <- function() {
     allow_null = FALSE,
     desc = "If `TRUE` energy consumption is tracked during training via the python library 'codecarbon'.",
     gui_box = NULL,
-    default_value = TRUE
+    default_value = TRUE,
+    test_values = TRUE
   )
   param$sustain_iso_code <- list(
     type = "string",
@@ -927,7 +1005,8 @@ get_param_dict <- function() {
       <https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes>.",
     gui_box = "Sustainability",
     gui_label = "Alpha-3-Code",
-    default_value = "DEU"
+    default_value = "DEU",
+    test_values = "DEU"
   )
   param$sustain_region <- list(
     type = "string",
@@ -936,7 +1015,8 @@ get_param_dict <- function() {
     desc = "Region within a country. Only available for USA and Canada See the documentation of
       codecarbon for more information. <https://mlco2.github.io/codecarbon/parameters.html>",
     gui_box = NULL,
-    default_value = NULL
+    default_value = NULL,
+    test_values = NULL
   )
   param$sustain_interval <- list(
     type = "int",
@@ -945,7 +1025,8 @@ get_param_dict <- function() {
     max = Inf,
     desc = "Interval in seconds for measuring power usage.",
     gui_box = NULL,
-    default_value = 15L
+    default_value = 15L,
+    test_values = 15L
   )
   param$sustain_log_level <- list(
     type = "string",
@@ -955,9 +1036,9 @@ get_param_dict <- function() {
     max = NULL,
     desc = "Level for printing information to the console.",
     gui_box = NULL,
-    default_value = "warning"
+    default_value = "warning",
+    test_values = "error"
   )
-
 
   # Training related------------------------------------------------------------
   param$loss_cls_fct_name <- list(
@@ -973,7 +1054,8 @@ get_param_dict <- function() {
     ),
     gui_box = "General Settings",
     gui_label = "Loss Function",
-    default_value = "FocalLoss"
+    default_value = "FocalLoss",
+    test_values = NULL
   )
   param$loss_pt_fct_name <- param$loss_cls_fct_name
   param$loss_pt_fct_name$allowed_values <- "MultiWayContrastiveLoss"
@@ -992,7 +1074,8 @@ get_param_dict <- function() {
     desc = "determining the optimizer used for training.",
     gui_box = "General Settings",
     gui_label = "Optimizer",
-    default_value = "AdamW"
+    default_value = "AdamW",
+    test_values = NULL
   )
 
   param$epochs <- list(
@@ -1003,7 +1086,8 @@ get_param_dict <- function() {
     desc = "Number of training epochs.",
     gui_box = "General Settings",
     gui_label = "Epochs",
-    default_value = 100L
+    default_value = 100L,
+    test_values = 2L
   )
   param$n_epoch <- param$epochs
 
@@ -1015,8 +1099,22 @@ get_param_dict <- function() {
     desc = "Size of the batches for training.",
     gui_box = "General Settings",
     gui_label = "Batch Size",
-    default_value = 32L
+    default_value = 32L,
+    test_values = 2L
   )
+
+  param$n_batches <- list(
+    type = "int",
+    allow_null = FALSE,
+    min = 1L,
+    max = Inf,
+    desc = "Number of batches.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = 2L,
+    test_values = 2L
+  )
+
   param$lr_rate <- list(
     type = "(double",
     allow_null = FALSE,
@@ -1026,7 +1124,8 @@ get_param_dict <- function() {
     magnitude = 0.1,
     gui_box = "Learning Rate",
     gui_label = "Learning Rate",
-    default_value = 1e-3
+    default_value = 1e-3,
+    test_values = 1e-3
   )
   param$learning_rate <- param$lr_rate
 
@@ -1038,14 +1137,16 @@ get_param_dict <- function() {
     desc = "Number of epochs used for warm up.",
     gui_box = "Learning Rate",
     gui_label = "Warm Up Ratio",
-    default_value = 0.01
+    default_value = 0.01,
+    test_values = 0.01
   )
   param$dir_checkpoint <- list(
     type = "string",
     allow_null = FALSE,
     allowed_values = NULL,
     desc = "Path to the directory where the checkpoint during training should be saved.
-      If the directory does not exist, it is created."
+      If the directory does not exist, it is created.",
+    test_values = NULL
   )
 
   # Logging related-------------------------------------------------------------
@@ -1055,7 +1156,8 @@ get_param_dict <- function() {
     allowed_values = NULL,
     desc = "Path to the directory where the log files should be saved.
       If no logging is desired set this argument to `NULL`.",
-    default_value = NULL
+    default_value = NULL,
+    test_values = NULL
   )
   param$log_file <- list(
     type = "string",
@@ -1063,7 +1165,8 @@ get_param_dict <- function() {
     allowed_values = NULL,
     desc = "Path to the file where the log files should be saved.
       If no logging is desired set this argument to `NULL`.",
-    default_value = NULL
+    default_value = NULL,
+    test_values = NULL
   )
   param$log_write_interval <- list(
     type = "int",
@@ -1072,13 +1175,15 @@ get_param_dict <- function() {
     max = Inf,
     desc = "Time in seconds determining the interval in which the logger should try to update
       the log files. Only relevant if `log_dir` is not `NULL`.",
-    default_value = 60L
+    default_value = 60L,
+    test_values = 60L
   )
   param$trace <- list(
     type = "bool",
     allow_null = FALSE,
     desc = "`TRUE` if information about the estimation phase should be printed to the console.",
-    default_value = FALSE
+    default_value = FALSE,
+    test_values = NULL
   )
   param$ml_trace <- list(
     type = "int",
@@ -1087,7 +1192,8 @@ get_param_dict <- function() {
     allow_null = FALSE,
     allowed_values = NULL,
     desc = "`ml_trace=0` does not print any information about the training process from pytorch on the console.",
-    default_value = 0L
+    default_value = 0L,
+    test_values = 0L
   )
   param$pytorch_trace <- param$ml_trace
 
@@ -1100,7 +1206,8 @@ get_param_dict <- function() {
     allow_null = FALSE,
     gui_box = "General Settings",
     gui_label = "Number of Dimensions for Embeddings",
-    default_value = 2L
+    default_value = 2L,
+    test_values = 2L
   )
   param$Ns <- list(
     type = "int",
@@ -1111,7 +1218,8 @@ get_param_dict <- function() {
     desc = "Number of cases for every class in the sample.",
     gui_label = "Number of Cases in the Sample",
     gui_box = "Sampling",
-    default_value = 5L
+    default_value = 5L,
+    test_values = 5L
   )
   param$Nq <- list(
     type = "int",
@@ -1122,7 +1230,8 @@ get_param_dict <- function() {
     desc = "Number of cases for every class in the query.",
     gui_label = "Number of Cases in the Query",
     gui_box = "Sampling",
-    default_value = 3L
+    default_value = 3L,
+    test_values = 3L
   )
   param$loss_alpha <- list(
     type = "double",
@@ -1135,7 +1244,8 @@ get_param_dict <- function() {
       loss concentrates on pulling cases to its corresponding prototypes.",
     gui_box = "Loss",
     gui_label = "Alpha",
-    default_value = 0.5
+    default_value = 0.5,
+    test_values = NULL
   )
   param$loss_margin <- list(
     type = "double",
@@ -1148,7 +1258,8 @@ get_param_dict <- function() {
     reaches better performance if the margin is a magnitude lower (e.g. 0.05 instead of 0.5).",
     gui_box = "Loss",
     gui_label = "Margin",
-    default_value = 0.05
+    default_value = 0.05,
+    test_values = NULL
   )
   param$sampling_separate <- list(
     type = "bool",
@@ -1163,7 +1274,8 @@ get_param_dict <- function() {
       only once during a training step.",
     gui_box = "Sampling",
     gui_label = "Strictly Separte Sample and Query",
-    default_value = FALSE
+    default_value = FALSE,
+    test_values = NULL
   )
   param$sampling_shuffle <- list(
     type = "bool",
@@ -1175,7 +1287,8 @@ get_param_dict <- function() {
       cases are not shuffled.",
     gui_box = "Sampling",
     gui_label = "Shuffle Order of Cases",
-    default_value = TRUE
+    default_value = TRUE,
+    test_values = NULL
   )
 
   # FeatureExtractor related-----------------------------------------------------
@@ -1188,7 +1301,8 @@ get_param_dict <- function() {
     desc = "Number of features the model should use.",
     gui_box = "General Settings",
     gui_label = "Number of Features",
-    default_value = 64L
+    default_value = 64L,
+    test_values = 12L
   )
   param$method <- list(
     type = "string",
@@ -1199,7 +1313,8 @@ get_param_dict <- function() {
     desc = "Method to use for the feature extraction. `'lstm'` for an extractor based on LSTM-layers or `'Dense'` for dense layers.",
     default_value = "Dense",
     gui_box = "General Settings",
-    gui_label = "Method"
+    gui_label = "Method",
+    test_values = NULL
   )
 
   param$orthogonal_method <- list(
@@ -1212,7 +1327,8 @@ get_param_dict <- function() {
     default_historic = "householder",
     default_value = " matrix_exp",
     gui_box = "General Settings",
-    gui_label = "Method"
+    gui_label = "Method",
+    test_values = NULL
   )
 
 
@@ -1226,7 +1342,8 @@ get_param_dict <- function() {
       be added to the input during training.",
     default_value = 1e-2,
     gui_box = "General Settings",
-    gui_label = "Noise Factor"
+    gui_label = "Noise Factor",
+    test_values = NULL
   )
   param$feature_extractor <- list(
     type = "TEFeatureExtractor",
@@ -1237,7 +1354,8 @@ get_param_dict <- function() {
     desc = "Object of class [TEFeatureExtractor] which should be used in order to reduce
     the number of dimensions of the text embeddings. If no feature extractor should be applied set `NULL`.",
     gui_label = "Feature Extractor",
-    default_value = NULL
+    default_value = NULL,
+    test_values = NULL
   )
 
   # Layer configuration=========================================================
@@ -1258,7 +1376,8 @@ get_param_dict <- function() {
     gui_box = "General Settings",
     gui_label = "Residual Connection",
     default_value = "ResidualGate",
-    default_historic = NULL
+    default_historic = NULL,
+    test_values = NULL
   )
 
   param$skip_connection_type <- list(
@@ -1277,7 +1396,8 @@ get_param_dict <- function() {
     gui_box = "General Settings",
     gui_label = "Residual Connection",
     default_value = "ResidualGate",
-    default_historic = NULL
+    default_historic = NULL,
+    test_values = NULL
   )
 
   param$skip_connection_type <- param$residual_type
@@ -1309,7 +1429,8 @@ get_param_dict <- function() {
     gui_box = "General Settings",
     gui_label = "Normalization",
     default_value = "LayerNorm",
-    default_historic = NULL
+    default_historic = NULL,
+    test_values = NULL
   )
 
   param$feat_normalization_type <- param$normalization_type
@@ -1330,6 +1451,24 @@ get_param_dict <- function() {
   param$merge_normalization_type <- param$normalization_type
   param$merge_normalization_type$gui_box <- "Merge Layer"
 
+  param$tf_normalization_position <- list(
+    type = "string",
+    min = NULL,
+    max = NULL,
+    allow_null = FALSE,
+    allowed_values = c("Pre", "Post"),
+    values_desc = list(
+      pre = "Applies normalization before the layers as described by [Xiong et al. (2020)](https://doi.org/10.48550/arXiv.2002.04745).",
+      post = "Applies normalization after the layers as described in the original transformer model."
+    ),
+    desc = "Position where the normalization should be applied.",
+    gui_box = "General Settings",
+    gui_label = "Normalization Position",
+    default_value = "Pre",
+    default_historic = "Post",
+    test_values = NULL
+  )
+
   # Intermediate Feature--------------------------------------------------------
   param$cls_pooling_features <- list(
     type = "int",
@@ -1340,10 +1479,53 @@ get_param_dict <- function() {
     desc = "Number of features to be extracted at the end of the model.",
     gui_box = "Classifiction Pooling Layer",
     gui_label = "Size",
-    default_value = 32L
+    default_value = 32L,
+    test_values = 4L
   )
   param$merge_pooling_features <- param$cls_pooling_features
   param$merge_pooling_features$gui_box <- "Merge Layer"
+
+  param$cls_head_type <- list(
+    type = "string",
+    min = NULL,
+    max = NULL,
+    allow_null = FALSE,
+    allowed_values = c("Regular", "PairwiseOrthogonal","PairwiseOrthogonalDense"),
+    values_desc = list(
+      Regular = "Applies a fully connected dense layer between the network and the
+      final layer that calculates the classes.",
+      PairwiseOrthogonal = "Applies a pairwise orthogonal layer as classification head as described by [Li et al. 2020](https://doi.org/10.1109/TIP.2020.2990277).",
+      PairwiseOrthogonalDense="Same as 'PairwiseOrthogonal' but with an additional dense layer before the head."
+    ),
+    desc = "Type of classification head.",
+    gui_box = "Classifiction Pooling Layer",
+    gui_label = "Classification Head",
+    default_value = "Regular",
+    default_historic = "Regular",
+    test_values = NULL
+  )
+
+  param$projection_type <- list(
+    type = "string",
+    min = NULL,
+    max = NULL,
+    allow_null = FALSE,
+    allowed_values = c("Regular", "PairwiseOrthogonal","PairwiseOrthogonalDense"),
+    values_desc = list(
+      Regular = "Applies a fully connected dense layer for calculating the position of a point on all axes. That is,
+      all neurons can contribute to every axes.",
+      PairwiseOrthogonal = "Applies a pairwise orthogonal layer without activation for calculating the position of a point. That is,
+      a neuron contributes only to one specific axis and an axis is influenced only by a disjoint Subsample of all neurons. The layer is described by
+       [Li et al. 2020](https://doi.org/10.1109/TIP.2020.2990277) in the context of classification heads.",
+      PairwiseOrthogonalDense="Same as 'PairwiseOrthogonal' but with an additional dense layer before the head."
+    ),
+    desc = "Type of projection.",
+    gui_box = "General Settings",
+    gui_label = "Projection Type",
+    default_value = "Regular",
+    default_historic = "Regular",
+    test_values = NULL
+  )
 
   param$cls_pooling_type <- list(
     type = "string",
@@ -1355,7 +1537,8 @@ get_param_dict <- function() {
     gui_box = "Classifiction Pooling Layer",
     gui_label = "Feature Extraction Method",
     default_value = "MinMax",
-    default_historic = NULL
+    default_historic = NULL,
+    test_values = NULL
   )
   param$merge_pooling_type <- param$cls_pooling_type
   param$merge_pooling_type$gui_box <- "Merge Layer"
@@ -1378,7 +1561,8 @@ get_param_dict <- function() {
     gui_box = "General Settings",
     gui_label = "Re-Parametrization",
     default_value = "None",
-    default_historic = "None"
+    default_historic = "None",
+    test_values = NULL
   )
   param$rec_parametrizations <- param$parametrizations
   param$rec_parametrizations$allowed_values <- "None"
@@ -1407,7 +1591,8 @@ get_param_dict <- function() {
     gui_box = "General Settings",
     gui_label = "Add Bias",
     default_value = FALSE,
-    default_historic = TRUE
+    default_historic = TRUE,
+    test_values = NULL
   )
   param$rec_bias <- param$bias
   param$rec_bias$gui_box <- "Recurrent Layers"
@@ -1431,7 +1616,8 @@ get_param_dict <- function() {
     gui_box = "General Settings",
     gui_label = "Activation Function",
     default_value = "ELU",
-    default_historic = "GELU"
+    default_historic = "GELU",
+    test_values = NULL
   )
   param$feat_act_fct <- param$act_fct
   param$feat_act_fct$gui_box <- "Feature Layer"
@@ -1455,7 +1641,8 @@ get_param_dict <- function() {
     desc = "determining the dropout between recurrent layers.",
     gui_box = "Recurrent Layers",
     gui_label = "Dropout",
-    default_value = 0.5
+    default_value = 0.5,
+    test_values = NULL
   )
 
   param$rec_type <- list(
@@ -1467,7 +1654,8 @@ get_param_dict <- function() {
     desc = "Type of the recurrent layers. `rec_type='GRU'` for Gated Recurrent Unit and `rec_type='LSTM'` for Long Short-Term Memory.",
     gui_box = "Recurrent Layers",
     gui_label = "Type",
-    default_value = "GRU"
+    default_value = "GRU",
+    test_values = NULL
   )
 
   param$rec_bidirectional <- list(
@@ -1479,7 +1667,8 @@ get_param_dict <- function() {
     desc = "If `TRUE` a bidirectional version of the recurrent layers is used.",
     gui_box = "Recurrent Layers",
     gui_label = "Bidirectional",
-    default_value = FALSE
+    default_value = FALSE,
+    test_values = NULL
   )
 
   param$rec_size <- list(
@@ -1491,7 +1680,8 @@ get_param_dict <- function() {
     desc = "Number of neurons for each recurrent layer.",
     gui_box = "Recurrent Layers",
     gui_label = "Size",
-    default_value = 32L
+    default_value = 32L,
+    test_values = c(2L, 5L)
   )
 
   param$rec_layers <- list(
@@ -1503,7 +1693,8 @@ get_param_dict <- function() {
     desc = "Number of recurrent layers.",
     gui_box = "Recurrent Layers",
     gui_label = "Number of Layers",
-    default_value = 1L
+    default_value = 1L,
+    test_values = c(0L, 1L, 2L)
   )
   param$rec_n_layers <- param$rec_layers
 
@@ -1517,7 +1708,8 @@ get_param_dict <- function() {
     desc = "determining the dropout between dense layers.",
     gui_box = "Dense Layers",
     gui_label = "Dropout",
-    default_value = 0.5
+    default_value = 0.5,
+    test_values = NULL
   )
   param$dense_size <- list(
     type = "int",
@@ -1528,7 +1720,8 @@ get_param_dict <- function() {
     desc = "Number of neurons for each dense layer.",
     gui_box = "Dense Layers",
     gui_label = "Size",
-    default_value = 32L
+    default_value = 32L,
+    test_values = c(10L, 16L)
   )
 
   param$dense_layers <- list(
@@ -1540,7 +1733,8 @@ get_param_dict <- function() {
     desc = "Number of dense layers.",
     gui_box = "Dense Layers",
     gui_label = "Number of Layers",
-    default_value = 0L
+    default_value = 0L,
+    test_values = c(0L, 1L, 2L)
   )
   param$dense_n_layers <- param$dense_layers
 
@@ -1554,7 +1748,8 @@ get_param_dict <- function() {
     desc = "If `TRUE` all streams use the same feature layer. If `FALSE` all streams use their own feature layer.",
     gui_box = "Feature Layer",
     gui_label = "Shared Layer",
-    default_value = TRUE
+    default_value = TRUE,
+    test_values = NULL
   )
 
   param$feat_dropout <- list(
@@ -1566,12 +1761,14 @@ get_param_dict <- function() {
     desc = "determining the dropout for the dense projection of the feature layer.",
     gui_box = "Feature Layer",
     gui_label = "Dropout",
-    default_value = 0.1
+    default_value = 0.1,
+    test_values = NULL
   )
 
   param$feat_size <- param$dense_size
   param$feat_size$gui_box <- "Feature Layer"
   param$feat_size$min <- 2L
+  param$feat_size$test_values = c(4L,6L)
 
   # Transformer Layer------------------------------------------------------------
   param$encoder_dropout <- list(
@@ -1583,7 +1780,8 @@ get_param_dict <- function() {
     desc = "determining the dropout for the dense projection within the transformer encoder layers.",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Dense Dropout",
-    default_value = 0.1
+    default_value = 0.1,
+    test_values = NULL
   )
   param$tf_dropout_rate_1 <- param$encoder_dropout
   param$tf_dropout_rate_1$desc <- "determining the dropout after the attention mechanism within the transformer encoder layers."
@@ -1599,7 +1797,8 @@ get_param_dict <- function() {
     desc = "determining the number of attention heads for a self-attention layer. Only relevant if `attention_type='multihead'`",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Number of Attention Heads",
-    default_value = 2L
+    default_value = 2L,
+    test_values = 2L
   )
   param$num_attention_heads <- param$self_attention_head
   param$n_head <- param$self_attention_head
@@ -1614,7 +1813,8 @@ get_param_dict <- function() {
     desc = "determining the size of the projection layer within a each transformer encoder.",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Intermediate Size",
-    default_value = 128L
+    default_value = 128L,
+    test_values = c(20L)
   )
   param$tf_dense_dim <- param$intermediate_size
   param$d_inner <- param$intermediate_size
@@ -1632,7 +1832,8 @@ get_param_dict <- function() {
     desc = "Choose the attention type.",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Attention Type",
-    default_value = "Fourier"
+    default_value = "Fourier",
+    test_values = NULL
   )
   param$tf_attention_type <- param$attention_type
 
@@ -1645,7 +1846,8 @@ get_param_dict <- function() {
     desc = "`TRUE` if positional embedding should be used.",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Add Positional Embedding",
-    default_value = FALSE
+    default_value = FALSE,
+    test_values = NULL
   )
 
   param$tf_positional_type <- list(
@@ -1663,7 +1865,8 @@ get_param_dict <- function() {
     gui_box = "Transformer Encoder Layers",
     gui_label = "Positional Information",
     default_value = "absolute",
-    default_historic = "None"
+    default_historic = "None",
+    test_values = NULL
   )
 
   param$repeat_encoder <- list(
@@ -1675,7 +1878,8 @@ get_param_dict <- function() {
     desc = "determining how many times the encoder should be added to the network.",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Number of Layers",
-    default_value = 0L
+    default_value = 0L,
+    test_values = c(0L, 1L, 2L)
   )
   param$tf_n_layers <- param$repeat_encoder
 
@@ -1689,7 +1893,8 @@ get_param_dict <- function() {
     desc = "determining the dropout for n-gram convolution layers.",
     gui_box = "Multiple N-Gram Layers",
     gui_label = "Dropout",
-    default_value = 0.1
+    default_value = 0.1,
+    test_values = NULL
   )
 
   param$ng_conv_n_layers <- list(
@@ -1701,7 +1906,8 @@ get_param_dict <- function() {
     desc = "determining how many times the n-gram layers should be added to the network.",
     gui_box = "Multiple N-Gram Layers",
     gui_label = "Number of Layers",
-    default_value = 0L
+    default_value = 0L,
+    test_values = c(0L, 1L, 2L)
   )
   param$ng_conv_ks_min <- list(
     type = "int",
@@ -1712,7 +1918,8 @@ get_param_dict <- function() {
     desc = "determining the minimal window size for n-grams.",
     gui_box = "Multiple N-Gram Layers",
     gui_label = "Smallest N-Gram",
-    default_value = 2L
+    default_value = 2L,
+    test_values = 2L
   )
   param$ng_conv_ks_max <- list(
     type = "int",
@@ -1723,7 +1930,8 @@ get_param_dict <- function() {
     desc = "determining the maximal window size for n-grams.",
     gui_box = "Multiple N-Gram Layers",
     gui_label = "Biggest N-Gram",
-    default_value = 2L
+    default_value = 2L,
+    test_values = 3L
   )
 
   # Parallel specific-----------------------------------------------------------
@@ -1740,12 +1948,173 @@ get_param_dict <- function() {
     allow_null = FALSE,
     min = NULL,
     max = NULL,
-    allowed_values = "Euclidean",
+    allowed_values = c("Euclidean", "CosineDistance"),
     desc = "Type of metric used for calculating the distance.",
     gui_box = "Loss",
     gui_label = "Metric Type",
-    default_value = "Euclidean"
+    default_value = "Euclidean",
+    test_values = NULL
   )
+
+  # Relevant for plot functions and methods
+  param$y_min <- list(
+    type = "int",
+    min = -Inf,
+    max = Inf,
+    allow_null = TRUE,
+    allowed_values = NULL,
+    desc = "Minimal value for y-axis. Set to `NULL` for an automatic adjustment.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL,
+    default_historic = NULL,
+    test_values = NULL
+  )
+  param$y_max <- list(
+    type = "int",
+    min = -Inf,
+    max = Inf,
+    allow_null = TRUE,
+    allowed_values = NULL,
+    desc = "Maximal value for y-axis. Set to `NULL` for an automatic adjustment.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL,
+    default_historic = NULL,
+    test_values = NULL
+  )
+  param$x_min <- list(
+    type = "int",
+    min = -Inf,
+    max = Inf,
+    allow_null = TRUE,
+    allowed_values = NULL,
+    desc = "Minimal value for x-axis. Set to `NULL` for an automatic adjustment.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL,
+    default_historic = NULL,
+    test_values = NULL
+  )
+  param$x_max <- list(
+    type = "int",
+    min = -Inf,
+    max = Inf,
+    allow_null = TRUE,
+    allowed_values = NULL,
+    desc = "Maximal value for x-axis. Set to `NULL` for an automatic adjustment.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL,
+    default_historic = NULL,
+    test_values = NULL
+  )
+  param$text_size <- list(
+    type = "int",
+    min = 1,
+    max = Inf,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "Size of text elements.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL,
+    default_historic = NULL,
+    test_values = NULL
+  )
+  param$add_min_max <- list(
+    type = "bool",
+    min = NULL,
+    max = NULL,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "If `TRUE` the minimal and maximal values during performance estimation are port of the plot. If `FALSE` only the mean values are shown. Parameter is ignored if `final_training=TRUE`.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL,
+    default_historic = NULL,
+    test_values = NULL
+  )
+  param$ind_selected_model <- list(
+    type = "bool",
+    min = NULL,
+    max = NULL,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "If `TRUE` the plot indicates the states of the model which are used after training. These are the final states of the fold or the final state of the last training loop.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL,
+    default_historic = NULL,
+    test_values = NULL
+  )
+  param$ind_best_model <- list(
+    type = "bool",
+    min = NULL,
+    max = NULL,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "If `TRUE` the plot indicates the best states of the model according to the chosen measure.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL,
+    default_historic = NULL,
+    test_values = NULL
+  )
+
+  param$final_training <- list(
+    type = "bool",
+    min = NULL,
+    max = NULL,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "If `FALSE` the values of the performance estimation are used. If `TRUE` only the epochs of the final training are used.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL,
+    default_historic = NULL,
+    test_values = NULL
+  )
+  param$masked_text <- list(
+    type = "string",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = NULL,
+    desc = "Text with mask tokens.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL,
+    test_values = NULL
+  )
+  param$n_solutions <- list(
+    type = "int",
+    min = 1,
+    max = Inf,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "Number of solutions the model should predict.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL,
+    default_historic = NULL,
+    test_values = NULL
+  )
+
+  param$n_samples <- list(
+    type = "int",
+    min = 1,
+    max = Inf,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "Number of samples.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = NULL,
+    default_historic = NULL,
+    test_values = NULL
+  )
+
 
   # ============================================================================
   return(param)
@@ -1762,6 +2131,22 @@ get_param_dict <- function() {
 #' @export
 get_param_def <- function(param_name) {
   return(get_param_dict()[[param_name]])
+}
+
+#' @title Create rd formula
+#' @description Function returns the syntax for displaying a formula depending on
+#' the output format.
+#' @param string_formula `string` Formula expression without specific format.
+#' @returns Returns a `string` which can be used in rd files to display a formula for
+#' different output types.
+#' @family Parameter Dictionary
+#' @keywords internal
+doc_formula <- function(string_formula) {
+  return(
+    paste0(
+      "\\ifelse{latex}{$", string_formula, "$}{\\ifelse{html}{\\eqn{", string_formula, "}}{`", string_formula, "`}}"
+    )
+  )
 }
 
 #' @title Description of an argument
@@ -1816,7 +2201,7 @@ get_param_doc_desc <- function(param_name) {
       } else {
         border_max <- NULL
       }
-      allowed_values <- paste0("`", border_min, " x ", border_max, "`")
+      allowed_values <- doc_formula(paste0(border_min, " x ", border_max))
     } else if (param_def$type == "int") {
       if (param_def$min != -Inf) {
         border_min <- paste(param_def$min, "<=")
@@ -1828,7 +2213,7 @@ get_param_doc_desc <- function(param_name) {
       } else {
         border_max <- NULL
       }
-      allowed_values <- paste0("`", border_min, " x ", border_max, "`")
+      allowed_values <- doc_formula(paste0(border_min, " x ", border_max))
     } else {
       allowed_values <- NULL
     }

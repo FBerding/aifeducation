@@ -759,9 +759,13 @@ downstream tasks can be calculated as
 
 $$Tokens_{Max} = N_{Chunks}*MaximalSequenceLength-(N_{Chunks}-1)*N_{Overlap}$$ 
 
-If
-the text is longer, the remaining tokens are ignored and lost for
-further analysis.
+If the text is longer, the remaining tokens are ignored and lost for
+further analysis. The result of this calculation is shown on the right side allowing 
+you to experiment with different options. In the case that the base model comes
+with tokenizer statistics the number of tokens is replaced with an estimate
+of the total number of words for a simpler interpretation. All values
+are estimates. That is, the real number of words/tokens for a given text depends
+on the concrete text. 
 
 > Please note that you can create multiple text embedding models with a
 > different configuration based on the same base model.

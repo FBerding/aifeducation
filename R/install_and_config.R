@@ -25,14 +25,14 @@
 #' @export
 get_recommended_py_versions <- function() {
   py_versions <- list(
-    transformers = c("4.56.0", "4.56.2"),
-    tokenizers = c("0.22.0", "0.22.0"),
-    pandas = c("2.3.2", "2.3.2"),
+    transformers = c("4.56.0", "4.57.1"),
+    tokenizers = c("0.22.0", "0.22.1"),
+    pandas = c("2.3.2", "2.3.3"),
     datasets = c("3.6.0", "3.6.0"),
-    codecarbon = c("3.0.0", "3.0.4"),
+    codecarbon = c("3.0.0", "3.0.8"),
     safetensors = c("0.6.2", "0.6.2"),
     torcheval = c("0.0.7", "0.0.7"),
-    accelerate = c("1.10.1", "1.10.1"),
+    accelerate = c("1.10.1", "1.11.0"),
     calflops = c("0.3.2", "0.3.2")
   )
 
@@ -252,14 +252,14 @@ install_aifeducation_studio <- function() {
 #' @family Installation and Configuration
 #' @export
 install_py_modules <- function(envname = "aifeducation",
-                               transformer_version = "<=4.56.1",
-                               tokenizers_version = "<=0.22.0",
-                               pandas_version = "<=2.3.2",
+                               transformer_version = "<=4.57.1",
+                               tokenizers_version = "<=0.22.1",
+                               pandas_version = "<=2.3.3",
                                datasets_version = "<=3.6.0",
-                               codecarbon_version = "<=3.0.4",
+                               codecarbon_version = "<=3.0.7",
                                safetensors_version = "<=0.6.2",
                                torcheval_version = "<=0.0.7",
-                               accelerate_version = "<=1.10.1",
+                               accelerate_version = "<=1.11.0",
                                calflops_version = "<=0.3.2",
                                pytorch_cuda_version = "12.9",
                                python_version = "3.12",
@@ -281,10 +281,10 @@ install_py_modules <- function(envname = "aifeducation",
   )
 
   if (detec_os() == "mac") {
-    message("Operating Systen:", "mac", "Cuda is not requested.")
+    message("Operating System: ", "mac", ". Cuda is not requested.")
     pytorch_cuda_version <- NULL
   } else {
-    message("Operating Systen:", detec_os(), "Cuda is requested.")
+    message("Operating System: ", detec_os(), ". Cuda is requested.")
   }
 
   if (!is.null(pytorch_cuda_version)) {

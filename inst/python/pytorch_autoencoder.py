@@ -294,22 +294,6 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   else:
     dtype=torch.double
     model.to(device,dtype=dtype)
-  
-  if optimizer_method=="Adam":
-    optimizer=torch.optim.Adam(lr=lr_rate,params=model.parameters(),weight_decay=1e-3)
-  elif optimizer_method=="RMSprop":
-    optimizer=torch.optim.RMSprop(lr=lr_rate,params=model.parameters(),momentum=0.90)
-  elif optimizer_method=="AdamW":
-    optimizer=torch.optim.AdamW(lr=lr_rate,params=model.parameters())
-  elif optimizer_method=="SGD":
-    optimizer=torch.optim.SGD(params=model.parameters(), lr=lr_rate, momentum=0.90, dampening=0, weight_decay=0, nesterov=False, maximize=False, foreach=None, differentiable=False, fused=None)
-  
-  
-  warm_up_steps=math.floor(epochs*lr_warm_up_ratio)
-  main_steps=epochs-warm_up_steps
-  scheduler_warm_up = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1e-9,end_factor=1, total_iters=warm_up_steps)
-  scheduler_main=torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1,end_factor=0, total_iters=main_steps)
-  scheduler = torch.optim.lr_scheduler.SequentialLR(schedulers = [scheduler_warm_up, scheduler_main], optimizer=optimizer,milestones=[warm_up_steps])
  
   loss_fct=torch.nn.MSELoss()
 
@@ -322,6 +306,23 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     val_data,
     batch_size=batch_size,
     shuffle=False)
+
+  if optimizer_method=="Adam":
+    optimizer=torch.optim.Adam(lr=lr_rate,params=model.parameters(),weight_decay=1e-3)
+  elif optimizer_method=="RMSprop":
+    optimizer=torch.optim.RMSprop(lr=lr_rate,params=model.parameters(),momentum=0.90)
+  elif optimizer_method=="AdamW":
+    optimizer=torch.optim.AdamW(lr=lr_rate,params=model.parameters())
+  elif optimizer_method=="SGD":
+    optimizer=torch.optim.SGD(params=model.parameters(), lr=lr_rate, momentum=0.90, dampening=0, weight_decay=0, nesterov=False, maximize=False, foreach=None, differentiable=False, fused=None)
+  
+  warm_up_steps=math.floor(epochs*lr_warm_up_ratio)
+  main_steps=epochs-warm_up_steps
+  scheduler_warm_up = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1e-9,end_factor=1, total_iters=warm_up_steps)
+  scheduler_main=torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1,end_factor=0.01, total_iters=main_steps)
+  #scheduler_main=torch.optim.lr_scheduler.CyclicLR(optimizer, base_lr=lr_rate*1e-3, max_lr=lr_rate, step_size_up=5*len(trainloader))
+  #scheduler_main=torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.95,last_epoch=-1)
+  scheduler = torch.optim.lr_scheduler.SequentialLR(schedulers = [scheduler_warm_up, scheduler_main], optimizer=optimizer,milestones=[warm_up_steps])    
     
   #Tensor for Saving Training History
   history_loss=torch.ones(size=(2,epochs),requires_grad=False)*-100

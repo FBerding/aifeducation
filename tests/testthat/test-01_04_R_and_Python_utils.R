@@ -5,6 +5,9 @@ testthat::skip_if_not(
   message = "Necessary python modules not available"
 )
 
+# Start time
+test_time_start <- Sys.time()
+
 test_that("class_vector_to_py_dataset", {
   vec <- c(0, 0, 1, 1, 2, 0)
   name_vector <- c("A", "B", "C", "d", "e", "f")
@@ -49,3 +52,9 @@ test_that("get_current_conda_env and get_current_venv", {
     expect_error(get_current_conda_env())
   }
 })
+
+# Monitor test time
+monitor_test_time_on_CI(
+  start_time = test_time_start,
+  test_name = "01_04_R_and_Python_utils"
+)
