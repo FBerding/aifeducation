@@ -268,7 +268,7 @@ between 4 and 32 lead to the best performance. Increasing the batch size also
 reduces the range of learning rates that provide stable convergence (Masters & Luschi 2018, p. 18).
 Good values for the *base* learning rate ($\eta_{Base}$) for batch sizes between 4 and 32 are in the range of 
 $2^{-6}$ and $2^{-10}$ (Masters & Luschi 2018, p. 15). Similar results report He, Liu et al. (2019) showing that 
-the ratio of batch size to learning rate $(batch size)/(learning rate)$ should be 
+the ratio of batch size to learning rate ${batch size}/{learning rate}$ should be 
 as small as possible in order to achieve good generalisation performance. 
 
 Goyal et al. (2017, p. 7) demonstrate that gradually increasing the learning rate at the beginning of training
