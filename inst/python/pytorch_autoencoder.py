@@ -132,9 +132,10 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
       self.param_w2=torch.nn.Parameter(torch.randn(math.ceil(self.features_in-self.difference*(1/3)),math.ceil(self.features_in-self.difference*(2/3))))
       self.param_w3=torch.nn.Parameter(torch.randn(self.features_out,math.ceil(self.features_in-self.difference*(1/3))))
       
-      torch.nn.utils.parametrizations.orthogonal(module=self, name="param_w1",orthogonal_map=orthogonal_method)
-      torch.nn.utils.parametrizations.orthogonal(module=self, name="param_w2",orthogonal_map=orthogonal_method)
-      torch.nn.utils.parametrizations.orthogonal(module=self, name="param_w3",orthogonal_map=orthogonal_method)
+      if not orthogonal_method=="None":
+        torch.nn.utils.parametrizations.orthogonal(module=self, name="param_w1",orthogonal_map=orthogonal_method)
+        torch.nn.utils.parametrizations.orthogonal(module=self, name="param_w2",orthogonal_map=orthogonal_method)
+        torch.nn.utils.parametrizations.orthogonal(module=self, name="param_w3",orthogonal_map=orthogonal_method)
       
       if not pad_value==0:
         self.switch_pad_value_start=layer_switch_pad_values(pad_value_old=pad_value,pad_value_new=0)
@@ -217,9 +218,9 @@ class ConvAutoencoder_with_Mask_PT(torch.nn.Module):
       self.param_w2=torch.nn.Parameter(torch.randn(self.features_out,math.ceil(self.features_in-self.difference*(1/2)),self.kernel_size))
       
       self.sequence_reduction=torch.nn.AvgPool1d(kernel_size=(self.kernel_size),stride=1,padding=0)
-
-      torch.nn.utils.parametrizations.orthogonal(self, "param_w1",orthogonal_map="householder")
-      torch.nn.utils.parametrizations.orthogonal(self, "param_w2",orthogonal_map="householder")
+      if not orthogonal_method=="None":
+        torch.nn.utils.parametrizations.orthogonal(self, "param_w1",orthogonal_map="householder")
+        torch.nn.utils.parametrizations.orthogonal(self, "param_w2",orthogonal_map="householder")
 
     def forward(self, x, encoder_mode=False, return_scs=False):
       if encoder_mode==False:
