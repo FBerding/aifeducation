@@ -1420,10 +1420,11 @@ get_param_dict <- function() {
     min = NULL,
     max = NULL,
     allow_null = FALSE,
-    allowed_values = c("LayerNorm", "None"),
+    allowed_values = c("LayerNorm", "BatchNorm","None"),
     values_desc = list(
-      LayerNorm = "Applies normalization as described by [Ba, Kiros, and Hinton (2016)](https://doi.org/10.48550/arXiv.1607.06450).",
-      None = "Applies no normalization. "
+      LayerNorm = "Applies normalization as described by [Ba, Kiros, and Hinton (2016)](https://doi.org/10.48550/arXiv.1607.06450). Implementation supports masking of sequences.",
+      BatchNorm = "Applies normalization as described by [Loffe and Szegedy](https://doi.org/10.48550/arXiv.1502.03167). Implementation supports masking of sequences.",
+      None = "Applies no normalization."
     ),
     desc = "Type of normalization applied to all layers and stack layers.",
     gui_box = "General Settings",
