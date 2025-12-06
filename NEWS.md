@@ -4,6 +4,24 @@ editor_options:
     wrap: 72
 ---
 
+# aifeducation 1.1.4
+
+**General**
+
+- Added support for python library 'datasets' 4.0.0 and higher.
+
+**Classifiers**
+
+- Added BatchNorm as a new option for normalization layers.
+
+**FeatureExtractors**
+
+- Added the option to use TEFeatureExtractors without orthogonal weights. 
+
+**Plots**
+
+- Changed calculation of the breaking points. Now they should not overlap.
+
 # aifeducation 1.1.3
 
 **BaseModels**
@@ -24,6 +42,7 @@ editor_options:
   is available for TEClassifierSequential and TEClassifierParallel. For the
   classifiers working with prototypes the layer can be used to change the
   projection into the embedding space (parameter projection_type).
+- Early stopping changed. Now the model stops training only if the loss is below 1e-6.
 
 **FeatureExtractor**
 

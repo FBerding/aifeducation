@@ -114,7 +114,7 @@ is generated automatically. Allowed values: any}
 
 \item{\code{method}}{\code{string} Method to use for the feature extraction. \code{'lstm'} for an extractor based on LSTM-layers or \code{'Dense'} for dense layers. Allowed values: 'Dense', 'LSTM'}
 
-\item{\code{orthogonal_method}}{\code{string} Method for ensuring orthogonality of weights. Allowed values: 'matrix_exp', 'cayley', 'householder'}
+\item{\code{orthogonal_method}}{\code{string} Method for ensuring orthogonality of weights. Allowed values: 'matrix_exp', 'cayley', 'householder', 'None'}
 
 \item{\code{noise_factor}}{\code{double} Value between 0 and a value lower 1 indicating how much noise should
 be added to the input during training. Allowed values: \ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}

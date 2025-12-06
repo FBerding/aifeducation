@@ -45,7 +45,9 @@ LargeDataSetBase <- R6::R6Class(
     },
 
     #--------------------------------------------------------------------------
-
+    #' @description Extracts the data from a python data set.
+    #' @param col_name `string` Name of the column.
+    #' @return Returns a `vector`, `matrix` or `array`.
     extract_column=function(col_name){
       check_class_and_type(
         object = col_name,
