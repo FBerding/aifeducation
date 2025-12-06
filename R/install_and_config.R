@@ -25,14 +25,14 @@
 #' @export
 get_recommended_py_versions <- function() {
   py_versions <- list(
-    transformers = c("4.56.0", "4.57.1"),
+    transformers = c("4.56.0", "4.57.3"),
     tokenizers = c("0.22.0", "0.22.1"),
     pandas = c("2.3.2", "2.3.3"),
-    datasets = c("3.6.0", "3.6.0"),
-    codecarbon = c("3.0.0", "3.0.8"),
-    safetensors = c("0.6.2", "0.6.2"),
+    datasets = c("3.6.0", "4.4.1"),
+    codecarbon = c("3.0.0", "3.2.0"),
+    safetensors = c("0.6.2", "0.7.0"),
     torcheval = c("0.0.7", "0.0.7"),
-    accelerate = c("1.10.1", "1.11.0"),
+    accelerate = c("1.10.1", "1.12.0"),
     calflops = c("0.3.2", "0.3.2")
   )
 
@@ -140,7 +140,7 @@ install_aifeducation <- function(install_aifeducation_studio = TRUE,
 #' @export
 update_aifeducation <- function(update_aifeducation_studio = TRUE,
                                 env_type = "auto",
-                                cuda_version = "12.4",
+                                cuda_version = "13.0",
                                 envname = "aifeducation") {
   # Search for environment
   if (env_type == "auto") {
@@ -252,16 +252,16 @@ install_aifeducation_studio <- function() {
 #' @family Installation and Configuration
 #' @export
 install_py_modules <- function(envname = "aifeducation",
-                               transformer_version = "<=4.57.1",
+                               transformer_version = "<=4.57.3",
                                tokenizers_version = "<=0.22.1",
                                pandas_version = "<=2.3.3",
-                               datasets_version = "<=3.6.0",
-                               codecarbon_version = "<=3.0.7",
-                               safetensors_version = "<=0.6.2",
+                               datasets_version = "<=4.4.1",
+                               codecarbon_version = "<=3.2.0",
+                               safetensors_version = "<=0.7.0",
                                torcheval_version = "<=0.0.7",
-                               accelerate_version = "<=1.11.0",
+                               accelerate_version = "<=1.12.0",
                                calflops_version = "<=0.3.2",
-                               pytorch_cuda_version = "12.9",
+                               pytorch_cuda_version = "13.0",
                                python_version = "3.12",
                                remove_first = FALSE,
                                use_conda = FALSE) {
