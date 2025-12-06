@@ -126,6 +126,6 @@ def get_layer_normalization(name,times, features,pad_value,eps=1e-5):
   if name=="LayerNorm":
     return LayerNorm_with_Mask(times=times,features=features,pad_value=pad_value,eps=eps)
   elif name=="BatchNorm":
-    return BatchNorm_with_Mask(features=features,pad_value=pad_value,eps=eps,momentum=0.1)
+    return BatchNorm_with_Mask(features=features,pad_value=pad_value,eps=eps,alpha=0.1)
   elif name=="None":
     return identity_layer(pad_value=pad_value,apply_masking=True)
