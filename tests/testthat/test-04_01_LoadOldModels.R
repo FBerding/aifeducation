@@ -36,6 +36,9 @@ for (version in versions) {
   test_that(paste("CLS", version), {
     tem_path <- file.path(root_path_general_data, paste("Version", version), "tem_model")
     cls_path <- file.path(root_path_general_data, paste("Version", version), "cls_model")
+    if(dir.exists(cls_path)){
+      cls_model <- load_from_disk(cls_path)
+    }
     if (dir.exists(tem_path) && dir.exists(cls_path)) {
       tem <- load_from_disk(tem_path)
 
@@ -44,7 +47,6 @@ for (version in versions) {
 
       test_embeddings <- tem$embed_large(text_dataset = example_data, trace = FALSE)
 
-      cls_model <- load_from_disk(cls_path)
       predictions <- cls_model$predict(newdata = test_embeddings)
 
       expect_equal(nrow(predictions), nrow(imdb_movie_reviews))

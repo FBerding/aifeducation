@@ -489,7 +489,6 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
       if (!is.null(embeddings_s)) {
         embeddings_s <- embeddings_s$get_dataset()
         embeddings_s$set_format("torch")
-        embeddings_s <- embeddings_s[["input"]]
       }
 
       if (!is.null(classes_s)) {
@@ -533,7 +532,8 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
           classes_s <- classes_s$to(device, dtype = dtype)
         }
         if (!is.null(embeddings_s)) {
-          embeddings_s <- embeddings_s$to(device, dtype = dtype)
+          embeddings_s <- embeddings_s["input"][0L:embeddings_s$num_rows]
+          embeddings_s=embeddings_s$to(device, dtype = dtype)
         }
         private$model$to(device, dtype = dtype)
         private$model$eval()
@@ -692,7 +692,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         pytorch_test_data <- NULL
       }
 
-      tmp_history <- py$TeClassifierTrainPrototype(
+       tmp_history <- py$TeClassifierTrainPrototype(
         model = private$model,
         loss_pt_fct_name = self$last_training$config$loss_pt_fct_name,
         optimizer_method = self$last_training$config$optimizer,

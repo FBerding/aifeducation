@@ -23,7 +23,6 @@ class GlobalAveragePooling1D_PT(torch.nn.Module):
     super().__init__()
 
   def forward(self,x,mask=None):
-    print("test")
     if not mask is None:
       mask_r=mask.reshape(mask.size()[0],mask.size()[1],1)
       print(mask)
@@ -669,7 +668,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   
   #Set Up Loaders
   ProtoNetSampler_Train=MetaLernerBatchSampler(
-  targets=train_data["labels"],
+  targets=train_data["labels"][range(0,len(train_data))],
   Ns=Ns,
   Nq=Nq,
   separate=sampling_separate,

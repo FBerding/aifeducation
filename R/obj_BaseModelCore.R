@@ -144,7 +144,7 @@ BaseModelCore <- R6::R6Class(
         message_top = "Tokenize Text"
       )
 
-      length_vector <- tokenized_texts_raw["length"]
+      length_vector <- extract_column_from_py_dataset(tokenized_texts_raw,"length")
       if (self$last_training$config$full_sequences_only) {
         relevant_indices <- which(length_vector == self$last_training$config$max_sequence_length)
       } else {
@@ -918,7 +918,7 @@ BaseModelCore <- R6::R6Class(
       mask_token <- self$Tokenizer$get_special_tokens()["mask_token", "token"]
 
       selected_data <- text_dataset$select(random_sample)
-      selected_texts <- selected_data[["text"]]
+      selected_texts <- extract_column_from_py_dataset(selected_data,"text")
       selected_texts_with_mask <- paste(mask_token, selected_texts)
 
       # Start Tracking

@@ -179,7 +179,7 @@ TEFeatureExtractor <- R6::R6Class(
         py$map_input_to_labels,
         load_from_cache_file = FALSE,
         keep_in_memory = FALSE,
-        cache_file_name = file.path(create_and_get_tmp_dir(), generate_id(15L))
+        cache_file_name = create_py_dataset_cache_file_path(file.path(create_and_get_tmp_dir(), generate_id(15L)))
       )
 
       # Check and create temporary directory for checkpoints

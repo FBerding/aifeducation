@@ -411,7 +411,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   
   #Set Up Loaders
   ProtoNetSampler_Train=MetaLernerBatchSampler(
-  targets=train_data["labels"],
+  targets=train_data["labels"][range(0,len(train_data))],
   Ns=Ns,
   Nq=Nq,
   separate=sampling_separate,
