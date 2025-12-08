@@ -101,19 +101,25 @@ class BatchNorm_with_Mask(torch.nn.Module):
       x_zeros=x*(~mask_features)
       gamma_expanded=self.gamma.expand(x_zeros.size(0),x_zeros.size(1),x_zeros.size(2))
       beta_expanded=self.beta.expand(x_zeros.size(0),x_zeros.size(1),x_zeros.size(2))
-      if self.training==True and x_zeros.size(0)>=2:
-        #Number of not padded elements
-        n_elements=torch.sum(~mask_features,dim=(0,1))
-        #Calc Batch Mean for every feature. Size is (Feature)
-        batch_mean=torch.sum(x_zeros,dim=(0,1))/n_elements
-        #Calc Batch Variance
-        batch_variance=torch.pow(x_zeros-torch.unsqueeze(torch.unsqueeze(batch_mean,dim=0),dim=0).expand(x_zeros.size(0),x_zeros.size(1),x_zeros.size(2)),2)
-        batch_variance=torch.sum(batch_variance,dim=(0,1))/n_elements
-        #Update running mean and variance
-        self.running_mean=(1-self.alpha)*self.running_mean+self.alpha*torch.unsqueeze(torch.unsqueeze(batch_mean.detach(),dim=0),dim=0)
-        self.running_variance=(1-self.alpha)*self.running_variance+self.alpha*torch.unsqueeze(torch.unsqueeze(batch_variance.detach(),dim=0),dim=0)*(x_zeros.size(0)/(x_zeros.size(0)-1))
-        #Normalize Scale and shift
-        y=gamma_expanded*(x_zeros-batch_mean)/(torch.sqrt(batch_variance)+self.eps)+beta_expanded
+      if self.training==True: 
+        if x_zeros.size(0)>=2:
+          #Number of not padded elements
+          n_elements=torch.sum(~mask_features,dim=(0,1))
+          #Calc Batch Mean for every feature. Size is (Feature)
+          batch_mean=torch.sum(x_zeros,dim=(0,1))/n_elements
+          #Calc Batch Variance
+          batch_variance=torch.pow(x_zeros-torch.unsqueeze(torch.unsqueeze(batch_mean,dim=0),dim=0).expand(x_zeros.size(0),x_zeros.size(1),x_zeros.size(2)),2)
+          batch_variance=(~mask_features)*batch_variance
+          batch_variance=torch.sum(batch_variance,dim=(0,1))/n_elements
+          #Update running mean and variance
+          self.running_mean=(1-self.alpha)*self.running_mean+self.alpha*torch.unsqueeze(torch.unsqueeze(batch_mean.detach(),dim=0),dim=0)
+          self.running_variance=(1-self.alpha)*self.running_variance+self.alpha*torch.unsqueeze(torch.unsqueeze(batch_variance.detach(),dim=0),dim=0)*(x_zeros.size(0)/(x_zeros.size(0)-1))
+          #Normalize Scale and shift
+          y=gamma_expanded*(x_zeros-batch_mean.detach())/(torch.sqrt(batch_variance.detach())+self.eps)+beta_expanded
+        else:
+          #Normalize Scale and shift
+          y=gamma_expanded*(x_zeros- self.running_mean.detach())/(torch.sqrt(self.running_variance.detach())+self.eps)+beta_expanded
+          #y=x_zeros
       else:
         #Normalize Scale and shift
         y=gamma_expanded*(x_zeros- self.running_mean)/(torch.sqrt(self.running_variance)+self.eps)+beta_expanded

@@ -12,7 +12,8 @@ editor_options:
 
 **Classifiers**
 
-- Added BatchNorm as a new option for normalization layers.
+- Added BatchNorm as a new option for normalization layers as described 
+  by [Loffe and Szegedy](https://doi.org/10.48550/arXiv.1502.03167).
 
 **FeatureExtractors**
 
