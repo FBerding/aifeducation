@@ -2,9 +2,9 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master, version_1_1_3_devb]
+    branches: [main, master, version_1_1_4]
   pull_request:
-    branches: [main, master, version_1_1_3_devb]
+    branches: [main, master, version_1_1_4]
 
 name: macos-check
 
@@ -92,7 +92,8 @@ jobs:
 
           reticulate::conda_install(
             packages = c(
-              "pytorch"#,
+              "pytorch",
+              "nomkl"
               #paste0("pytorch-cuda", "=", pytorch_cuda_version)
             ),
             envname = envname,
@@ -101,7 +102,7 @@ jobs:
             pip = FALSE
           )
           reticulate::conda_install(
-            packages = c(relevant_modules, relevant_modules_pt),
+            packages = c(relevant_modules, relevant_modules_pt,"nomkl"),
             envname = envname,
             conda = "auto",
             pip = TRUE
