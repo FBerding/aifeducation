@@ -47,8 +47,13 @@ LargeDataSetBase <- R6::R6Class(
     #--------------------------------------------------------------------------
     #' @description Extracts the data from a python data set.
     #' @param col_name `string` Name of the column.
-    #' @return Returns a `vector`, `matrix` or `array`.
-    extract_column=function(col_name){
+    #' @param format `string` Format of the data.
+    #' * `"R"` returns the data as a R object.
+    #' * `"torch"` returns the data as PyTorch tensors.
+    #' * `"numpy"` returns the data as numpy array.
+    #' @return Returns a `vector`, `matrix` or `array` for `format="R"`. In
+    #' all other cases the requestes format is returned..
+    extract_column=function(col_name, format="R"){
       check_class_and_type(
         object = col_name,
         object_name = "col_name",
@@ -57,7 +62,8 @@ LargeDataSetBase <- R6::R6Class(
         )
       if(col_name%in%self$get_colnames()){
         extraction=extract_column_from_py_dataset(
-          private$data,col_name
+          py_dataset=private$data,
+          column_name=col_name
         )
         return(extraction)
       } else {

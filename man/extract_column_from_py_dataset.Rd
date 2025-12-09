@@ -4,15 +4,23 @@
 \alias{extract_column_from_py_dataset}
 \title{Extract column}
 \usage{
-extract_column_from_py_dataset(py_dataset, column_name)
+extract_column_from_py_dataset(py_dataset, column_name, format = "R")
 }
 \arguments{
 \item{py_dataset}{\code{datasets.arrow_dataset.Dataset} data set to extract the column from.}
 
 \item{column_name}{\code{string} Name of the column to extract.}
+
+\item{format}{\code{string} Format of the requested data.
+\itemize{
+\item \code{"R"} returns the data as a R object.
+\item \code{"torch"} returns the data as PyTorch tensors.
+\item \code{"numpy"} returns the data as numpy array.
+}}
 }
 \value{
-Returns a \code{vector}, \code{matrix} or \code{array}.
+Returns a \code{vector}, \code{matrix} or \code{array} for \code{format="R"}. In all other
+cases the requested format is returned.
 }
 \description{
 Function extracts the content of a column from a python data set in order to allow further operations in \emph{R}.
