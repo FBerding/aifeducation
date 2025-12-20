@@ -63,7 +63,8 @@ LargeDataSetBase <- R6::R6Class(
       if(col_name%in%self$get_colnames()){
         extraction=extract_column_from_py_dataset(
           py_dataset=private$data,
-          column_name=col_name
+          column_name=col_name,
+          format = format
         )
         return(extraction)
       } else {

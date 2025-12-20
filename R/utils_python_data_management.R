@@ -242,6 +242,9 @@ extract_column_from_py_dataset <- function(py_dataset, column_name,format="R") {
       data_column$set_format(format)
       r_column <- data_column[column_name]
       r_column <- r_column[seq.int(from = 0, to = data_column$num_rows - 1L)]
+      if(format=="numpy"){
+        r_column=reticulate::r_to_py(r_column)
+      }
       return(r_column)
     }
   } else {
@@ -254,7 +257,11 @@ extract_column_from_py_dataset <- function(py_dataset, column_name,format="R") {
       return(r_column)
     } else {
       py_dataset$set_format(format)
-      return(py_dataset[[column_name]])
+      r_column=py_dataset[[column_name]]
+      if(format=="numpy"){
+        r_column=reticulate::r_to_py(r_column)
+      }
+      return(r_column)
     }
   }
 }
