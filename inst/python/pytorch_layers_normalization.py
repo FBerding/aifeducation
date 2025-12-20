@@ -152,18 +152,18 @@ class RMSNorm_with_Mask(nn.Module):
         else:
           self.pad_value=torch.tensor(pad_value)
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: torch.Tensor,seq_len=None, mask_times=None, mask_features=None):
         """
         x: (..., features)
         """
         rms=x*(~mask_features)
         rms=rms.pow(2)
-        rms=torch.sum(rms,dim=2)/torch.sum((~mask_features),dim=2)
+        rms=torch.sum(rms,dim=2,keepdim=True)/torch.sum((~mask_features),dim=2,keepdim=True)
         rms=rms.sqrt()
         x_norm = x / (rms + self.eps)
         x_norm = x_norm * self.gamma
         x_norm = x_norm.masked_fill_(mask=mask_features,value=self.pad_value)
-        return  x_norm 
+        return  x_norm, seq_len, mask_times, mask_features
 
 #PowerNorm with mask-----------------------------------------------------------
 class PowerNormFunction(Function):

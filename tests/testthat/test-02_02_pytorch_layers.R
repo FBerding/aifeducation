@@ -346,6 +346,112 @@ test_that("BatchNorm with Mask", {
   expect_equal(results, res_expected, tolerance = 1e-5)
 })
 
+# RMSNorm with Mask-----------------------------------------------------------
+test_that("RMSNorm with Mask", {
+  device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
+  pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
+  times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
+  features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
+  sequence_length <- sample(x = seq(from = 1, to = times, by = 1), size = 30, replace = TRUE)
+  example_tensor <- generate_tensors(
+    times = times,
+    features = features,
+    seq_len = sequence_length,
+    pad_value = pad_value
+  )$to(device)
+  masking_layer <- py$masking_layer(pad_value)$to(device)
+  values <- masking_layer(example_tensor)
+
+  layer <- py$RMSNorm_with_Mask(
+    features = as.integer(features),
+    pad_value = as.integer(pad_value)
+  )$to(device)
+  y <- layer(
+    x = values[[1]],
+    seq_len = values[[2]],
+    mask_times = values[[3]],
+    mask_features = values[[4]]
+  )
+
+  # Test that masking values are the same
+  expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(values[[2]]))
+  expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(values[[3]]))
+  expect_equal(tensor_to_numpy(y[[4]]), tensor_to_numpy(values[[4]]))
+
+  # Test that padding is not destroyed
+  y_2 <- masking_layer(y[[1]])
+  expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(y_2[[2]]))
+  expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(y_2[[3]]))
+  expect_equal(tensor_to_numpy(y[[4]]), tensor_to_numpy(y_2[[4]]))
+
+  # Test that the computations are correct for sequences with full length
+  #example_tensor <- generate_tensors(
+  #  times = times,
+  #  features = features,
+  #  seq_len = rep.int(times, times = 10),
+  #  pad_value = pad_value
+  #)$to(device)
+  #comparison_layer <- torch.nn.RMSNorm(
+  #  normalized_shape = example_tensor$size(2L),
+  #  eps = 1e-05,
+  #  elementwise_affine = TRUE,
+  #  device = NULL,
+  #  dtype = example_tensor$dtype
+  #)$to(device)
+  #res_expected <- tensor_to_numpy(comparison_layer(example_tensor))
+  #values <- masking_layer(example_tensor)
+
+  #results <- tensor_to_numpy(layer(
+  #  x = values[[1]],
+  #  seq_len = values[[2]],
+  #  mask_times = values[[3]],
+  #  mask_features = values[[4]]
+  #)[[1]])
+  #expect_equal(results, res_expected, tolerance = 1e-5)
+})
+
+#PowerNorm with mask-----------------------------------------------------------
+test_that("PowerNorm with Mask", {
+  device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
+  pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
+  times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
+  features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
+  sequence_length <- sample(x = seq(from = 1, to = times, by = 1), size = 30, replace = TRUE)
+  example_tensor <- generate_tensors(
+    times = times,
+    features = features,
+    seq_len = sequence_length,
+    pad_value = pad_value
+  )$to(device)
+  masking_layer <- py$masking_layer(pad_value)$to(device)
+  values <- masking_layer(example_tensor)
+
+  layer <- py$PowerNorm_with_Mask(
+    features = as.integer(features),
+    pad_value = as.integer(pad_value),
+    alpha=0.9,
+    eps = 1e-05
+  )$to(device)
+  layer$eval()
+  y <- layer(
+    x = values[[1]],
+    seq_len = values[[2]],
+    mask_times = values[[3]],
+    mask_features = values[[4]]
+  )
+
+  # Test that masking values are the same
+  expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(values[[2]]))
+  expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(values[[3]]))
+  expect_equal(tensor_to_numpy(y[[4]]), tensor_to_numpy(values[[4]]))
+
+  # Test that padding is not destroyed
+  y_2 <- masking_layer(y[[1]])
+  expect_equal(tensor_to_numpy(y[[2]]), tensor_to_numpy(y_2[[2]]))
+  expect_equal(tensor_to_numpy(y[[3]]), tensor_to_numpy(y_2[[3]]))
+  expect_equal(tensor_to_numpy(y[[4]]), tensor_to_numpy(y_2[[4]]))
+})
+
 # Dense Layer with Mask-----------------------------------------------------------
 test_that("DenseLayer with Mask", {
   device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
