@@ -121,6 +121,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     confusion_matrix_train=confusion_matrix_train.to(device,dtype=torch.double)
     
     model.train(True)
+    torch.autograd.set_detect_anomaly(True)
     for batch in trainloader:
       inputs=batch["input"]
       labels=batch["labels"]
@@ -188,7 +189,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
         labels=labels.to(device,dtype=current_dtype)
       
         outputs=model(inputs,prediction_mode=False)
-        
+
         loss=loss_fct(outputs,labels).mean()
         val_loss +=loss.item()
       

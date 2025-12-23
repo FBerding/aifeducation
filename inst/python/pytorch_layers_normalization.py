@@ -147,19 +147,20 @@ class RMSNorm_with_Mask(nn.Module):
         super().__init__()
         self.eps = eps
         self.gamma = nn.Parameter(torch.ones(features))  # Multiplied
+        self.features=features
         if isinstance(pad_value, torch.Tensor):
           self.pad_value=pad_value.detach()
         else:
           self.pad_value=torch.tensor(pad_value)
 
-    def forward(self, x: torch.Tensor,seq_len=None, mask_times=None, mask_features=None):
+    def forward(self, x: torch.Tensor,seq_len,mask_times,mask_features):
         """
         x: (..., features)
         """
         rms=x*(~mask_features)
-        rms=rms.pow(2)
-        rms=torch.sum(rms,dim=2,keepdim=True)/torch.sum((~mask_features),dim=2,keepdim=True)
-        rms=rms.sqrt()
+        rms=torch.pow(rms,2)
+        rms=torch.sum(rms,dim=2,keepdim=True)/self.features
+        rms=torch.sqrt(rms+self.eps) #eps for numeric stability
         x_norm = x / (rms + self.eps)
         x_norm = x_norm * self.gamma
         x_norm = x_norm.masked_fill_(mask=mask_features,value=self.pad_value)
@@ -274,7 +275,7 @@ class PowerNorm_with_Mask(nn.Module):
         return x_norm, seq_len, mask_times, mask_features
 
 
-def get_layer_normalization(name,times, features,pad_value,eps=1e-5):
+def get_layer_normalization(name,times, features,pad_value,eps=1e-8):
   if name=="LayerNorm":
     return LayerNorm_with_Mask(times=times,features=features,pad_value=pad_value,eps=eps)
   elif name=="BatchNorm":
