@@ -43,7 +43,7 @@ class masking_layer(torch.nn.Module):
     seq_len=torch.sum(~mask_times,dim=1)
     #Get mask for the level of features
     n_elements=seq_len*features
-    mask_features=torch.reshape(torch.repeat_interleave(mask_times,repeats=features,dim=1),(x.size(dim=0),x.size(dim=1),features))
+    mask_features=torch.unsqueeze(mask_times,dim=2).expand((x.size(dim=0),x.size(dim=1),features))
     #Bring values to device
     seq_len=seq_len.to(device)
     mask_times=mask_times.to(device)

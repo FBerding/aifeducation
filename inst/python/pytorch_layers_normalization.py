@@ -113,7 +113,7 @@ class BatchNorm_with_Mask(torch.nn.Module):
       if self.training==True: 
         if x_zeros.size(0)>=2:
           #Number of not padded elements
-          n_elements=torch.sum(~mask_features,dim=(0,1))
+          n_elements=torch.sum(~mask_times)
           #Calc Batch Mean for every feature. Size is (Feature)
           batch_mean=torch.sum(x_zeros,dim=(0,1))/n_elements
           #Calc Batch Variance
@@ -121,19 +121,17 @@ class BatchNorm_with_Mask(torch.nn.Module):
           batch_variance=(~mask_features)*batch_variance
           batch_variance=torch.sum(batch_variance,dim=(0,1))/n_elements
           #Update running mean and variance
-          #self.running_mean=(1-self.alpha)*self.running_mean.to(batch_mean.device)+self.alpha*torch.unsqueeze(torch.unsqueeze(batch_mean.detach(),dim=0),dim=0)
-          #self.running_variance=(1-self.alpha)*self.running_variance.to(batch_variance.device)+self.alpha*torch.unsqueeze(torch.unsqueeze(batch_variance.detach(),dim=0),dim=0)*(x_zeros.size(0)/(x_zeros.size(0)-1))
           self.running_mean=(1-self.alpha)*self.running_mean+self.alpha*torch.unsqueeze(torch.unsqueeze(batch_mean,dim=0),dim=0)
           self.running_variance=(1-self.alpha)*self.running_variance+self.alpha*torch.unsqueeze(torch.unsqueeze(batch_variance,dim=0),dim=0)*(x_zeros.size(0)/(x_zeros.size(0)-1))
           #Normalize Scale and shift
-          y=gamma_expanded*(x_zeros-batch_mean)/(torch.sqrt(batch_variance)+self.eps)+beta_expanded
+          y=gamma_expanded*(x_zeros-batch_mean)/(torch.sqrt(batch_variance+self.eps)+self.eps)+beta_expanded
         else:
           #Normalize Scale and shift
-          y=gamma_expanded*(x_zeros-self.running_mean)/(torch.sqrt(self.running_variance)+self.eps)+beta_expanded
+          y=gamma_expanded*(x_zeros-self.running_mean)/(torch.sqrt(self.running_variance+self.eps)+self.eps)+beta_expanded
           #y=x_zeros
       else:
         #Normalize Scale and shift
-        y=gamma_expanded*(x_zeros- self.running_mean)/(torch.sqrt(self.running_variance)+self.eps)+beta_expanded
+        y=gamma_expanded*(x_zeros- self.running_mean)/(torch.sqrt(self.running_variance+self.eps)+self.eps)+beta_expanded
       #Insert padding values
       normalized=y.masked_fill_(mask=mask_features, value=self.pad_value)
       if x.dim()==2:
