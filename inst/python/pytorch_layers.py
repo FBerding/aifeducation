@@ -239,7 +239,7 @@ class dense_layer_with_mask(torch.nn.Module):
       
   def forward(self,x,seq_len,mask_times,mask_features):
     #Calculate new mask on the feature level
-    mask_features_new=self.calc_new_mask(mask_features=mask_features)
+    mask_features_new=self.calc_new_mask(mask_times=mask_times)
       
     #Calculate values
     y=self.dense(x)
@@ -254,14 +254,8 @@ class dense_layer_with_mask(torch.nn.Module):
     #Return values
     return y[0],y[1],y[2],mask_features_new
   
-  def calc_new_mask(self,mask_features):
-    if self.input_size>self.output_size:
-      mask_features_new=torch.index_select(mask_features,2,torch.arange(start=0, end=self.output_size).to(device=mask_features.device))
-    elif self.input_size<self.output_size:
-      tmp_mask=torch.index_select(mask_features,2,torch.arange(start=0, end=1).to(device=mask_features.device))
-      mask_features_new=tmp_mask.repeat(1,1,self.output_size)
-    else:
-      mask_features_new=mask_features
+  def calc_new_mask(self,mask_times):
+    mask_features_new=torch.unsqueeze(mask_times,dim=2).expand((mask_times.size(0),mask_times.size(1),self.output_size))
     return mask_features_new
 
 # Pooling Layer================================================================
