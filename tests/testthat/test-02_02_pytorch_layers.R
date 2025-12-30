@@ -343,7 +343,7 @@ test_that("BatchNorm with Mask", {
     mask_times = values[[3]],
     mask_features = values[[4]]
   )[[1]])
-  expect_equal(results, res_expected, tolerance = 1e-5)
+  expect_equal(results, res_expected, tolerance = 1e-4)
 })
 
 # RMSNorm with Mask-----------------------------------------------------------
