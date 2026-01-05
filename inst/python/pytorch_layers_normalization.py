@@ -42,11 +42,11 @@ class LayerNorm_with_Mask(torch.nn.Module):
         self.pad_value=torch.tensor(pad_value)
       self.gamma = torch.nn.Parameter(torch.ones(1, 1, self.features))
 
-    def forward(self, x,seq_len,mask_times,mask_features):
-
-      #Calculate mean 
+    def forward(self, x,mask_times):
       #Set padding value to zero for correct sum
+      mask_features=get_FeatureMask_from_mask(mask_times,x.size(2))
       x_zeros=x*(~mask_features)
+      #Calculate mean 
       #Create the sum for every timestep and case. These sum has the
       #shape (Batch, Times)
       mean=torch.sum(x_zeros,dim=2)/self.features
@@ -62,16 +62,15 @@ class LayerNorm_with_Mask(torch.nn.Module):
       
       var_long=torch.unsqueeze(var,dim=2)
       var_long=var_long.expand(-1,-1,self.features)
-      #var_long=var_long+self.eps
-      
+
       #Calculate normalized output
       gamma_long=self.gamma.expand(x.size(0),self.times,-1)
       normalized=gamma_long*(x_zeros-mean_long)/var_long
       
       #Insert padding values
-      normalized=torch.where(condition=mask_features,input=self.pad_value,other=normalized)
+      normalized=normalized.masked_fill(mask=mask_features,value=self.pad_value)
 
-      return normalized, seq_len,mask_times,mask_features
+      return normalized, mask_times
 
 #BatchNorm_with_Mask------------------------------------------------------------
 #Layer generating the Batch Norm for sequential data.
@@ -97,47 +96,52 @@ class BatchNorm_with_Mask(torch.nn.Module):
       self.register_buffer("running_mean",torch.zeros((1, 1, self.features)))
       self.register_buffer("running_variance",torch.ones((1, 1, self.features)))
 
-    def forward(self, x,seq_len=None,mask_times=None,mask_features=None):
+    def forward(self, x,mask_times=None):
       if x.dim()==2:
         xs=torch.unsqueeze(x,dim=1)
       else:
         xs=x
-      if seq_len is None or mask_times is None or mask_features is None:
-        seq_len=torch.tensor(xs.size(1)).repeat(xs.size(0)).to(xs.device)
+      if mask_times is None:
         mask_times=torch.zeros((xs.size(0),xs.size(1)),dtype=torch.bool,device=xs.device)
-        mask_features=torch.zeros((xs.size(0),xs.size(1),xs.size(2)),dtype=torch.bool,device=xs.device)
       #Set padding value to zero for correct sum
+      mask_features=get_FeatureMask_from_mask(mask_times,self.features)
       x_zeros=xs*(~mask_features)
       gamma_expanded=self.gamma.expand(x_zeros.size(0),x_zeros.size(1),x_zeros.size(2))
       beta_expanded=self.beta.expand(x_zeros.size(0),x_zeros.size(1),x_zeros.size(2))
       if self.training==True: 
         if x_zeros.size(0)>=2:
           #Number of not padded elements
-          n_elements=torch.sum(~mask_times)
+          n_elements=torch.sum(~mask_times,dim=(0,1))
           #Calc Batch Mean for every feature. Size is (Feature)
           batch_mean=torch.sum(x_zeros,dim=(0,1))/n_elements
           #Calc Batch Variance
-          batch_variance=torch.pow(x_zeros-torch.unsqueeze(torch.unsqueeze(batch_mean,dim=0),dim=0).expand(x_zeros.size(0),x_zeros.size(1),x_zeros.size(2)),2)
+          batch_variance=x_zeros-torch.unsqueeze(torch.unsqueeze(batch_mean,dim=0),dim=0).expand(x_zeros.size(0),x_zeros.size(1),x_zeros.size(2))
+          batch_variance=torch.pow(batch_variance,2)
           batch_variance=(~mask_features)*batch_variance
-          batch_variance=torch.sum(batch_variance,dim=(0,1))/n_elements
+          batch_variance=torch.sum(batch_variance,dim=(0,1))
+          #print(batch_variance)
+          #print(n_elements)
+          batch_variance=batch_variance/n_elements
+          batch_variance=batch_variance+self.eps
           #Update running mean and variance
           self.running_mean=(1-self.alpha)*self.running_mean+self.alpha*torch.unsqueeze(torch.unsqueeze(batch_mean,dim=0),dim=0)
-          self.running_variance=(1-self.alpha)*self.running_variance+self.alpha*torch.unsqueeze(torch.unsqueeze(batch_variance,dim=0),dim=0)*(x_zeros.size(0)/(x_zeros.size(0)-1))
+          self.running_variance=(1-self.alpha)*self.running_variance+self.alpha*(n_elements/(n_elements-1))*torch.unsqueeze(torch.unsqueeze(batch_variance,dim=0),dim=0)*(x_zeros.size(0)/(x_zeros.size(0)-1))
+          #self.running_variance=torch.clamp(self.running_variance,min=0.0,max=None)
           #Normalize Scale and shift
-          y=gamma_expanded*(x_zeros-batch_mean)/(torch.sqrt(batch_variance+self.eps)+self.eps)+beta_expanded
+          y=gamma_expanded*(x_zeros-batch_mean)/(torch.sqrt(batch_variance)+self.eps)+beta_expanded
         else:
           #Normalize Scale and shift
-          y=gamma_expanded*(x_zeros-self.running_mean)/(torch.sqrt(self.running_variance+self.eps)+self.eps)+beta_expanded
+          y=gamma_expanded*(x_zeros-self.running_mean)/(torch.sqrt(self.running_variance)+self.eps)+beta_expanded
           #y=x_zeros
       else:
         #Normalize Scale and shift
-        y=gamma_expanded*(x_zeros- self.running_mean)/(torch.sqrt(self.running_variance+self.eps)+self.eps)+beta_expanded
+        y=gamma_expanded*(x_zeros- self.running_mean)/(torch.sqrt(self.running_variance)+self.eps)+beta_expanded
       #Insert padding values
-      normalized=y.masked_fill_(mask=mask_features, value=self.pad_value)
+      normalized=y.masked_fill(mask=mask_features, value=self.pad_value)
       if x.dim()==2:
         normalized=torch.squeeze(normalized,dim=1)
       #Return results
-      return normalized, seq_len, mask_times, mask_features
+      return normalized, mask_times
 
 #RMSNorm with mask--------------------------------------------------------------
 class RMSNorm_with_Mask(nn.Module):
@@ -151,18 +155,19 @@ class RMSNorm_with_Mask(nn.Module):
         else:
           self.pad_value=torch.tensor(pad_value)
 
-    def forward(self, x: torch.Tensor,seq_len,mask_times,mask_features):
+    def forward(self, x: torch.Tensor,mask_times):
         """
         x: (..., features)
         """
+        mask_features=get_FeatureMask_from_mask(mask_times,self.features)
         rms=x*(~mask_features)
         rms=torch.pow(rms,2)
         rms=torch.sum(rms,dim=2,keepdim=True)/self.features
         rms=torch.sqrt(rms+self.eps) #eps for numeric stability
         x_norm = x / (rms + self.eps)
         x_norm = x_norm * self.gamma
-        x_norm = x_norm.masked_fill_(mask=mask_features,value=self.pad_value)
-        return  x_norm, seq_len, mask_times, mask_features
+        x_norm = x_norm.masked_fill(mask=mask_features,value=self.pad_value)
+        return  x_norm,  mask_times
 
 #PowerNorm with mask-----------------------------------------------------------
 class PowerNormFunction(Function):
@@ -234,10 +239,15 @@ class PowerNorm_with_Mask(nn.Module):
         else:
             self.pad_value = torch.tensor(pad_value)
 
-    def forward(self, x, seq_len=None, mask_times=None, mask_features=None):
+    def forward(self, x, mask_times=None):
         """
         x: (B, t, d) or (B, d)
         """
+
+        if mask_times is None:
+          mask_features=None
+        else:
+          mask_features= mask_features=get_FeatureMask_from_mask(mask_times,self.gamma.size(0))
 
         if mask_features is not None:
             # Set padding value to zero
@@ -270,10 +280,10 @@ class PowerNorm_with_Mask(nn.Module):
                 condition=mask_features, input=self.pad_value, other=x_norm
             )
 
-        return x_norm, seq_len, mask_times, mask_features
+        return x_norm, mask_times
 
 
-def get_layer_normalization(name,times, features,pad_value,eps=1e-8):
+def get_layer_normalization(name,times, features,pad_value,eps=1e-6):
   if name=="LayerNorm":
     return LayerNorm_with_Mask(times=times,features=features,pad_value=pad_value,eps=eps)
   elif name=="BatchNorm":

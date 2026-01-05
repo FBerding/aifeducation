@@ -301,7 +301,7 @@ class AddPositionalEmbedding_PT(torch.nn.Module):
     input_seq=input_seq.to(device)
     
     input_seq=input_seq.repeat(x.shape[0], 1)
-    input_seq.masked_fill_(mask,value=0)
+    input_seq.masked_fill(mask,value=0)
     embedded_positions_masked=self.embedding(input_seq)
    
     return x+embedded_positions_masked
