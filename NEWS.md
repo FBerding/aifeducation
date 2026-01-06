@@ -9,11 +9,11 @@ editor_options:
 **General**
 
 - Added support for python library 'datasets' 4.0.0 and higher.
+- Re-factor all custom layers for classification models.
 
 **Classifiers**
 
 - Added new normalization layers
-    - BatchNorm by [Loffe and Szegedy](https://doi.org/10.48550/arXiv.1502.03167)
     - RMSNorm by [Zhang and Sennrich](https://doi.org/10.48550/arXiv.1910.07467)
     - PowerNorm by [Shen et al.](https://doi.org/10.48550/arXiv.2003.07845)
 - Fixed bug in Masking Layer during the calculation of the mask for features.
