@@ -99,8 +99,12 @@ class BatchNorm_with_Mask(torch.nn.Module):
     def forward(self, x,mask_times=None):
       if x.dim()==2:
         x_reshaped=torch.unsqueeze(x,dim=1)
+        if mask_times is None:
+          mask_times=torch.zeros((x.size(0),1),dtype=torch.bool,device=x.device)
       else:
         x_reshaped=x
+        if mask_times is None:
+         mask_times=torch.zeros((x.size(0),x.size(1)),dtype=torch.bool,device=x.device)
       mask_features=get_FeatureMask_from_mask(mask_times,self.features)
       gamma_expanded=self.gamma.expand(x_reshaped.size(0),x_reshaped.size(1),x_reshaped.size(2))
       beta_expanded=self.beta.expand(x_reshaped.size(0),x_reshaped.size(1),x_reshaped.size(2))
@@ -108,7 +112,8 @@ class BatchNorm_with_Mask(torch.nn.Module):
       if self.training==True:
         if x.dim()==3:
           x_stacked=torch.reshape(x,shape=(x.size(0)*x.size(1),x.size(2)))
-          mask_stacked=torch.reshape(mask_times,shape=(mask_times.size(0)*mask_times.size(1)))
+          mask_stacked=torch.reshape(mask_times,shape=(mask_times.size(0)*mask_times.size(1),1))
+          mask_stacked=torch.squeeze(mask_stacked,dim=1)
         else:
           x_stacked=x
           mask_stacked=mask_times
