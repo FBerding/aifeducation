@@ -3,11 +3,11 @@ testthat::skip_if_not(
   condition = check_aif_py_modules(trace = FALSE),
   message = "Necessary python modules not available"
 )
+load_all_py_scripts()
 
 # Start time
 test_time_start <- Sys.time()
 
-load_all_py_scripts()
 
 # SetUp Test---------------------------------------------------------------------
 root_path_general_data <- testthat::test_path("test_data/Embeddings")
