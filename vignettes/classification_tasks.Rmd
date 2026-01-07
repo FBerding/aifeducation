@@ -1535,7 +1535,9 @@ classifier$train(
   log_dir = NULL,
   log_write_interval = 10,
   n_cores = auto_n_cores(),
-  lr_rate = 3e-2,
+  lr_rate = 0.25,
+  lr_min = 3e-2,
+  lr_scheduler="Linear",
   lr_warm_up_ratio = 0.05,
   optimizer = "AdamW"
 )
@@ -2022,7 +2024,9 @@ classifier_prototype$train(
   log_dir = NULL,
   log_write_interval = 10,
   n_cores = auto_n_cores(),
-  lr_rate = 3e-2,
+  lr_rate = 0.25,
+  lr_min = 3e-2,
+  lr_scheduler = "Linear",
   lr_warm_up_ratio = 0.05,
   optimizer = "AdamW"
 )
@@ -2414,7 +2418,9 @@ feature_extractor$train(
   sustain_interval = 15,
   epochs = 800,
   batch_size = 64,
-  lr_rate = 6e-2,
+  lr_rate = 0.5,
+  lr_min = 6e-2,
+  lr_scheduler = "Cyclic",
   trace = TRUE,
   ml_trace = 0,
   optimizer = "AdamW",
@@ -2542,7 +2548,9 @@ classifier_with_fe$train(
   log_dir = NULL,
   log_write_interval = 10,
   n_cores = auto_n_cores(),
-  lr_rate = 3e-2,
+  lr_rate = 0.25,
+  lr_min = 3e-2,
+  lr_scheduler = "Linear",
   lr_warm_up_ratio = 0.05,
   optimizer = "AdamW"
 )

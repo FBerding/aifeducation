@@ -1077,6 +1077,25 @@ get_param_dict <- function() {
     default_value = "AdamW",
     test_values = NULL
   )
+  param$lr_scheduler <- list(
+    type = "string",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = c("None", "Linear", "Cyclic"),
+    values_desc = list(
+      None = "Uses no learning reate scheduler and no warm up phase.",
+      Linear = "Decreases the learning rate linear from the maximal value (lr_rate) to its minimum (lr_min).",
+      Cyclic = "Decreases the learning rate for 5 epochs to lr_min. Thereafter the learning rate increases for 5 epochs to lr_rate."
+    ),
+    desc = "Learning rate scheduler. To use a constant learning rate for the whole training set this parameter to 'None'.",
+    gui_box = "General Settings",
+    gui_label = "Optimizer",
+    default_value = "AdamW",
+    test_values = NULL
+  )
+
+
 
   param$epochs <- list(
     type = "int",
@@ -1120,7 +1139,7 @@ get_param_dict <- function() {
     allow_null = FALSE,
     min = 0L,
     max = 1L,
-    desc = "Initial learning rate for the training.",
+    desc = "Initial learning rate for the training. Sets the maximal learning rate.",
     magnitude = 0.1,
     gui_box = "Learning Rate",
     gui_label = "Learning Rate",
@@ -1128,13 +1147,25 @@ get_param_dict <- function() {
     test_values = 1e-3
   )
   param$learning_rate <- param$lr_rate
+  param$lr_min <- list(
+    type = "(double",
+    allow_null = FALSE,
+    min = 0L,
+    max = 1L,
+    desc = "Minimal learning rate during training.",
+    magnitude = 0.1,
+    gui_box = "Learning Rate",
+    gui_label = "Learning Rate",
+    default_value = 1e-4,
+    test_values = 1e-4
+  )
 
   param$lr_warm_up_ratio <- list(
     type = "(double)",
     allow_null = FALSE,
     min = 0L,
     max = 0.50,
-    desc = "Number of epochs used for warm up.",
+    desc = "Number of epochs used for warm up. To disable warm up set this value to 0.0.",
     gui_box = "Learning Rate",
     gui_label = "Warm Up Ratio",
     default_value = 0.01,

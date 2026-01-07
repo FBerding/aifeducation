@@ -119,6 +119,8 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param log_write_interval `r get_param_doc_desc("log_write_interval")`
     #' @param lr_rate `r get_param_doc_desc("lr_rate")`
     #' @param lr_warm_up_ratio `r get_param_doc_desc("lr_warm_up_ratio")`
+    #' @param lr_min `r get_param_doc_desc("lr_min")`
+    #' @param lr_scheduler `r get_param_doc_desc("lr_scheduler")`
     #' @param optimizer `r get_param_doc_desc("optimizer")`
     #' @note This model requires that the underlying [TextEmbeddingModel] uses `pad_value=0`. If
     #' this condition is not met the pad value is switched before training.
@@ -137,7 +139,9 @@ TEFeatureExtractor <- R6::R6Class(
                      log_dir = NULL,
                      log_write_interval = 10L,
                      lr_rate = 1e-3,
+                     lr_min=1e-4,
                      lr_warm_up_ratio = 0.02,
+                     lr_scheduler="None",
                      optimizer = "AdamW") {
       tmp_args <- get_called_args(n = 1L)
       check_all_args(args = tmp_args)
@@ -147,7 +151,9 @@ TEFeatureExtractor <- R6::R6Class(
       private$save_all_args(args = tmp_args, group = "training")
 
       # Perform additional checks and adjustments
-      # private$check_param_combinations()
+      if (lr_rate < lr_min) {
+        stop("lr_rate must be at least lr_min")
+      }
 
       # set up logger
       private$set_up_logger(log_dir = log_dir, log_write_interval = log_write_interval)
@@ -205,6 +211,8 @@ TEFeatureExtractor <- R6::R6Class(
         optimizer_method = self$last_training$config$optimizer,
         lr_rate = self$last_training$config$lr_rate,
         lr_warm_up_ratio = self$last_training$config$lr_warm_up_ratio,
+        lr_min=self$last_training$config$lr_min,
+        scheduler_type=self$last_training$config$lr_scheduler,
         epochs = as.integer(self$last_training$config$epochs),
         trace = as.integer(self$last_training$config$ml_trace),
         batch_size = as.integer(self$last_training$config$batch_size),

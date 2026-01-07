@@ -1100,6 +1100,8 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         loss_cls_fct_name = self$last_training$config$loss_cls_fct_name,
         optimizer_method = self$last_training$config$optimizer,
         lr_rate = self$last_training$config$lr_rate,
+        lr_min=self$last_training$config$lr_min,
+        scheduler_type=self$last_training$config$lr_scheduler,
         lr_warm_up_ratio = self$last_training$config$lr_warm_up_ratio,
         epochs = as.integer(self$last_training$config$epochs),
         trace = as.integer(self$last_training$config$ml_trace),
@@ -1237,6 +1239,10 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         if (self$last_training$config$sc_max_k < self$last_training$config$sc_min_k) {
           stop("sc_max_k must be at least sc_min_k")
         }
+      }
+
+      if (self$last_training$config$lr_rate < self$last_training$config$lr_min) {
+        stop("lr_rate must be at least lr_min")
       }
     },
     #---------------------------------------------------------------------------

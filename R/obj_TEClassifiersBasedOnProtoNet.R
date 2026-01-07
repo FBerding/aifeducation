@@ -66,7 +66,9 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
     #' @param ml_trace `r get_param_doc_desc("ml_trace")`
     #' @param n_cores `r get_param_doc_desc("n_cores")`
     #' @param lr_rate `r get_param_doc_desc("lr_rate")`
+    #' @param lr_min `r get_param_doc_desc("lr_min")`
     #' @param lr_warm_up_ratio `r get_param_doc_desc("lr_warm_up_ratio")`
+    #' @param lr_scheduler `r get_param_doc_desc("lr_scheduler")`
     #' @param optimizer `r get_param_doc_desc("optimizer")`
     #' @param Ns `r get_param_doc_desc("Ns")`
     #' @param Nq `r get_param_doc_desc("Nq")`
@@ -116,6 +118,8 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
                      log_write_interval = 10L,
                      n_cores = auto_n_cores(),
                      lr_rate = 1e-3,
+                     lr_min=1e-4,
+                     lr_scheduler="None",
                      lr_warm_up_ratio = 0.02,
                      optimizer = "AdamW") {
       private$do_training(args = get_called_args(n = 1L))
@@ -698,6 +702,8 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         optimizer_method = self$last_training$config$optimizer,
         lr_rate = self$last_training$config$lr_rate,
         lr_warm_up_ratio = self$last_training$config$lr_warm_up_ratio,
+        lr_min=self$last_training$config$lr_min,
+        scheduler_type=self$last_training$config$lr_scheduler,
         Ns = as.integer(self$last_training$config$Ns),
         Nq = as.integer(self$last_training$config$Nq),
         loss_alpha = self$last_training$config$loss_alpha,
