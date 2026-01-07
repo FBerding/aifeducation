@@ -194,6 +194,8 @@ tensor_list_to_numpy <- function(tensor_list) {
 #' @return Returns a `vector`, `matrix` or `array` for `format="R"`. In all other
 #' cases the requested format is returned.
 #'
+#' @importFrom utils head
+#'
 #' @family Utils Python Data Management Developers
 #' @export
 extract_column_from_py_dataset <- function(py_dataset, column_name,format="R") {
@@ -225,7 +227,7 @@ extract_column_from_py_dataset <- function(py_dataset, column_name,format="R") {
         r_column <- r_column[seq.int(from = 0, to = data_column$num_rows - 1L)]
 
         if (is.array(r_column) || is.matrix(r_column)) {
-          r_column <- head(r_column,n=1L)
+          r_column <- utils::head(r_column,n=1L)
         }
       } else {
         r_column <- data_column[column_name]

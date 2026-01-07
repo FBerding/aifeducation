@@ -108,7 +108,7 @@ class BatchNorm_with_Mask(torch.nn.Module):
       if self.training==True:
         if x.dim()==3:
           x_stacked=torch.reshape(x,shape=(x.size(0)*x.size(1),x.size(2)))
-          mask_stacked=torch.reshape(mask_times,shape=(mask_times.size(0)*mask_times.size(1),mask_times.size(2)))
+          mask_stacked=torch.reshape(mask_times,shape=(mask_times.size(0)*mask_times.size(1)))
         else:
           x_stacked=x
           mask_stacked=mask_times
