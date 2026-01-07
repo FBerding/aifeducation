@@ -103,6 +103,8 @@ class identity_layer(torch.nn.Module):
   def forward(self,x,mask_times):
     if self.apply_masking==True:
       y=x.masked_fill(mask=get_FeatureMask_from_mask(mask_times,x.size(2)),value=self.pad_value)
+    else:
+      y=x
     return y,mask_times
 
 #Blockwise orthogonal dense layer----------------------------------------------
