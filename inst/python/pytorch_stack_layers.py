@@ -66,7 +66,7 @@ class stack_dense_layer(torch.nn.Module):
       self.layer_list.append(tmp_layer)
 
   def forward(self,x,mask_times):
-    y=x.clone()
+    y=x
     for r in range(self.n_layers):
       current_layer=self.layer_list[r]
       y,mask_times=current_layer(x=y,mask_times=mask_times)
@@ -213,11 +213,9 @@ class stack_tf_encoder_layer(torch.nn.Module):
   def forward(self,x,mask_times):
     y=self.positional_embedding_layer(x)
     y=y.masked_fill(mask=get_FeatureMask_from_mask(mask_times,self.features),value=self.pad_value)
-
     for r in range(self.n_layers):
       current_layer=self.layer_list[r]
       y,mask_times=current_layer(y,mask_times)
-
     #Residual connection
     y,mask_times=self.residual_connection(x,y,mask_times)
     return y,mask_times
@@ -265,7 +263,7 @@ class stack_n_gram_convolution(torch.nn.Module):
     self.residual_connection=layer_residual_connection(self.residual_type,self.pad_value) 
 
   def forward(self,x,mask_times):
-    y=x.clone()
+    y=x
     for r in range(self.n_layers):
       current_layer=self.layer_list[r]
       y,mask_times=current_layer(y,mask_times)
