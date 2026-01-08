@@ -1452,10 +1452,10 @@ get_param_dict <- function() {
     max = NULL,
     allow_null = FALSE,
     allowed_values = c(
-      "LayerNorm",
+      #"LayerNorm",
       "BatchNorm",
-      "PowerNorm",
-      "RMSNorm",
+      #"PowerNorm",
+      #"RMSNorm",
       "None"),
     values_desc = list(
       LayerNorm = "Applies normalization as described by [Ba, Kiros, and Hinton (2016)](https://doi.org/10.48550/arXiv.1607.06450). Implementation supports masking of sequences.",

@@ -97,6 +97,7 @@ class BatchNorm_with_Mask(torch.nn.Module):
       self.register_buffer("running_variance",torch.ones((1, 1, self.features)))
 
     def forward(self, x,mask_times=None):
+      #Ensure Format (Batch,Times,Features)
       if x.dim()==2:
         x_reshaped=torch.unsqueeze(x,dim=1)
         if mask_times is None:
@@ -106,41 +107,20 @@ class BatchNorm_with_Mask(torch.nn.Module):
         if mask_times is None:
          mask_times=torch.zeros((x.size(0),x.size(1)),dtype=torch.bool,device=x.device)
       mask_features=get_FeatureMask_from_mask(mask_times,self.features)
+      x_reshaped=(~mask_features)*x_reshaped
       gamma_expanded=self.gamma.expand(x_reshaped.size(0),x_reshaped.size(1),x_reshaped.size(2))
       beta_expanded=self.beta.expand(x_reshaped.size(0),x_reshaped.size(1),x_reshaped.size(2))
-      #Calculate Mean and Variance and update running mean and variance
+
       if self.training==True:
-        if x.dim()==3:
-          x_stacked=torch.reshape(x,shape=(x.size(0)*x.size(1),x.size(2)))
-          mask_stacked=torch.reshape(mask_times,shape=(mask_times.size(0)*mask_times.size(1),1))
-          mask_stacked=torch.squeeze(mask_stacked,dim=1)
-        else:
-          x_stacked=x
-          mask_stacked=mask_times
-          x_sub=torch.index_select(
-            input=x_stacked,
-            dim=0,
-            index=torch.masked_select(
-              input=torch.arange(start=0,end=x_stacked.size(0)),
-              mask=~mask_stacked
-            )
-          )
-        if x_sub.size(0)>=2:
-          batch_mean=torch.mean(
-            input=x_sub, 
-            dim=0
-          )
-          batch_variance=torch.var(
-            input=x_sub, 
-            dim=0,
-            correction=0
-          )
+        #calc batch mean and variance
+        batch_mean, batch_variance,n_elements=self.calc_batch_statistics(x_reshaped,mask_times)
+        if batch_mean is not None:
           #Update running mean and variance
-          n_elements=x_sub.size(0)
-          self.running_mean=(1-self.alpha)*self.running_mean+self.alpha*torch.unsqueeze(torch.unsqueeze(batch_mean,dim=0),dim=0)
-          self.running_variance=(1-self.alpha)*self.running_variance+self.alpha*(n_elements/(n_elements-1))*torch.unsqueeze(torch.unsqueeze(batch_variance,dim=0),dim=0)*(x_zeros.size(0)/(x_zeros.size(0)-1))
+          self.running_mean=(1-self.alpha)*self.running_mean+self.alpha*torch.unsqueeze(torch.unsqueeze(batch_mean.detach(),dim=0),dim=0)
+          self.running_variance=(1-self.alpha)*self.running_variance+self.alpha*(n_elements/(n_elements-1))*torch.unsqueeze(torch.unsqueeze(batch_variance.detach(),dim=0),dim=0)
           #Normalize Scale and shift
-          y=gamma_expanded*(x_reshaped-batch_mean)/(torch.sqrt(batch_variance)+self.eps)+beta_expanded
+          #self.eps in torch.sqrt is necessary for numeric stability
+          y=gamma_expanded*(x_reshaped-batch_mean)/(torch.sqrt(batch_variance+self.eps)+self.eps)+beta_expanded
         else:
           #Normalize Scale and shift
           y=gamma_expanded*(x_reshaped-self.running_mean)/(torch.sqrt(self.running_variance)+self.eps)+beta_expanded
@@ -153,6 +133,40 @@ class BatchNorm_with_Mask(torch.nn.Module):
         normalized=torch.squeeze(normalized,dim=1)
       #Return results
       return normalized, mask_times
+    def calc_batch_statistics(self,x,mask_times):
+      #Transfrom to shape (Batch*Times,Feature)
+      if x.dim()==3:
+        x_stacked=torch.reshape(x,shape=(x.size(0)*x.size(1),x.size(2)))
+        mask_stacked=torch.reshape(mask_times,shape=(mask_times.size(0)*mask_times.size(1),1))
+        mask_stacked=torch.squeeze(mask_stacked,dim=1)
+      else:
+        x_stacked=x
+        mask_stacked=mask_times
+      #Select only the rows that are not masked
+      x_sub=torch.index_select(
+        input=x_stacked,
+        dim=0,
+        index=torch.masked_select(
+          input=torch.arange(start=0,end=x_stacked.size(0)).to(mask_stacked.device),
+          mask=~mask_stacked
+        )
+      )
+      #Calc meand and variance only if at least two rows exist
+      if x_sub.size(0)>=2:
+        batch_mean=torch.mean(
+          input=x_sub, 
+          dim=0
+        )
+        batch_variance=torch.var(
+          input=x_sub, 
+          dim=0
+        )
+        batch_variance=torch.clamp(batch_variance,min=0.0,max=None)
+      else:
+        batch_mean=None
+        batch_variance=None
+      n_elements=x_sub.size(0)
+      return batch_mean, batch_variance, n_elements
 
 #RMSNorm with mask--------------------------------------------------------------
 class RMSNorm_with_Mask(nn.Module):
