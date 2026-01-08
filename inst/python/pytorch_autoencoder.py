@@ -308,11 +308,15 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     batch_size=batch_size,
     shuffle=False)
 
-  optimizer=get_Optimizer(optimizer_method)
+  optimizer=get_Optimizer(
+    optimizer_method,
+    params=model.parameters(),
+    lr_rate=lr_rate
+  )
   scheduler=get_lr_scheduler(
     optimizer=optimizer,
     scheduler_type=scheduler_type,
-    warm_up_ration=lr_warm_up_ratio,
+    lr_warm_up_ratio=lr_warm_up_ratio,
     total_epochs=epochs,
     batches_per_epoch=len(trainloader),
     max_lr=lr_rate,

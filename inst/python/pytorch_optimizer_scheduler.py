@@ -15,7 +15,7 @@
 import torch 
 import math
 
-def get_Optimizer(optimizer_method,params):
+def get_Optimizer(optimizer_method,params,lr_rate):
   if optimizer_method=="Adam":
     optimizer=torch.optim.Adam(lr=lr_rate,params=params,weight_decay=1e-3)
   elif optimizer_method=="RMSprop":
@@ -26,7 +26,7 @@ def get_Optimizer(optimizer_method,params):
     optimizer=torch.optim.SGD(params=params, lr=lr_rate, momentum=0.90, dampening=0, weight_decay=0, nesterov=False, maximize=False, foreach=None, differentiable=False, fused=None)
   return optimizer
 
-def get_lr_scheduler(optimizer,scheduler_type,warm_up_ration,total_epochs,batches_per_epoch,max_lr,min_lr):
+def get_lr_scheduler(optimizer,scheduler_type,lr_warm_up_ratio,total_epochs,batches_per_epoch,max_lr,min_lr):
   warm_up_steps=math.floor(total_epochs*lr_warm_up_ratio)
   main_steps=total_epochs-warm_up_steps
   if scheduler_type=="Linear":

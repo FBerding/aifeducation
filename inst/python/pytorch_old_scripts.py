@@ -625,17 +625,6 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     dtype=torch.double
     model.to(device,dtype=dtype)
   
-  optimizer=get_Optimizer(optimizer_method)
-  scheduler=get_lr_scheduler(
-    optimizer=optimizer,
-    scheduler_type=scheduler_type,
-    warm_up_ration=lr_warm_up_ratio,
-    total_epochs=epochs,
-    batches_per_epoch=len(trainloader),
-    max_lr=lr_rate,
-    min_lr=lr_min
-  )
-    
   #if loss_fct_name=="ProtoNetworkMargin":
   loss_fct=ProtoNetLossWithMargin_PT(
     alpha=loss_alpha,
@@ -683,7 +672,22 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       test_data,
       batch_size=Ns+Nq,
       shuffle=False)
-  
+      
+  optimizer=get_Optimizer(
+    optimizer_method,
+    params=model.parameters(),
+    lr_rate=lr_rate
+  )
+  scheduler=get_lr_scheduler(
+    optimizer=optimizer,
+    scheduler_type=scheduler_type,
+    lr_warm_up_ratio=lr_warm_up_ratio,
+    total_epochs=epochs,
+    batches_per_epoch=len(trainloader),
+    max_lr=lr_rate,
+    min_lr=lr_min
+  )
+      
   #Log file
   if not (log_dir is None):
     log_file=log_dir+"/aifeducation_state.log"
