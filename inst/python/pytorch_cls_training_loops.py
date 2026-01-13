@@ -165,7 +165,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     avg_iota_train=torch.sum(avg_iota_train)/n_classes
     
     #Update learning rate
-    scheduler.step()
+    if scheduler!=None:
+      scheduler.step()
     #print(scheduler.get_last_lr())
 
     #Validation----------------------------------------------------------------
@@ -536,7 +537,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     avg_iota_train=torch.sum(avg_iota_train)/n_classes
     
     #Update learning rate
-    scheduler.step()
+    if scheduler!=None:
+      scheduler.step()
     
     #Calculate trained prototypes----------------------------------------------
     model.eval()

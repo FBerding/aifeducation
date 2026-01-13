@@ -522,6 +522,8 @@ prepare_session <- function(env_type = "auto", envname = "aifeducation") {
   message("Checking python packages. This can take a moment.")
   if (check_aif_py_modules(trace = FALSE)) {
     message("All necessary python packages are available.")
+    message("Load all python objects and functions.")
+    load_all_py_scripts()
   } else {
     stop("Not all required python packages are available. Call check_aif_py_modules for details.")
   }

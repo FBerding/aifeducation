@@ -212,7 +212,9 @@ be added to the input during training. Allowed values: \(0 &lt;= x &lt;= 1\)</p>
 <span>  log_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  log_write_interval <span class="op">=</span> <span class="fl">10L</span>,</span>
 <span>  lr_rate <span class="op">=</span> <span class="fl">0.001</span>,</span>
+<span>  lr_min <span class="op">=</span> <span class="fl">1e-04</span>,</span>
 <span>  lr_warm_up_ratio <span class="op">=</span> <span class="fl">0.02</span>,</span>
+<span>  lr_scheduler <span class="op">=</span> <span class="st">"None"</span>,</span>
 <span>  optimizer <span class="op">=</span> <span class="st">"AdamW"</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
@@ -279,11 +281,19 @@ the log files. Only relevant if <code>log_dir</code> is not <code>NULL</code>. A
 
 
 <dt><code>lr_rate</code></dt>
-<dd><p><code>double</code> Initial learning rate for the training. Allowed values: \(0 &lt; x &lt;= 1\)</p></dd>
+<dd><p><code>double</code> Initial learning rate for the training. Sets the maximal learning rate. Allowed values: \(0 &lt; x &lt;= 1\)</p></dd>
+
+
+<dt><code>lr_min</code></dt>
+<dd><p><code>double</code> Minimal learning rate during training. Allowed values: \(0 &lt; x &lt;= 1\)</p></dd>
 
 
 <dt><code>lr_warm_up_ratio</code></dt>
-<dd><p><code>double</code> Number of epochs used for warm up. Allowed values: \(0 &lt; x &lt; 0.5\)</p></dd>
+<dd><p><code>double</code> Number of epochs used for warm up. To disable warm up set this value to 0.0. Allowed values: \(0 &lt; x &lt; 0.5\)</p></dd>
+
+
+<dt><code>lr_scheduler</code></dt>
+<dd><p><code>string</code> Learning rate scheduler. To use a constant learning rate for the whole training set this parameter to 'None'. Allowed values: 'None', 'Linear', 'Cyclic'</p></dd>
 
 
 <dt><code>optimizer</code></dt>

@@ -370,7 +370,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
         last_log_loss=write_log_performance_py(log_file=log_file_loss, history=history_loss.numpy().tolist(), last_log = last_log_loss, write_interval = log_write_interval)
     
     #Update learning rate
-    scheduler.step()
+    if scheduler!=None:
+      scheduler.step()
     
     #Validation----------------------------------------------------------------
     val_loss=0.0

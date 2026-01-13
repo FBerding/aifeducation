@@ -34,7 +34,7 @@ def get_lr_scheduler(optimizer,scheduler_type,lr_warm_up_ratio,total_epochs,batc
   elif scheduler_type=="Cyclic":
     scheduler_main=torch.optim.lr_scheduler.CyclicLR(optimizer, base_lr=min_lr, max_lr=max_lr, step_size_up=5*batches_per_epoch)
   elif scheduler_type=="None":
-    scheduler_main=torch.optim.lr_scheduler.ConstantLR(optimizer, factor=1, total_iters=1, last_epoch=-1)
+    return None
   
   if lr_warm_up_ratio>0.0 and scheduler_type!="None":
     scheduler_warm_up = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=min_lr/max_lr,end_factor=1, total_iters=warm_up_steps)
