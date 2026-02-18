@@ -72,129 +72,187 @@ class LayerNorm_with_Mask(torch.nn.Module):
 
       return normalized, mask_times
 
-#BatchNorm_with_Mask------------------------------------------------------------
-#Layer generating the Batch Norm for sequential data.
+# BatchNorm_with_Mask------------------------------------------------------------
+# Layer generating the Batch Norm for sequential data.
 # Returns a list with the following tensors
 # * Input and output tensor (Batch, Times, Features) or (Batch, Features)
 # * Sequence length of the tensors shape (Batch)
 # * mask_times Mask on the level of complete sequences shape (Batch, Times)
 # * mask_features Mask on the level of single features shape (Bath, Times, Features)
-# True indicates that the sequence or feature is padded. If True these values should not be part 
+# True indicates that the sequence or feature is padded. If True these values should not be part
 # of further computations
 class BatchNorm_with_Mask(torch.nn.Module):
-    def __init__(self, features,pad_value,eps=1e-5,alpha=0.1):
-      super().__init__()
-      self.eps=eps
-      self.alpha=alpha
-      self.features = features
-      if isinstance(pad_value, torch.Tensor):
-        self.pad_value=pad_value.detach()
-      else:
-        self.pad_value=torch.tensor(pad_value)
-      self.gamma = torch.nn.Parameter(torch.ones(1, 1, self.features))
-      self.beta = torch.nn.Parameter(torch.zeros(1, 1, self.features))
-      self.register_buffer("running_mean",torch.zeros((1, 1, self.features)))
-      self.register_buffer("running_variance",torch.ones((1, 1, self.features)))
-
-    def forward(self, x,mask_times=None):
-      #Ensure Format (Batch,Times,Features)
-      if x.dim()==2:
-        x_reshaped=torch.unsqueeze(x,dim=1)
-        if mask_times is None:
-          mask_times=torch.zeros((x.size(0),1),dtype=torch.bool,device=x.device)
-      else:
-        x_reshaped=x
-        if mask_times is None:
-         mask_times=torch.zeros((x.size(0),x.size(1)),dtype=torch.bool,device=x.device)
-      mask_features=get_FeatureMask_from_mask(mask_times,self.features)
-      x_reshaped=(~mask_features)*x_reshaped
-      gamma_expanded=self.gamma.expand(x_reshaped.size(0),x_reshaped.size(1),x_reshaped.size(2))
-      beta_expanded=self.beta.expand(x_reshaped.size(0),x_reshaped.size(1),x_reshaped.size(2))
-
-      if self.training==True:
-        #calc batch mean and variance
-        batch_mean, batch_variance,n_elements=self.calc_batch_statistics(x_reshaped,mask_times)
-        if batch_mean is not None:
-          #Update running mean and variance
-          self.running_mean=(1-self.alpha)*self.running_mean+self.alpha*torch.unsqueeze(torch.unsqueeze(batch_mean.detach(),dim=0),dim=0)
-          self.running_variance=(1-self.alpha)*self.running_variance+self.alpha*(n_elements/(n_elements-1))*torch.unsqueeze(torch.unsqueeze(batch_variance.detach(),dim=0),dim=0)
-          #Normalize Scale and shift
-          #self.eps in torch.sqrt is necessary for numeric stability
-          y=gamma_expanded*(x_reshaped-batch_mean)/(torch.sqrt(batch_variance+self.eps)+self.eps)+beta_expanded
+    def __init__(
+        self,
+        features: int,
+        pad_value: torch.LongTensor | int,
+        eps: float = 1e-5,
+        alpha: float = 0.1,
+    ):
+        super().__init__()
+        self.eps = eps
+        self.alpha = alpha
+        self.features = features
+        if isinstance(pad_value, torch.Tensor):
+            self.pad_value = pad_value.detach()
         else:
-          #Normalize Scale and shift
-          y=gamma_expanded*(x_reshaped-self.running_mean)/(torch.sqrt(self.running_variance)+self.eps)+beta_expanded
-      else:
-        #Normalize Scale and shift
-        y=gamma_expanded*(x_reshaped-self.running_mean)/(torch.sqrt(self.running_variance)+self.eps)+beta_expanded
-      #Insert padding values
-      normalized=y.masked_fill(mask=mask_features, value=self.pad_value)
-      if x.dim()==2:
-        normalized=torch.squeeze(normalized,dim=1)
-      #Return results
-      return normalized, mask_times
-    def calc_batch_statistics(self,x,mask_times):
-      #Transfrom to shape (Batch*Times,Feature)
-      if x.dim()==3:
-        x_stacked=torch.reshape(x,shape=(x.size(0)*x.size(1),x.size(2)))
-        mask_stacked=torch.reshape(mask_times,shape=(mask_times.size(0)*mask_times.size(1),1))
-        mask_stacked=torch.squeeze(mask_stacked,dim=1)
-      else:
-        x_stacked=x
-        mask_stacked=mask_times
-      #Select only the rows that are not masked
-      x_sub=torch.index_select(
-        input=x_stacked,
-        dim=0,
-        index=torch.masked_select(
-          input=torch.arange(start=0,end=x_stacked.size(0)).to(mask_stacked.device),
-          mask=~mask_stacked
-        )
-      )
-      #Calc meand and variance only if at least two rows exist
-      if x_sub.size(0)>=2:
-        batch_mean=torch.mean(
-          input=x_sub, 
-          dim=0
-        )
-        batch_variance=torch.var(
-          input=x_sub, 
-          dim=0
-        )
-        batch_variance=torch.clamp(batch_variance,min=0.0,max=None)
-      else:
-        batch_mean=None
-        batch_variance=None
-      n_elements=x_sub.size(0)
-      return batch_mean, batch_variance, n_elements
+            self.pad_value = torch.tensor(pad_value)
+        self.gamma = torch.nn.Parameter(torch.ones(1, 1, self.features))
+        self.beta = torch.nn.Parameter(torch.zeros(1, 1, self.features))
+        self.register_buffer("running_mean", torch.zeros((1, 1, self.features)))
+        self.register_buffer("running_variance", torch.ones((1, 1, self.features)))
+
+    def forward(
+        self,
+        x: torch.FloatTensor,  # (B, F) | (B, T, F)
+        mask_times: torch.BoolTensor = None,
+    ) -> tuple:
+        # Ensure Format (Batch,Times,Features)
+        if x.dim() == 2:
+            x_reshaped = torch.unsqueeze(x, dim=1)
+            if mask_times is None:
+                mask_times = torch.zeros(
+                    (x.size(0), 1), dtype=torch.bool, device=x.device
+                )
+        else:
+            x_reshaped = x
+            if mask_times is None:
+                mask_times = torch.zeros(
+                    (x.size(0), x.size(1)), dtype=torch.bool, device=x.device
+                )
+        B, T, F = x_reshaped.shape
+        mask_features = get_FeatureMask_from_mask(mask_times, self.features)
+        x_reshaped = (~mask_features) * x_reshaped
+        gamma_expanded = self.gamma.expand(B, T, F)
+        beta_expanded = self.beta.expand(B, T, F)
+
+        if self.training == True:
+            # calc batch mean and variance
+            # (F_out), (F_out), B * T
+            batch_mean, batch_variance, n_elements = self.calc_batch_statistics(
+                x_reshaped, mask_times
+            )
+            if batch_mean is not None:
+                # Update running mean and variance
+                self.running_mean = (
+                    1 - self.alpha
+                ) * self.running_mean + self.alpha * torch.unsqueeze(
+                    torch.unsqueeze(batch_mean.detach(), dim=0), dim=0
+                )  # (1, 1, F_out)
+                self.running_variance = (
+                    1 - self.alpha
+                ) * self.running_variance + self.alpha * (
+                    n_elements / (n_elements - 1)
+                ) * torch.unsqueeze(
+                    torch.unsqueeze(batch_variance.detach(), dim=0), dim=0
+                )  # (1, 1, F_out)
+                # Normalize Scale and shift
+                # self.eps in torch.sqrt is necessary for numeric stability
+                y = (
+                    gamma_expanded
+                    * (x_reshaped - batch_mean)
+                    / (torch.sqrt(batch_variance + self.eps) + self.eps)
+                    + beta_expanded
+                )  # (B, T, F)
+            else:
+                # Normalize Scale and shift
+                y = (
+                    gamma_expanded
+                    * (x_reshaped - self.running_mean)
+                    / (torch.sqrt(self.running_variance) + self.eps)
+                    + beta_expanded
+                )
+        else:
+            # Normalize Scale and shift
+            y = (
+                gamma_expanded
+                * (x_reshaped - self.running_mean)
+                / (torch.sqrt(self.running_variance) + self.eps)
+                + beta_expanded
+            )
+        # Insert padding values
+        # (B, T, F)
+        normalized = y.masked_fill(mask=mask_features, value=self.pad_value)
+        if x.dim() == 2:
+            normalized = torch.squeeze(normalized, dim=1)  # (B, F)
+        # Return results
+        return normalized, mask_times  # (B, F) | (B, T, F); (B, T)
+
+    def calc_batch_statistics(
+        self,
+        x: torch.FloatTensor,  # (B, T, F)
+        mask_times: torch.BoolTensor,  # (B, T)
+    ) -> tuple:
+        # Transfrom to shape (Batch*Times,Feature)
+        if x.dim() == 3:
+            B, T, F = x.shape
+            x_stacked = torch.reshape(x, shape=(B * T, F))
+            mask_stacked = torch.reshape(
+                mask_times, shape=(mask_times.size(0) * mask_times.size(1), 1)
+            )  # (B * T, 1)
+            mask_stacked = torch.squeeze(mask_stacked, dim=1)  # (B * T)
+        else:
+            x_stacked = x
+            mask_stacked = mask_times
+        # Select only the rows that are not masked
+        x_sub = torch.index_select(
+            input=x_stacked,  # (B * T, F)
+            dim=0,
+            index=torch.masked_select(
+                input=torch.arange(start=0, end=x_stacked.size(0)).to(
+                    mask_stacked.device
+                ),
+                mask=~mask_stacked,  # (B * T)
+            ),
+        )  # (B * T, F_out)
+        # Calc meand and variance only if at least two rows exist
+        if x_sub.size(0) >= 2:
+            batch_mean = torch.mean(input=x_sub, dim=0)  # (F_out)
+            batch_variance = torch.var(input=x_sub, dim=0)  # (F_out)
+            batch_variance = torch.clamp(batch_variance, min=0.0, max=None)  # (F_out)
+        else:
+            batch_mean = None
+            batch_variance = None
+        n_elements = x_sub.size(0)  # B * T
+        return batch_mean, batch_variance, n_elements  # (F_out), (F_out), B * T
+
 
 #RMSNorm with mask--------------------------------------------------------------
 class RMSNorm_with_Mask(nn.Module):
-    def __init__(self, features: int, pad_value, eps: float = 1e-8):
+    def __init__(
+        self,
+        features: int,
+        pad_value: torch.LongTensor | int,
+        eps: float = 1e-8,
+    ):
         super().__init__()
         self.eps = eps
         self.gamma = nn.Parameter(torch.ones(features))  # Multiplied
-        self.features=features
+        self.features = features
         if isinstance(pad_value, torch.Tensor):
-          self.pad_value=pad_value.detach()
+            self.pad_value = pad_value.detach()
         else:
-          self.pad_value=torch.tensor(pad_value)
+            self.pad_value = torch.tensor(pad_value)
 
-    def forward(self, x: torch.Tensor,mask_times):
+    def forward(
+        self,
+        x: torch.FloatTensor,  # (B, T, F)
+        mask_times: torch.BoolTensor,  # (B, T)
+    ) -> tuple:
         """
         x: (..., features)
         """
-        mask_features=get_FeatureMask_from_mask(mask_times,self.features)
-        rms=x*(~mask_features)
-        rms=torch.pow(rms,2)
-        rms=torch.sum(rms,dim=2,keepdim=True)/self.features
-        rms=torch.sqrt(rms+self.eps) #eps for numeric stability
+        mask_features = get_FeatureMask_from_mask(mask_times, self.features)
+        rms = x * (~mask_features)
+        rms = torch.pow(rms, 2)
+        rms = torch.sum(rms, dim=2, keepdim=True) / self.features
+        rms = torch.sqrt(rms + self.eps)  # eps for numeric stability
         x_norm = x / (rms + self.eps)
         x_norm = x_norm * self.gamma
-        x_norm = x_norm.masked_fill(mask=mask_features,value=self.pad_value)
-        return  x_norm,  mask_times
+        x_norm = x_norm.masked_fill(mask=mask_features, value=self.pad_value)
+        return x_norm, mask_times
 
-#PowerNorm with mask-----------------------------------------------------------
+# PowerNorm with mask-----------------------------------------------------------
 class PowerNormFunction(Function):
     @staticmethod
     def forward(ctx, X, gamma, beta, running_psi, nu, alpha, eps, training):
@@ -247,7 +305,13 @@ class PowerNormFunction(Function):
 
 
 class PowerNorm_with_Mask(nn.Module):
-    def __init__(self, features, pad_value=-100, alpha=0.9, eps=1e-6):
+    def __init__(
+        self,
+        features: int,
+        pad_value: torch.LongTensor = -100,
+        alpha: float = 0.9,
+        eps: float = 1e-6,
+    ):
         super().__init__()
 
         self.gamma = nn.Parameter(torch.ones(features))
@@ -264,15 +328,21 @@ class PowerNorm_with_Mask(nn.Module):
         else:
             self.pad_value = torch.tensor(pad_value)
 
-    def forward(self, x, mask_times=None):
+    def forward(
+        self,
+        x: torch.FloatTensor,
+        mask_times: torch.BoolTensor = None,
+    ) -> tuple:
         """
         x: (B, t, d) or (B, d)
         """
 
         if mask_times is None:
-          mask_features=None
+            mask_features = None
         else:
-          mask_features= mask_features=get_FeatureMask_from_mask(mask_times,self.gamma.size(0))
+            mask_features = mask_features = get_FeatureMask_from_mask(
+                mask_times, self.gamma.size(0)
+            )
 
         if mask_features is not None:
             # Set padding value to zero
