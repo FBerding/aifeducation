@@ -25,11 +25,11 @@
 #' @export
 get_recommended_py_versions <- function() {
   py_versions <- list(
-    transformers = c("4.56.0", "4.57.3"),
-    tokenizers = c("0.22.0", "0.22.1"),
-    pandas = c("2.3.2", "2.3.3"),
-    datasets = c("3.6.0", "4.4.1"),
-    codecarbon = c("3.0.0", "3.2.0"),
+    transformers = c("4.56.0", "5.2.0"),
+    tokenizers = c("0.22.0", "0.22.2"),
+    pandas = c("2.3.2", "3.0.1"),
+    datasets = c("3.6.0", "4.5.0"),
+    codecarbon = c("3.0.0", "3.2.2"),
     safetensors = c("0.6.2", "0.7.0"),
     torcheval = c("0.0.7", "0.0.7"),
     accelerate = c("1.10.1", "1.12.0"),
@@ -252,11 +252,11 @@ install_aifeducation_studio <- function() {
 #' @family Installation and Configuration
 #' @export
 install_py_modules <- function(envname = "aifeducation",
-                               transformer_version = "<=4.57.3",
-                               tokenizers_version = "<=0.22.1",
-                               pandas_version = "<=2.3.3",
-                               datasets_version = "<=4.4.1",
-                               codecarbon_version = "<=3.2.0",
+                               transformer_version = "<=5.2.0",
+                               tokenizers_version = "<=0.22.2",
+                               pandas_version = "<=3.0.1",
+                               datasets_version = "<=4.5.0",
+                               codecarbon_version = "<=3.2.2",
                                safetensors_version = "<=0.7.0",
                                torcheval_version = "<=0.0.7",
                                accelerate_version = "<=1.12.0",
