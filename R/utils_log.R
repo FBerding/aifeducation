@@ -274,7 +274,7 @@ cat_message <- function(msg, trace) {
 #'
 #' @param log `data.frame` containing the log.
 #' @return Returns a `data.frame` containing epochs, loss, and val_loss.
-#'
+#' @importFrom reticulate import_builtins
 #' @family Utils Log Developers
 #' @export
 clean_pytorch_log_transformers <- function(log) {
