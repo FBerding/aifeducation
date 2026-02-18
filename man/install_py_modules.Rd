@@ -6,11 +6,11 @@
 \usage{
 install_py_modules(
   envname = "aifeducation",
-  transformer_version = "<=4.57.3",
-  tokenizers_version = "<=0.22.1",
-  pandas_version = "<=2.3.3",
-  datasets_version = "<=4.4.1",
-  codecarbon_version = "<=3.2.0",
+  transformer_version = "<=5.2.0",
+  tokenizers_version = "<=0.22.2",
+  pandas_version = "<=3.0.1",
+  datasets_version = "<=4.5.0",
+  codecarbon_version = "<=3.2.2",
   safetensors_version = "<=0.7.0",
   torcheval_version = "<=0.0.7",
   accelerate_version = "<=1.12.0",

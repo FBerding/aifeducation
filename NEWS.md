@@ -9,6 +9,7 @@ editor_options:
 **General**
 
 - Added support for python library 'datasets' 4.0.0 and higher.
+- Added support for python library 'transformers' 5.0.0 and higher.
 - Re-factor all custom layers for classification models.
 
 **Classifiers**
