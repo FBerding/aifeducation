@@ -454,12 +454,16 @@ set_transformers_logger <- function(level = "ERROR") {
 #' activate a virtual environment with the given name. If this environment does not exist
 #' it tries to activate a conda environment with the given name. If this fails
 #' the default virtual environment is used.
+#' @param check_session `bool` If `TRUE` functions checks if all necessary python packages are
+#' available. Set this argument to `FALSE` can speed up sessions' preparation.
+#' Set this argument to `FALSE` only if you are certain that the requirements for the
+#' package are satisfied.
 #'
 #' @return Function does not return anything. It is used for preparing python and R.
 #'
 #' @family Installation and Configuration
 #' @export
-prepare_session <- function(env_type = "auto", envname = "aifeducation") {
+prepare_session <- function(env_type = "auto", envname = "aifeducation", check_session=TRUE) {
   if (!reticulate::py_available(FALSE)) {
     message("Python is not initalized.")
     if (env_type == "auto") {
@@ -519,18 +523,20 @@ prepare_session <- function(env_type = "auto", envname = "aifeducation") {
 
   # Print information
   message("Detected OS: ", detec_os())
-  message("Checking python packages. This can take a moment.")
-  if (check_aif_py_modules(trace = FALSE)) {
-    message("All necessary python packages are available.")
-    message("Load all python objects and functions.")
-    load_all_py_scripts()
-  } else {
-    stop("Not all required python packages are available. Call check_aif_py_modules for details.")
-  }
+  if(check_session){
+    message("Checking python packages. This can take a moment.")
+    if (check_aif_py_modules(trace = FALSE)) {
+      message("All necessary python packages are available.")
+      message("Load all python objects and functions.")
+      load_all_py_scripts()
+    } else {
+      stop("Not all required python packages are available. Call check_aif_py_modules for details.")
+    }
 
-  pkg_versions <- get_py_package_versions()
-  message(paste(paste0(names(pkg_versions), ":"), pkg_versions, collapse = "\n"))
-  message("GPU Acceleration: ", torch$cuda$is_available())
+    pkg_versions <- get_py_package_versions()
+    message(paste(paste0(names(pkg_versions), ":"), pkg_versions, collapse = "\n"))
+    message("GPU Acceleration: ", torch$cuda$is_available())
+  }
   message("Location for Temporary Files:", create_and_get_tmp_dir())
 }
 
