@@ -932,7 +932,7 @@ check_and_prepare_for_studio <- function(env_type = "auto") {
     }
   }
 
-  prepare_session(env_type = env_type, envname = "aifeducation")
+  prepare_session(env_type = env_type, envname = "aifeducation", check_session = TRUE)
 
   message("Checking pytorch machine learning framework.")
   available_ml_frameworks <- NULL
