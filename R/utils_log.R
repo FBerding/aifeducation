@@ -282,6 +282,9 @@ clean_pytorch_log_transformers <- function(log) {
     history_data <- log
   } else {
     python_bulit_ins <- reticulate::import_builtins()
+    print(class(log))
+    print(log)
+    print(log$columns)
     data_colnames <- python_bulit_ins$list(log$columns)
     history_data <- log$to_numpy()
     colnames(history_data) <- data_colnames
