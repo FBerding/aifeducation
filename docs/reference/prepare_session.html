@@ -53,7 +53,11 @@ it will be activated. If python is already initialized it uses the current envir
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">prepare_session</span><span class="op">(</span>env_type <span class="op">=</span> <span class="st">"auto"</span>, envname <span class="op">=</span> <span class="st">"aifeducation"</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">prepare_session</span><span class="op">(</span></span>
+<span>  env_type <span class="op">=</span> <span class="st">"auto"</span>,</span>
+<span>  envname <span class="op">=</span> <span class="st">"aifeducation"</span>,</span>
+<span>  check_session <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -70,6 +74,13 @@ the default virtual environment is used.</p></dd>
 
 <dt id="arg-envname">envname<a class="anchor" aria-label="anchor" href="#arg-envname"></a></dt>
 <dd><p><code>string</code> envname name of the requested environment.</p></dd>
+
+
+<dt id="arg-check-session">check_session<a class="anchor" aria-label="anchor" href="#arg-check-session"></a></dt>
+<dd><p><code>bool</code> If <code>TRUE</code> functions checks if all necessary python packages are
+available. Set this argument to <code>FALSE</code> can speed up sessions' preparation.
+Set this argument to <code>FALSE</code> only if you are certain that the requirements for the
+package are satisfied.</p></dd>
 
 </dl></div>
     <div class="section level2">
