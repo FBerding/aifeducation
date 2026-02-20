@@ -278,17 +278,16 @@ cat_message <- function(msg, trace) {
 #' @family Utils Log Developers
 #' @export
 clean_pytorch_log_transformers <- function(log) {
-  if (check_versions(a = get_py_package_version("transformers"), operator = "<", b = "5.0.0")) {
+  if (is.data.frame(log)){
     history_data <- log
-  } else {
+  } else if (inherits(x=log,what = "pandas.DataFrame")){
     python_bulit_ins <- reticulate::import_builtins()
-    print(class(log))
-    print(log)
-    print(log$columns)
     data_colnames <- python_bulit_ins$list(log$columns)
     history_data <- log$to_numpy()
     colnames(history_data) <- data_colnames
     history_data <- as.data.frame(history_data)
+  } else {
+    stop("Class of log is not supported.")
   }
 
   max_epochs <- max(history_data$epoch)
