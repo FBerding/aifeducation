@@ -1077,25 +1077,6 @@ get_param_dict <- function() {
     default_value = "AdamW",
     test_values = NULL
   )
-  param$lr_scheduler <- list(
-    type = "string",
-    allow_null = FALSE,
-    min = NULL,
-    max = NULL,
-    allowed_values = c("None", "Linear", "Cyclic"),
-    values_desc = list(
-      None = "Uses no learning reate scheduler and no warm up phase.",
-      Linear = "Decreases the learning rate linear from the maximal value (lr_rate) to its minimum (lr_min).",
-      Cyclic = "Decreases the learning rate for 5 epochs to lr_min. Thereafter the learning rate increases for 5 epochs to lr_rate."
-    ),
-    desc = "Learning rate scheduler. To use a constant learning rate for the whole training set this parameter to 'None'.",
-    gui_box = "General Settings",
-    gui_label = "Optimizer",
-    default_value = "AdamW",
-    test_values = NULL
-  )
-
-
 
   param$epochs <- list(
     type = "int",
@@ -1155,9 +1136,26 @@ get_param_dict <- function() {
     desc = "Minimal learning rate during training.",
     magnitude = 0.1,
     gui_box = "Learning Rate",
-    gui_label = "Learning Rate",
+    gui_label = "Minimal Learning Rate",
     default_value = 1e-4,
     test_values = 1e-4
+  )
+  param$lr_scheduler <- list(
+    type = "string",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = c("None", "Linear", "Cyclic"),
+    values_desc = list(
+      None = "Uses no learning rate scheduler and no warm up phase.",
+      Linear = "Decreases the learning rate linear from the maximal value (lr_rate) to its minimum (lr_min).",
+      Cyclic = "Decreases the learning rate for 5 epochs to lr_min. Thereafter the learning rate increases for 5 epochs to lr_rate."
+    ),
+    desc = "Learning rate scheduler. To use a constant learning rate for the whole training set this parameter to 'None'.",
+    gui_box = "Learning Rate",
+    gui_label = "Scheduler",
+    default_value = "None",
+    test_values = NULL
   )
 
   param$lr_warm_up_ratio <- list(
@@ -1358,7 +1356,7 @@ get_param_dict <- function() {
     default_historic = "householder",
     default_value = " matrix_exp",
     gui_box = "General Settings",
-    gui_label = "Method",
+    gui_label = "Orthogonal Method",
     test_values = NULL
   )
 
