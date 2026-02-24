@@ -191,7 +191,6 @@ long_models <- function(args) {
         path_args = args[[method]]$path_args,
         meta_args = args[[method]]$meta_args
       )
-
       # Call Method
       do.call(what = object[[method]], args = args[[method]]$args)
     }
