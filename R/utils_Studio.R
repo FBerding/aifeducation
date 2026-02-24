@@ -1345,6 +1345,9 @@ summarize_args_for_long_task <- function(input,
   if ("learning_rate" %in% params) {
     param_list["learning_rate"] <- list(as.numeric(param_list[["learning_rate"]]))
   }
+  if ("lr_min" %in% params) {
+    param_list["lr_min"] <- list(as.numeric(param_list[["lr_min"]]))
+  }
 
   # Override params but only if the argument to override exists
   for (param in names(override_args)) {
