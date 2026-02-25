@@ -11,6 +11,7 @@ editor_options:
 - Added support for python library 'datasets' 4.0.0 and higher.
 - Added support for python library 'transformers' 5.0.0 and higher.
 - Re-factor all custom layers for classification models.
+- Added option to choose between learning rate schedulers.
 
 **Classifiers**
 
@@ -49,12 +50,11 @@ editor_options:
   classifiers working with prototypes the layer can be used to change the
   projection into the embedding space (parameter projection_type).
 - Early stopping changed. Now the model stops training only if the loss is below 1e-6.
-- Added option to choose between learning rate schedulers.
+
 
 **FeatureExtractor**
 
 - Added new options for plotting training history.
-- Added option to choose between learning rate schedulers.
 
 **Graphical User Interface Aifeducation Studio**
 
