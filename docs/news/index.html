@@ -47,8 +47,9 @@
 <h2 class="pkg-version" data-toc-text="1.1.4" id="aifeducation-114">aifeducation 1.1.4<a class="anchor" aria-label="anchor" href="#aifeducation-114"></a></h2>
 <p><strong>General</strong></p>
 <ul><li>Added support for python library ‘datasets’ 4.0.0 and higher.</li>
-<li>Added support for python library ‘transformers’ 5.0.0 and higher.</li>
+<li>Added support for python library ‘transformers’ 5.0.0 and higher. Please note that the package does not update python libraries automatically. If you update to transformer version 5 some older models available on hugging face may not work.</li>
 <li>Re-factor all custom layers for classification models.</li>
+<li>Added option to choose between learning rate schedulers.</li>
 </ul><p><strong>Classifiers</strong></p>
 <ul><li>Added new normalization layers
 <ul><li>BatchNorm by <a href="https://doi.org/10.48550/arXiv.1502.03167" class="external-link">Loffe and Szegedy</a>
@@ -76,10 +77,8 @@
 <li>Fixed an errors causing pseudo labeling to crash in some cases.</li>
 <li>Added a new type of classification head: OLS-Layer described by <a href="https://doi.org/10.1109/TIP.2020.2990277" class="external-link">Li et al. 2020</a>. The new head is available for TEClassifierSequential and TEClassifierParallel. For the classifiers working with prototypes the layer can be used to change the projection into the embedding space (parameter projection_type).</li>
 <li>Early stopping changed. Now the model stops training only if the loss is below 1e-6.</li>
-<li>Added option to choose between learning rate schedulers.</li>
 </ul><p><strong>FeatureExtractor</strong></p>
 <ul><li>Added new options for plotting training history.</li>
-<li>Added option to choose between learning rate schedulers.</li>
 </ul><p><strong>Graphical User Interface Aifeducation Studio</strong></p>
 <ul><li>Added new controlling widgets for the new options for plotting training history.</li>
 <li>Reduced the number of columns for sustainability data for more transparency (BaseModels and TextEmbeddingModels).</li>

@@ -9,7 +9,10 @@ editor_options:
 **General**
 
 - Added support for python library 'datasets' 4.0.0 and higher.
-- Added support for python library 'transformers' 5.0.0 and higher.
+- Added support for python library 'transformers' 5.0.0 and higher. Please note 
+  that the package does not update python libraries automatically. If you
+  update to transformer version 5 some older models available on hugging face
+  may not work.
 - Re-factor all custom layers for classification models.
 - Added option to choose between learning rate schedulers.
 
