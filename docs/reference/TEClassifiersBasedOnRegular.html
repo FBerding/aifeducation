@@ -11,7 +11,7 @@ This class is not designed for a direct application and should only be used by d
 
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -151,7 +151,9 @@ is used as the final model.</p><div class="section">
 <span>  log_write_interval <span class="op">=</span> <span class="fl">10L</span>,</span>
 <span>  n_cores <span class="op">=</span> <span class="fu"><a href="../reference/auto_n_cores.html">auto_n_cores</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  lr_rate <span class="op">=</span> <span class="fl">0.001</span>,</span>
+<span>  lr_min <span class="op">=</span> <span class="fl">1e-04</span>,</span>
 <span>  lr_warm_up_ratio <span class="op">=</span> <span class="fl">0.02</span>,</span>
+<span>  lr_scheduler <span class="op">=</span> <span class="st">"None"</span>,</span>
 <span>  optimizer <span class="op">=</span> <span class="st">"AdamW"</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
@@ -240,7 +242,7 @@ sustainability should be tracked. A list can be found on Wikipedia:
 
 <dt><code>sustain_region</code></dt>
 <dd><p><code>string</code> Region within a country. Only available for USA and Canada See the documentation of
-codecarbon for more information. <a href="https://mlco2.github.io/codecarbon/parameters.html" class="external-link">https://mlco2.github.io/codecarbon/parameters.html</a> Allowed values: any</p></dd>
+codecarbon for more information. <a href="https://docs.codecarbon.io/latest/getting-started/parameters/" class="external-link">https://docs.codecarbon.io/latest/getting-started/parameters/</a> Allowed values: any</p></dd>
 
 
 <dt><code>sustain_interval</code></dt>
@@ -282,11 +284,19 @@ the log files. Only relevant if <code>log_dir</code> is not <code>NULL</code>. A
 
 
 <dt><code>lr_rate</code></dt>
-<dd><p><code>double</code> Initial learning rate for the training. Allowed values: \(0 &lt; x &lt;= 1\)</p></dd>
+<dd><p><code>double</code> Initial learning rate for the training. Sets the maximal learning rate. Allowed values: \(0 &lt; x &lt;= 1\)</p></dd>
+
+
+<dt><code>lr_min</code></dt>
+<dd><p><code>double</code> Minimal learning rate during training. Allowed values: \(0 &lt; x &lt;= 1\)</p></dd>
 
 
 <dt><code>lr_warm_up_ratio</code></dt>
-<dd><p><code>double</code> Number of epochs used for warm up. Allowed values: \(0 &lt; x &lt; 0.5\)</p></dd>
+<dd><p><code>double</code> Number of epochs used for warm up. To disable warm up set this value to 0.0. Allowed values: \(0 &lt; x &lt; 0.5\)</p></dd>
+
+
+<dt><code>lr_scheduler</code></dt>
+<dd><p><code>string</code> Learning rate scheduler. To use a constant learning rate for the whole training set this parameter to 'None'. Allowed values: 'None', 'Linear', 'Cyclic'</p></dd>
 
 
 <dt><code>optimizer</code></dt>
@@ -339,7 +349,7 @@ this aim, the distance from the anchor is calculated and all cases are arranged 
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>
