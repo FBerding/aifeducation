@@ -4,7 +4,7 @@ on:
   push:
     branches: [main, master, version_1_1_4b]
   pull_request:
-    branches: [main, master, version_1_1_4b]
+    branches: [mainb, masterb, version_1_1_4b]
 
 name: macos-check
 
