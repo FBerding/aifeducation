@@ -428,11 +428,14 @@ TextEmbeddingModel <- R6::R6Class(
 
         batch_results[length(batch_results) + 1] <- list(tmp_embeddings)
 
-        if (trace == TRUE) {
-          cat(paste(
-            date(),
-            "Document", i, "/", n_documents, "Done", "\n"
-          ))
+        if (trace) {
+          progress_bar_percent(
+            iter=i,
+            max_iter=n_documents,
+            text_pre="Document",
+            text_post="done",
+            inc_absolute=TRUE
+          )
         }
       }
 
@@ -549,10 +552,13 @@ TextEmbeddingModel <- R6::R6Class(
           embedded_texts_large$add_embeddings_from_EmbeddedText(embeddings)
         }
         if (trace) {
-          cat(paste(
-            get_time_stamp(),
-            "Batch", i, "/", total_number_of_bachtes, "done", "\n"
-          ))
+          progress_bar_percent(
+            iter=i,
+            max_iter=total_number_of_bachtes,
+            text_pre="Batch",
+            text_post="done",
+            inc_absolute=TRUE
+          )
         }
 
         # Update log
