@@ -261,3 +261,45 @@ detect_base_model_type <- function(model) {
     stop("Architecture for the model could not be detected.")
   }
 }
+
+#' @title Print progression
+#' @description Function for implementing an indicator of progression.
+#'
+#'
+#'
+#' The function
+#' uses `message` This printing the indicator to console can be suppressed with
+#' `suppressMessages`.
+#'
+#'@param iter `double` Current state/iteration of the process.
+#'@param max_iter `double` Maximal state/iteration of the process.
+#'@param text_pre `string` Text displayed at the beginning of the process indicator.
+#'  Set to `NULL` for no text.
+#'@param text_post `string` Text displayed at the end of the process indicator.
+#'  Set to `NULL` for no text.
+#'@param inc_absolute `bool` If set to `TRUE` indicates the current state
+#'  with absolute values.#'
+#' @return Returns nothing. Prints an indicator of progression to console.
+#' @family Utils Developers
+#' @keywords internal
+#' @noRd
+progress_bar_percent=function(iter=NULL,max_iter=NULL,text_pre=NULL,text_post=NULL,inc_absolute=TRUE){
+  percent=round(iter/max_iter*100,digits=2)
+  if(inc_absolute){
+    text_absolute=paste0(" (",iter,"|",max_iter,")")
+  } else {
+    text_absolute=""
+  }
+  pre_text=if(is.null(text_pre)){""} else {text_pre}
+  post_text=if(is.null(text_post)){""} else {paste0(" ",text_post)}
+  message(
+    appendLF=FALSE,
+    "\r",
+    pre_text," ",
+    percent," %",
+    text_absolute,
+    post_text,
+    if(iter>=max_iter){"\n"} else {""}
+  )
+}
+
