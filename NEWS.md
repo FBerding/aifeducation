@@ -4,6 +4,17 @@ editor_options:
     wrap: 72
 ---
 
+# aifeducation 1.1.5
+
+**General**
+
+- Replaced the current logging mechanism with a more sophisticated version.
+
+**Installation and configuration**
+
+- Fixed error in 'install_aifeducation_studio'.
+- Fixed error in detecting MacOS.
+
 # aifeducation 1.1.4
 
 **General**
