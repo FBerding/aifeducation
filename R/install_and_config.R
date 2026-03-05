@@ -202,6 +202,7 @@ update_aifeducation <- function(update_aifeducation_studio = TRUE,
 #' @export
 install_aifeducation_studio <- function() {
   utils::install.packages(
+    c(
     "ggplot2",
     "rlang",
     "shiny",
@@ -215,6 +216,7 @@ install_aifeducation_studio <- function() {
     "DT",
     "readtext",
     "readxl"
+  )
   )
 }
 
@@ -549,11 +551,11 @@ prepare_session <- function(env_type = "auto", envname = "aifeducation", check_s
 #' @noRd
 detec_os <- function() {
   sys_name <- tolower(Sys.info()["sysname"])
-  if (sys_name == "windows") {
+  if (tolower(sys_name) == "windows") {
     return("windows")
-  } else if (sys_name == "unix" || sys_name == "linux") {
+  } else if (tolower(sys_name) == "unix" || tolower(sys_name) == "linux") {
     return("linux")
-  } else if (sys_name == "Darwin") {
+  } else if (tolowser(sys_name) == "darwin") {
     return("mac")
   } else {
     return(sys_name)
