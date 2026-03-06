@@ -10,10 +10,18 @@ editor_options:
 
 - Replaced the current logging mechanism with a more sophisticated version.
 
-**Installation and configuration**
+**Saving and Loading**
+
+- Add error message to load_from_disk for the case that there is no model at the specified location.
+
+**Installation and Configuration**
 
 - Fixed error in 'install_aifeducation_studio'.
 - Fixed error in detecting MacOS.
+
+**AI for Education - Studio**
+
+- Increased size of widgets for a better usability.
 
 # aifeducation 1.1.4
 
