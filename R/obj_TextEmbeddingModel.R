@@ -394,6 +394,13 @@ TextEmbeddingModel <- R6::R6Class(
       pytorch_embedding_model$eval()
 
       n_documents <- length(raw_text)
+
+      PgrInd=ProgressIndicator$new(
+        max_iter = n_documents,
+        inc_absolute = TRUE,
+        calc_eta = TRUE
+      )
+
       for (i in seq_along(raw_text)) {
         tokens <- tokenizer(
           raw_text[i],
@@ -429,12 +436,10 @@ TextEmbeddingModel <- R6::R6Class(
         batch_results[length(batch_results) + 1] <- list(tmp_embeddings)
 
         if (trace) {
-          progress_bar_percent(
+          PgrInd$print_step(
             iter=i,
-            max_iter=n_documents,
             text_pre="Document",
-            text_post="done",
-            inc_absolute=TRUE
+            text_post="done"
           )
         }
       }
@@ -518,6 +523,13 @@ TextEmbeddingModel <- R6::R6Class(
       last_log <- NULL
 
       # Process every batch
+
+      PgrInd=ProgressIndicator$new(
+        max_iter = total_number_of_bachtes,
+        inc_absolute = TRUE,
+        calc_eta = TRUE
+      )
+
       for (i in 1L:total_number_of_bachtes) {
         tmp_subset <- text_dataset$select(as.integer(batches_index[[i]]))
         embeddings <- self$embed(
@@ -552,12 +564,10 @@ TextEmbeddingModel <- R6::R6Class(
           embedded_texts_large$add_embeddings_from_EmbeddedText(embeddings)
         }
         if (trace) {
-          progress_bar_percent(
+          PgrInd$print_step(
             iter=i,
-            max_iter=total_number_of_bachtes,
             text_pre="Batch",
-            text_post="done",
-            inc_absolute=TRUE
+            text_post="done"
           )
         }
 
