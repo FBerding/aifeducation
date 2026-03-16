@@ -22,10 +22,10 @@ class_range <- c(2, 3)
 prob_precision <- 1e-6
 
 # Skip Tests-------------------------------------------------------------------
-skip_creation_test <- TRUE
-skip_function_save_load <- TRUE
+skip_creation_test <- FALSE
+skip_function_save_load <- FALSE
 skip_training_test <- FALSE
-skip_documentation <- TRUE
+skip_documentation <- FALSE
 
 # SetUp-------------------------------------------------------------------------
 # Set paths
