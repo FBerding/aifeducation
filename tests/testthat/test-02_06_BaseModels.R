@@ -262,6 +262,15 @@ for (object_class_name in object_class_names) {
     })
 
     test_that(paste(
+      "get_n_layers",
+      object_class_name,
+      get_current_args_for_print(config_args),
+      get_current_args_for_print(train_args)
+    ), {
+      expect_gte(base_model$get_n_layers(),config_args$num_hidden_layers)
+    })
+
+    test_that(paste(
       "set_publication_info",
       object_class_name,
       get_current_args_for_print(config_args),
