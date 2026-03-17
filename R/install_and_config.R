@@ -535,10 +535,17 @@ prepare_session <- function(env_type = "auto", envname = "aifeducation", check_s
     pkg_versions <- get_py_package_versions()
     message(paste(paste0(names(pkg_versions), ":"), pkg_versions, collapse = "\n"))
     message("GPU Acceleration: ", torch$cuda$is_available())
+
+    if (check_versions(a="5.0.0",operator = ">=",b=get_py_package_version("transformers"))){
+      message("Version of python package 'transformers' is 5.0.0 or higher. Some older models
+              from hugging face may not work.")
+    }
+
   }
   message("Load all python objects and functions.")
   load_all_py_scripts()
   message("Location for Temporary Files:", create_and_get_tmp_dir())
+
 }
 
 #' @title Function for detecting the OS..
