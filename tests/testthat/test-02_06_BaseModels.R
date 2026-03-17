@@ -124,10 +124,11 @@ for (object_class_name in object_class_names) {
       object_class_name,
       get_current_args_for_print(config_args),
       get_current_args_for_print(train_args)
-    ),{
+    ), {
       expect_gte(
-        object=base_model$count_parameter(),
-        expected=1L)
+        object = base_model$count_parameter(),
+        expected = 1L
+      )
     })
 
     test_that(paste(
@@ -267,7 +268,19 @@ for (object_class_name in object_class_names) {
       get_current_args_for_print(config_args),
       get_current_args_for_print(train_args)
     ), {
-      expect_gte(base_model$get_n_layers(),config_args$num_hidden_layers)
+      if (base_model$get_model_type() != "funnel") {
+        expect_gte(base_model$get_n_layers(), config_args$num_hidden_layers)
+      } else if (base_model$get_model_type() == "funnel") {
+        if (is.null(config_args$block_repeats)) {
+          expected <- sum(config_args$block_sizes)
+        } else {
+          expected <- sum(config_args$block_sizes * config_args$block_repeats)
+        }
+        expect_gte(
+          base_model$get_n_layers(),
+          expected
+        )
+      }
     })
 
     test_that(paste(
@@ -276,28 +289,28 @@ for (object_class_name in object_class_names) {
       get_current_args_for_print(config_args),
       get_current_args_for_print(train_args)
     ), {
-      types=c("developer","modifier")
-      entries=c("developed_by","modified_by")
-      authors=c("a1","b1")
-      citation=c("cit1","cit2")
-      urls=c("url1","url2")
-      for(i in 1:2){
+      types <- c("developer", "modifier")
+      entries <- c("developed_by", "modified_by")
+      authors <- c("a1", "b1")
+      citation <- c("cit1", "cit2")
+      urls <- c("url1", "url2")
+      for (i in 1:2) {
         base_model$set_publication_info(
-          type=types[i],
-          authors=authors[i],
-          citation=citation[i],
+          type = types[i],
+          authors = authors[i],
+          citation = citation[i],
           url = urls[i]
         )
         expect_equal(
-          object=base_model$get_publication_info()[[entries[i]]][["authors"]],
+          object = base_model$get_publication_info()[[entries[i]]][["authors"]],
           authors[i]
         )
         expect_equal(
-          object=base_model$get_publication_info()[[entries[i]]][["citation"]],
+          object = base_model$get_publication_info()[[entries[i]]][["citation"]],
           citation[i]
         )
         expect_equal(
-          object=base_model$get_publication_info()[[entries[i]]][["url"]],
+          object = base_model$get_publication_info()[[entries[i]]][["url"]],
           urls[i]
         )
       }
