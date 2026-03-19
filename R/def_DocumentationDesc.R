@@ -475,7 +475,7 @@ build_documentation_for_model <- function(model_name, cls_type = NULL, core_type
 
 #' @title Generate documentation of all layers for an vignette or article
 #' @description Function for generating the whole documentation for an article
-#' used on the packages home page.
+#' used on the package's home page.
 #' @returns Returns a `string` containing the description written in rmarkdown.
 #' @note Function is designed to be used with inline r code in rmarkdown vignettes/articles.
 #' @family Utils Documentation
