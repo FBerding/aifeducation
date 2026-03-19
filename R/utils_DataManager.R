@@ -255,6 +255,16 @@ create_synthetic_units_from_matrix <- function(matrix_form,
   if(anyNA(tmp_target)){
     stop("Labels contain NA.")
   }
+  if(anyNA(matrix_form)){
+    stop("Labels contain NA.")
+  }
+  if(!is.numeric(matrix_form)){
+    stop("matrix_form must be numeric")
+  }
+  if(!is.character(cat)){
+    stop("cat must be of type character")
+  }
+
 
   syn_data <- NULL
   if (method == "knnor") {
