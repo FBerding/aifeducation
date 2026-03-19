@@ -151,7 +151,7 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
     index = seq_len(length(input)),
     .export = "create_synthetic_units_from_matrix",
     .errorhandling = "pass"
-  ) %do% {
+  ) %dopar% {
     # index <- 1
     tmp_results=create_synthetic_units_from_matrix(
       matrix_form = matrix_form[
