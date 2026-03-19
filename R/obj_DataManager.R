@@ -373,14 +373,8 @@ DataManagerClassifier <- R6::R6Class(
 
       # Set up parallel processing
       requireNamespace(package = "foreach", quietly = TRUE)
-      # if(is_on_CI()==FALSE){
       cl <- parallel::makeCluster(self$config$n_cores)
       doParallel::registerDoParallel(cl)
-      # } else {
-      #  foreach::registerDoSEQ()
-      #  cl=NULL
-      # }
-
 
       # Create Synthetic Cases
       tmp_data$set_format("np")
@@ -392,7 +386,8 @@ DataManagerClassifier <- R6::R6Class(
         min_k = self$config$sc$min_k,
         max_k = self$config$sc$max_k,
         times = self$config$times,
-        features = self$config$features
+        features = self$config$features,
+        pad_value=self$config$pad_value
       )
 
       # Unload cluster for parallel processing
