@@ -12,6 +12,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
+
+#' @title Create tasks for generating synthetic cases
+#' @description This function creates a valid list of tasks for generating synthetic cases. The
+#' result of this function should be used within the function `get_synthetic_cases_from_matrix`.
+#' @param target Named `factor` containing the labels of the corresponding embeddings.
+#' @param sequence_length `int` Length of the text embedding sequences.
+#' @param method `vector` containing strings of the requested methods for generating new cases. Currently
+#'   "knnor" from this package is available.
+#' @param min_k `int` The minimal number of nearest neighbors during sampling process.
+#' @param max_k `int` The maximum number of nearest neighbors during sampling process.
+#' @return `list` with the following components:
+#'   * `cat`: `string` Category/class to generate synthetic cases for.
+#'   * `required_cases`: `int` Number of synthetic cases to generate.
+#'   * `k`: `int` Number of neighbors used for generating synthetic cases.
+#'   * `selected_cases`: `vector` of `int` representing the indices of cases that should be used.
+#'   * `chunks`: `int` Sequence length for which the synthetic cases are generated.
+#'
+#' @family Utils Developers
+#' @keywords internal
+#' @noRd
 create_sc_tasks_and_config=function(sequence_length,target,max_k,min_k){
   input=list()
   # get possible seq lengths in order to group the cases by sequence length

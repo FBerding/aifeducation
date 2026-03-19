@@ -12,7 +12,8 @@ get_synthetic_cases_from_matrix(
   sequence_length,
   method = "knnor",
   min_k = 1L,
-  max_k = 6L
+  max_k = 6L,
+  pad_value = -100L
 )
 }
 \arguments{
