@@ -562,7 +562,7 @@ detec_os <- function() {
     return("windows")
   } else if (tolower(sys_name) == "unix" || tolower(sys_name) == "linux") {
     return("linux")
-  } else if (tolowser(sys_name) == "darwin") {
+  } else if (tolower(sys_name) == "darwin") {
     return("mac")
   } else {
     return(sys_name)
