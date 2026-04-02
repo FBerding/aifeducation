@@ -9,6 +9,7 @@ editor_options:
 **General**
 
 - Replaced the current logging mechanism with a more sophisticated version.
+- Add new tests.
 
 **Saving and Loading**
 
@@ -22,6 +23,10 @@ editor_options:
 **AI for Education - Studio**
 
 - Increased size of widgets for a better usability.
+
+**Classifiers**
+
+- Fixed a bug with knnor which caused a crash for some datasets.
 
 # aifeducation 1.1.4
 
