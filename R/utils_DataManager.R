@@ -47,7 +47,7 @@ create_sc_tasks_and_config=function(sequence_length,target,max_k,min_k){
     max_freq <- max(cat_freq)
 
     for (cat in categories) {
-      if(cat_freq[cat]>3L && cat_freq[cat]<max_freq){
+      if(cat_freq[cat]>4L && cat_freq[cat]<max_freq){
         # Check k and adjust if necessary
         n_neighbors <- cat_freq[cat] - 2L
 
@@ -140,6 +140,7 @@ create_sc_tasks_and_config=function(sequence_length,target,max_k,min_k){
 #'   "knnor" from this package is available.
 #' @param min_k `int` The minimal number of nearest neighbors during sampling process.
 #' @param max_k `int` The maximum number of nearest neighbors during sampling process.
+#' @param pad_value `int` Value for indicating padding.
 #' @return `list` with the following components:
 #'   * `syntetic_embeddings`: Named `data.frame` containing the text embeddings of the synthetic cases.
 #'   * `syntetic_targets`: Named `factor` containing the labels of the corresponding synthetic cases.
@@ -167,12 +168,12 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
     max_k=max_k
     )
 
+  index <- 1
   result_list <- foreach::foreach(
     index = seq_len(length(input)),
     .export = "create_synthetic_units_from_matrix",
     .errorhandling = "pass"
   ) %dopar% {
-    # index <- 1
     tmp_results=create_synthetic_units_from_matrix(
       matrix_form = matrix_form[
         input[[index]]$selected_cases,
@@ -249,8 +250,6 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
 #' @param required_cases `int` Number of cases necessary to fill the gab between the frequency of the class under
 #'   investigation and the major class.
 #' @param k `int` The number of nearest neighbors during sampling process.
-#' @param max_k `int` The maximum number of nearest neighbors during sampling process.
-#' @param k_s `int` Number of ks in the complete generation process.
 #' @param method `vector` containing strings of the requested methods for generating new cases. Currently
 #'   "knnor" from this package is available.
 #' @param cat `string` The category for which new cases should be created.
