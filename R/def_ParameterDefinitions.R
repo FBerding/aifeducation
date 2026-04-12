@@ -1013,7 +1013,7 @@ get_param_dict <- function() {
     allow_null = TRUE,
     allowed_values = NULL,
     desc = "Region within a country. Only available for USA and Canada See the documentation of
-      codecarbon for more information. <https://docs.codecarbon.io/latest/getting-started/parameters/>",
+      codecarbon for more information. <https://docs.codecarbon.io/latest/>",
     gui_box = NULL,
     default_value = NULL,
     test_values = NULL

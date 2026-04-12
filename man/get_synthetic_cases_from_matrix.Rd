@@ -33,6 +33,8 @@ get_synthetic_cases_from_matrix(
 \item{min_k}{\code{int} The minimal number of nearest neighbors during sampling process.}
 
 \item{max_k}{\code{int} The maximum number of nearest neighbors during sampling process.}
+
+\item{pad_value}{\code{int} Value for indicating padding.}
 }
 \value{
 \code{list} with the following components:
