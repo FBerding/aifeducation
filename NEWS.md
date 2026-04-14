@@ -27,6 +27,8 @@ editor_options:
 **Classifiers**
 
 - Fixed a bug with knnor which caused a crash for some datasets.
+- Fixed a bug in Multiple N-Gram Layers. 
+  This version of the package is not compatible with older models containing this kind of layer.
 
 # aifeducation 1.1.4
 

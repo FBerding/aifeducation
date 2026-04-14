@@ -432,8 +432,9 @@ class layer_mutiple_n_gram_convolution(torch.nn.Module):
     else:
       self.pad_value=torch.tensor(pad_value)
 
-    self.filters_per_ks=math.ceil(self.features/self.num_n_grams)
-    self.n_filters_min=self.features-(self.num_n_grams-1)*self.filters_per_ks
+    self.filters_per_ks = math.floor(self.features / self.num_n_grams)
+    assert self.filters_per_ks >= 1, "filters per n-gram must be at least 1"
+    residual=self.features-self.filters_per_ks*self.num_n_grams+self.filters_per_ks
     
     self.device=device
     self.dtype=dtype
@@ -445,9 +446,9 @@ class layer_mutiple_n_gram_convolution(torch.nn.Module):
     
     for i in range(self.ks_min,self.ks_max+1):
       if not i==self.ks_max:
-        tmp_n_filters=self.filters_per_ks
+        tmp_n_filters = residual
       else:
-        tmp_n_filters=self.n_filters_min
+        tmp_n_filters=self.filters_per_ks
       self.layer_list.append(
         layer_n_gram_convolution(
           kernel_size_times=i, 
