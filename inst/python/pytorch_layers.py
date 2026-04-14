@@ -445,7 +445,7 @@ class layer_mutiple_n_gram_convolution(torch.nn.Module):
     self.layer_list=torch.nn.ModuleList()
     
     for i in range(self.ks_min,self.ks_max+1):
-      if not i==self.ks_max:
+      if i==self.ks_min:
         tmp_n_filters = residual
       else:
         tmp_n_filters=self.filters_per_ks
