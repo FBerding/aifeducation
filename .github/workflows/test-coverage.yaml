@@ -213,7 +213,8 @@ jobs:
             "Description_UI",
             "Description_Server",
             "long_train_transformer",
-            "load_and_check_base_model"
+            "load_and_check_base_model",
+            "extract_args_from_input"
           )
 
           cov <- covr::package_coverage(
