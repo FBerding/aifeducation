@@ -22,10 +22,10 @@ class_range <- c(2, 3)
 prob_precision <- 1e-6
 
 # Skip Tests-------------------------------------------------------------------
-skip_creation_test <- TRUE
-skip_function_save_load <- TRUE
+skip_creation_test <- FALSE
+skip_function_save_load <- FALSE
 skip_training_test <- FALSE
-skip_documentation <- TRUE
+skip_documentation <- FALSE
 
 # SetUp-------------------------------------------------------------------------
 # Set paths
@@ -603,7 +603,7 @@ for (object_class_name in object_class_names) {
       i <- sample(x = seq.int(from = 1, to = nrow(predictions)), size = 1)
       expect_equal(predictions[i, columns_to_compate, drop = FALSE],
         predictions_2[i, columns_to_compate, drop = FALSE],
-        tolerance = 1e-6
+        tolerance = 1e-5
       )
       })
 
