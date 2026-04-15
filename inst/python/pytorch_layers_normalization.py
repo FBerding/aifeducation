@@ -134,18 +134,20 @@ class BatchNorm_with_Mask(torch.nn.Module):
             )
             if batch_mean is not None:
                 # Update running mean and variance
-                self.running_mean = (
+                self.running_mean = torch.nn.Parameter((
                     1 - self.alpha
                 ) * self.running_mean + self.alpha * torch.unsqueeze(
                     torch.unsqueeze(batch_mean.detach(), dim=0), dim=0
-                )  # (1, 1, F_out)
-                self.running_variance = (
+                ),
+                requires_grad=False)  # (1, 1, F_out)
+                self.running_variance =  torch.nn.Parameter((
                     1 - self.alpha
                 ) * self.running_variance + self.alpha * (
                     n_elements / (n_elements - 1)
                 ) * torch.unsqueeze(
                     torch.unsqueeze(batch_variance.detach(), dim=0), dim=0
-                )  # (1, 1, F_out)
+                ),
+                requires_grad=False)  # (1, 1, F_out)
                 # Normalize Scale and shift
                 # self.eps in torch.sqrt is necessary for numeric stability
                 y = (
