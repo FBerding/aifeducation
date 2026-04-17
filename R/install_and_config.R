@@ -25,7 +25,7 @@
 #' @export
 get_recommended_py_versions <- function() {
   py_versions <- list(
-    transformers = c("4.56.0", "5.5.4"),
+    transformers = c("4.56.0", "5.2.0"),
     tokenizers = c("0.22.0", "0.22.2"),
     pandas = c("2.3.2", "3.0.2"),
     datasets = c("3.6.0", "4.8.4"),
@@ -254,7 +254,7 @@ install_aifeducation_studio <- function() {
 #' @family Installation and Configuration
 #' @export
 install_py_modules <- function(envname = "aifeducation",
-                               transformer_version = "<=5.5.4",
+                               transformer_version = "<=5.2.0",
                                tokenizers_version = "<=0.22.2",
                                pandas_version = "<=3.0.2",
                                datasets_version = "<=4.8.4",
