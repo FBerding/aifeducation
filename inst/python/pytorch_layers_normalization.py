@@ -99,8 +99,8 @@ class BatchNorm_with_Mask(torch.nn.Module):
             self.pad_value = torch.tensor(pad_value)
         self.gamma = torch.nn.Parameter(torch.ones(1, 1, self.features))
         self.beta = torch.nn.Parameter(torch.zeros(1, 1, self.features))
-        self.running_mean=torch.nn.Parameter(torch.zeros((1, 1, self.features)),requires_grad=False)
-        self.running_variance=torch.nn.Parameter(torch.ones((1, 1, self.features)),requires_grad=False)
+        self.register_buffer("running_mean",torch.zeros((1, 1, self.features)))
+        self.register_buffer("running_variance",torch.ones((1, 1, self.features)))
 
     def forward(
         self,
@@ -134,20 +134,18 @@ class BatchNorm_with_Mask(torch.nn.Module):
             )
             if batch_mean is not None:
                 # Update running mean and variance
-                self.running_mean = torch.nn.Parameter((
+                self.running_mean = (
                     1 - self.alpha
                 ) * self.running_mean + self.alpha * torch.unsqueeze(
                     torch.unsqueeze(batch_mean.detach(), dim=0), dim=0
-                ),
-                requires_grad=False)  # (1, 1, F_out)
-                self.running_variance =  torch.nn.Parameter((
+                )  # (1, 1, F_out)
+                self.running_variance =  (
                     1 - self.alpha
                 ) * self.running_variance + self.alpha * (
                     n_elements / (n_elements - 1)
                 ) * torch.unsqueeze(
                     torch.unsqueeze(batch_variance.detach(), dim=0), dim=0
-                ),
-                requires_grad=False)  # (1, 1, F_out)
+                )  # (1, 1, F_out)
                 # Normalize Scale and shift
                 # self.eps in torch.sqrt is necessary for numeric stability
                 y = (
@@ -319,8 +317,8 @@ class PowerNorm_with_Mask(nn.Module):
         self.gamma = nn.Parameter(torch.ones(features))
         self.beta = nn.Parameter(torch.zeros(features))
 
-        self.running_psi= nn.Parameter(torch.ones(features),requires_grad=False)
-        self.nu= nn.Parameter(torch.zeros(features),requires_grad=False)
+        self.register_buffer("running_psi",torch.ones(features))
+        self.register_buffer("nu",torch.zeros(features))
 
         self.alpha = alpha
         self.eps = eps
