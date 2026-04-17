@@ -18,48 +18,133 @@ import numpy as np
 import math
 import safetensors
 
-def TeClassifierTrain(model,loss_cls_fct_name , optimizer_method,scheduler_type, lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,batch_size,
-train_data,val_data,filepath,use_callback,n_classes,class_weights,test_data=None,
-log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
-  
-  device=('cuda' if torch.cuda.is_available() else 'cpu')
-  
+#Functions that are part of the training loop
+def get_device():
+  return 'cuda' if torch.cuda.is_available() else 'cpu'
+
+def get_dtype(device):
   if device=="cpu":
-    #current_dtype=float
-    current_dtype=torch.float64
-    model.to(device,dtype=current_dtype)
+    current_dtype=torch.float
   else:
-    current_dtype=torch.double
-    model.to(device,dtype=current_dtype)
-  
-  class_weights=class_weights.clone()
-  class_weights=class_weights.to(device)
-  
-  if loss_cls_fct_name =="CrossEntropyLoss":
+    current_dtype=torch.float
+    
+def get_loss_cls_fct(name,class_weights):
+  if name =="CrossEntropyLoss":
     loss_fct=torch.nn.CrossEntropyLoss(
         reduction="none",
         weight = class_weights)
-  elif loss_cls_fct_name =="FocalLoss":
+  elif name =="FocalLoss":
     loss_fct=focal_loss(
       gamma=2,
       class_weights = class_weights
     )
-  
+  return loss_fct
+
+def build_data_loaders(train_data, val_data, batch_size, test_data=None, pin_memory=False):
   trainloader=torch.utils.data.DataLoader(
     train_data,
     batch_size=batch_size,
+    pin_memory=pin_memory,
     shuffle=True)
-    
   valloader=torch.utils.data.DataLoader(
     val_data,
     batch_size=batch_size,
+    pin_memory=pin_memory,
     shuffle=False)
-    
   if not (test_data is None):
     testloader=torch.utils.data.DataLoader(
       test_data,
       batch_size=batch_size,
+      pin_memory=pin_memory,
       shuffle=False)
+  else:
+    testloader=None
+  return trainloader, valloader, testloader
+
+#========
+def _run_epoch(model,dataloader,loss_fct,optimizer,scheduler,device,current_dtype,is_train=False):
+    if is_train:
+      model.train()
+      context=torch.enable_grad()
+    else:
+      model.eval()
+      context=torch.autograd.grad_mode.inference_mode(mode=True)
+      
+    #torch.autograd.set_detect_anomaly(True)
+    
+    for batch in dataloader:
+      inputs=batch["input"]
+      labels=batch["labels"]
+
+      sample_weights=batch["sample_weights"]
+      sample_weights=torch.reshape(input=sample_weights,shape=(sample_weights.size(dim=0),1))
+
+      inputs = inputs.to(device,dtype=current_dtype)
+      labels=labels.to(device,dtype=current_dtype)
+      sample_weights=sample_weights.to(device,dtype=current_dtype)
+      
+      optimizer.zero_grad()
+      
+      outputs=model(inputs,prediction_mode=False)
+      loss=loss_fct(outputs,labels)*sample_weights
+      loss=loss.mean()
+      loss.backward()
+      optimizer.step()
+      total_loss +=loss.item()
+      
+      #Calc Accuracy
+      pred_idx=torch.nn.Softmax(dim=1)(outputs).max(dim=1).indices
+      label_idx=labels.max(dim=1).indices
+          
+      match=(pred_idx==label_idx)
+      n_matches_train+=match.sum().item()
+      n_total_train+=outputs.size(0)
+      
+      #Calc Balanced Accuracy
+      confusion_matrix_train+=multiclass_confusion_matrix(input=outputs,target=label_idx,num_classes=n_classes)
+      
+      #Update log file
+      if not (log_dir is None):
+        current_step+=1
+        last_log=write_log_py(log_file=log_file, value_top = log_top_value, value_middle = epoch+1, value_bottom = current_step,
+                  total_top = log_top_total, total_middle = epochs, total_bottom = total_steps, message_top = log_top_message, message_middle = "Epochs",
+                  message_bottom = "Steps", last_log = last_log, write_interval = log_write_interval)
+        last_log_loss=write_log_performance_py(log_file=log_file_loss, history=history_loss.numpy().tolist(), last_log = last_log_loss, write_interval = log_write_interval)
+     
+    #Calc final metrics for epoch  
+    total_loss=total_loss/len(dataloader)
+    acc=n_matches_train/n_total_train
+    bacc=torch.sum(torch.diagonal(confusion_matrix_train)/torch.sum(confusion_matrix_train,dim=1))/n_classes
+    avg_iota=torch.diagonal(confusion_matrix_train)/(torch.sum(confusion_matrix_train,dim=0)+torch.sum(confusion_matrix_train,dim=1)-torch.diagonal(confusion_matrix_train))
+    avg_iota=torch.sum(avg_iota)/n_classes
+    
+    #Update learning rate
+    if scheduler!=None:
+      scheduler.step()
+    
+    return {"loss":total_loss,"acc":acc,"bcc":bacc,"avg_iota":avg_iota}  
+#==========  
+
+def TeClassifierTrain(model,loss_cls_fct_name , optimizer_method,scheduler_type, lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,batch_size,
+train_data,val_data,filepath,use_callback,n_classes,class_weights,test_data=None,
+log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
+  
+  device=get_device()
+  current_dtype=get_dtype(device)
+  model.to(device=device,dtype=current_dtype)
+  
+  class_weights=class_weights.clone()
+  class_weights=class_weights.to(device)
+  loss_fct=get_loss_cls_fct(name=loss_cls_fct_name,class_weights=class_weights)
+  loss_fct.to(device=device,dtype=current_dtype)
+  
+  trainloader, valloader, testloader = build_data_loaders(
+    train_data=train_data,
+    val_data=val_data,
+    test_data=test_data,
+    batch_size=batch_size,
+    pin_memory = True if device=="cuda" else False
+  )
   
   optimizer=get_Optimizer(
     optimizer_method,
@@ -118,7 +203,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     confusion_matrix_train=confusion_matrix_train.to(device,dtype=torch.double)
     
     model.train(True)
-    torch.autograd.set_detect_anomaly(True)
+    #torch.autograd.set_detect_anomaly(True)
     for batch in trainloader:
       inputs=batch["input"]
       labels=batch["labels"]
@@ -167,7 +252,6 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     #Update learning rate
     if scheduler!=None:
       scheduler.step()
-    #print(scheduler.get_last_lr())
 
     #Validation----------------------------------------------------------------
     val_loss=0.0
