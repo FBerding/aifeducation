@@ -108,16 +108,14 @@ class LSTMAutoencoder_with_Mask_PT(torch.nn.Module):
         x=self.switch_pad_value_final(x)
       return x
     def get_mask(self,x):
-      device=('cuda' if torch.cuda.is_available() else 'cpu')
       time_sums=torch.sum(x,dim=2)
       mask=(time_sums==0)
       mask_long=torch.reshape(torch.repeat_interleave(mask,repeats=self.features_in,dim=1),(x.size(dim=0),x.size(dim=1),self.features_in))
-      mask_long=mask_long.to(device)
+      mask_long=mask_long.to(x.device)
       return mask_long
     def add_noise(self, x):
-      device=('cuda' if torch.cuda.is_available() else 'cpu')
       noise=self.noise_factor*torch.rand(size=x.size())
-      noise=noise.to(device)
+      noise=noise.to(x.device)
       return(noise)
       
 class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
@@ -189,16 +187,14 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
         return x
       
     def get_mask(self,x):
-      device=('cuda' if torch.cuda.is_available() else 'cpu')
       time_sums=torch.sum(x,dim=2)
       mask=(time_sums==0)
       mask_long=torch.reshape(torch.repeat_interleave(mask,repeats=self.features_in,dim=1),(x.size(dim=0),x.size(dim=1),self.features_in))
-      mask_long=mask_long.to(device)
+      mask_long=mask_long.to(x.device)
       return mask_long
     def add_noise(self, x):
-      device=('cuda' if torch.cuda.is_available() else 'cpu')
       noise=self.noise_factor*torch.rand(size=x.size())
-      noise=noise.to(device)
+      noise=noise.to(x.device,x.dtype)
       return(noise)
     
 class ConvAutoencoder_with_Mask_PT(torch.nn.Module):
@@ -297,6 +293,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     model.to(device,dtype=dtype)
  
   loss_fct=torch.nn.MSELoss()
+  loss_fct.to(device,dtype=dtype)
 
   trainloader=torch.utils.data.DataLoader(
     train_data,
@@ -438,8 +435,8 @@ def TeFeatureExtractorBatchExtract(model,dataset,batch_size):
     dtype=torch.float
     model.to(device,dtype=dtype)
   else:
-    model.to(device,dtype=torch.double)
     dtype=torch.float
+    model.to(device,dtype=dtype)
     
   model.eval()
   predictionloader=torch.utils.data.DataLoader(
