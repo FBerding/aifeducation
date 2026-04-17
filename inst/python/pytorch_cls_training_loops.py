@@ -464,10 +464,10 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   device=('cuda' if torch.cuda.is_available() else 'cpu')
   
   if device=="cpu":
-    dtype=torch.float64
+    dtype=torch.float
     model.to(device,dtype=dtype)
   else:
-    dtype=torch.double
+    dtype=torch.float
     model.to(device,dtype=dtype)
     
   if loss_pt_fct_name =="MultiWayContrastiveLoss":
