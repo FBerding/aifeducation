@@ -52,7 +52,7 @@ jobs:
          tokenizers_version = "<=0.22.2"
          pandas_version = "<=3.0.2"
          datasets_version = "<=4.8.4"
-         codecarbon_version = "<=3.2.6"
+         codecarbon_version = "<=3.2.2"
          safetensors_version = "<=0.7.0"
          torcheval_version = "<=0.0.7"
          accelerate_version = "<=1.13.0"
