@@ -202,7 +202,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
     #'
     embed = function(embeddings_q = NULL, embeddings_s = NULL, classes_s = NULL, batch_size = 32L, ml_trace = 1L) {
       # Load Custom Model Scripts
-      private$load_reload_python_scripts()
+      
 
       # Check arguments and forward
       forward_results <- private$forward(
@@ -450,7 +450,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
       }
 
       # Load Custom Model Scripts
-      private$load_reload_python_scripts()
+      
 
       # prepare embeddings
       embeddings_q <- private$prepare_embeddings_for_forward(embeddings_q, batch_size = batch_size)

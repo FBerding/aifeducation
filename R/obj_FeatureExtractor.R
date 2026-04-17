@@ -159,7 +159,7 @@ TEFeatureExtractor <- R6::R6Class(
       private$set_up_logger(log_dir = log_dir, log_write_interval = log_write_interval)
 
       # Loading PY Scripts
-      private$load_reload_python_scripts()
+
 
       # Start-------------------------------------------------------------------
       if (self$last_training$config$trace) {
@@ -262,7 +262,7 @@ TEFeatureExtractor <- R6::R6Class(
       }
 
       # Load Custom Model Scripts
-      private$load_reload_python_scripts()
+
 
       # Check number of cases in the data
       single_prediction <- private$check_single_prediction(data_embeddings)
@@ -447,26 +447,8 @@ TEFeatureExtractor <- R6::R6Class(
   private = list(
     trained = FALSE,
     #--------------------------------------------------------------------------
-    load_reload_python_scripts = function() {
-      load_py_scripts(c(
-        "pytorch_act_fct.py",
-        "pytorch_loss_fct.py",
-        "pytorch_layers.py",
-        "pytorch_layers_normalization.py",
-        "pytorch_stack_layers.py",
-        "pytorch_autoencoder.py",
-        "py_log.py",
-        "py_functions.py",
-        "pytorch_classifier_models.py",
-        "pytorch_cls_training_loops.py",
-        "pytorch_predict_batch.py",
-        "pytorch_datacollators.py",
-        "pytorch_old_scripts.py"
-      ))
-    },
-    #--------------------------------------------------------------------------
     create_reset_model = function() {
-      private$load_reload_python_scripts()
+
       private$check_config_for_TRUE()
 
       if (private$model_config$method == "LSTM") {

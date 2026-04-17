@@ -39,20 +39,6 @@ BaseModelCore <- R6::R6Class(
         url = NULL
       )
     ),
-
-    #-------------------------------------------------------------------------
-    load_reload_python_scripts = function() {
-      load_py_scripts(
-        c(
-          "py_log.py",
-          "datasets_transformer_compute_vocabulary.py",
-          "datasets_transformer_prepare_data.py",
-          "pytorch_transformer_callbacks.py",
-          "pytorch_base_models_training_loops.py",
-          "data_collator.py"
-        )
-      )
-    },
     #--------------------------------------------------------------------------
     # Method for loading training history
     load_training_history = function(model_dir) {
@@ -375,7 +361,7 @@ BaseModelCore <- R6::R6Class(
     #---------------------------------------------------------------------------
     do_configuration = function(args) {
       # Load or reload python scripts
-      private$load_reload_python_scripts()
+
 
       # Check if the object is not configured
       private$check_config_for_FALSE()
@@ -422,7 +408,7 @@ BaseModelCore <- R6::R6Class(
       }
 
       # Load or reload python scripts
-      private$load_reload_python_scripts()
+
 
       # set up logger
       private$set_up_logger(log_dir = args$log_dir, log_write_interval = args$log_write_interval)
@@ -841,7 +827,7 @@ BaseModelCore <- R6::R6Class(
       private$load_config_file(dir_path)
 
       # Load or reload python scripts
-      private$load_reload_python_scripts()
+
 
       # Load BaseModel
       private$load_BaseModel(dir_path = dir_path)

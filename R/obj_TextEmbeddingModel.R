@@ -55,16 +55,6 @@ TextEmbeddingModel <- R6::R6Class(
       private$model_info$model_language <- model_language
     },
     #-------------------------------------------------------------------------
-    load_reload_python_scripts = function() {
-      load_py_scripts(
-        files = c(
-          "pytorch_layers.py",
-          "MPNetForMPLM_PT.py",
-          "pytorch_text_embedding_model.py"
-        )
-      )
-    },
-    #-------------------------------------------------------------------------
     # Method for checking and setting the embedding configuration
     check_and_set_embedding_layers = function(emb_layer_min,
                                               emb_layer_max) {
@@ -203,7 +193,7 @@ TextEmbeddingModel <- R6::R6Class(
                          pad_value = -100L,
                          base_model = NULL) {
       # Load or reload python scripts
-      private$load_reload_python_scripts()
+
 
       # Check if the object is not configured
       private$check_config_for_FALSE()
@@ -250,7 +240,7 @@ TextEmbeddingModel <- R6::R6Class(
       private$load_config_file(dir_path)
 
       # Load or reload python scripts
-      private$load_reload_python_scripts()
+
 
       # Load Base model
       version_lower <- check_versions(
@@ -359,7 +349,7 @@ TextEmbeddingModel <- R6::R6Class(
       check_type(object = return_large_dataset, type = "bool", FALSE)
 
       # Load python scripts
-      private$load_reload_python_scripts()
+
 
       # Object for storing embeddings
       batch_results <- list()

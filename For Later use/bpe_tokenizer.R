@@ -21,7 +21,7 @@ BPETokenizer <- R6::R6Class(
                          add_prefix_space = TRUE,
                          trim_offsets = FALSE,
                          vocab_do_lower_case = FALSE) {
-      private$load_reload_python_scripts()
+      
       private$check_config_for_FALSE()
 
       private$save_all_args(

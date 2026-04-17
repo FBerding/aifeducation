@@ -796,7 +796,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     #---------------------------------------------------------------------------
     load_pytorch_model = function(dir_path) {
       # Load python scripts
-      private$load_reload_python_scripts()
+      
 
       # Load the model---------------------------------------------------------
       path_pt <- paste0(dir_path, "/", "model_data", ".pt")

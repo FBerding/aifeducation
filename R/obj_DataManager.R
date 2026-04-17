@@ -592,7 +592,7 @@ DataManagerClassifier <- R6::R6Class(
     },
     add_matrix_form = function(dataset) {
       if (!is.null(dataset)) {
-        private$load_reload_python_scripts()
+
         dataset <- dataset$map(py$map_input_to_matrix_form,
           fn_kwargs = list(
             times = as.integer(self$config$times),
@@ -609,7 +609,7 @@ DataManagerClassifier <- R6::R6Class(
     },
     add_one_hot_encoding = function(dataset) {
       if (!is.null(dataset)) {
-        private$load_reload_python_scripts()
+
         dataset <- dataset$map(py$map_labels_to_one_hot,
           fn_kwargs = reticulate::dict(list(num_classes = as.integer(self$config$n_classes))),
           load_from_cache_file = FALSE,
@@ -620,11 +620,6 @@ DataManagerClassifier <- R6::R6Class(
       } else {
         return(NULL)
       }
-    },
-    load_reload_python_scripts = function() {
-      reticulate::py_run_file(system.file("python/py_functions.py",
-        package = "aifeducation"
-      ))
     },
     create_indices_name_map = function() {
       self$name_idx$labeled_data <- seq.int(from = 0L, to = (length(extract_column_from_py_dataset(self$datasets$data_labeled,"id"))) - 1L)
