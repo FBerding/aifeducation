@@ -10,6 +10,7 @@ editor_options:
 
 - Replaced the current logging mechanism with a more sophisticated version.
 - Add new tests.
+- Update to newer versions of python packages.
 
 **Saving and Loading**
 
@@ -29,6 +30,11 @@ editor_options:
 - Fixed a bug with knnor which caused a crash for some datasets.
 - Fixed a bug in Multiple N-Gram Layers. 
   This version of the package is not compatible with older models containing this kind of layer.
+- Changed dtype from float64 to float32 and added decorator torch.inference_mode() for predictions.
+
+**TeFeatureExtractor**
+
+- Changed dtype from float64 to float32 and added decorator torch.inference_mode() for predictions.
 
 # aifeducation 1.1.4
 
