@@ -526,6 +526,7 @@ build_layer_stack_documentation_for_vignette <- function() {
 #' @noRd
 #' @keywords internal
 build_aife_site <- function(clear_docs = FALSE) {
+  devtools::document()
   build_layer_stack_documentation_for_vignette()
 
   requireNamespace("pkgdown")
