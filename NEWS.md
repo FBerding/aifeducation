@@ -10,7 +10,7 @@ editor_options:
 
 - Replaced the current logging mechanism with a more sophisticated version.
 - Add new tests.
-- Update to newer versions of python packages.
+- Update to newer versions of python packages (except 'transformers' and 'codecarbon').
 
 **Saving and Loading**
 
