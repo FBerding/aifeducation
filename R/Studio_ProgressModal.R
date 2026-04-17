@@ -54,56 +54,56 @@ create_process_modal <- function(ns,
       label = "Update Now"
     )
   )
-  prograssbars_list[length(prograssbars_list) + 1] <- shiny::tagList(
+  prograssbars_list[length(prograssbars_list) + 1L] <- shiny::tagList(
     shinyWidgets::progressBar(
       id = ns("pgr_top"),
-      value = 0,
+      value = 0L,
       display_pct = TRUE,
       title = "Overall"
     )
   )
-  if (inc_middle == TRUE) {
-    prograssbars_list[length(prograssbars_list) + 1] <- list(
+  if (inc_middle) {
+    prograssbars_list[length(prograssbars_list) + 1L] <- list(
       shinyWidgets::progressBar(
         id = ns("pgr_middle"),
-        value = 0,
+        value = 0L,
         display_pct = TRUE,
         title = "Batches"
       )
     )
   }
-  if (inc_bottom == TRUE) {
-    prograssbars_list[length(prograssbars_list) + 1] <- list(
+  if (inc_bottom) {
+    prograssbars_list[length(prograssbars_list) + 1L] <- list(
       shinyWidgets::progressBar(
         id = ns("pgr_bottom"),
-        value = 0,
+        value = 0L,
         display_pct = TRUE,
         title = "Steps"
       )
     )
   }
 
-  if (inc_graphic == TRUE) {
-    prograssbars_list[length(prograssbars_list) + 1] <- list(
+  if (inc_graphic) {
+    prograssbars_list[length(prograssbars_list) + 1L] <- list(
       shiny::tags$hr()
     )
-    prograssbars_list[length(prograssbars_list) + 1] <- list(
+    prograssbars_list[length(prograssbars_list) + 1L] <- list(
       shiny::tags$p("Loss Development")
     )
-    prograssbars_list[length(prograssbars_list) + 1] <- list(
+    prograssbars_list[length(prograssbars_list) + 1L] <- list(
       shiny::plotOutput(
         outputId = ns("pgr_plot")
       )
     )
   }
 
-  prograssbars_list[length(prograssbars_list) + 1] <- list(
+  prograssbars_list[length(prograssbars_list) + 1L] <- list(
     shiny::tags$hr()
   )
-  prograssbars_list[length(prograssbars_list) + 1] <- list(
+  prograssbars_list[length(prograssbars_list) + 1L] <- list(
     shiny::tags$p("Error messages:")
   )
-  prograssbars_list[length(prograssbars_list) + 1] <- list(
+  prograssbars_list[length(prograssbars_list) + 1L] <- list(
     shiny::textOutput(outputId = ns("error_messages"))
   )
 
@@ -157,12 +157,12 @@ start_and_monitor_long_task <- function(id,
 
     # Reset log
     reset_log(log_path = log_path)
-    loss_log_path <- paste0(dirname(log_path), "/aifeducation_loss.log")
+    loss_log_path <- file.path(dirname(log_path), "aifeducation_loss.log")
     # if (ExtendedTask_type %in% c("classifier", "feature_extractor")) {
     reset_loss_log(
       log_path = loss_log_path,
       # epochs = ExtendedTask_arguments$epochs
-      epochs = 2
+      epochs = 2L
     )
 
     # Create progress modal
@@ -239,13 +239,13 @@ start_and_monitor_long_task <- function(id,
         bottom <- NULL
 
         if (!is.null(log)) {
-          if (!is.na(log[1, 3]) & log[1, 3] != "NA") top <- log[1, ]
-          if (!is.na(log[2, 3]) & log[2, 3] != "NA") middle <- log[2, ]
-          if (!is.na(log[3, 3]) & log[3, 3] != "NA") bottom <- log[3, ]
+          if (!is.na(log[1L, 3L]) & log[1L, 3L] != "NA") top <- log[1L, ]
+          if (!is.na(log[2L, 3L]) & log[2L, 3L] != "NA") middle <- log[2L, ]
+          if (!is.na(log[3L, 3L]) & log[3L, 3L] != "NA") bottom <- log[3L, ]
         }
 
         loss_data <- NULL
-        if (pgr_use_graphic == TRUE) {
+        if (pgr_use_graphic) {
           path_loss <- loss_log_path
           loss_data <- read_loss_log(path_loss)
         }
@@ -264,18 +264,18 @@ start_and_monitor_long_task <- function(id,
       {
         plot_data <- progress_bar_status()$loss_data
         if (!is.null(plot_data)) {
-          if (ncol(plot_data) == 4) {
+          if (ncol(plot_data) == 4L) {
             data_columns <- c("train", "validation", "test")
           } else {
             data_columns <- c("train", "validation")
           }
           y_max <- max(plot_data[data_columns])
-          y_min <- max(min(plot_data[data_columns]), 0)
+          y_min <- max(min(plot_data[data_columns]), 0L)
           # TODO (Yuliia): .data has no visible binding
           plot <- ggplot2::ggplot(data = plot_data) +
             ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$train, color = "train")) +
             ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$validation, color = "validation"))
-          if (ncol(plot_data) == 4) {
+          if (ncol(plot_data) == 4L) {
             plot <- plot + ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$test, color = "test"))
           }
           plot <- plot +
@@ -289,13 +289,13 @@ start_and_monitor_long_task <- function(id,
               "test" = "darkgreen"
             )) +
             ggplot2::theme(
-              text = ggplot2::element_text(size = 12),
+              text = ggplot2::element_text(size = 12L),
               legend.position = "bottom"
             )
           return(plot)
         }
       },
-      res = 2 * 72
+      res = 2L * 72L
     )
 
 
