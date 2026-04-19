@@ -444,17 +444,16 @@ def TeFeatureExtractorBatchExtract(model,dataset,batch_size):
     batch_size=batch_size,
     shuffle=False)
 
-  with torch.no_grad():
-    iteration=0
-    for batch in predictionloader:
-      inputs=batch["input"]
-      inputs = inputs.to(device,dtype=dtype)
-      predictions=model(inputs,encoder_mode=True)
-      
-      if iteration==0:
-        predictions_list=predictions.to("cpu")
-      else:
-        predictions_list=torch.concatenate((predictions_list,predictions.to("cpu")), axis=0, out=None)
-      iteration+=1
+  iteration=0
+  for batch in predictionloader:
+    inputs=batch["input"]
+    inputs = inputs.to(device,dtype=dtype)
+    predictions=model(inputs,encoder_mode=True)
+    
+    if iteration==0:
+      predictions_list=predictions.to("cpu")
+    else:
+      predictions_list=torch.concatenate((predictions_list,predictions.to("cpu")), axis=0, out=None)
+    iteration+=1
   
   return predictions_list
