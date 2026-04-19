@@ -154,7 +154,7 @@ check_adjust_n_samples_on_CI <- function(
     n_samples_requested,
     n_CI = 50L) {
   # If on github use only a small random sample
-  if (Sys.getenv("CI") != "true") {
+  if (Sys.getenv("CI") == "true") {
     return(min(n_samples_requested, n_CI))
   } else {
     return(n_samples_requested)
