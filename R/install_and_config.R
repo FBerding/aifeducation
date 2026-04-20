@@ -25,7 +25,7 @@
 #' @export
 get_recommended_py_versions <- function() {
   py_versions <- list(
-    transformers = c("4.56.0", "5.2.0"),
+    transformers = c("4.56.0", "5.5.4"),
     tokenizers = c("0.22.0", "0.22.2"),
     pandas = c("2.3.2", "3.0.2"),
     datasets = c("3.6.0", "4.8.4"),
@@ -254,7 +254,7 @@ install_aifeducation_studio <- function() {
 #' @family Installation and Configuration
 #' @export
 install_py_modules <- function(envname = "aifeducation",
-                               transformer_version = "<=5.2.0",
+                               transformer_version = "<=5.5.4",
                                tokenizers_version = "<=0.22.2",
                                pandas_version = "<=3.0.2",
                                datasets_version = "<=4.8.4",
@@ -536,7 +536,7 @@ prepare_session <- function(env_type = "auto", envname = "aifeducation", check_s
     message(paste(paste0(names(pkg_versions), ":"), pkg_versions, collapse = "\n"))
     message("GPU Acceleration: ", torch$cuda$is_available())
 
-    if (check_versions(a="5.0.0",operator = ">=",b=get_py_package_version("transformers"))){
+    if (check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "5.0.0")){
       message("Version of python package 'transformers' is 5.0.0 or higher. Some older models
               from hugging face may not work.")
     }
