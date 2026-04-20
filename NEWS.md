@@ -11,6 +11,9 @@ editor_options:
 - Replaced the current logging mechanism with a more sophisticated version.
 - Add new tests.
 - Update to newer versions of python packages (except 'transformers' and 'codecarbon').
+- Fixed 'check_adjust_n_samples_on_CI'.
+- Fixed the y_max value in all plots for objects based on text embeddings. Now the
+  value is correctly calculated if 'y_max=NULL'.
 
 **Saving and Loading**
 
@@ -24,6 +27,13 @@ editor_options:
 **AI for Education - Studio**
 
 - Increased size of widgets for a better usability.
+
+**BaseModel**
+
+- In transformers 4.49.0 and transformers 5.0.0 the data collator for whole word masking changed. 
+  Now aifeducation is compatible with these versions and whole word masking.
+- MPNet is temporarily not available with transformers of 5.0.0 and higher. This will be changed
+  with the next release. 
 
 **Classifiers**
 
