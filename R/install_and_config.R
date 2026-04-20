@@ -40,14 +40,14 @@ get_recommended_py_versions <- function(package_name = NULL) {
   )
 
   if (is.null(package_name)) {
-    data_matrix <- matrix(nrow = 3, ncol = length(py_versions))
+    data_matrix <- matrix(nrow = 3L, ncol = length(py_versions))
     for (i in seq_along(py_versions)) {
-      data_matrix[1, i] <- py_versions[[i]][1]
-      data_matrix[2, i] <- py_versions[[i]][2]
-      if (length(py_versions[[i]]) == 2) {
-        data_matrix[3, i] <- py_versions[[i]][2]
+      data_matrix[1L, i] <- py_versions[[i]][1L]
+      data_matrix[2L, i] <- py_versions[[i]][2L]
+      if (length(py_versions[[i]]) == 2L) {
+        data_matrix[3L, i] <- py_versions[[i]][2L]
       } else {
-        data_matrix[3, i] <- py_versions[[i]][3]
+        data_matrix[3L, i] <- py_versions[[i]][3L]
       }
     }
     data_matrix <- as.data.frame(data_matrix)
@@ -62,10 +62,10 @@ get_recommended_py_versions <- function(package_name = NULL) {
       )
     }
     package_versions <- py_versions[[package_name]]
-    if (length(package_versions) == 2) {
-      package_version <- package_versions[2]
+    if (length(package_versions) == 2L) {
+      package_version <- package_versions[2L]
     } else {
-      package_version <- package_versions[3]
+      package_version <- package_versions[3L]
     }
     final_string <- paste0("<=", package_version)
     return(final_string)
