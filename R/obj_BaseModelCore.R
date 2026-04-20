@@ -169,21 +169,51 @@ BaseModelCore <- R6::R6Class(
         msg = "Create Data Collator",
         trace = self$last_training$config$trace
       )
-
       if (self$last_training$config$whole_word) {
-        tmp_data_collator <- py$DataCollatorForWholeWordMask(
+        tmp_data_collator <- py$AifeDataCollatorForWholeWordMask(
           tokenizer = self$Tokenizer$get_tokenizer(),
           mlm_probability = self$last_training$config$p_mask,
           pad_input = FALSE
         )
       } else {
-        tmp_data_collator <- transformers$DataCollatorForLanguageModeling(
-          tokenizer = self$Tokenizer$get_tokenizer(),
-          mlm = TRUE,
-          mlm_probability = self$last_training$config$p_mask,
-          return_tensors = "pt"
-        )
+        if (
+          check_versions(a = get_py_package_version("transformers"), operator = "<", b = "4.49.0")
+        ) {
+          tmp_data_collator <- transformers$DataCollatorForLanguageModeling(
+            tokenizer = self$Tokenizer$get_tokenizer(),
+            mlm = TRUE,
+            mlm_probability = self$last_training$config$p_mask,
+            return_tensors = "pt"
+          )
+        }
+        else if (check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "4.49.0") &&
+          check_versions(a = get_py_package_version("transformers"), operator = "<", b = "5.0.0")
+        ) {
+          tmp_data_collator <- transformers$DataCollatorForLanguageModeling(
+            tokenizer = self$Tokenizer$get_tokenizer(),
+            mlm = TRUE,
+            mlm_probability = self$last_training$config$p_mask,
+            mask_replace_prob = 1.0,
+            random_replace_prob = 0.0,
+            return_tensors = "pt"
+          )
+        } else if (
+          check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "5.0.0")
+        ) {
+          tmp_data_collator <- transformers$DataCollatorForLanguageModeling(
+            tokenizer = self$Tokenizer$get_tokenizer(),
+            mlm = TRUE,
+            whole_word_mask = FALSE,
+            mlm_probability = self$last_training$config$p_mask,
+            mask_replace_prob = 1.0,
+            random_replace_prob = 0.0,
+            return_tensors = "pt"
+          )
+        } else {
+          stop("Version not implemented. Version of transformers is ",get_py_package_version("transformers"))
+        }
       }
+
       return(tmp_data_collator)
     },
     #---------------------------------------------------------------------------
