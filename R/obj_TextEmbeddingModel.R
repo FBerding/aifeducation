@@ -363,7 +363,7 @@ TextEmbeddingModel <- R6::R6Class(
         pytorch_dtype <- torch$float
       } else {
         pytorch_device <- "cpu"
-        pytorch_dtype <- torch$double
+        pytorch_dtype <- torch$float
       }
 
       require_token_type_ids <- self$BaseModel$get_private()$return_token_type_ids
