@@ -24,6 +24,7 @@ example_folders <- setdiff(
   y = c("examples", "examples/bert_uncased")
 )
 unlink(x = example_folders, recursive = TRUE)
+script_time_start <- Sys.time()
 ```
 
 # 1 Introduction and Overview
@@ -1615,7 +1616,7 @@ classifier$plot_training_history(
   x_min = NULL,
   x_max = NULL,
   y_min = NULL,
-  y_max = 1L,
+  y_max = NULL,
   add_min_max = FALSE,
   text_size = 10
 )
@@ -1669,7 +1670,7 @@ classifier$plot_training_history(
   x_min = NULL,
   x_max = NULL,
   y_min = NULL,
-  y_max = 1L,
+  y_max = NULL,
   add_min_max = FALSE,
   text_size = 10
 )
@@ -3064,6 +3065,10 @@ ou, L. (2023). Meta-Learning: Theory, Algorithms and Applications.
 Elsevier Science & Technology.
 <https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=7134465>
 
+
+```{r, include = FALSE}
+print(paste(test_name, "Duration:", format(Sys.time() - script_time_start)))
+```
 
 
 
