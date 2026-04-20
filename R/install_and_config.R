@@ -16,16 +16,19 @@
 #' @description Returns the minimum and maximum versions of the core
 #' python packages used in *aifeducation*. It is recommended to use packages of
 #' these version. Packages of other versions can result in errors or unexpected results.
-#'
-#' @return Returns a `data.frame` with the packages in the columns and the minimum and
-#' maximum version in the rows.
+#' @param package_name `string` Name of the package the recommended version should be returned. If
+#' set to `NULL` a table with all core packages and their supported version is returned.
+#' @return Returns a `data.frame` with the packages in the columns and the minimum,
+#' maximum, and recommended version in the rows. If a concrete name is passed returns a
+#' string with leading '<='.
 #'
 #' @family Installation and Configuration
 #'
 #' @export
-get_recommended_py_versions <- function() {
+get_recommended_py_versions <- function(package_name = NULL) {
+  check_class_and_type(object = package_name, object_name = "package_name", type_classes = "string", allow_NULL = TRUE)
   py_versions <- list(
-    transformers = c("4.56.0", "5.5.4"),
+    transformers = c("4.56.0", "5.5.4", "4.57.6"),
     tokenizers = c("0.22.0", "0.22.2"),
     pandas = c("2.3.2", "3.0.2"),
     datasets = c("3.6.0", "4.8.4"),
@@ -36,9 +39,37 @@ get_recommended_py_versions <- function() {
     calflops = c("0.3.2", "0.3.2")
   )
 
-  py_versions <- as.data.frame(py_versions)
-  rownames(py_versions) <- c("min", "max")
-  return(py_versions)
+  if (is.null(package_name)) {
+    data_matrix <- matrix(nrow = 3, ncol = length(py_versions))
+    for (i in seq_along(py_versions)) {
+      data_matrix[1, i] <- py_versions[[i]][1]
+      data_matrix[2, i] <- py_versions[[i]][2]
+      if (length(py_versions[[i]]) == 2) {
+        data_matrix[3, i] <- py_versions[[i]][2]
+      } else {
+        data_matrix[3, i] <- py_versions[[i]][3]
+      }
+    }
+    data_matrix <- as.data.frame(data_matrix)
+    colnames(data_matrix) <- names(py_versions)
+    rownames(data_matrix) <- c("min", "max", "recommended")
+    return(data_matrix)
+  } else {
+    if (!(package_name %in% names(py_versions))) {
+      stop(
+        "Verson of the package ist not implemented. Supported packages are ",
+        toString(names(py_versions))
+      )
+    }
+    package_versions <- py_versions[[package_name]]
+    if (length(package_versions) == 2) {
+      package_version <- package_versions[2]
+    } else {
+      package_version <- package_versions[3]
+    }
+    final_string <- paste0("<=", package_version)
+    return(final_string)
+  }
 }
 
 #' @title Install aifeducation on a machine
@@ -203,20 +234,20 @@ update_aifeducation <- function(update_aifeducation_studio = TRUE,
 install_aifeducation_studio <- function() {
   utils::install.packages(
     c(
-    "ggplot2",
-    "rlang",
-    "shiny",
-    "shinyFiles",
-    "shinyWidgets",
-    "shinycssloaders",
-    "sortable",
-    "bslib",
-    "future",
-    "promises",
-    "DT",
-    "readtext",
-    "readxl"
-  )
+      "ggplot2",
+      "rlang",
+      "shiny",
+      "shinyFiles",
+      "shinyWidgets",
+      "shinycssloaders",
+      "sortable",
+      "bslib",
+      "future",
+      "promises",
+      "DT",
+      "readtext",
+      "readxl"
+    )
   )
 }
 
@@ -245,6 +276,7 @@ install_aifeducation_studio <- function() {
 #'   environment.
 #' @note Function tries to identify the type of operating system. In the case that
 #' MAC OS is detected 'PyTorch' is installed without support for cuda.
+#' @note Supported versions of the packages can be requested with `get_recommended_py_versions())`
 #'
 #' @importFrom reticulate conda_create
 #' @importFrom reticulate conda_remove
@@ -254,15 +286,15 @@ install_aifeducation_studio <- function() {
 #' @family Installation and Configuration
 #' @export
 install_py_modules <- function(envname = "aifeducation",
-                               transformer_version = "<=5.5.4",
-                               tokenizers_version = "<=0.22.2",
-                               pandas_version = "<=3.0.2",
-                               datasets_version = "<=4.8.4",
-                               codecarbon_version = "<=3.2.2",
-                               safetensors_version = "<=0.7.0",
-                               torcheval_version = "<=0.0.7",
-                               accelerate_version = "<=1.13.0",
-                               calflops_version = "<=0.3.2",
+                               transformer_version = get_recommended_py_versions("transformers"),
+                               tokenizers_version = get_recommended_py_versions("tokenizers"),
+                               pandas_version = get_recommended_py_versions("pandas"),
+                               datasets_version = get_recommended_py_versions("datasets"),
+                               codecarbon_version = get_recommended_py_versions("codecarbon"),
+                               safetensors_version = get_recommended_py_versions("safetensors"),
+                               torcheval_version = get_recommended_py_versions("torcheval"),
+                               accelerate_version = get_recommended_py_versions("accelerate"),
+                               calflops_version = get_recommended_py_versions("calflops"),
                                pytorch_cuda_version = "13.0",
                                python_version = "3.12",
                                remove_first = FALSE,
@@ -465,7 +497,7 @@ set_transformers_logger <- function(level = "ERROR") {
 #'
 #' @family Installation and Configuration
 #' @export
-prepare_session <- function(env_type = "auto", envname = "aifeducation", check_session=TRUE) {
+prepare_session <- function(env_type = "auto", envname = "aifeducation", check_session = TRUE) {
   if (!reticulate::py_available(FALSE)) {
     message("Python is not initalized.")
     if (env_type == "auto") {
@@ -525,7 +557,7 @@ prepare_session <- function(env_type = "auto", envname = "aifeducation", check_s
 
   # Print information
   message("Detected OS: ", detec_os())
-  if(check_session){
+  if (check_session) {
     message("Checking python packages. This can take a moment.")
     if (check_aif_py_modules(trace = FALSE)) {
       message("All necessary python packages are available.")
@@ -536,16 +568,14 @@ prepare_session <- function(env_type = "auto", envname = "aifeducation", check_s
     message(paste(paste0(names(pkg_versions), ":"), pkg_versions, collapse = "\n"))
     message("GPU Acceleration: ", torch$cuda$is_available())
 
-    if (check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "5.0.0")){
+    if (check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "5.0.0")) {
       message("Version of python package 'transformers' is 5.0.0 or higher. Some older models
               from hugging face may not work.")
     }
-
   }
   message("Load all python objects and functions.")
   load_all_py_scripts()
   message("Location for Temporary Files:", create_and_get_tmp_dir())
-
 }
 
 #' @title Function for detecting the OS..
