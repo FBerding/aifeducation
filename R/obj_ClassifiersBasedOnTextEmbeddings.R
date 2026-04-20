@@ -119,9 +119,6 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         )
       }
 
-      # Load Custom Model Scripts
-
-
       # Check number of cases in the data
       single_prediction <- private$check_single_prediction(newdata)
 

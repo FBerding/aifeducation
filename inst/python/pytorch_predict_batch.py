@@ -18,7 +18,7 @@ import numpy as np
 import math
 import safetensors
 
-@torch.inference_mode()
+@torch.no_grad()
 def TeClassifierBatchPredict(model,dataset,batch_size):
   
   device=('cuda' if torch.cuda.is_available() else 'cpu')
@@ -50,7 +50,7 @@ def TeClassifierBatchPredict(model,dataset,batch_size):
   
   return predictions_list
       
-@torch.inference_mode()      
+@torch.no_grad()      
 def TeProtoNetClassifierBatchPredict(model,dataset,batch_size,embeddings_s,classes_s,prediction_mode=True):
   
   device=('cuda' if torch.cuda.is_available() else 'cpu')

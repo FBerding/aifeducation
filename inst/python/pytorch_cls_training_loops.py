@@ -61,17 +61,69 @@ def build_data_loaders(train_data, val_data, batch_size, test_data=None, pin_mem
     testloader=None
   return trainloader, valloader, testloader
 
+def calc_cls_performance_measures(confusion_matrix,n_classes):
+  with torch.no_grad()
+      acc=torch.sum(torch.diagonal(confusion_matrix))/torch.sum(confusion_matrix)
+      bacc=torch.sum(torch.diagonal(confusion_matrix)/torch.sum(confusion_matrix,dim=1))/n_classes
+      avg_iota=torch.diagonal(confusion_matrix)/(torch.sum(confusion_matrix,dim=0)+torch.sum(confusion_matrix,dim=1)-torch.diagonal(confusion_matrix))
+      avg_iota=torch.sum(avg_iota)/n_classes
+  return acc, bacc, avg_iota
+
+def LogWriter:
+  def __init__(self,log_file,log_file_loss ,value_top = 1, value_middle = 1, value_bottom = 1,
+                  total_top = 2, total_middle = 2, total_bottom = 2, message_top = "Top", message_middle = "Middle",
+                  message_bottom = "Bottom",history_loss=None, last_log = None, write_interval = 2):
+    self.log_file=log_file
+    self.log_file_loss=log_file_loss
+    self.value_top=value_top
+    self.value_middle=value_middle
+    self.value_bottom=value_bottom
+    self.total_top=total_top
+    self.total_middle=total_middle
+    self.total_bottom=total_bottom
+    self.message_top=message_top
+    self.message_middle=message_middle
+    self.message_bottom=message_bottom
+    self.last_log=last_log
+    self.last_log_loss=last_log_loss
+    self.history_loss=history_loss
+    sefl.write_interval
+  def set_value(self,value,level):
+    if level=="top":
+      self.value_top=value
+    elif level=="middle":
+      self.value_middle=value
+    elif level=="bottom":
+      self.value_bottom=value
+  def inc_value(self,level):
+    if level=="top":
+      self.value_top+=1
+    elif level=="middle":
+      self.value_middle+=1
+    elif level=="bottom":
+      self.value_bottom+=1
+  def set_history_loss(self,history_loss):
+    self.history_loss=history_loss
+  def write_log(self):
+    if not (log_dir is None):
+      self.last_log=write_log_py(log_file=self.log_file, value_top = self.value_top, value_middle = self.value_middle, value_bottom = self.value_bottom,
+                    total_top = self.total_top, total_middle = self.total_middle, total_bottom = self.total_bottom, message_top = self.message_top, message_middle = self.message_middle,
+                    message_bottom = self.message_bottom, last_log = self.last_log, write_interval = self.write_interval)
+      self.last_log_loss=write_log_performance_py(log_file=self.log_file_loss, history=history_loss.numpy().tolist(), last_log = self.last_log_loss, write_interval = self.write_interval)
+     
+    
 #========
-def _run_epoch(model,dataloader,loss_fct,optimizer,scheduler,device,current_dtype,is_train=False):
+def _run_epoch(model,dataloader,loss_fct,optimizer,scheduler,device,current_dtype,logger,is_train=False):
     if is_train:
       model.train()
       context=torch.enable_grad()
     else:
       model.eval()
       context=torch.autograd.grad_mode.inference_mode(mode=True)
-      
-    #torch.autograd.set_detect_anomaly(True)
     
+    confusion_matrix=torch.zeros(size=(n_classes,n_classes))
+    confusion_matrix=confusion_matrix.to(device,dtype=current_dtype)
+      
     for batch in dataloader:
       inputs=batch["input"]
       labels=batch["labels"]
@@ -83,45 +135,35 @@ def _run_epoch(model,dataloader,loss_fct,optimizer,scheduler,device,current_dtyp
       labels=labels.to(device,dtype=current_dtype)
       sample_weights=sample_weights.to(device,dtype=current_dtype)
       
-      optimizer.zero_grad()
+      if is_train:
+        optimizer.zero_grad()
+        model.train()
+        ctx=torch.enable_grad()
+      else:
+        model.eval()
+        ctx=torch.inference_mode()
       
-      outputs=model(inputs,prediction_mode=False)
-      loss=loss_fct(outputs,labels)*sample_weights
-      loss=loss.mean()
-      loss.backward()
-      optimizer.step()
+      with ctx:   
+        outputs=model(inputs,prediction_mode=False)
+        loss=loss_fct(outputs,labels)*sample_weights
+        loss=loss.mean()
+        if is_train:
+          loss.backward()
+          optimizer.step()
+          if scheduler!=None:
+            scheduler.step()
+      
       total_loss +=loss.item()
-      
-      #Calc Accuracy
-      pred_idx=torch.nn.Softmax(dim=1)(outputs).max(dim=1).indices
-      label_idx=labels.max(dim=1).indices
-          
-      match=(pred_idx==label_idx)
-      n_matches_train+=match.sum().item()
-      n_total_train+=outputs.size(0)
-      
-      #Calc Balanced Accuracy
-      confusion_matrix_train+=multiclass_confusion_matrix(input=outputs,target=label_idx,num_classes=n_classes)
+      confusion_matrix+=multiclass_confusion_matrix(input=outputs,target=label_idx,num_classes=n_classes)
       
       #Update log file
-      if not (log_dir is None):
-        current_step+=1
-        last_log=write_log_py(log_file=log_file, value_top = log_top_value, value_middle = epoch+1, value_bottom = current_step,
-                  total_top = log_top_total, total_middle = epochs, total_bottom = total_steps, message_top = log_top_message, message_middle = "Epochs",
-                  message_bottom = "Steps", last_log = last_log, write_interval = log_write_interval)
-        last_log_loss=write_log_performance_py(log_file=log_file_loss, history=history_loss.numpy().tolist(), last_log = last_log_loss, write_interval = log_write_interval)
+      logger.set_value(level="middle",value=epoch+1)
+      logger.inc_value(level="bottom")
+      logger.write_log()
      
     #Calc final metrics for epoch  
     total_loss=total_loss/len(dataloader)
-    acc=n_matches_train/n_total_train
-    bacc=torch.sum(torch.diagonal(confusion_matrix_train)/torch.sum(confusion_matrix_train,dim=1))/n_classes
-    avg_iota=torch.diagonal(confusion_matrix_train)/(torch.sum(confusion_matrix_train,dim=0)+torch.sum(confusion_matrix_train,dim=1)-torch.diagonal(confusion_matrix_train))
-    avg_iota=torch.sum(avg_iota)/n_classes
-    
-    #Update learning rate
-    if scheduler!=None:
-      scheduler.step()
-    
+    acc, bacc, avg_iota=calc_cls_performance_measures()
     return {"loss":total_loss,"acc":acc,"bcc":bacc,"avg_iota":avg_iota}  
 #==========  
 
