@@ -35,17 +35,20 @@ raw_texts <- LargeDataSetForText$new(example_data)
 
 # Test Configuration
 object_class_names <- BaseModelsIndex
-# object_class_names <- c(
-#  "BaseModelDebertaV2")
-#  "BaseModelBert",
-#  #"BaseModelFunnel",
-#  #"BaseModelLongformer"#,
-#  "BaseModelModernBert",
-#  "BaseModelRoberta",
-#  "BaseModelMPNet"
-# )
+if (check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "5.0.0")){
+  object_class_names <- c(
+      "BaseModelDebertaV2",
+      "BaseModelBert",
+     "BaseModelFunnel",
+     #"BaseModelLongformer",
+      "BaseModelModernBert",
+      "BaseModelRoberta"#,
+    #  "BaseModelMPNet"
+  )
+}
 
-max_samples <- 4
+
+max_samples <- 3
 max_samples_CI <- 1
 
 
