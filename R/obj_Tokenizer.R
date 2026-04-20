@@ -498,7 +498,9 @@ WordPieceTokenizer <- R6::R6Class(
         cls_token = cls_token,
         mask_token = mask_token,
         bos_token = bos_token,
-        eos_token = eos_token
+        eos_token = eos_token,
+        padding_side = "right",
+        truncation_side = "right"
       )
 
       # Calculate tokenizer statistics
