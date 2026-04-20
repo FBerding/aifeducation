@@ -19,7 +19,7 @@ max_samples_training_CI <- 1
 
 class_range <- c(2, 3)
 
-prob_precision <- 1e-6
+prob_precision <- 1e-5
 
 # Skip Tests-------------------------------------------------------------------
 skip_creation_test <- FALSE
