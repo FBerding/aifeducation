@@ -10,7 +10,6 @@ test_time_start <- Sys.time()
 # config------------------------------------------------------------------------
 load_all_py_scripts()
 object_class_names <- get_TEClassifiers_class_names(super_class = "ClassifiersBasedOnTextEmbeddings")
-
 max_samples <- 20
 max_samples_CI <- 2
 
