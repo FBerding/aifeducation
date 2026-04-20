@@ -3067,7 +3067,7 @@ Elsevier Science & Technology.
 
 
 ```{r, include = FALSE}
-print(paste(test_name, "Duration:", format(Sys.time() - script_time_start)))
+cat(paste("script runtime:", format(Sys.time() - script_time_start,digits=3L)))
 ```
 
 
