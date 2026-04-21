@@ -388,7 +388,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   
     #Check if there are furhter information for training-----------------------
     # If there are no addtiononal information. Stop training and continue
-    if train_loss/len(trainloader)<1e-6 and acc_train==1 and bacc_train==1 and avg_iota_train==1:
+    if train_loss/len(trainloader)<1e-3 and acc_train==1 and bacc_train==1 and avg_iota_train==1:
       break
   
   #Finalize--------------------------------------------------------------------
@@ -768,7 +768,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
           
     #Check if there are furhter information for training-----------------------
     # If there are no addtiononal information. Stop training and continue
-    if train_loss/len(trainloader)<1e-6 and acc_train==1 and bacc_train==1 and avg_iota_train==1:
+    if train_loss/len(trainloader)<1e-3 and acc_train==1 and bacc_train==1 and avg_iota_train==1:
       break
   
   #Finalize--------------------------------------------------------------------
