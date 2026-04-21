@@ -40,6 +40,17 @@ def get_loss_cls_fct(name,class_weights):
     )
   return loss_fct
 
+def get_loss_cls_pt_fct(name,margin,alpha):
+  if name=="MultiWayContrastiveLoss":
+    fct=multi_way_contrastive_loss(
+      alpha=alpha,
+      margin=margin)
+  elif name=="MultiWayContrastiveLossFC":
+    fct=multi_way_contrastive_loss_fc(
+      alpha=alpha,
+      margin=margin)
+  return fct
+
 def build_data_loaders(train_data, val_data, batch_size, test_data=None, pin_memory=False):
   trainloader=torch.utils.data.DataLoader(
     train_data,
@@ -61,122 +72,6 @@ def build_data_loaders(train_data, val_data, batch_size, test_data=None, pin_mem
     testloader=None
   return trainloader, valloader, testloader
 
-def create_metric_storage(metric_names,epochs,inc_test):
-  storage={}
-  for metric in metric_names:
-    if inc_test:
-      tmp_metric_storage=np.zeros((3,epochs))
-    else:
-      tmp_metric_storage=np.zeros((2,epochs))
-    storage[metric]=  tmp_metric_storage
-  storage["checkpoints"]=np.zeros((epochs))
-  return storage
-
-def calc_cls_performance_measures(confusion_matrix,n_classes):
-  with torch.no_grad():
-      acc=torch.sum(torch.diagonal(confusion_matrix))/torch.sum(confusion_matrix)
-      bacc=torch.sum(torch.diagonal(confusion_matrix)/torch.sum(confusion_matrix,dim=1))/n_classes
-      avg_iota=torch.diagonal(confusion_matrix)/(torch.sum(confusion_matrix,dim=0)+torch.sum(confusion_matrix,dim=1)-torch.diagonal(confusion_matrix))
-      avg_iota=torch.sum(avg_iota)/n_classes
-  return acc, bacc, avg_iota
-
-class LogWriter:
-  def __init__(self,log_file,log_file_loss ,value_top = 1, value_middle = 1, value_bottom = 1,
-                  total_top = 2, total_middle = 2, total_bottom = 2, message_top = "Top", message_middle = "Middle",
-                  message_bottom = "Bottom",history_loss=None, last_log = None, write_interval = 2):
-    self.log_file=log_file
-    self.log_file_loss=log_file_loss
-    self.value_top=value_top
-    self.value_middle=value_middle
-    self.value_bottom=value_bottom
-    self.total_top=total_top
-    self.total_middle=total_middle
-    self.total_bottom=total_bottom
-    self.message_top=message_top
-    self.message_middle=message_middle
-    self.message_bottom=message_bottom
-    self.last_log=last_log
-    self.last_log_loss=last_log_loss
-    self.history_loss=history_loss
-    sefl.write_interval
-  def set_value(self,value,level):
-    if level=="top":
-      self.value_top=value
-    elif level=="middle":
-      self.value_middle=value
-    elif level=="bottom":
-      self.value_bottom=value
-  def inc_value(self,level):
-    if level=="top":
-      self.value_top+=1
-    elif level=="middle":
-      self.value_middle+=1
-    elif level=="bottom":
-      self.value_bottom+=1
-  def set_history_loss(self,history_loss):
-    self.history_loss=history_loss
-  def write_log(self):
-    if not (log_dir is None):
-      self.last_log=write_log_py(log_file=self.log_file, value_top = self.value_top, value_middle = self.value_middle, value_bottom = self.value_bottom,
-                    total_top = self.total_top, total_middle = self.total_middle, total_bottom = self.total_bottom, message_top = self.message_top, message_middle = self.message_middle,
-                    message_bottom = self.message_bottom, last_log = self.last_log, write_interval = self.write_interval)
-      self.last_log_loss=write_log_performance_py(log_file=self.log_file_loss, history=history_loss.numpy().tolist(), last_log = self.last_log_loss, write_interval = self.write_interval)
-     
-    
-#========
-def _run_epoch(model,dataloader,loss_fct,optimizer,scheduler,device,current_dtype,logger,is_train=False):
-    if is_train:
-      model.train()
-      context=torch.enable_grad()
-    else:
-      model.eval()
-      context=torch.autograd.grad_mode.inference_mode(mode=True)
-    
-    confusion_matrix=torch.zeros(size=(n_classes,n_classes))
-    confusion_matrix=confusion_matrix.to(device,dtype=current_dtype)
-      
-    for batch in dataloader:
-      inputs=batch["input"]
-      labels=batch["labels"]
-
-      sample_weights=batch["sample_weights"]
-      sample_weights=torch.reshape(input=sample_weights,shape=(sample_weights.size(dim=0),1))
-
-      inputs = inputs.to(device,dtype=current_dtype)
-      labels=labels.to(device,dtype=current_dtype)
-      sample_weights=sample_weights.to(device,dtype=current_dtype)
-      
-      if is_train:
-        optimizer.zero_grad()
-        model.train()
-        ctx=torch.enable_grad()
-      else:
-        model.eval()
-        ctx=torch.inference_mode()
-      
-      with ctx:   
-        outputs=model(inputs,prediction_mode=False)
-        loss=loss_fct(outputs,labels)*sample_weights
-        loss=loss.mean()
-        if is_train:
-          loss.backward()
-          optimizer.step()
-          if scheduler!=None:
-            scheduler.step()
-      
-      total_loss +=loss.item()
-      confusion_matrix+=multiclass_confusion_matrix(input=outputs,target=label_idx,num_classes=n_classes)
-      
-      #Update log file
-      logger.set_value(level="middle",value=epoch+1)
-      logger.inc_value(level="bottom")
-      logger.write_log()
-     
-    #Calc final metrics for epoch  
-    total_loss=total_loss/len(dataloader)
-    acc, bacc, avg_iota=calc_cls_performance_measures()
-    return {"loss":total_loss,"acc":acc,"bcc":bacc,"avg_iota":avg_iota}  
-#==========  
 
 def TeClassifierTrain(model,loss_cls_fct_name , optimizer_method,scheduler_type, lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,batch_size,
 train_data,val_data,filepath,use_callback,n_classes,class_weights,test_data=None,
@@ -514,20 +409,16 @@ def TeClassifierTrainPrototype(model,loss_pt_fct_name , optimizer_method, schedu
 loss_alpha, loss_margin, train_data,val_data,filepath,use_callback,n_classes,sampling_separate,sampling_shuffle,test_data=None,
 log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
   
-  device=('cuda' if torch.cuda.is_available() else 'cpu')
-  
-  if device=="cpu":
-    dtype=torch.float
-    model.to(device,dtype=dtype)
-  else:
-    dtype=torch.float
-    model.to(device,dtype=dtype)
-    
-  if loss_pt_fct_name =="MultiWayContrastiveLoss":
-    loss_fct=multi_way_contrastive_loss(
-      alpha=loss_alpha,
-      margin=loss_margin)
-    
+  device=get_device()
+  current_dtype=get_dtype(device)
+  model.to(device=device,dtype=current_dtype)
+
+  loss_fct=get_loss_cls_pt_fct(
+    name=loss_pt_fct_name,
+    alpha=loss_alpha,
+    margin=loss_margin
+  )
+
   #Tensor for Saving Training History
   if not (test_data is None):
     history_loss=torch.ones(size=(3,epochs),requires_grad=False)*-100
@@ -556,22 +447,16 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   trainloader=torch.utils.data.DataLoader(
     train_data,
     batch_sampler=ProtoNetSampler_Train)
-  
   valloader=torch.utils.data.DataLoader(
     val_data,
     batch_size=Ns+Nq,
     shuffle=False)
-    
   if not (test_data is None):
     testloader=torch.utils.data.DataLoader(
       test_data,
       batch_size=Ns+Nq,
       shuffle=False)
       
-  #loader_for_trained_prototpyes=torch.utils.data.DataLoader(
-  #  train_data,
-  #  batch_size=Ns+Nq,
-  #  shuffle=False) 
   optimizer=get_Optimizer(
     optimizer_method,
     params=model.parameters(),
@@ -610,7 +495,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     n_matches_train=0
     n_total_train=0
     confusion_matrix_train=torch.zeros(size=(n_classes,n_classes))
-    confusion_matrix_train=confusion_matrix_train.to(device,dtype=torch.double)
+    confusion_matrix_train=confusion_matrix_train.to(device,dtype=current_dtype)
     
     n_batches=0
     
@@ -628,18 +513,20 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       sample_classes=labels[0:(n_classes*Ns)].clone()
       query_classes=labels[(n_classes*Ns):(n_classes*(Ns+Nq))].clone()
 
-      sample_inputs = sample_inputs.to(device,dtype=dtype)
-      query_inputs = query_inputs.to(device,dtype=dtype)
+      sample_inputs = sample_inputs.to(device,dtype=current_dtype)
+      query_inputs = query_inputs.to(device,dtype=current_dtype)
   
-      sample_classes = sample_classes.to(device,dtype=dtype)
-      query_classes = query_classes.to(device,dtype=dtype)
+      sample_classes = sample_classes.to(device,dtype=current_dtype)
+      query_classes = query_classes.to(device,dtype=current_dtype)
 
       optimizer.zero_grad()
-      outputs=model(input_q=query_inputs,
-      classes_q=query_classes,
-      input_s=sample_inputs,
-      classes_s=sample_classes,
-      prediction_mode=False)
+      outputs=model(
+        input_q=query_inputs,
+        classes_q=query_classes,
+        input_s=sample_inputs,
+        classes_s=sample_classes,
+        prediction_mode=False
+      )
       
       loss=loss_fct(classes_q=outputs[2],distance_matrix=outputs[1],metric_scale_factor=model.get_metric_scale_factor().detach())
       loss.backward()
@@ -685,7 +572,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       model=model,
       data_loader=trainloader,
       device=device,
-      dtype=dtype
+      dtype=current_dtype
       )
     
     model.set_trained_prototypes(
@@ -699,7 +586,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     n_total_val=0
     
     confusion_matrix_val=torch.zeros(size=(n_classes,n_classes))
-    confusion_matrix_val=confusion_matrix_val.to(device,dtype=torch.double)
+    confusion_matrix_val=confusion_matrix_val.to(device,dtype=current_dtype)
 
     model.eval()
     with torch.no_grad():
@@ -707,8 +594,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
         inputs=batch["input"]
         labels=batch["labels"]
         
-        inputs = inputs.to(device,dtype=dtype)
-        labels=labels.to(device,dtype=dtype)
+        inputs = inputs.to(device,dtype=current_dtype)
+        labels=labels.to(device,dtype=current_dtype)
         outputs=model(input_q=inputs,classes_q=labels,prediction_mode=False)
 
         loss=loss_fct(classes_q=outputs[2],distance_matrix=outputs[1],metric_scale_factor=model.get_metric_scale_factor().detach())
@@ -745,7 +632,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       n_total_test=0
       
       confusion_matrix_test=torch.zeros(size=(n_classes,n_classes))
-      confusion_matrix_test=confusion_matrix_test.to(device,dtype=torch.double)
+      confusion_matrix_test=confusion_matrix_test.to(device,dtype=current_dtype)
   
       model.eval()
       with torch.no_grad():
@@ -753,8 +640,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
           inputs=batch["input"]
           labels=batch["labels"]
           
-          inputs = inputs.to(device,dtype=dtype)
-          labels=labels.to(device,dtype=dtype)
+          inputs = inputs.to(device,dtype=current_dtype)
+          labels=labels.to(device,dtype=current_dtype)
         
           outputs=model(inputs,prediction_mode=False)
  
