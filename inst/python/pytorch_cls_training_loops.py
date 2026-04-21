@@ -151,7 +151,6 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     confusion_matrix_train=confusion_matrix_train.to(device,dtype=torch.double)
     
     model.train(True)
-    #torch.autograd.set_detect_anomaly(True)
     for batch in trainloader:
       inputs=batch["input"]
       labels=batch["labels"]
