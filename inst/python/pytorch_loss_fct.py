@@ -70,3 +70,30 @@ class multi_way_contrastive_loss(torch.nn.Module):
     l_push=(1-self.alpha)*l_push
     loss=(l_pull+l_push)/K
     return loss
+
+class multi_way_contrastive_loss_fc(torch.nn.Module):
+  def __init__(self,alpha=0.2,margin=0.5,class_weights=None,gamma=2):
+    super().__init__()
+    self.alpha=alpha
+    self.margin=margin
+    self.class_weights=class_weights
+    self.gamma=gamma
+    
+    self.mw_contrastive_loss=multi_way_contrastive_loss(alpha=self.alpha,margin=self.margin)
+    self.focal_loss=focal_loss(class_weights=self.class_weights,gamma=self.gamma)
+  
+  def forward(self,classes_q,distance_matrix,metric_scale_factor):
+    loss_mw=self.mw_contrastive_loss(
+      classes_q=classes_q,
+      distance_matrix=distance_matrix,
+      metric_scale_factor=metric_scale_factor
+    )
+
+    target_focal=torch.nn.functional.one_hot(classes_q.long(), num_classes=distance_matrix.size(1))
+    loss_fc=self.focal_loss(
+      prediction=-distance_matrix,
+      target=target_focal.float()
+    ).mean()
+    loss=(loss_mw+loss_fc)/2
+    return loss
+    
