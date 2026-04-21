@@ -17,7 +17,7 @@
 #'
 #' @param id `string` determining the id for the namespace.
 #' @return This function does nothing return. It is used to build a page for a shiny app.
-#'
+#' @importFrom utils person
 #' @family studio_gui_page_document
 #' @keywords internal
 #' @noRd

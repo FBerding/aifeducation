@@ -522,6 +522,7 @@ build_layer_stack_documentation_for_vignette <- function() {
 #' @param clear_docs `bool` If `TRUE` the docs folder will be completely cleared.
 #' @return Function does nothing return. It builds the homepage for the package.
 #' @importFrom stringi stri_replace_all
+#' @importFrom devtools document
 #' @family Parameter Dictionary
 #' @noRd
 #' @keywords internal
