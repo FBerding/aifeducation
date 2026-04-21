@@ -144,7 +144,7 @@ named and has to use the same names as used in in the embeddings. .}
 used for the validation sample during the estimation of the model.
 The remaining cases are part of the training data. Allowed values: \ifelse{latex}{$0 < x < 1$}{\ifelse{html}{\eqn{0 < x < 1}}{`0 < x < 1`}}}
 
-\item{\code{loss_pt_fct_name}}{\code{string} Name of the loss function to use during training. Allowed values: 'MultiWayContrastiveLoss'}
+\item{\code{loss_pt_fct_name}}{\code{string} Name of the loss function to use during training. Allowed values: 'MultiWayContrastiveLoss', 'MultiWayContrastiveLossFC'}
 
 \item{\code{use_sc}}{\code{bool} \code{TRUE} if the estimation should integrate synthetic cases. \code{FALSE} if not.}
 
