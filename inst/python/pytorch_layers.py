@@ -18,10 +18,12 @@ import math
 import safetensors
 
 def get_SeqLen_from_mask(mask):
-  return torch.sum(~mask,dim=1,keepdim=False)
+  seq_len = torch.sum(~mask,dim=1,keepdim=False)
+  return seq_len.detach()
 
 def get_FeatureMask_from_mask(mask,num_features):
-  return torch.unsqueeze(mask,dim=2).expand((mask.size(0),mask.size(1),num_features))
+  mask = torch.unsqueeze(mask,dim=2).expand((mask.size(0),mask.size(1),num_features))
+  return mask.detach()
 
 # Masking Layer------------------------------------------------------------------
 # Layer for generating masking tensors
@@ -39,12 +41,12 @@ class masking_layer(torch.nn.Module):
       self.pad_value=pad_value
   def forward(self,x):
     features=x.size()[-1]
-    device=('cuda' if torch.cuda.is_available() else 'cpu')
-    time_sums=torch.sum(x,dim=2)
-    #Get mask on the level of sequences/times
-    mask_times=(time_sums==features*self.pad_value)
-    #Bring values to device
-    mask_times=mask_times.to(device)
+    with torch.no_grad():
+      time_sums=torch.sum(x,dim=2)
+      #Get mask on the level of sequences/times
+      mask_times=(time_sums==features*self.pad_value)
+      #Bring values to device
+      mask_times=mask_times.to(x.device)
     return x, mask_times
 
 #Dropout layer with mask
@@ -555,10 +557,9 @@ class layer_abs_positional_embedding(torch.nn.Module):
     
   def forward(self, x):
     mask=self.get_mask(x)
-    device=('cuda' if torch.cuda.is_available() else 'cpu')
 
     input_seq=torch.arange(start=1, end=(self.sequence_length+1), step=1)
-    input_seq=input_seq.to(device)
+    input_seq=input_seq.to(x.device)
     
     input_seq=input_seq.repeat(x.shape[0], 1)
     input_seq.masked_fill(mask,value=0)
@@ -781,8 +782,6 @@ class merge_layer(torch.nn.Module):
     self.pooling_over_features=layer_adaptive_extreme_pooling_1d(
       output_size=self.n_extracted_features,
       pooling_type=self.pooling_type)
-      
-      
 
   def forward(self,tensor_list,mask_times):
     #Extract features by pooling and conotate to a new sequence
@@ -874,7 +873,7 @@ class layer_global_average_pooling_1d(torch.nn.Module):
       else:
         applied_mask=mask
       mask_r=applied_mask.reshape(applied_mask.size()[0],applied_mask.size()[1],1)
-      x=torch.mul(x,mask_r)
+      x=torch.mul(x,mask_r.detach())
     x=torch.sum(x,dim=1)*(1/self.get_length(x))
     return x
   
