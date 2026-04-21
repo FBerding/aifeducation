@@ -1998,7 +1998,7 @@ classifier_prototype$train(
   data_targets = review_labels,
   data_folds = 10,
   data_val_size = 0.25,
-  loss_pt_fct_name = "MultiWayContrastiveLoss",
+  loss_pt_fct_name = "MultiWayContrastiveLossFC",
   use_sc = FALSE,
   sc_method = "knnor",
   sc_min_k = 1,
