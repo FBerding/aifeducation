@@ -61,6 +61,17 @@ def build_data_loaders(train_data, val_data, batch_size, test_data=None, pin_mem
     testloader=None
   return trainloader, valloader, testloader
 
+def create_metric_storage(metric_names,epochs,inc_test):
+  storage={}
+  for metric in metric_names:
+    if inc_test:
+      tmp_metric_storage=np.zeros((3,epochs))
+    else:
+      tmp_metric_storage=np.zeros((2,epochs))
+    storage[metric]=  tmp_metric_storage
+  storage["checkpoints"]=np.zeros((epochs))
+  return storage
+
 def calc_cls_performance_measures(confusion_matrix,n_classes):
   with torch.no_grad():
       acc=torch.sum(torch.diagonal(confusion_matrix))/torch.sum(confusion_matrix)
