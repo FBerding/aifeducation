@@ -62,7 +62,7 @@ def build_data_loaders(train_data, val_data, batch_size, test_data=None, pin_mem
   return trainloader, valloader, testloader
 
 def calc_cls_performance_measures(confusion_matrix,n_classes):
-  with torch.no_grad()
+  with torch.no_grad():
       acc=torch.sum(torch.diagonal(confusion_matrix))/torch.sum(confusion_matrix)
       bacc=torch.sum(torch.diagonal(confusion_matrix)/torch.sum(confusion_matrix,dim=1))/n_classes
       avg_iota=torch.diagonal(confusion_matrix)/(torch.sum(confusion_matrix,dim=0)+torch.sum(confusion_matrix,dim=1)-torch.diagonal(confusion_matrix))
