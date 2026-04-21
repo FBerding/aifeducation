@@ -1058,9 +1058,11 @@ get_param_dict <- function() {
     test_values = NULL
   )
   param$loss_pt_fct_name <- param$loss_cls_fct_name
-  param$loss_pt_fct_name$allowed_values <- "MultiWayContrastiveLoss"
+  param$loss_pt_fct_name$allowed_values <- c("MultiWayContrastiveLoss","MultiWayContrastiveLossFC")
   param$loss_pt_fct_name$values_desc <- list(
-    MultiWayContrastiveLoss = "Applies the loss described by [Zhang et al. 2019](https://doi.org/10.1007/978-3-030-16145-3_24)."
+    MultiWayContrastiveLoss = "Applies the loss described by [Zhang et al. 2019](https://doi.org/10.1007/978-3-030-16145-3_24).",
+    MultiWayContrastiveLossFC = "Applies the sum of the loss described by [Zhang et al. 2019](https://doi.org/10.1007/978-3-030-16145-3_24) and the
+    Focal Loss described by [Lin et al. 2017](https://doi.org/10.48550/arXiv.1708.02002)."
   )
   param$loss_pt_fct_name$default_value <- "MultiWayContrastiveLoss"
   param$loss_pt_fct_name$gui_box <- "General Settings"
