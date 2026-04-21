@@ -3065,8 +3065,9 @@ ou, L. (2023). Meta-Learning: Theory, Algorithms and Applications.
 Elsevier Science & Technology.
 <https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=7134465>
 
+# Script runtime
 
-```{r, include = FALSE}
+```{r, include = TRUE}
 cat(paste("script runtime:", format(Sys.time() - script_time_start,digits=3L)))
 ```
 
