@@ -69,7 +69,7 @@ def calc_cls_performance_measures(confusion_matrix,n_classes):
       avg_iota=torch.sum(avg_iota)/n_classes
   return acc, bacc, avg_iota
 
-def LogWriter:
+class LogWriter:
   def __init__(self,log_file,log_file_loss ,value_top = 1, value_middle = 1, value_bottom = 1,
                   total_top = 2, total_middle = 2, total_bottom = 2, message_top = "Top", message_middle = "Middle",
                   message_bottom = "Bottom",history_loss=None, last_log = None, write_interval = 2):
