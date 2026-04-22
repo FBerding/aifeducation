@@ -16,7 +16,8 @@ Returns an \code{int} depending on the test environment.
 }
 \description{
 Function adjust the number of samples depending on the test environment.
-On continuous integration it is limited to a random sample of combinations.
+On continuous integration it is limited to a random sample of combinations. The same is
+true if cuda is unavailable.
 }
 \seealso{
 Other Utils TestThat Developers: 
