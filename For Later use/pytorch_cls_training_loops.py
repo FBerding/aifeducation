@@ -197,7 +197,7 @@ def _run_epoch(model,epoch,dataloader,loss_fct,optimizer,scheduler,device,n_clas
         ctx=torch.enable_grad()
       else:
         model.eval()
-        ctx=torch.inference_mode()
+        ctx=torch.no_grad()
       
       with ctx:   
         outputs=model(inputs,prediction_mode=False)
