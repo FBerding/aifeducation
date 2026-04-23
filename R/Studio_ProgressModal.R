@@ -246,7 +246,9 @@ start_and_monitor_long_task <- function(id,
         if (pgr_use_graphic) {
           path_loss <- loss_log_path
           loss_data <- try(
-            expr = read_loss_log(path_loss),
+            suppressWarnings(
+              read_loss_log(path_loss),
+            ),
             silent = TRUE
           )
           if (inherits(x = loss_data, what = "try-error")) {
@@ -268,6 +270,9 @@ start_and_monitor_long_task <- function(id,
       {
         plot_data <- progress_bar_status()$loss_data
         if (!is.null(plot_data)) {
+          x_max=nrow(plot_data)
+          x_min=1
+          plot_data=na.omit(plot_data)
           if (ncol(plot_data) == 4L) {
             data_columns <- c("train", "validation", "test")
           } else {
@@ -275,7 +280,6 @@ start_and_monitor_long_task <- function(id,
           }
           y_max <- max(plot_data[data_columns])
           y_min <- max(min(plot_data[data_columns]), 0L)
-          # TODO (Yuliia): .data has no visible binding
           plot <- ggplot2::ggplot(data = plot_data) +
             ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$train, color = "train")) +
             ggplot2::geom_line(ggplot2::aes(x = .data$epoch, y = .data$validation, color = "validation"))
@@ -285,7 +289,7 @@ start_and_monitor_long_task <- function(id,
           plot <- plot +
             ggplot2::theme_classic() +
             ggplot2::ylab("loss") +
-            ggplot2::coord_cartesian(ylim = c(y_min, y_max)) +
+            ggplot2::coord_cartesian(ylim = c(y_min, y_max),xlim = c(x_min,x_max)) +
             ggplot2::xlab("epoch") +
             ggplot2::scale_color_manual(values = c(
               "train" = "red",
