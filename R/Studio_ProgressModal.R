@@ -150,7 +150,7 @@ start_and_monitor_long_task <- function(id,
                                         pgr_use_middle = FALSE,
                                         pgr_use_bottom = FALSE,
                                         pgr_use_graphic = FALSE,
-                                        update_intervall = 30,
+                                        update_intervall = 4,
                                         success_type = "data_sets") {
   shiny::moduleServer(id, function(input, output, session) {
     #--------------------------------------------------------------------------
@@ -192,12 +192,12 @@ start_and_monitor_long_task <- function(id,
     }
 
     args <- ExtendedTask_arguments
-    #print(args)
-    #save(args,
+    # print(args)
+    # save(args,
     #  file = paste0(getwd(), "/arguments.rda")
-    #)
+    # )
     future::plan(future::multisession)
-    #future::plan(future::sequential)
+    # future::plan(future::sequential)
 
     # Start ExtendedTask
     CurrentTask <- NULL
@@ -227,9 +227,7 @@ start_and_monitor_long_task <- function(id,
       # Do periodical checks only if the task is actual running
       if (CurrentTask$status() == "running") {
         shiny::invalidateLater(millis = update_intervall * 1000)
-        # TODO (Yuliia): force_update assigned but may not be used
         force_update <- input$force_update
-        # print(get_time_stamp())
 
         log <- NULL
         if (!is.null(log_path)) log <- read_log(log_path)
@@ -247,7 +245,13 @@ start_and_monitor_long_task <- function(id,
         loss_data <- NULL
         if (pgr_use_graphic) {
           path_loss <- loss_log_path
-          loss_data <- read_loss_log(path_loss)
+          loss_data <- try(
+            expr = read_loss_log(path_loss),
+            silent = TRUE
+          )
+          if (inherits(x = loss_data, what = "try-error")) {
+            loss_data <- NULL
+          }
         }
 
         log_list <- list(
