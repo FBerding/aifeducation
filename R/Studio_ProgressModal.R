@@ -270,9 +270,9 @@ start_and_monitor_long_task <- function(id,
       {
         plot_data <- progress_bar_status()$loss_data
         if (!is.null(plot_data)) {
-          x_max=nrow(plot_data)
-          x_min=1
-          plot_data=na.omit(plot_data)
+          x_max <- nrow(plot_data)
+          x_min <- 1
+          plot_data <- na.omit(plot_data)
           if (ncol(plot_data) == 4L) {
             data_columns <- c("train", "validation", "test")
           } else {
@@ -289,7 +289,7 @@ start_and_monitor_long_task <- function(id,
           plot <- plot +
             ggplot2::theme_classic() +
             ggplot2::ylab("loss") +
-            ggplot2::coord_cartesian(ylim = c(y_min, y_max),xlim = c(x_min,x_max)) +
+            ggplot2::coord_cartesian(ylim = c(y_min, y_max), xlim = c(x_min, x_max)) +
             ggplot2::xlab("epoch") +
             ggplot2::scale_color_manual(values = c(
               "train" = "red",
