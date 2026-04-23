@@ -108,7 +108,7 @@ def print_epoch_results(trace,loss_only,metric_storage,epoch,epochs,metric_crite
     else:
       end_string="\r"
     if loss_only:
-      print("{:.4f} % | Train Loss {:.4f} | Val Loss {:.4f} Best {:.4f} {} {:.4f} Best {:.4f}".format(
+      print("{:.4f} % | Train Loss {:.8f} | Val Loss {:.8f} Best {:.8f} {} {:.8f} Best {:.8f}".format(
               (epoch+1)/epochs,
               train_loss,
               val_loss,
@@ -149,7 +149,7 @@ def check_and_set_checkpoints_cls(use_callback,model,filepath,epoch,metric_stora
   return best_val_loss, best_acc,best_bacc,best_val_avg_iota  
 
 
-def run_epoch_cls(model,dataloader,loss_fct,optimizer,scheduler,epoch,n_classes,device,current_dtype,cblock,metric_storage,logger):
+def run_epoch_cls(model,dataloader,loss_fct,optimizer,scaler,scheduler,epoch,n_classes,device,current_dtype,cblock,metric_storage,logger):
   total_loss=0.0
   confusion_matrix=torch.zeros(size=(n_classes,n_classes),device=device,dtype=current_dtype)
 
@@ -161,7 +161,6 @@ def run_epoch_cls(model,dataloader,loss_fct,optimizer,scheduler,epoch,n_classes,
     model.eval()
     ctx=torch.no_grad()
 
-  model.train(True)
   for batch in dataloader:
     with ctx: 
       inputs=batch["input"]
@@ -177,12 +176,16 @@ def run_epoch_cls(model,dataloader,loss_fct,optimizer,scheduler,epoch,n_classes,
       
       if cblock=="train":
         optimizer.zero_grad()
-      outputs=model(inputs,prediction_mode=False)
-      loss=loss_fct(outputs,labels)*sample_weights
-      loss=loss.mean()
+      with torch.autocast(device_type=device, dtype=None, enabled=True):  
+        outputs=model(inputs,prediction_mode=False)
+        loss=loss_fct(outputs,labels)*sample_weights
+        loss=loss.mean()
       if cblock=="train":
-        loss.backward()
-        optimizer.step()
+        scaler.scale(loss).backward()
+        scaler.step(optimizer)
+        scaler.update()  
+        #loss.backward()
+        #optimizer.step()
         if scheduler!=None:
           scheduler.step()
       #Metrics
@@ -209,7 +212,7 @@ def run_epoch_cls(model,dataloader,loss_fct,optimizer,scheduler,epoch,n_classes,
   )
   return results
 
-def run_epoch_cls_pt(model,dataloader,loss_fct,optimizer,scheduler,epoch,Ns,Nq,n_classes,device,current_dtype,cblock,metric_storage,logger):
+def run_epoch_cls_pt(model,dataloader,loss_fct,optimizer,scaler, scheduler,epoch,Ns,Nq,n_classes,device,current_dtype,cblock,metric_storage,logger):
   total_loss=0.0
   confusion_matrix=torch.zeros(size=(n_classes,n_classes),device=device,dtype=current_dtype)
 
@@ -221,7 +224,6 @@ def run_epoch_cls_pt(model,dataloader,loss_fct,optimizer,scheduler,epoch,Ns,Nq,n
     model.eval()
     ctx=torch.no_grad()
 
-  model.train(True)
   for batch in dataloader:
     with ctx:
       inputs=batch["input"]
@@ -237,20 +239,24 @@ def run_epoch_cls_pt(model,dataloader,loss_fct,optimizer,scheduler,epoch,Ns,Nq,n
         query_classes = query_classes.to(device,dtype=current_dtype)
 
         optimizer.zero_grad()
-        outputs=model(
-          input_q=query_inputs,
-          classes_q=query_classes,
-          input_s=sample_inputs,
-          classes_s=sample_classes,
-          prediction_mode=False
-        )
-        loss=loss_fct(
-          classes_q=outputs[2],
-          distance_matrix=outputs[1],
-          metric_scale_factor=model.get_metric_scale_factor().detach()
-        )
-        loss.backward()
-        optimizer.step()
+        with torch.autocast(device_type=device, dtype=None, enabled=True):
+          outputs=model(
+            input_q=query_inputs,
+            classes_q=query_classes,
+            input_s=sample_inputs,
+            classes_s=sample_classes,
+            prediction_mode=False
+          )
+          loss=loss_fct(
+            classes_q=outputs[2],
+            distance_matrix=outputs[1],
+            metric_scale_factor=model.get_metric_scale_factor().detach()
+          )
+        scaler.scale(loss).backward()
+        scaler.step(optimizer)
+        scaler.update()  
+        #loss.backward()
+        #optimizer.step()
         if scheduler!=None:
           scheduler.step()
         #Metrics
@@ -260,12 +266,13 @@ def run_epoch_cls_pt(model,dataloader,loss_fct,optimizer,scheduler,epoch,Ns,Nq,n
       else:
         inputs = inputs.to(device,dtype=current_dtype)
         labels=labels.to(device,dtype=current_dtype)
-        outputs=model(input_q=inputs,classes_q=labels,prediction_mode=False)
-        loss=loss_fct(
-          classes_q=outputs[2],
-          distance_matrix=outputs[1],
-          metric_scale_factor=model.get_metric_scale_factor().detach()
-        )
+        with torch.autocast(device_type=device, dtype=None, enabled=True):
+          outputs=model(input_q=inputs,classes_q=labels,prediction_mode=False)
+          loss=loss_fct(
+            classes_q=outputs[2],
+            distance_matrix=outputs[1],
+            metric_scale_factor=model.get_metric_scale_factor().detach()
+          )
         #Metrics
         total_loss +=loss.item()
         pred_idx=outputs[0].max(dim=1).indices.to(dtype=torch.long,device=device)
@@ -339,6 +346,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     max_lr=lr_rate,
     min_lr=lr_min
   )
+  amp_scaler=torch.amp.GradScaler(device ,enabled=True)
   #Numpys for Saving Training History
   metric_storage=create_metric_storage(
     metric_names=["loss","accuracy","balanced_accuracy","avg_iota"],
@@ -355,8 +363,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   if not (test_data is None):
     total_steps=total_steps+len(testloader)
   logger=LogWriter(
-    log_file=log_dir+"/aifeducation_state.log",
-    log_file_loss =log_dir+"/aifeducation_loss.log",
+    log_file=log_dir+"/aifeducation_state.log" if not (log_dir is None) else None,
+    log_file_loss =log_dir+"/aifeducation_loss.log" if not (log_dir is None) else None,
     value_top = log_top_value, 
     value_middle = 0, 
     value_bottom = 0,
@@ -375,6 +383,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       model=model,
       dataloader=trainloader,
       optimizer=optimizer,
+      scaler=amp_scaler,
       scheduler=scheduler,
       loss_fct=loss_fct,
       epoch=epoch,
@@ -390,6 +399,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       dataloader=valloader,
       loss_fct=loss_fct,
       optimizer=optimizer,
+      scaler=amp_scaler,
       scheduler=scheduler,
       epoch=epoch,
       n_classes=n_classes,
@@ -404,6 +414,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
         model=model,
         dataloader=testloader,
         optimizer=optimizer,
+        scaler=amp_scaler,
         scheduler=scheduler,
         loss_fct=loss_fct,
         epoch=epoch,
@@ -414,6 +425,9 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
         metric_storage=metric_storage,
         logger=logger
       )
+    #Update logger   
+    logger.reset_value(level="bottom")
+    logger.inc_value(level="middle")
     #Callback-------------------------------------------------------------------
     best_val_loss, best_acc, best_bacc, best_val_avg_iota = check_and_set_checkpoints_cls(
       use_callback=use_callback,
@@ -513,13 +527,14 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     max_lr=lr_rate,
     min_lr=lr_min
   )
+  amp_scaler=torch.amp.GradScaler(device ,enabled=True)
  #Logger
   total_steps=len(trainloader)+len(valloader)
   if not (test_data is None):
     total_steps=total_steps+len(testloader)
   logger=LogWriter(
-    log_file=log_dir+"/aifeducation_state.log",
-    log_file_loss =log_dir+"/aifeducation_loss.log",
+    log_file=log_dir+"/aifeducation_state.log" if not (log_dir is None) else None,
+    log_file_loss =log_dir+"/aifeducation_loss.log" if not (log_dir is None) else None,
     value_top = log_top_value, 
     value_middle = 0, 
     value_bottom = 0,
@@ -538,6 +553,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       model=model,
       dataloader=trainloader,
       optimizer=optimizer,
+      scaler=amp_scaler,
       scheduler=scheduler,
       loss_fct=loss_fct,
       epoch=epoch,
@@ -555,6 +571,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       dataloader=valloader,
       loss_fct=loss_fct,
       optimizer=optimizer,
+      scaler=amp_scaler,
       scheduler=scheduler,
       epoch=epoch,
       Ns=Ns,
@@ -571,6 +588,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
         model=model,
         dataloader=testloader,
         optimizer=optimizer,
+        scaler=amp_scaler,
         scheduler=scheduler,
         loss_fct=loss_fct,
         epoch=epoch,
@@ -583,6 +601,9 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
         metric_storage=metric_storage,
         logger=logger
       )    
+    #Update logger   
+    logger.reset_value(level="bottom")
+    logger.inc_value(level="middle")
     #Callback-------------------------------------------------------------------
     best_val_loss, best_acc, best_bacc, best_val_avg_iota = check_and_set_checkpoints_cls(
       use_callback=use_callback,
