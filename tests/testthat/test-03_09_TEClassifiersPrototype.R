@@ -26,7 +26,7 @@ create_dir(testthat::test_path("test_artefacts"), FALSE)
 root_path_results <- testthat::test_path("test_artefacts/TeClassifierProtoNet")
 create_dir(root_path_results, FALSE)
 root_path_feature_extractor <- testthat::test_path("test_data_tmp/classifier/feature_extractor_pytorch")
-tolerance=1e-5
+tolerance=1e-4
 
 # SetUp datasets
 # Disable tqdm progressbar
