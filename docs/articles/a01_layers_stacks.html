@@ -584,7 +584,7 @@ features.</p>
 <p>In the case of selecting the minmal <em>and</em> maximal features at
 the same time the minmal features are concatenated to the tensor of the
 maximal features resulting in the shape
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mi>B</mi><mi>a</mi><mi>t</mi><mi>c</mi><mi>h</mi><mo>,</mo><mi>T</mi><mi>i</mi><mi>m</mi><mi>e</mi><mi>s</mi><mo>,</mo><mn>2</mn><mo>*</mo><mi>F</mi><mi>e</mi><mi>a</mi><mi>t</mi><mi>u</mi><mi>r</mi><mi>e</mi><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(Batch, Times, 2*Features)</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>B</mi><mi>a</mi><mi>t</mi><mi>c</mi><mi>h</mi><mo>,</mo><mi>T</mi><mi>i</mi><mi>m</mi><mi>e</mi><mi>s</mi><mo>,</mo><mn>2</mn><mo>*</mo><mi>F</mi><mi>e</mi><mi>a</mi><mi>t</mi><mi>u</mi><mi>r</mi><mi>e</mi><mi>s</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(Batch, Times, 2*Features)</annotation></semantics></math>
 at the end of the first step. In the second step the number of requested
 features is halved. The first half is used for the maximal features and
 the second for the minimal features. All parameters with the prefix

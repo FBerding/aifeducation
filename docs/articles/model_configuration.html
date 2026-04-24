@@ -158,18 +158,18 @@ Thus, this recommendation is always satisfied.</p>
 <p>Levine et al. (2020, p. 2) investigate the architecture of
 transformers and reveal that the minimal depth of a transformer encoder
 with multi-head attention should be
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub><mo>=</mo><mi>l</mi><mi>o</mi><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>d</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">L_{min}=log(d)</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub><mo>=</mo><mi>l</mi><mi>o</mi><mi>g</mi><mo stretchy="false" form="prefix">(</mo><mi>d</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">L_{min}=log(d)</annotation></semantics></math>,
 where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>d</mi><annotation encoding="application/x-tex">d</annotation></semantics></math>
 is the hidden size. For example, if the hidden size of the attention
 layer is 768, this formula suggests at least
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub><mo>=</mo><mi>l</mi><mi>o</mi><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>768</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>6.64379</mn></mrow><annotation encoding="application/x-tex">L_{min}=log(768)=6.64379</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub><mo>=</mo><mi>l</mi><mi>o</mi><mi>g</mi><mo stretchy="false" form="prefix">(</mo><mn>768</mn><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>6.64379</mn></mrow><annotation encoding="application/x-tex">L_{min}=log(768)=6.64379</annotation></semantics></math>,
 so seven layers. In addition, their work offers a formula for estimating
 the optimal depth depending on the hidden size (Levine et al. 2020,
 p. 8):
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mrow><mi>o</mi><mi>p</mi><mi>t</mi><mi>i</mi><mi>m</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>d</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mrow><mi>l</mi><mi>o</mi><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>d</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mn>5.039</mn></mrow><mn>0.0555</mn></mfrac></mrow><annotation encoding="application/x-tex">L_{optim}(d)=\frac{log(d)-5.039}{0.0555}</annotation></semantics></math>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mrow><mi>o</mi><mi>p</mi><mi>t</mi><mi>i</mi><mi>m</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><mi>d</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mfrac><mrow><mi>l</mi><mi>o</mi><mi>g</mi><mo stretchy="false" form="prefix">(</mo><mi>d</mi><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mn>5.039</mn></mrow><mn>0.0555</mn></mfrac></mrow><annotation encoding="application/x-tex">L_{optim}(d)=\frac{log(d)-5.039}{0.0555}</annotation></semantics></math>
 For a hidden size of 768,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mrow><mi>o</mi><mi>p</mi><mi>t</mi><mi>i</mi><mi>m</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mn>768</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>28.91513033</mn></mrow><annotation encoding="application/x-tex">L_{optim}(768)=28.91513033</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mrow><mi>o</mi><mi>p</mi><mi>t</mi><mi>i</mi><mi>m</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><mn>768</mn><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>28.91513033</mn></mrow><annotation encoding="application/x-tex">L_{optim}(768)=28.91513033</annotation></semantics></math>
 would be about 29 layers.</p>
 <p><strong>Number of attention heads</strong></p>
 <p>The hidden size (the width of the layers) of a transformer has an

@@ -2422,7 +2422,7 @@ feature_extractor$train(
   batch_size = 64,
   lr_rate = 0.5,
   lr_min = 6e-2,
-  lr_scheduler = "Cyclic",
+  lr_scheduler = "Linear",
   trace = TRUE,
   ml_trace = 0,
   optimizer = "AdamW",

@@ -58,6 +58,9 @@
 <li>Fixed error in detecting MacOS.</li>
 </ul><p><strong>AI for Education - Studio</strong></p>
 <ul><li>Increased size of widgets for a better usability.</li>
+<li>Fixed a bug in progress modal that could crash a training loop.</li>
+<li>Reduced the time interval to update progress graphics to 4 seconds.</li>
+<li>Improved visualization of training processes.</li>
 </ul><p><strong>BaseModel</strong></p>
 <ul><li>In transformers 4.49.0 and transformers 5.0.0 the data collator for whole word masking changed. Now aifeducation is compatible with these versions and whole word masking.</li>
 <li>MPNet is temporarily not available with transformers of 5.0.0 and higher. This will be changed with the next release.</li>
@@ -65,8 +68,11 @@
 <ul><li>Fixed a bug with knnor which caused a crash for some datasets.</li>
 <li>Fixed a bug in Multiple N-Gram Layers. This version of the package is not compatible with older models containing this kind of layer.</li>
 <li>Changed dtype from float64 to float32 and added decorator torch.inference_mode() for predictions.</li>
+<li>Add Automatic Mixed Precision to training loops of all classifiers.</li>
+<li>Add ‘MultiWayContrastiveLossFC’ as a new loss for classifiers with prototypes. This loss is a combination of ‘MultiWayContrastiveLoss’ and ‘FocalLoss’.</li>
 </ul><p><strong>TeFeatureExtractor</strong></p>
 <ul><li>Changed dtype from float64 to float32 and added decorator torch.inference_mode() for predictions.</li>
+<li>Add Automatic Mixed Precision to training loop.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.1.4" id="aifeducation-114">aifeducation 1.1.4<a class="anchor" aria-label="anchor" href="#aifeducation-114"></a></h2><p class="text-muted">CRAN release: 2026-03-02</p>
