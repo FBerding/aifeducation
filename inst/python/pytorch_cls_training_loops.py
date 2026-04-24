@@ -152,7 +152,7 @@ def check_and_set_checkpoints_cls(use_callback,model,filepath,epoch,metric_stora
   return best_val_loss, best_acc,best_bacc,best_val_avg_iota  
 
 
-def run_epoch_cls(model,dataloader,loss_fct,optimizer,scaler,scheduler,epoch,n_classes,device,current_dtype,cblock,metric_storage,logger):
+def run_epoch_cls(model,dataloader,loss_fct,optimizer,scaler,scheduler,amp,epoch,n_classes,device,current_dtype,cblock,metric_storage,logger):
   total_loss=0.0
   confusion_matrix=torch.zeros(size=(n_classes,n_classes),device=device,dtype=current_dtype)
 
@@ -179,7 +179,7 @@ def run_epoch_cls(model,dataloader,loss_fct,optimizer,scaler,scheduler,epoch,n_c
       
       if cblock=="train":
         optimizer.zero_grad()
-      with torch.autocast(device_type=device, dtype=None, enabled=True):  
+      with torch.autocast(device_type=device, dtype=None, enabled=amp):  
         outputs=model(inputs,prediction_mode=False)
         loss=loss_fct(outputs,labels)*sample_weights
         loss=loss.mean()
@@ -215,7 +215,7 @@ def run_epoch_cls(model,dataloader,loss_fct,optimizer,scaler,scheduler,epoch,n_c
   )
   return results
 
-def run_epoch_cls_pt(model,dataloader,loss_fct,optimizer,scaler, scheduler,epoch,Ns,Nq,n_classes,device,current_dtype,cblock,metric_storage,logger):
+def run_epoch_cls_pt(model,dataloader,loss_fct,optimizer,scaler, scheduler,amp,epoch,Ns,Nq,n_classes,device,current_dtype,cblock,metric_storage,logger):
   total_loss=0.0
   confusion_matrix=torch.zeros(size=(n_classes,n_classes),device=device,dtype=current_dtype)
 
@@ -242,7 +242,7 @@ def run_epoch_cls_pt(model,dataloader,loss_fct,optimizer,scaler, scheduler,epoch
         query_classes = query_classes.to(device,dtype=current_dtype)
 
         optimizer.zero_grad()
-        with torch.autocast(device_type=device, dtype=None, enabled=True):
+        with torch.autocast(device_type=device, dtype=None, enabled=amp):
           outputs=model(
             input_q=query_inputs,
             classes_q=query_classes,
@@ -269,7 +269,7 @@ def run_epoch_cls_pt(model,dataloader,loss_fct,optimizer,scaler, scheduler,epoch
       else:
         inputs = inputs.to(device,dtype=current_dtype)
         labels=labels.to(device,dtype=current_dtype)
-        with torch.autocast(device_type=device, dtype=None, enabled=True):
+        with torch.autocast(device_type=device, dtype=None, enabled=amp):
           outputs=model(input_q=inputs,classes_q=labels,prediction_mode=False)
           loss=loss_fct(
             classes_q=outputs[2],
@@ -314,7 +314,7 @@ def run_epoch_cls_pt(model,dataloader,loss_fct,optimizer,scaler, scheduler,epoch
   )
   return results
 
-def TeClassifierTrain(model,loss_cls_fct_name , optimizer_method,scheduler_type, lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,batch_size,
+def TeClassifierTrain(model,loss_cls_fct_name , optimizer_method,scheduler_type,amp, lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,batch_size,
 train_data,val_data,filepath,use_callback,n_classes,class_weights,test_data=None,
 log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
   #Prepare model
@@ -349,7 +349,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     max_lr=lr_rate,
     min_lr=lr_min
   )
-  amp_scaler=torch.amp.GradScaler(device ,enabled=True)
+  amp_scaler=torch.amp.GradScaler(device ,enabled=amp)
   #Numpys for Saving Training History
   metric_storage=create_metric_storage(
     metric_names=["loss","accuracy","balanced_accuracy","avg_iota"],
@@ -388,6 +388,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       optimizer=optimizer,
       scaler=amp_scaler,
       scheduler=scheduler,
+      amp=amp,
       loss_fct=loss_fct,
       epoch=epoch,
       n_classes=n_classes,
@@ -404,6 +405,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       optimizer=optimizer,
       scaler=amp_scaler,
       scheduler=scheduler,
+      amp=amp,
       epoch=epoch,
       n_classes=n_classes,
       device=device,
@@ -419,6 +421,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
         optimizer=optimizer,
         scaler=amp_scaler,
         scheduler=scheduler,
+        amp=amp,
         loss_fct=loss_fct,
         epoch=epoch,
         n_classes=n_classes,
@@ -467,7 +470,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     model.load_state_dict(torch.load(filepath,weights_only=True))
   return metric_storage
 
-def TeClassifierTrainPrototype(model,loss_pt_fct_name , optimizer_method, scheduler_type, lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,Ns,Nq,
+def TeClassifierTrainPrototype(model,loss_pt_fct_name , optimizer_method, scheduler_type, amp,lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,Ns,Nq,
 loss_alpha, loss_margin, train_data,val_data,filepath,use_callback,n_classes,sampling_separate,sampling_shuffle,test_data=None,
 log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
   #Prepare model
@@ -530,7 +533,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     max_lr=lr_rate,
     min_lr=lr_min
   )
-  amp_scaler=torch.amp.GradScaler(device ,enabled=True)
+  amp_scaler=torch.amp.GradScaler(device ,enabled=amp)
  #Logger
   total_steps=len(trainloader)+len(valloader)
   if not (test_data is None):
@@ -558,6 +561,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       optimizer=optimizer,
       scaler=amp_scaler,
       scheduler=scheduler,
+      amp=amp,
       loss_fct=loss_fct,
       epoch=epoch,
       Ns=Ns,
@@ -576,6 +580,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       optimizer=optimizer,
       scaler=amp_scaler,
       scheduler=scheduler,
+      amp=amp,
       epoch=epoch,
       Ns=Ns,
       Nq=Nq,
@@ -593,6 +598,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
         optimizer=optimizer,
         scaler=amp_scaler,
         scheduler=scheduler,
+        amp=amp,
         loss_fct=loss_fct,
         epoch=epoch,
         Ns=Ns,

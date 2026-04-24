@@ -1540,7 +1540,8 @@ classifier$train(
   lr_min = 3e-2,
   lr_scheduler="Linear",
   lr_warm_up_ratio = 0.05,
-  optimizer = "AdamW"
+  optimizer = "AdamW",
+  amp = TRUE
 )
 ```
 
@@ -1569,6 +1570,10 @@ A study conducted by Masters and Luschi (2018) suggests ways to achieve good
 batch size for using `"SGD"` as optimizer. Their study shows that smaller batch sizes
 offer more stable and reliable training and at the same time achieve better
 generalisation performance. Batch sizes between 4 and 32 lead to the best performance.
+
+To speed up computations we activate automatic mixed precision (amp) 
+with gradient scaling by setting `amp = TRUE`. In general we recommend to activate
+mixed precision. If you encounter any problems turn this option off.
 
 Please note that there are 
 exceptions to this rule. In the context of contrastive
@@ -2029,7 +2034,8 @@ classifier_prototype$train(
   lr_min = 3e-2,
   lr_scheduler = "None",
   lr_warm_up_ratio = 0.05,
-  optimizer = "AdamW"
+  optimizer = "AdamW",
+  amp = TRUE
 )
 ```
 
@@ -2426,6 +2432,7 @@ feature_extractor$train(
   trace = TRUE,
   ml_trace = 0,
   optimizer = "AdamW",
+  amp = TRUE,
   lr_warm_up_ratio = 0.10
 )
 ```
@@ -2554,7 +2561,8 @@ classifier_with_fe$train(
   lr_min = 3e-2,
   lr_scheduler = "Linear",
   lr_warm_up_ratio = 0.05,
-  optimizer = "AdamW"
+  optimizer = "AdamW",
+  amp = TRUE
 )
 ```
 

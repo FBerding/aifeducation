@@ -126,7 +126,8 @@ is used as the final model.
   lr_min = 1e-04,
   lr_scheduler = "None",
   lr_warm_up_ratio = 0.02,
-  optimizer = "AdamW"
+  optimizer = "AdamW",
+  amp = FALSE
 )}\if{html}{\out{</div>}}
 }
 
@@ -223,6 +224,11 @@ the log files. Only relevant if \code{log_dir} is not \code{NULL}. Allowed value
 \item{\code{lr_warm_up_ratio}}{\code{double} Number of epochs used for warm up. To disable warm up set this value to 0.0. Allowed values: \ifelse{latex}{$0 < x < 0.5$}{\ifelse{html}{\eqn{0 < x < 0.5}}{`0 < x < 0.5`}}}
 
 \item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values: 'Adam', 'RMSprop', 'AdamW', 'SGD'}
+
+\item{\code{amp}}{\code{bool} Apply automatic mixed precision to spped up computations. It is generally
+recommended to set this parameter to \code{TRUE}. If you encounter problems set to \code{FALSE}.
+* \code{FALSE}: Use full precision.
+* \code{TRUE}: Use automatic mixed precision (amp) with gradient scaling.}
 
 \item{\code{loss_balance_class_weights}}{\code{bool} If \code{TRUE} class weights are generated based on the frequencies of the
 training data with the method Inverse Class Frequency. If \code{FALSE} each class has the weight 1.}

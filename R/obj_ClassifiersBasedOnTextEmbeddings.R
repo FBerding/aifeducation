@@ -1099,6 +1099,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         lr_rate = self$last_training$config$lr_rate,
         lr_min=self$last_training$config$lr_min,
         scheduler_type=self$last_training$config$lr_scheduler,
+        amp=self$last_training$config$amp,
         lr_warm_up_ratio = self$last_training$config$lr_warm_up_ratio,
         epochs = as.integer(self$last_training$config$epochs),
         trace = as.integer(self$last_training$config$ml_trace),

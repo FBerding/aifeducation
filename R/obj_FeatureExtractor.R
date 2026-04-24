@@ -122,6 +122,7 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param lr_min `r get_param_doc_desc("lr_min")`
     #' @param lr_scheduler `r get_param_doc_desc("lr_scheduler")`
     #' @param optimizer `r get_param_doc_desc("optimizer")`
+    #' @param amp `r get_param_doc_desc("amp")`
     #' @note This model requires that the underlying [TextEmbeddingModel] uses `pad_value=0`. If
     #' this condition is not met the pad value is switched before training.
     #' @return Function does not return a value. It changes the object into a trained classifier.
@@ -142,7 +143,8 @@ TEFeatureExtractor <- R6::R6Class(
                      lr_min=1e-4,
                      lr_warm_up_ratio = 0.02,
                      lr_scheduler="None",
-                     optimizer = "AdamW") {
+                     optimizer = "AdamW",
+                     amp = FALSE) {
       tmp_args <- get_called_args(n = 1L)
       check_all_args(args = tmp_args)
       self$check_embedding_model(data_embeddings)
@@ -209,6 +211,7 @@ TEFeatureExtractor <- R6::R6Class(
       self$last_training$history <- py$AutoencoderTrain_PT_with_Datasets(
         model = private$model,
         optimizer_method = self$last_training$config$optimizer,
+        amp=self$last_training$config$amp,
         lr_rate = self$last_training$config$lr_rate,
         lr_warm_up_ratio = self$last_training$config$lr_warm_up_ratio,
         lr_min=self$last_training$config$lr_min,

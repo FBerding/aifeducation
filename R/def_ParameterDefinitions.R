@@ -1171,6 +1171,23 @@ get_param_dict <- function() {
     default_value = 0.01,
     test_values = 0.01
   )
+
+  param$amp <- list(
+    type = "bool",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = NULL,
+    desc = "Apply automatic mixed precision to spped up computations. It is generally
+    recommended to set this parameter to `TRUE`. If you encounter problems set to `FALSE`.
+    * `FALSE`: Use full precision.
+    * `TRUE`: Use automatic mixed precision (amp) with gradient scaling.",
+    gui_box = "General Settings",
+    gui_label = "Apply automatic mixed precision",
+    default_value = FALSE,
+    test_values = FALSE
+  )
+
   param$dir_checkpoint <- list(
     type = "string",
     allow_null = FALSE,

@@ -149,7 +149,8 @@ Method for training a neural net.
   lr_min = 1e-04,
   lr_warm_up_ratio = 0.02,
   lr_scheduler = "None",
-  optimizer = "AdamW"
+  optimizer = "AdamW",
+  amp = FALSE
 )}\if{html}{\out{</div>}}
 }
 
@@ -198,6 +199,11 @@ the log files. Only relevant if \code{log_dir} is not \code{NULL}. Allowed value
 \item{\code{lr_scheduler}}{\code{string} Learning rate scheduler. To use a constant learning rate for the whole training set this parameter to 'None'. Allowed values: 'None', 'Linear', 'Cyclic'}
 
 \item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values: 'Adam', 'RMSprop', 'AdamW', 'SGD'}
+
+\item{\code{amp}}{\code{bool} Apply automatic mixed precision to spped up computations. It is generally
+recommended to set this parameter to \code{TRUE}. If you encounter problems set to \code{FALSE}.
+* \code{FALSE}: Use full precision.
+* \code{TRUE}: Use automatic mixed precision (amp) with gradient scaling.}
 }
 \if{html}{\out{</div>}}
 }

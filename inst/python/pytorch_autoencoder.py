@@ -279,7 +279,7 @@ class ConvAutoencoder_with_Mask_PT(torch.nn.Module):
       return(noise)
 
 
-def run_epoch_autoencoder(model,dataloader,loss_fct,optimizer,scaler,scheduler,epoch,device,current_dtype,cblock,metric_storage,logger):
+def run_epoch_autoencoder(model,dataloader,loss_fct,optimizer,scaler,scheduler,amp,epoch,device,current_dtype,cblock,metric_storage,logger):
   total_loss=0.0
   if cblock=="train":
     optimizer.zero_grad()
@@ -296,7 +296,7 @@ def run_epoch_autoencoder(model,dataloader,loss_fct,optimizer,scaler,scheduler,e
       labels=labels.to(device,dtype=current_dtype)
       if cblock=="train":
         optimizer.zero_grad()
-      with torch.autocast(device_type=device, dtype=None, enabled=True):  
+      with torch.autocast(device_type=device, dtype=None, enabled=amp):  
         outputs=model(inputs,encoder_mode=False)
         loss=loss_fct(outputs,labels)
       if cblock=="train":
@@ -332,7 +332,7 @@ def check_and_set_checkpoints_loss(use_callback,model,filepath,epoch,metric_stor
         metric_storage["checkpoints"][epoch]=1
   return best_val_loss
     
-def AutoencoderTrain_PT_with_Datasets(model,optimizer_method,scheduler_type, lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,batch_size,
+def AutoencoderTrain_PT_with_Datasets(model,optimizer_method,scheduler_type,amp, lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,batch_size,
 train_data,val_data,filepath,use_callback,
 log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
   #Set test data to None
@@ -367,7 +367,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     max_lr=lr_rate,
     min_lr=lr_min
   )
-  amp_scaler=torch.amp.GradScaler(device ,enabled=True)
+  amp_scaler=torch.amp.GradScaler(device ,enabled=amp)
   #Tensor for Saving Training History
     #Numpys for Saving Training History
   metric_storage=create_metric_storage(
@@ -403,6 +403,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       dataloader=trainloader,
       optimizer=optimizer,
       scaler=amp_scaler,
+      amp=amp,
       scheduler=scheduler,
       loss_fct=loss_fct,
       epoch=epoch,
@@ -418,6 +419,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       loss_fct=loss_fct,
       optimizer=optimizer,
       scaler=amp_scaler,
+      amp=amp,
       scheduler=scheduler,
       epoch=epoch,
       device=device,
@@ -432,6 +434,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
         dataloader=testloader,
         optimizer=optimizer,
         scaler=amp_scaler,
+        amp=amp,
         scheduler=scheduler,
         loss_fct=loss_fct,
         epoch=epoch,
