@@ -227,6 +227,7 @@ TEFeatureExtractor <- R6::R6Class(
         log_top_message = log_top_message
       )
       rownames(self$last_training$history$loss) <- c("train", "val")
+      self$last_training$history <- list(self$last_training$history)
 
       # Stop sustainability tracking if requested
       private$stop_sustainability_tracking()

@@ -108,7 +108,10 @@ def print_epoch_results(trace,loss_only,metric_storage,epoch,epochs,metric_crite
     else:
       end_string="\r"
     if loss_only:
-      print("{:.4f} % | Train Loss {:.8f} | Val Loss {:.8f} Best {:.8f} {} {:.8f} Best {:.8f}".format(
+      loss=metric_storage["loss"]
+      train_loss=loss[0,epoch]
+      val_loss=loss[1,epoch]
+      print("{:.4f} % | Train Loss {:.8f} | Val Loss {:.8f} Best {:.8f}".format(
               (epoch+1)/epochs,
               train_loss,
               val_loss,

@@ -626,9 +626,9 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
                                         pl_step = NULL) {
       plot_data <- self$last_training$history
 
-      if (length(plot_data) <= 1L) {
-        plot_data[[1L]] <- list(loss = plot_data[[1L]])
-      }
+      #if (length(plot_data) <= 1L) {
+      #  plot_data[[1L]] <- list(loss = plot_data[[1L]])
+      #}
 
       if (is.null_or_na(final)) {
         final <- FALSE
