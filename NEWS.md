@@ -27,6 +27,9 @@ editor_options:
 **AI for Education - Studio**
 
 - Increased size of widgets for a better usability.
+- Fixed a bug in progress modal that could crash a training loop.
+- Reduced the time interval to update progress graphics to 4 seconds.
+- Improved visualization of training processes.
 
 **BaseModel**
 
@@ -41,10 +44,14 @@ editor_options:
 - Fixed a bug in Multiple N-Gram Layers. 
   This version of the package is not compatible with older models containing this kind of layer.
 - Changed dtype from float64 to float32 and added decorator torch.inference_mode() for predictions.
+- Add Automatic Mixed Precision to training loops of all classifiers.
+- Add 'MultiWayContrastiveLossFC' as a new loss for classifiers with prototypes. This loss is a
+  combination of 'MultiWayContrastiveLoss' and 'FocalLoss'.
 
 **TeFeatureExtractor**
 
 - Changed dtype from float64 to float32 and added decorator torch.inference_mode() for predictions.
+- Add Automatic Mixed Precision to training loop.
 
 # aifeducation 1.1.4
 
