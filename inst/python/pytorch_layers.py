@@ -539,8 +539,8 @@ class layer_fourier_transformation(torch.nn.Module):
     self.fourier_batch=torch.vmap(func=torch.fft.fft2,in_dims=0,out_dims=0)
     
   def forward(self,x):
-    result=self.fourier_batch(x,norm="backward").real
-    return result
+    result=self.fourier_batch(x.to(torch.complex64),norm="backward").real
+    return result.to(x.dtype)
 
 #----------------
 class layer_abs_positional_embedding(torch.nn.Module):
