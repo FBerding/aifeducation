@@ -29,7 +29,7 @@ Objects of class TEFeatureExtractor are designed to be used with any Classifiers
 
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -215,7 +215,8 @@ be added to the input during training. Allowed values: \(0 &lt;= x &lt;= 1\)</p>
 <span>  lr_min <span class="op">=</span> <span class="fl">1e-04</span>,</span>
 <span>  lr_warm_up_ratio <span class="op">=</span> <span class="fl">0.02</span>,</span>
 <span>  lr_scheduler <span class="op">=</span> <span class="st">"None"</span>,</span>
-<span>  optimizer <span class="op">=</span> <span class="st">"AdamW"</span></span>
+<span>  optimizer <span class="op">=</span> <span class="st">"AdamW"</span>,</span>
+<span>  amp <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -243,7 +244,7 @@ sustainability should be tracked. A list can be found on Wikipedia:
 
 <dt><code>sustain_region</code></dt>
 <dd><p><code>string</code> Region within a country. Only available for USA and Canada See the documentation of
-codecarbon for more information. <a href="https://docs.codecarbon.io/latest/getting-started/parameters/" class="external-link">https://docs.codecarbon.io/latest/getting-started/parameters/</a> Allowed values: any</p></dd>
+codecarbon for more information. <a href="https://docs.codecarbon.io/latest/" class="external-link">https://docs.codecarbon.io/latest/</a> Allowed values: any</p></dd>
 
 
 <dt><code>sustain_interval</code></dt>
@@ -298,6 +299,13 @@ the log files. Only relevant if <code>log_dir</code> is not <code>NULL</code>. A
 
 <dt><code>optimizer</code></dt>
 <dd><p><code>string</code> determining the optimizer used for training. Allowed values: 'Adam', 'RMSprop', 'AdamW', 'SGD'</p></dd>
+
+
+<dt><code>amp</code></dt>
+<dd><p><code>bool</code> Apply automatic mixed precision to spped up computations. It is generally
+recommended to set this parameter to <code>TRUE</code>. If you encounter problems set to <code>FALSE</code>.
+* <code>FALSE</code>: Use full precision.
+* <code>TRUE</code>: Use automatic mixed precision (amp) with gradient scaling.</p></dd>
 
 
 </dl><p></p></div>

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -58,7 +58,8 @@
 <span>  <span class="va">sequence_length</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"knnor"</span>,</span>
 <span>  min_k <span class="op">=</span> <span class="fl">1L</span>,</span>
-<span>  max_k <span class="op">=</span> <span class="fl">6L</span></span>
+<span>  max_k <span class="op">=</span> <span class="fl">6L</span>,</span>
+<span>  pad_value <span class="op">=</span> <span class="op">-</span><span class="fl">100L</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -97,6 +98,10 @@
 
 <dt id="arg-max-k">max_k<a class="anchor" aria-label="anchor" href="#arg-max-k"></a></dt>
 <dd><p><code>int</code> The maximum number of nearest neighbors during sampling process.</p></dd>
+
+
+<dt id="arg-pad-value">pad_value<a class="anchor" aria-label="anchor" href="#arg-pad-value"></a></dt>
+<dd><p><code>int</code> Value for indicating padding.</p></dd>
 
 </dl></div>
     <div class="section level2">

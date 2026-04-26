@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -392,8 +392,10 @@ tensor is retained (Pham, Kruszewski &amp; Boleda 2016).</p>
 <p>The layer is able to consider multiple n-grams at the same time. In
 this case the convolution of the n-grams is done seprately and the
 resulting tensors are concatenated along the feature dimension. The
-number of filters for every n-gram is set to num_features/num_n-grams.
-Thus, the resulting tensor has the same shape as the input tensor.</p>
+number of filters for each n-gram is set to the next smallest natural
+number of num_features/num_n-grams. A residual is added to the first
+n-gram. Thus, the resulting tensor has the same shape as the input
+tensor.</p>
 <p>Sub-sequences that are masked in the input are also masked in the
 output.</p>
 <p>The output of this layer can be understand as the results of the
@@ -582,7 +584,7 @@ features.</p>
 <p>In the case of selecting the minmal <em>and</em> maximal features at
 the same time the minmal features are concatenated to the tensor of the
 maximal features resulting in the shape
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mi>B</mi><mi>a</mi><mi>t</mi><mi>c</mi><mi>h</mi><mo>,</mo><mi>T</mi><mi>i</mi><mi>m</mi><mi>e</mi><mi>s</mi><mo>,</mo><mn>2</mn><mo>*</mo><mi>F</mi><mi>e</mi><mi>a</mi><mi>t</mi><mi>u</mi><mi>r</mi><mi>e</mi><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(Batch, Times, 2*Features)</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>B</mi><mi>a</mi><mi>t</mi><mi>c</mi><mi>h</mi><mo>,</mo><mi>T</mi><mi>i</mi><mi>m</mi><mi>e</mi><mi>s</mi><mo>,</mo><mn>2</mn><mo>*</mo><mi>F</mi><mi>e</mi><mi>a</mi><mi>t</mi><mi>u</mi><mi>r</mi><mi>e</mi><mi>s</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(Batch, Times, 2*Features)</annotation></semantics></math>
 at the end of the first step. In the second step the number of requested
 features is halved. The first half is used for the maximal features and
 the second for the minimal features. All parameters with the prefix

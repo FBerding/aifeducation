@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,7 +44,38 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="1.1.4" id="aifeducation-114">aifeducation 1.1.4<a class="anchor" aria-label="anchor" href="#aifeducation-114"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.1.5" id="aifeducation-115">aifeducation 1.1.5<a class="anchor" aria-label="anchor" href="#aifeducation-115"></a></h2>
+<p><strong>General</strong></p>
+<ul><li>Replaced the current logging mechanism with a more sophisticated version.</li>
+<li>Add new tests.</li>
+<li>Update to newer versions of python packages (except ‘transformers’ and ‘codecarbon’).</li>
+<li>Fixed ‘check_adjust_n_samples_on_CI’.</li>
+<li>Fixed the y_max value in all plots for objects based on text embeddings. Now the value is correctly calculated if ‘y_max=NULL’.</li>
+</ul><p><strong>Saving and Loading</strong></p>
+<ul><li>Add error message to load_from_disk for the case that there is no model at the specified location.</li>
+</ul><p><strong>Installation and Configuration</strong></p>
+<ul><li>Fixed error in ‘install_aifeducation_studio’.</li>
+<li>Fixed error in detecting MacOS.</li>
+</ul><p><strong>AI for Education - Studio</strong></p>
+<ul><li>Increased size of widgets for a better usability.</li>
+<li>Fixed a bug in progress modal that could crash a training loop.</li>
+<li>Reduced the time interval to update progress graphics to 4 seconds.</li>
+<li>Improved visualization of training processes.</li>
+</ul><p><strong>BaseModel</strong></p>
+<ul><li>In transformers 4.49.0 and transformers 5.0.0 the data collator for whole word masking changed. Now aifeducation is compatible with these versions and whole word masking.</li>
+<li>MPNet is temporarily not available with transformers of 5.0.0 and higher. This will be changed with the next release.</li>
+</ul><p><strong>Classifiers</strong></p>
+<ul><li>Fixed a bug with knnor which caused a crash for some datasets.</li>
+<li>Fixed a bug in Multiple N-Gram Layers. This version of the package is not compatible with older models containing this kind of layer.</li>
+<li>Changed dtype from float64 to float32 and added decorator torch.inference_mode() for predictions.</li>
+<li>Add Automatic Mixed Precision to training loops of all classifiers.</li>
+<li>Add ‘MultiWayContrastiveLossFC’ as a new loss for classifiers with prototypes. This loss is a combination of ‘MultiWayContrastiveLoss’ and ‘FocalLoss’.</li>
+</ul><p><strong>TeFeatureExtractor</strong></p>
+<ul><li>Changed dtype from float64 to float32 and added decorator torch.inference_mode() for predictions.</li>
+<li>Add Automatic Mixed Precision to training loop.</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.1.4" id="aifeducation-114">aifeducation 1.1.4<a class="anchor" aria-label="anchor" href="#aifeducation-114"></a></h2><p class="text-muted">CRAN release: 2026-03-02</p>
 <p><strong>General</strong></p>
 <ul><li>Added support for python library ‘datasets’ 4.0.0 and higher.</li>
 <li>Added support for python library ‘transformers’ 5.0.0 and higher. Please note that the package does not update python libraries automatically. If you update to transformer version 5 some older models available on hugging face may not work.</li>

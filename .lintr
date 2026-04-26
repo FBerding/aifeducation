@@ -2,7 +2,7 @@ linters: linters_with_tags(
   tags=c("common_mistakes","consistency","correctness","efficiency","robustness"),
   object_name_linter=NULL,
   return_linter=return_linter(
-    return_style = "explicit",
+    return_style = NULL,
     allow_implicit_else = TRUE,
     return_functions = NULL,
     except = NULL,

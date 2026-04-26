@@ -24,6 +24,7 @@ example_folders <- setdiff(
   y = c("examples", "examples/bert_uncased")
 )
 unlink(x = example_folders, recursive = TRUE)
+script_time_start <- Sys.time()
 ```
 
 # 1 Introduction and Overview
@@ -1539,7 +1540,8 @@ classifier$train(
   lr_min = 3e-2,
   lr_scheduler="Linear",
   lr_warm_up_ratio = 0.05,
-  optimizer = "AdamW"
+  optimizer = "AdamW",
+  amp = TRUE
 )
 ```
 
@@ -1568,6 +1570,10 @@ A study conducted by Masters and Luschi (2018) suggests ways to achieve good
 batch size for using `"SGD"` as optimizer. Their study shows that smaller batch sizes
 offer more stable and reliable training and at the same time achieve better
 generalisation performance. Batch sizes between 4 and 32 lead to the best performance.
+
+To speed up computations we activate automatic mixed precision (amp) 
+with gradient scaling by setting `amp = TRUE`. In general we recommend to activate
+mixed precision. If you encounter any problems turn this option off.
 
 Please note that there are 
 exceptions to this rule. In the context of contrastive
@@ -1615,7 +1621,7 @@ classifier$plot_training_history(
   x_min = NULL,
   x_max = NULL,
   y_min = NULL,
-  y_max = 1L,
+  y_max = NULL,
   add_min_max = FALSE,
   text_size = 10
 )
@@ -1669,7 +1675,7 @@ classifier$plot_training_history(
   x_min = NULL,
   x_max = NULL,
   y_min = NULL,
-  y_max = 1L,
+  y_max = NULL,
   add_min_max = FALSE,
   text_size = 10
 )
@@ -1997,7 +2003,7 @@ classifier_prototype$train(
   data_targets = review_labels,
   data_folds = 10,
   data_val_size = 0.25,
-  loss_pt_fct_name = "MultiWayContrastiveLoss",
+  loss_pt_fct_name = "MultiWayContrastiveLossFC",
   use_sc = FALSE,
   sc_method = "knnor",
   sc_min_k = 1,
@@ -2028,7 +2034,8 @@ classifier_prototype$train(
   lr_min = 3e-2,
   lr_scheduler = "None",
   lr_warm_up_ratio = 0.05,
-  optimizer = "AdamW"
+  optimizer = "AdamW",
+  amp = TRUE
 )
 ```
 
@@ -2421,10 +2428,11 @@ feature_extractor$train(
   batch_size = 64,
   lr_rate = 0.5,
   lr_min = 6e-2,
-  lr_scheduler = "Cyclic",
+  lr_scheduler = "Linear",
   trace = TRUE,
   ml_trace = 0,
   optimizer = "AdamW",
+  amp = TRUE,
   lr_warm_up_ratio = 0.10
 )
 ```
@@ -2553,7 +2561,8 @@ classifier_with_fe$train(
   lr_min = 3e-2,
   lr_scheduler = "Linear",
   lr_warm_up_ratio = 0.05,
-  optimizer = "AdamW"
+  optimizer = "AdamW",
+  amp = TRUE
 )
 ```
 
@@ -3064,6 +3073,11 @@ ou, L. (2023). Meta-Learning: Theory, Algorithms and Applications.
 Elsevier Science & Technology.
 <https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=7134465>
 
+# Script runtime
+
+```{r, include = TRUE}
+cat(paste("script runtime:", format(Sys.time() - script_time_start,digits=3L)))
+```
 
 
 

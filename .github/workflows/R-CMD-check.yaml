@@ -2,9 +2,9 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master, version_1_1_4]
+    branches: [main, master, version_1_1_5_dev]
   pull_request:
-    branches: [main, master, version_1_1_4]
+    branches: [main, master, version_1_1_5_dev]
 
 name: R-CMD-check
 
@@ -18,7 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-         # - {os: macos-latest,   r: 'release'}
+        #  - {os: windows,   r: 'release'}
         #  - {os: macos-latest,   r: 'devel'}
           - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,   r: 'release'}
@@ -65,13 +65,13 @@ jobs:
 
          transformer_version = "<=5.2.0"
          tokenizers_version = "<=0.22.2"
-         pandas_version = "<=3.0.1"
-         datasets_version = "<=4.5.0"
+         pandas_version = "<=3.0.2"
+         datasets_version = "<=4.8.4"
          codecarbon_version = "<=3.2.2"
          safetensors_version = "<=0.7.0"
          torcheval_version = "<=0.0.7"
-         accelerate_version = "<=1.12.0"
-         calflops_version="<=0.3.2"
+         accelerate_version = "<=1.13.0"
+         calflops_version = "<=0.3.2"
          pytorch_cuda_version = "13.0"
 
           relevant_modules <- c(
