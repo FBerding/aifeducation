@@ -115,6 +115,11 @@ for (object_class_name in object_class_names) {
         expect_gte(object = classifier$count_parameter(), expected = 0)
       })
 
+      test_that(paste("print method", object_class_name, get_current_args_for_print(test_combination)), {
+        expect_no_error(classifier$print())
+        expect_no_error(print(classifier))
+      })
+
       test_that(paste("Predictions", object_class_name, get_current_args_for_print(test_combination)), {
         # Number of predictions
         suppressMessages(

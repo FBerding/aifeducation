@@ -262,6 +262,27 @@ detect_base_model_type <- function(model) {
   }
 }
 
+#' @title Pad string
+#' @description Function pad a string to the given length.
+#' @param str `character vector` that should be padded.
+#' @param width `int` or `NULL` determining the length of the string.
+#' @param pad `character` used as padding symbol.
+#' @param end `character` added ad the end of all strings.
+#' @return Returns a `character vector` with the padded strings.
+#' @family Utils Developers
+#' @keywords internal
+#' @noRd
+pad_str=function(str,width=NULL,pad=" ",end=":"){
+  string_length <- nchar(str)
+  if (is.null(width)){
+    t_width=max(nchar(str))
+  } else {
+    t_width=width
+  }
+  return(
+    paste0(str, strrep(pad, t_width-string_length),end)
+  )
+}
 
 #' @title ProgressIndicator
 #' @description R6 class that can be used to print the current state of a progress
