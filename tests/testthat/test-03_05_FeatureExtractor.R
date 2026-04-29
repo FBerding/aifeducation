@@ -80,6 +80,11 @@ for (framework in ml_frameworks) {
       })
       gc()
 
+      test_that(paste(framework, method, data_type, "print method"), {
+        expect_no_error(classifier$print())
+        expect_no_error(print(classifier))
+      })
+
       test_that(paste(framework, method, data_type, "train with log"), {
         train_path <- paste0(root_path_results, "/", "train_", generate_id())
         create_dir(train_path, FALSE)

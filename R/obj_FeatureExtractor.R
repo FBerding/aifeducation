@@ -446,6 +446,24 @@ TEFeatureExtractor <- R6::R6Class(
         text_size = text_size
       )
       return(tmp_plot)
+    },
+    #' @description Print method for classifiers.
+    #' @return Prints a short description of the object.
+    print=function(){
+      rows=c("Object","ID","Label","Configured","Trained","Times","Features In","Features Out", "Parameter")
+      padded_rows=pad_str(rows,width = NULL,pad=" ", end=": ")
+      cat(
+        sep="",
+        padded_rows[1L],class(self)[1L],"\n",
+        padded_rows[2L],private$model_info$model_name,"\n",
+        padded_rows[3L],private$model_info$model_label,"\n",
+        padded_rows[4L],self$is_configured(),"\n",
+        padded_rows[5L],self$is_trained(),"\n",
+        padded_rows[6L],self$get_text_embedding_model()$times,"\n",
+        padded_rows[7L],self$get_text_embedding_model()$features,"\n",
+        padded_rows[8L],extractor$get_model_config()$features,"\n",
+        padded_rows[9L],self$count_parameter(),"\n"
+      )
     }
   ),
   private = list(
