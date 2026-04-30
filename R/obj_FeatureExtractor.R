@@ -461,7 +461,7 @@ TEFeatureExtractor <- R6::R6Class(
         padded_rows[5L],self$is_trained(),"\n",
         padded_rows[6L],self$get_text_embedding_model()$times,"\n",
         padded_rows[7L],self$get_text_embedding_model()$features,"\n",
-        padded_rows[8L],extractor$get_model_config()$features,"\n",
+        padded_rows[8L],self$get_model_config()$features,"\n",
         padded_rows[9L],self$count_parameter(),"\n"
       )
     }

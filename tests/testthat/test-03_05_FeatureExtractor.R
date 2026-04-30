@@ -42,6 +42,21 @@ method_list <- list(
 for (framework in ml_frameworks) {
   for (data_type in names(dataset_list)) {
     for (method in method_list[[framework]]) {
+      test_that(paste(framework, method, data_type, "print method"), {
+        extractor <- TEFeatureExtractor$new()
+        extractor$configure(
+          name = "Test_extractor",
+          label = "Test Extractor",
+          text_embeddings = dataset_list[[data_type]],
+          features = 128,
+          method = method,
+          orthogonal_method = "matrix_exp",
+          noise_factor = 0.2
+        )
+        expect_no_error(extractor$print())
+        expect_no_error(print(extractor))
+      })
+
       # Create----------------------------------------------------------------
       extractor <- TEFeatureExtractor$new()
       extractor$configure(
@@ -79,11 +94,6 @@ for (framework in ml_frameworks) {
         expect_true(extractor$get_sustainability_data()$sustainability_tracked)
       })
       gc()
-
-      test_that(paste(framework, method, data_type, "print method"), {
-        expect_no_error(classifier$print())
-        expect_no_error(print(classifier))
-      })
 
       test_that(paste(framework, method, data_type, "train with log"), {
         train_path <- paste0(root_path_results, "/", "train_", generate_id())
