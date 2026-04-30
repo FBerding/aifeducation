@@ -108,14 +108,16 @@ class LSTMAutoencoder_with_Mask_PT(torch.nn.Module):
         x=self.switch_pad_value_final(x)
       return x
     def get_mask(self,x):
-      time_sums=torch.sum(x,dim=2)
-      mask=(time_sums==0)
-      mask_long=torch.reshape(torch.repeat_interleave(mask,repeats=self.features_in,dim=1),(x.size(dim=0),x.size(dim=1),self.features_in))
-      mask_long=mask_long.to(x.device)
+      with torch.no_grad():
+        time_sums=torch.sum(x,dim=2)
+        mask=(time_sums==0)
+        mask_long=torch.reshape(torch.repeat_interleave(mask,repeats=self.features_in,dim=1),(x.size(dim=0),x.size(dim=1),self.features_in))
+        mask_long=mask_long.to(x.device)
       return mask_long
     def add_noise(self, x):
-      noise=self.noise_factor*torch.rand(size=x.size())
-      noise=noise.to(x.device)
+      with torch.no_grad():
+        noise=self.noise_factor*torch.rand(size=x.size())
+        noise=noise.to(x.device)
       return(noise)
       
 class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
@@ -187,14 +189,16 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
         return x
       
     def get_mask(self,x):
-      time_sums=torch.sum(x,dim=2)
-      mask=(time_sums==0)
-      mask_long=torch.reshape(torch.repeat_interleave(mask,repeats=self.features_in,dim=1),(x.size(dim=0),x.size(dim=1),self.features_in))
-      mask_long=mask_long.to(x.device)
+      with torch.no_grad():
+        time_sums=torch.sum(x,dim=2)
+        mask=(time_sums==0)
+        mask_long=torch.reshape(torch.repeat_interleave(mask,repeats=self.features_in,dim=1),(x.size(dim=0),x.size(dim=1),self.features_in))
+        mask_long=mask_long.to(x.device)
       return mask_long
     def add_noise(self, x):
-      noise=self.noise_factor*torch.rand(size=x.size())
-      noise=noise.to(x.device,x.dtype)
+      with torch.no_grad():
+        noise=self.noise_factor*torch.rand(size=x.size())
+        noise=noise.to(x.device,x.dtype)
       return(noise)
     
 class ConvAutoencoder_with_Mask_PT(torch.nn.Module):
