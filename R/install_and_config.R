@@ -565,8 +565,8 @@ prepare_session <- function(env_type = "auto", envname = "aifeducation", check_s
       stop("Not all required python packages are available. Call check_aif_py_modules for details.")
     }
     pkg_versions <- get_py_package_versions()
-    message(paste(paste0(names(pkg_versions), ":"), pkg_versions, collapse = "\n"))
-    message("GPU Acceleration: ", torch$cuda$is_available())
+    print_strings=pad_str(c(names(pkg_versions),"GPU Acceleration"),width = NULL,pad=" ", end=": ")
+    message(paste0(print_strings,c(pkg_versions,torch$cuda$is_available()),collapse = "\n"))
 
     if (check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "5.0.0")) {
       message("Version of python package 'transformers' is 5.0.0 or higher. Some older models
