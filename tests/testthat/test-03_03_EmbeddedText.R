@@ -106,6 +106,32 @@ test_that("EmbeddedText - No FeatureExtractor", {
   expect_equal(new_data_set_converted$get_pad_value(), -100)
 })
 
+#Print Method-------------------------------------------------------------------
+test_that("LargeDataSetForTexts - print method", {
+  new_embedded_text <- EmbeddedText$new()
+  new_embedded_text$configure(
+    model_name = imdb_embeddings$get_model_info()$model_name,
+    model_label = imdb_embeddings$get_model_info()$model_label,
+    model_date = imdb_embeddings$get_model_info()$model_date,
+    model_method = imdb_embeddings$get_model_info()$model_method,
+    model_version = imdb_embeddings$get_model_info()$model_version,
+    model_language = imdb_embeddings$get_model_info()$model_language,
+    param_seq_length = imdb_embeddings$get_model_info()$param_seq_length,
+    param_chunks = imdb_embeddings$get_model_info()$param_chunks,
+    param_features = imdb_embeddings$get_features(),
+    param_overlap = imdb_embeddings$get_model_info()$param_overlap,
+    param_emb_layer_min = imdb_embeddings$get_model_info()$param_emb_layer_min,
+    param_emb_layer_max = imdb_embeddings$get_model_info()$param_emb_layer_max,
+    param_emb_pool_type = imdb_embeddings$get_model_info()$param_emb_pool_type,
+    param_aggregation = imdb_embeddings$get_model_info()$param_aggregation,
+    param_pad_value = -100,
+    embeddings = imdb_embeddings$embeddings
+  )
+
+  expect_no_error(new_embedded_text$print())
+  expect_no_error(print(new_embedded_text))
+})
+
 # Test basic parameters--------------------------------------------------------
 test_that("EmbeddedText - Save and Load", {
   new_embedded_text <- EmbeddedText$new()
