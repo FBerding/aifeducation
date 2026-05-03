@@ -116,6 +116,10 @@ for (object_class_name in object_class_names) {
         tokenizer2$encode(raw_text = "This is a test.", token_encodings_only = TRUE)
       )
 
+      #print method
+        expect_no_error(tokenizer$print())
+        expect_no_error(print(tokenizer))
+
       # Clear directory for next test
       unlink(paste0(test_art_tmp_path, "/", "WordPieceTokenizer"), recursive = TRUE)
     })

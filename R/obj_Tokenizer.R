@@ -356,6 +356,25 @@ TokenizerBase <- R6::R6Class(
         )
       )
       return(statistics)
+    },
+    #' @description Print method for classifiers.
+    #' @return Prints a short description of the object.
+    print=function(){
+      rows=c("Object","Configured","Trained", "Vocab Size", "Tokens/Word","Mask Token","Pad Token","Unk token")
+      padded_rows=pad_str(rows,width = NULL,pad=" ", end=": ")
+      statistics=self$get_tokenizer_statistics()
+      special_tokens=self$get_special_tokens()
+      cat(
+        sep="",
+        padded_rows[1L],class(self)[1L],"\n",
+        padded_rows[2L],private$configured,"\n",
+        padded_rows[3L],private$trained[1L],"\n",
+        padded_rows[4L],private$model_config$vocab_size,"\n",
+        padded_rows[5L],statistics[1L,"mu_g"],"\n",
+        padded_rows[6L],special_tokens["mask_token","token"],"\n",
+        padded_rows[7L],special_tokens["pad_token","token"],"\n",
+        padded_rows[8L],special_tokens["unk_token","token"],"\n"
+      )
     }
   )
 )
