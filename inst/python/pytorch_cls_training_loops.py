@@ -85,10 +85,15 @@ def create_metric_storage(metric_names,epochs,inc_test):
 
 def calc_cls_performance_measures(confusion_matrix,n_classes):
   with torch.no_grad():
-      acc=torch.sum(torch.diagonal(confusion_matrix))/torch.sum(confusion_matrix)
-      bacc=torch.sum(torch.diagonal(confusion_matrix)/torch.sum(confusion_matrix,dim=1))/n_classes
-      avg_iota=torch.diagonal(confusion_matrix)/(torch.sum(confusion_matrix,dim=0)+torch.sum(confusion_matrix,dim=1)-torch.diagonal(confusion_matrix))
-      avg_iota=torch.sum(avg_iota)/n_classes
+    diagonal=torch.diagonal(confusion_matrix) #(n_classes)
+    total_sum=torch.sum(confusion_matrix) #()
+    true_classes=torch.sum(confusion_matrix,dim=1) #(n_classes)
+    col_sum=torch.sum(confusion_matrix,dim=0) #(n_classes)
+  
+    acc=torch.sum(diagonal)/total_sum
+    bacc=torch.sum(diagonal/true_classes)/n_classes
+    avg_iota=diagonal/(col_sum+true_classes-diagonal)
+    avg_iota=torch.sum(avg_iota)/n_classes
   return {"accuracy":acc, "balanced_accuracy":bacc, "avg_iota":avg_iota}
 
 def add_metrics(metrics,storage,cblock,epoch):
