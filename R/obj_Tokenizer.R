@@ -117,6 +117,12 @@ TokenizerBase <- R6::R6Class(
     get_tokenizer_statistics = function() {
       return(private$tokenizer_statistics)
     },
+    # ------------------------------------------------------------------------
+    #' @description Vocabulary. size
+    #' @return Returns a `int` representing the size of the vocabulary.
+    get_vocab_size(){
+      return(private$model_config$vocab_size)
+    }
     #--------------------------------------------------------------------------
     #' @description Python tokenizer
     #' @return Returns the python tokenizer within the model.
@@ -369,7 +375,7 @@ TokenizerBase <- R6::R6Class(
         padded_rows[1L],class(self)[1L],"\n",
         padded_rows[2L],private$configured,"\n",
         padded_rows[3L],private$trained[1L],"\n",
-        padded_rows[4L],private$model_config$vocab_size,"\n",
+        padded_rows[4L],self$get_vocab_size(),"\n",
         padded_rows[5L],statistics[1L,"mu_g"],"\n",
         padded_rows[6L],special_tokens["mask_token","token"],"\n",
         padded_rows[7L],special_tokens["pad_token","token"],"\n",
