@@ -199,7 +199,7 @@ def run_epoch_cls(model,dataloader,loss_fct,optimizer,scaler,scheduler,amp,epoch
       #Metrics
       total_loss +=loss.item()
       label_idx=labels.max(dim=1).indices
-    confusion_matrix+=multiclass_confusion_matrix(input=outputs,target=label_idx,num_classes=n_classes)
+    confusion_matrix+=multiclass_confusion_matrix(input=outputs,target=label_idx,num_classes=n_classes,normalize = None)
     
     #Update log file
     logger.inc_value("bottom")
@@ -285,7 +285,7 @@ def run_epoch_cls_pt(model,dataloader,loss_fct,optimizer,scaler, scheduler,amp,e
         total_loss +=loss.item()
         pred_idx=outputs[0].max(dim=1).indices.to(dtype=torch.long,device=device)
         label_idx=outputs[2].to(dtype=torch.long,device=device)
-    confusion_matrix+=multiclass_confusion_matrix(input=pred_idx,target=label_idx,num_classes=n_classes)
+    confusion_matrix+=multiclass_confusion_matrix(input=pred_idx,target=label_idx,num_classes=n_classes,normalize = None)
     #Update log file
     logger.inc_value("bottom")
     logger.write_log()
