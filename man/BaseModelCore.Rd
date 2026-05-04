@@ -53,6 +53,7 @@ Objects of class \code{TokenizerBase}.}
 \item \href{#method-BaseModelCore-set_publication_info}{\code{BaseModelCore$set_publication_info()}}
 \item \href{#method-BaseModelCore-estimate_sustainability_inference_fill_mask}{\code{BaseModelCore$estimate_sustainability_inference_fill_mask()}}
 \item \href{#method-BaseModelCore-calc_flops_architecture_based}{\code{BaseModelCore$calc_flops_architecture_based()}}
+\item \href{#method-BaseModelCore-print}{\code{BaseModelCore$print()}}
 \item \href{#method-BaseModelCore-clone}{\code{BaseModelCore$clone()}}
 }
 }
@@ -493,6 +494,19 @@ Calculates FLOPS based on model's architecture.
 }
 \subsection{Returns}{
 Returns a \code{data.frame} storing the estimates.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-BaseModelCore-print"></a>}}
+\if{latex}{\out{\hypertarget{method-BaseModelCore-print}{}}}
+\subsection{Method \code{print()}}{
+Print method for classifiers.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{BaseModelCore$print()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Prints a short description of the object.
 }
 }
 \if{html}{\out{<hr>}}

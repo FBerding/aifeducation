@@ -59,8 +59,10 @@ Other Tokenizer:
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="TokenizerBase" data-id="get_special_tokens"><a href='../../aifeducation/html/TokenizerBase.html#method-TokenizerBase-get_special_tokens'><code>aifeducation::TokenizerBase$get_special_tokens()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="TokenizerBase" data-id="get_tokenizer"><a href='../../aifeducation/html/TokenizerBase.html#method-TokenizerBase-get_tokenizer'><code>aifeducation::TokenizerBase$get_tokenizer()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="TokenizerBase" data-id="get_tokenizer_statistics"><a href='../../aifeducation/html/TokenizerBase.html#method-TokenizerBase-get_tokenizer_statistics'><code>aifeducation::TokenizerBase$get_tokenizer_statistics()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="TokenizerBase" data-id="get_vocab_size"><a href='../../aifeducation/html/TokenizerBase.html#method-TokenizerBase-get_vocab_size'><code>aifeducation::TokenizerBase$get_vocab_size()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="TokenizerBase" data-id="load_from_disk"><a href='../../aifeducation/html/TokenizerBase.html#method-TokenizerBase-load_from_disk'><code>aifeducation::TokenizerBase$load_from_disk()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="TokenizerBase" data-id="n_special_tokens"><a href='../../aifeducation/html/TokenizerBase.html#method-TokenizerBase-n_special_tokens'><code>aifeducation::TokenizerBase$n_special_tokens()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="TokenizerBase" data-id="print"><a href='../../aifeducation/html/TokenizerBase.html#method-TokenizerBase-print'><code>aifeducation::TokenizerBase$print()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="TokenizerBase" data-id="save"><a href='../../aifeducation/html/TokenizerBase.html#method-TokenizerBase-save'><code>aifeducation::TokenizerBase$save()</code></a></span></li>
 </ul>
 </details>

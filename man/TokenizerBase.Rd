@@ -33,12 +33,14 @@ Other R6 Classes for Developers:
 \item \href{#method-TokenizerBase-save}{\code{TokenizerBase$save()}}
 \item \href{#method-TokenizerBase-load_from_disk}{\code{TokenizerBase$load_from_disk()}}
 \item \href{#method-TokenizerBase-get_tokenizer_statistics}{\code{TokenizerBase$get_tokenizer_statistics()}}
+\item \href{#method-TokenizerBase-get_vocab_size}{\code{TokenizerBase$get_vocab_size()}}
 \item \href{#method-TokenizerBase-get_tokenizer}{\code{TokenizerBase$get_tokenizer()}}
 \item \href{#method-TokenizerBase-encode}{\code{TokenizerBase$encode()}}
 \item \href{#method-TokenizerBase-decode}{\code{TokenizerBase$decode()}}
 \item \href{#method-TokenizerBase-get_special_tokens}{\code{TokenizerBase$get_special_tokens()}}
 \item \href{#method-TokenizerBase-n_special_tokens}{\code{TokenizerBase$n_special_tokens()}}
 \item \href{#method-TokenizerBase-calculate_statistics}{\code{TokenizerBase$calculate_statistics()}}
+\item \href{#method-TokenizerBase-print}{\code{TokenizerBase$print()}}
 \item \href{#method-TokenizerBase-clone}{\code{TokenizerBase$clone()}}
 }
 }
@@ -119,6 +121,19 @@ Tokenizer statistics
 
 \subsection{Returns}{
 Returns a \code{data.frame} containing the tokenizer's statistics.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TokenizerBase-get_vocab_size"></a>}}
+\if{latex}{\out{\hypertarget{method-TokenizerBase-get_vocab_size}{}}}
+\subsection{Method \code{get_vocab_size()}}{
+Vocabulary. size
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TokenizerBase$get_vocab_size()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns a \code{int} representing the size of the vocabulary.
 }
 }
 \if{html}{\out{<hr>}}
@@ -272,6 +287,19 @@ Applications, 21, 200335.
 }
 \subsection{Returns}{
 Returns an 'int' counting the number of special tokens.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TokenizerBase-print"></a>}}
+\if{latex}{\out{\hypertarget{method-TokenizerBase-print}{}}}
+\subsection{Method \code{print()}}{
+Print method for classifiers.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TokenizerBase$print()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Prints a short description of the object.
 }
 }
 \if{html}{\out{<hr>}}

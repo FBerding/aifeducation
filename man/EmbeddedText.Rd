@@ -54,6 +54,7 @@ in the columns.}
 \item \href{#method-EmbeddedText-get_all_fields}{\code{EmbeddedText$get_all_fields()}}
 \item \href{#method-EmbeddedText-set_package_versions}{\code{EmbeddedText$set_package_versions()}}
 \item \href{#method-EmbeddedText-get_package_versions}{\code{EmbeddedText$get_package_versions()}}
+\item \href{#method-EmbeddedText-print}{\code{EmbeddedText$print()}}
 \item \href{#method-EmbeddedText-clone}{\code{EmbeddedText$clone()}}
 }
 }
@@ -411,6 +412,19 @@ versions used for creating the model.
 \subsection{Returns}{
 Returns a \code{list} containing the versions of the relevant
 R and python packages.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-EmbeddedText-print"></a>}}
+\if{latex}{\out{\hypertarget{method-EmbeddedText-print}{}}}
+\subsection{Method \code{print()}}{
+Print method for classifiers.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EmbeddedText$print()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Prints a short description of the object.
 }
 }
 \if{html}{\out{<hr>}}

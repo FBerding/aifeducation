@@ -75,6 +75,7 @@ recall, and f1 for every fold.
 \item \href{#method-ClassifiersBasedOnTextEmbeddings-adjust_target_levels}{\code{ClassifiersBasedOnTextEmbeddings$adjust_target_levels()}}
 \item \href{#method-ClassifiersBasedOnTextEmbeddings-plot_training_history}{\code{ClassifiersBasedOnTextEmbeddings$plot_training_history()}}
 \item \href{#method-ClassifiersBasedOnTextEmbeddings-plot_coding_stream}{\code{ClassifiersBasedOnTextEmbeddings$plot_coding_stream()}}
+\item \href{#method-ClassifiersBasedOnTextEmbeddings-print}{\code{ClassifiersBasedOnTextEmbeddings$print()}}
 \item \href{#method-ClassifiersBasedOnTextEmbeddings-clone}{\code{ClassifiersBasedOnTextEmbeddings$clone()}}
 }
 }
@@ -366,6 +367,19 @@ is helpful for analyzing the consequences of coding errors.
 }
 \subsection{Returns}{
 Returns a plot of class \code{ggplot} visualizing the training process.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-ClassifiersBasedOnTextEmbeddings-print"></a>}}
+\if{latex}{\out{\hypertarget{method-ClassifiersBasedOnTextEmbeddings-print}{}}}
+\subsection{Method \code{print()}}{
+Print method for classifiers.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ClassifiersBasedOnTextEmbeddings$print()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Prints a short description of the object.
 }
 }
 \if{html}{\out{<hr>}}

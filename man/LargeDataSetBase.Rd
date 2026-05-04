@@ -40,6 +40,7 @@ Other R6 Classes for Developers:
 \item \href{#method-LargeDataSetBase-set_package_versions}{\code{LargeDataSetBase$set_package_versions()}}
 \item \href{#method-LargeDataSetBase-get_package_versions}{\code{LargeDataSetBase$get_package_versions()}}
 \item \href{#method-LargeDataSetBase-get_all_fields}{\code{LargeDataSetBase$get_all_fields()}}
+\item \href{#method-LargeDataSetBase-print}{\code{LargeDataSetBase$print()}}
 \item \href{#method-LargeDataSetBase-clone}{\code{LargeDataSetBase$clone()}}
 }
 }
@@ -278,6 +279,19 @@ Return all fields.
 
 \subsection{Returns}{
 Method returns a \code{list} containing all public and private fields of the object.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-LargeDataSetBase-print"></a>}}
+\if{latex}{\out{\hypertarget{method-LargeDataSetBase-print}{}}}
+\subsection{Method \code{print()}}{
+Print method for classifiers.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{LargeDataSetBase$print()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Prints a short description of the object.
 }
 }
 \if{html}{\out{<hr>}}

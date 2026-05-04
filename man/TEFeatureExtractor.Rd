@@ -50,6 +50,7 @@ Other Text Embedding:
 \item \href{#method-TEFeatureExtractor-extract_features}{\code{TEFeatureExtractor$extract_features()}}
 \item \href{#method-TEFeatureExtractor-extract_features_large}{\code{TEFeatureExtractor$extract_features_large()}}
 \item \href{#method-TEFeatureExtractor-plot_training_history}{\code{TEFeatureExtractor$plot_training_history()}}
+\item \href{#method-TEFeatureExtractor-print}{\code{TEFeatureExtractor$print()}}
 \item \href{#method-TEFeatureExtractor-clone}{\code{TEFeatureExtractor$clone()}}
 }
 }
@@ -304,6 +305,19 @@ This method requires the \emph{R} package 'ggplot2' to work.
 }
 \subsection{Returns}{
 Returns a plot of class \code{ggplot} visualizing the training process.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TEFeatureExtractor-print"></a>}}
+\if{latex}{\out{\hypertarget{method-TEFeatureExtractor-print}{}}}
+\subsection{Method \code{print()}}{
+Print method for classifiers.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TEFeatureExtractor$print()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Prints a short description of the object.
 }
 }
 \if{html}{\out{<hr>}}

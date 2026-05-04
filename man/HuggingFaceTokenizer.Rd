@@ -21,6 +21,7 @@ Other Tokenizer:
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-HuggingFaceTokenizer-create_from_hf}{\code{HuggingFaceTokenizer$create_from_hf()}}
+\item \href{#method-HuggingFaceTokenizer-get_vocab_size}{\code{HuggingFaceTokenizer$get_vocab_size()}}
 \item \href{#method-HuggingFaceTokenizer-clone}{\code{HuggingFaceTokenizer$clone()}}
 }
 }
@@ -52,6 +53,7 @@ Other Tokenizer:
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="TokenizerBase" data-id="get_tokenizer_statistics"><a href='../../aifeducation/html/TokenizerBase.html#method-TokenizerBase-get_tokenizer_statistics'><code>aifeducation::TokenizerBase$get_tokenizer_statistics()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="TokenizerBase" data-id="load_from_disk"><a href='../../aifeducation/html/TokenizerBase.html#method-TokenizerBase-load_from_disk'><code>aifeducation::TokenizerBase$load_from_disk()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="TokenizerBase" data-id="n_special_tokens"><a href='../../aifeducation/html/TokenizerBase.html#method-TokenizerBase-n_special_tokens'><code>aifeducation::TokenizerBase$n_special_tokens()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="aifeducation" data-topic="TokenizerBase" data-id="print"><a href='../../aifeducation/html/TokenizerBase.html#method-TokenizerBase-print'><code>aifeducation::TokenizerBase$print()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="aifeducation" data-topic="TokenizerBase" data-id="save"><a href='../../aifeducation/html/TokenizerBase.html#method-TokenizerBase-save'><code>aifeducation::TokenizerBase$save()</code></a></span></li>
 </ul>
 </details>
@@ -74,6 +76,19 @@ Creates a tokenizer from a pretrained model
 }
 \subsection{Returns}{
 Does return a new object of this class.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-HuggingFaceTokenizer-get_vocab_size"></a>}}
+\if{latex}{\out{\hypertarget{method-HuggingFaceTokenizer-get_vocab_size}{}}}
+\subsection{Method \code{get_vocab_size()}}{
+Vocabulary. size
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{HuggingFaceTokenizer$get_vocab_size()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns a \code{int} representing the size of the vocabulary.
 }
 }
 \if{html}{\out{<hr>}}

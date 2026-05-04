@@ -50,6 +50,7 @@ Other Data Management:
 \item \href{#method-LargeDataSetForTextEmbeddings-add_embeddings_from_EmbeddedText}{\code{LargeDataSetForTextEmbeddings$add_embeddings_from_EmbeddedText()}}
 \item \href{#method-LargeDataSetForTextEmbeddings-add_embeddings_from_LargeDataSetForTextEmbeddings}{\code{LargeDataSetForTextEmbeddings$add_embeddings_from_LargeDataSetForTextEmbeddings()}}
 \item \href{#method-LargeDataSetForTextEmbeddings-convert_to_EmbeddedText}{\code{LargeDataSetForTextEmbeddings$convert_to_EmbeddedText()}}
+\item \href{#method-LargeDataSetForTextEmbeddings-print}{\code{LargeDataSetForTextEmbeddings$print()}}
 \item \href{#method-LargeDataSetForTextEmbeddings-clone}{\code{LargeDataSetForTextEmbeddings$clone()}}
 }
 }
@@ -422,6 +423,19 @@ This may lead to an out-of-memory error.
 
 \subsection{Returns}{
 LargeDataSetForTextEmbeddings an object of class \link{EmbeddedText} which is stored in the memory/RAM.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-LargeDataSetForTextEmbeddings-print"></a>}}
+\if{latex}{\out{\hypertarget{method-LargeDataSetForTextEmbeddings-print}{}}}
+\subsection{Method \code{print()}}{
+Print method for classifiers.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{LargeDataSetForTextEmbeddings$print()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Prints a short description of the object.
 }
 }
 \if{html}{\out{<hr>}}
