@@ -122,7 +122,7 @@ TokenizerBase <- R6::R6Class(
     #' @return Returns a `int` representing the size of the vocabulary.
     get_vocab_size(){
       return(private$model_config$vocab_size)
-    }
+    },
     #--------------------------------------------------------------------------
     #' @description Python tokenizer
     #' @return Returns the python tokenizer within the model.
