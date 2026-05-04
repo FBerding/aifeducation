@@ -371,6 +371,14 @@ TEFeatureExtractor <- R6::R6Class(
         batch_size = batch_size,
         zero_based = TRUE
       )
+
+      #Set Up progress indicator
+      PgrInd=ProgressIndicator$new(
+        max_iter = total_number_of_bachtes,
+        inc_absolute = TRUE,
+        calc_eta = TRUE
+      )
+
       # Process every batch
       for (i in 1L:total_number_of_bachtes) {
         tmp_subset <- data_embeddings$select(as.integer(batches_index[[i]]))
@@ -414,10 +422,13 @@ TEFeatureExtractor <- R6::R6Class(
           # Add new data
           embedded_texts_large$add_embeddings_from_EmbeddedText(embeddings)
         }
-        print_message(
-          msg = paste("Compress Embeddings - Batch", i, "/", total_number_of_bachtes, "done"),
-          trace = trace
-        )
+        if (trace) {
+          PgrInd$print_step(
+            iter=i,
+            text_pre="Compress Embeddings",
+            text_post="done"
+          )
+        }
         gc()
       }
       return(embedded_texts_large)
