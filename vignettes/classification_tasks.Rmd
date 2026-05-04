@@ -581,6 +581,12 @@ data_set_reviews_text <- LargeDataSetForText$new()
 data_set_reviews_text$add_from_data.frame(example_data)
 ```
 
+You can inspect the data set with `print`.
+
+```{r, include = TRUE, eval = TRUE}
+print(data_set_reviews_text)
+```
+
 We save the categories/labels within a separate factor.
 
 ```{r, include = TRUE, eval = TRUE}
@@ -760,6 +766,11 @@ save_to_disk(
 tokenizer <- load_from_disk("examples/example_tokenizer")
 ```
 
+To get a short summary of a tokenizer you can use `print`.
+```{r, include = TRUE, eval = TRUE}
+print(tokenizer)
+```
+
 Now you are ready to create a base model.
 
 ## 3.3 Creating a BaseModel
@@ -903,6 +914,12 @@ base_model$fill_mask(
 Here you can provide a text with a mask token indicating the gab the model should close.
 As a result you get the logits, the token id and the concrete token the model suggests to
 replace the mask token with.
+
+You get a short summary of an object of this class with `print`.
+
+```{r, include = TRUE, eval = TRUE}
+print(base_model)
+```
 
 ## 3.4 Analyzing a BaseModel
 
@@ -1130,7 +1147,14 @@ of dimensions which is used to characterize the content
 of every chunk of text. This value is important as it determines the complexity 
 a classifier or feature extractor has to deal with. Some of classifier's and
 feature extractor's parameters depend on this value. We elaborate this at the relevant point
-for the different models. 
+for the different models.
+
+You get a short summary of an object of this class with `print`.
+
+```{r, include = TRUE, eval = TRUE}
+print(bert_modeling)
+```
+
 
 ## 4.3 Transforming Raw Texts into Embedded Texts
 
@@ -1151,6 +1175,12 @@ The method `embed_large`creates an object of class
 the embeddings of every text. The embeddings are an array, of which the
 first dimension refers to specific texts, the second dimension refers to
 chunks/sequences, and the third dimension refers to the features.
+
+You can inspect the data set with `print`.
+
+```{r, include = TRUE, eval = TRUE}
+print(review_embeddings)
+```
 
 With the embedded texts you now have the input to train a new classifier
 or to apply a pre-trained classifier for predicting categories/classes.
@@ -1489,6 +1519,12 @@ to establish a connection to a single class. In contrast to regular dense layers
 (`cls_head_type = "Regular"`) where all neurons of the previous layer are connected
 all classes. We add a dense layer before the classification head (`cls_head_type = "PairwiseOrthogonalDense"`) in 
 order to improve performance with high rates for dropout in the previous layers.
+
+You receive a short summary of the classifier by calling `print`.
+
+```{r, include = TRUE, eval = TRUE}
+print(classifier)
+```
 
 After you have created a new classifier, you can begin training. 
 You can see the number of learnable parameters of your model with:
@@ -2452,6 +2488,12 @@ feature_extractor$plot_training_history(
 
 ```{r, include = FALSE}
 running_num_figures <- running_num_figures + 1
+```
+
+You receive a short summary of the extractor by calling `print`.
+
+```{r, include = TRUE, eval = TRUE}
+print(feature_extractor)
 ```
 
 ## 8.4 Application
