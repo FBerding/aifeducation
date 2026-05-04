@@ -579,6 +579,12 @@ HuggingFaceTokenizer <- R6::R6Class(
 
       # Set trained field
       private$trained <- TRUE
+    },
+    # ------------------------------------------------------------------------
+    #' @description Vocabulary. size
+    #' @return Returns a `int` representing the size of the vocabulary.
+    get_vocab_size = function(){
+      return(private$model$vocab_size)
     }
   )
 )
