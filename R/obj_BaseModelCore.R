@@ -1097,6 +1097,29 @@ BaseModelCore <- R6::R6Class(
       results[1L, "date"] <- get_time_stamp()
 
       return(results)
+    },
+    #' @description Print method for classifiers.
+    #' @return Prints a short description of the object.
+    print=function(){
+      rows=c("Object","Configured","Trained", "Parameter","Seq. Len.","Features","N Layer", "Vocab Size", "Tokens/Word","Mask Token","Pad Token","Unk token")
+      padded_rows=pad_str(rows,width = NULL,pad=" ", end=": ")
+      statistics=self$Tokenizer$get_tokenizer_statistics()
+      special_tokens=self$Tokenizer$get_special_tokens()
+      cat(
+        sep="",
+        padded_rows[1L],class(self)[1L],"\n",
+        padded_rows[2L],private$configured,"\n",
+        padded_rows[3L],private$trained[1L],"\n",
+        padded_rows[4L],self$count_parameter(),"\n",
+        padded_rows[5L],self$get_model_config()$max_position_embeddings,"\n",
+        padded_rows[6L],self$get_final_size(),"\n",
+        padded_rows[7L],self$get_n_layers(),"\n",
+        padded_rows[8L],self$Tokenizer$get_vocab_size(),"\n",
+        padded_rows[9L],statistics[1L,"mu_g"],"\n",
+        padded_rows[10L],special_tokens["mask_token","token"],"\n",
+        padded_rows[11L],special_tokens["pad_token","token"],"\n",
+        padded_rows[12L],special_tokens["unk_token","token"],"\n"
+      )
     }
   )
 )

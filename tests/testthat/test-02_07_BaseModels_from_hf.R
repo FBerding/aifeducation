@@ -88,6 +88,16 @@ for (object_class_name in object_class_names) {
 
   #--------------------------------------------------------------------------
   test_that(paste(
+    "Print Method",
+    object_class_name,
+    get_current_args_for_print(train_args)
+  ), {
+    expect_no_error(base_model$print())
+    expect_no_error(print(base_model))
+  })
+
+
+  test_that(paste(
     "Save Model",
     object_class_name,
     get_current_args_for_print(train_args)
@@ -241,6 +251,8 @@ for (object_class_name in object_class_names) {
       base_model_reloaded$Tokenizer$get_sustainability_data()
     )
   })
+
+
 
   # Clear directory for next test
   unlink(paste0(tmp_dir), recursive = TRUE)

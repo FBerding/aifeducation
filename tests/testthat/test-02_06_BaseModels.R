@@ -123,6 +123,16 @@ for (object_class_name in object_class_names) {
 
     #--------------------------------------------------------------------------
     test_that(paste(
+      "Print Method",
+      object_class_name,
+      get_current_args_for_print(config_args),
+      get_current_args_for_print(train_args)
+    ), {
+      expect_no_error(base_model$print())
+      expect_no_error(print(base_model))
+    })
+
+    test_that(paste(
       "Count Parameter",
       object_class_name,
       get_current_args_for_print(config_args),
