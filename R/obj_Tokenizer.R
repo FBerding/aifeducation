@@ -120,7 +120,7 @@ TokenizerBase <- R6::R6Class(
     # ------------------------------------------------------------------------
     #' @description Vocabulary. size
     #' @return Returns a `int` representing the size of the vocabulary.
-    get_vocab_size = function(){
+    get_vocab_size = function() {
       return(private$model_config$vocab_size)
     },
     #--------------------------------------------------------------------------
@@ -363,23 +363,122 @@ TokenizerBase <- R6::R6Class(
       )
       return(statistics)
     },
+    #--------------------------------------------------------------------------
+    #' @description Method for calculating the necessary number of chunks to cover
+    #' a specific quantile of documents completely.
+    #' @description Tokenizer split raw texts into a sequences of tokens. Most neural nets can only
+    #' process a given sequence length. Thus, long texts must be split into a
+    #' sequence of sequences in order to represent the whole text. This method calculates
+    #' how many sequences are necessary. The number of sequences of sequences is called chunks.
+    #' @description You can think of these chunks as dividing a long texts into several paragraphs.
+    #' @param text_dataset `r get_param_doc_desc("text_dataset")`
+    #' @param batch_size `r get_param_doc_desc("batch_size")`
+    #' @param seq_len_tokens `r get_param_doc_desc("seq_len_tokens")`
+    #' @param token_overlap `r get_param_doc_desc("token_overlap")`
+    #' @param trace `r get_param_doc_desc("trace")`
+    #' @returns Returns a `vector` containing the number of chunks to cover a given
+    #' quantile of documents completely.
+    calc_quantiles = function(text_dataset, batch_size = 32L, seq_len_tokens = 512L,token_overlap=0L,trace=TRUE) {
+      check_class_and_type(
+        object = text_dataset,
+        object_name = "text_dataset",
+        type_classes = "LargeDataSetForText",
+        allow_NULL = FALSE
+      )
+      check_class_and_type(
+        object = seq_len_tokens,
+        object_name = "seq_len_tokens",
+        type_classes = "int",
+        min = 2L,
+        max = NULL,
+        allow_NULL = FALSE
+      )
+      check_class_and_type(
+        object = token_overlap,
+        object_name = "token_overlap",
+        type_classes = "int",
+        min = 0L,
+        max = NULL,
+        allow_NULL = FALSE
+      )
+      check_class_and_type(
+        object = batch_size,
+        object_name = "batch_size",
+        type_classes = "int",
+        min = 1L,
+        max = NULL,
+        allow_NULL = FALSE
+      )
+      n_texts=text_dataset$n_rows()
+      results=vector(length = n_texts)
+
+      # Get total number of batches for the loop
+      total_number_of_bachtes <- ceiling(text_dataset$n_rows() / batch_size)
+
+      # Get indices for every batch
+      batches_index <- get_batches_index(
+        number_rows = text_dataset$n_rows(),
+        batch_size = batch_size,
+        zero_based = TRUE
+      )
+
+      PgrInd=ProgressIndicator$new(
+        max_iter = total_number_of_bachtes,
+        inc_absolute = TRUE,
+        calc_eta = TRUE
+      )
+
+      for (i in seq(total_number_of_bachtes)) {
+        tmp_subset <- text_dataset$select(as.integer(batches_index[[i]]))
+        tmp_encodings=self$encode(
+          raw_text=extract_column_from_py_dataset(
+            py_dataset=tmp_subset,
+            column_name = "text",
+            format = "R"),
+                              token_overlap = token_overlap,
+                              max_token_sequence_length = seq_len_tokens,
+                              n_chunks = 1L,
+                              token_encodings_only = FALSE,
+                              token_to_int = TRUE,
+                              return_token_type_ids = FALSE,
+                              trace = FALSE
+        )
+        results[batches_index[[i]]+1]=tmp_encodings$total_chunks
+        if (trace) {
+          PgrInd$print_step(
+            iter=i,
+            text_pre="Calculating Chunks",
+            text_post="done"
+          )
+        }
+      }
+      return(
+        ceiling(
+        quantile(
+          x=results,
+          probs=c(.10,.20,.30,.40,.50,.60,.70,.75,.80,.85,.90,.95,.99,.999,1.0)
+          )
+      )
+      )
+    },
+    #--------------------------------------------------------------------------
     #' @description Print method for classifiers.
     #' @return Prints a short description of the object.
-    print=function(){
-      rows=c("Object","Configured","Trained", "Vocab Size", "Tokens/Word","Mask Token","Pad Token","Unk token")
-      padded_rows=pad_str(rows,width = NULL,pad=" ", end=": ")
-      statistics=self$get_tokenizer_statistics()
-      special_tokens=self$get_special_tokens()
+    print = function() {
+      rows <- c("Object", "Configured", "Trained", "Vocab Size", "Tokens/Word", "Mask Token", "Pad Token", "Unk Token")
+      padded_rows <- pad_str(rows, width = NULL, pad = " ", end = ": ")
+      statistics <- self$get_tokenizer_statistics()
+      special_tokens <- self$get_special_tokens()
       cat(
-        sep="",
-        padded_rows[1L],class(self)[1L],"\n",
-        padded_rows[2L],private$configured,"\n",
-        padded_rows[3L],private$trained[1L],"\n",
-        padded_rows[4L],self$get_vocab_size(),"\n",
-        padded_rows[5L],statistics[1L,"mu_g"],"\n",
-        padded_rows[6L],special_tokens["mask_token","token"],"\n",
-        padded_rows[7L],special_tokens["pad_token","token"],"\n",
-        padded_rows[8L],special_tokens["unk_token","token"],"\n"
+        sep = "",
+        padded_rows[1L], class(self)[1L], "\n",
+        padded_rows[2L], private$configured, "\n",
+        padded_rows[3L], private$trained[1L], "\n",
+        padded_rows[4L], self$get_vocab_size(), "\n",
+        padded_rows[5L], statistics[1L, "mu_g"], "\n",
+        padded_rows[6L], special_tokens["mask_token", "token"], "\n",
+        padded_rows[7L], special_tokens["pad_token", "token"], "\n",
+        padded_rows[8L], special_tokens["unk_token", "token"], "\n"
       )
     }
   )
@@ -410,7 +509,6 @@ WordPieceTokenizer <- R6::R6Class(
     #' @return `r get_description("return_nothing")`
     configure = function(vocab_size = 10000L,
                          vocab_do_lower_case = FALSE) {
-
       private$check_config_for_FALSE()
 
       private$save_all_args(
@@ -583,7 +681,7 @@ HuggingFaceTokenizer <- R6::R6Class(
     # ------------------------------------------------------------------------
     #' @description Vocabulary. size
     #' @return Returns a `int` representing the size of the vocabulary.
-    get_vocab_size = function(){
+    get_vocab_size = function() {
       return(private$model$vocab_size)
     }
   )

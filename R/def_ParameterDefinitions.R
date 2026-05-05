@@ -774,6 +774,19 @@ get_param_dict <- function() {
     test_values = 10L
   )
 
+  param$seq_len_tokens <- list(
+    type = "int",
+    allow_null = FALSE,
+    min = 1L,
+    max = Inf,
+    allowed_values = NULL,
+    desc = "Length of a sequence in tokens",
+    gui_box = "Sequence Modeling",
+    gui_label = "Sequence Length",
+    default_value = 512L,
+    test_values = 512L
+  )
+
   # Data related-----------------------------------------------------------------
   param$data_embeddings <- list(
     type = c("EmbeddedText", "LargeDataSetForTextEmbeddings"),
