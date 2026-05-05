@@ -665,9 +665,6 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         private$create_reset_model()
       }
 
-      # Set loss function
-      loss_cls_fct_name <- "ProtoNetworkMargin"
-
       # Set target column
       if (!private$model_config$require_one_hot) {
         target_column <- "labels"

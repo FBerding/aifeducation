@@ -1391,9 +1391,6 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       private$init_and_start_sustainability_tracking()
 
       # Start Training----------------------------------------------------------
-      # Load Custom Model Scripts
-
-
       # Start Loop inclusive final training
       for (iter in 1L:(self$last_training$config$n_folds + 1L)) {
         base::gc(verbose = FALSE, full = TRUE)
