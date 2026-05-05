@@ -556,7 +556,7 @@ TextEmbeddingModel <- R6::R6Class(
         if (trace) {
           PgrInd$print_step(
             iter=i,
-            text_pre="Batch",
+            text_pre="Calculating Embeddings",
             text_post="done"
           )
         }
