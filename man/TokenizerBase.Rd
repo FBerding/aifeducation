@@ -7,6 +7,9 @@
 Does return a new object of this class.
 
 Returns a \code{data.frame} containing the estimates.
+
+Returns a \code{vector} containing the number of chunks to cover a given
+quantile of documents completely.
 }
 \description{
 Base class for tokenizers containing all methods shared by the sub-classes.
@@ -40,6 +43,7 @@ Other R6 Classes for Developers:
 \item \href{#method-TokenizerBase-get_special_tokens}{\code{TokenizerBase$get_special_tokens()}}
 \item \href{#method-TokenizerBase-n_special_tokens}{\code{TokenizerBase$n_special_tokens()}}
 \item \href{#method-TokenizerBase-calculate_statistics}{\code{TokenizerBase$calculate_statistics()}}
+\item \href{#method-TokenizerBase-calc_quantiles}{\code{TokenizerBase$calc_quantiles()}}
 \item \href{#method-TokenizerBase-print}{\code{TokenizerBase$print()}}
 \item \href{#method-TokenizerBase-clone}{\code{TokenizerBase$clone()}}
 }
@@ -287,6 +291,47 @@ Applications, 21, 200335.
 }
 \subsection{Returns}{
 Returns an 'int' counting the number of special tokens.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TokenizerBase-calc_quantiles"></a>}}
+\if{latex}{\out{\hypertarget{method-TokenizerBase-calc_quantiles}{}}}
+\subsection{Method \code{calc_quantiles()}}{
+Method for calculating the necessary number of chunks to cover
+a specific quantile of documents completely.
+
+
+Tokenizer split raw texts into a sequences of tokens. Most neural nets can only
+process a given sequence length. Thus, long texts must be split into a
+sequence of sequences in order to represent the whole text. This method calculates
+how many sequences are necessary. The number of sequences of sequences is called chunks.
+
+
+You can think of these chunks as dividing a long texts into several paragraphs.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TokenizerBase$calc_quantiles(
+  text_dataset,
+  batch_size = 32L,
+  seq_len_tokens = 512L,
+  token_overlap = 0L,
+  trace = TRUE
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{text_dataset}}{\code{LargeDataSetForText} \link{LargeDataSetForText} Object storing textual data.}
+
+\item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+
+\item{\code{seq_len_tokens}}{\code{int} Length of a sequence in tokens Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+
+\item{\code{token_overlap}}{\code{int} Number of tokens from the previous chunk that should be added at the beginng of the next chunk. Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
+
+\item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
