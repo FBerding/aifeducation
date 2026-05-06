@@ -135,7 +135,7 @@ TEClassifierParallel <- R6::R6Class(
                          tf_normalization_type = "LayerNorm",
                          tf_normalization_position = "Pre",
                          tf_residual_type = "ResidualGate",
-                         merge_attention_type = "multi_head",
+                         merge_attention_type = "MultiHead",
                          merge_num_heads = 1L,
                          merge_normalization_type = "LayerNorm",
                          merge_pooling_features = 50L,
@@ -149,7 +149,7 @@ TEClassifierParallel <- R6::R6Class(
     create_reset_model = function() {
       private$check_config_for_TRUE()
 
-      
+
 
       private$model <- py$TEClassifierParallel(
         features = as.integer(private$model_config$features),
