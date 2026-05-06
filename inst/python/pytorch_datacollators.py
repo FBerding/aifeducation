@@ -35,7 +35,7 @@ class MetaLernerBatchSampler(torch.utils.data.sampler.Sampler):
         
         #Create dictonary that contains the indexes sorted for every class
         self.indices_per_class={}
-        #Create dictornary thats sotres the number of cases per class
+        #Create dictornary thats sorts the number of cases per class
         self.cases_per_class={}
         #Gather indicies per class and cases per class
         for c in self.classes:
@@ -45,7 +45,7 @@ class MetaLernerBatchSampler(torch.utils.data.sampler.Sampler):
          #Create dictonary that contains the indexes sorted for every class and query/sample
         self.query_indices_per_class={}
         self.sample_indices_per_class={}
-        #Create dictornary thats sotres the number of cases per class and query/sample
+        #Create dictornary that sorts the number of cases per class and query/sample
         self.query_cases_per_class={}
         self.sample_cases_per_class={}
 
