@@ -665,6 +665,27 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         private$create_reset_model()
       }
 
+      #Adjust Ns and Nq to current frequencies
+      min_total_freq=min(
+        min(table(extract_column_from_py_dataset(py_dataset = train_data,column_name = "labels",format = "R"))),
+        min(table(extract_column_from_py_dataset(py_dataset = val_data,column_name = "labels",format = "R"))),
+        min(table(extract_column_from_py_dataset(py_dataset = test_data,column_name = "labels",format = "R")))
+      )
+      if(min_total_freq<(self$last_training$config$Ns+self$last_training$config$Nq)){
+        factor=(self$last_training$config$Ns)*(self$last_training$config$Ns+self$last_training$config$Nq)
+        tmp_ns=ceiling(min_total_freq*factor)
+        tmp_ns=max(1,min(tmp_ns,min_total_freq-1))
+        tmp_nq=min_total_freq-tmp_ns
+        message(
+          "Absolute frequencies of all classes is not sufficent for the chosen Nq and Ns.\n",
+          "Change value for Ns from ",self$last_training$config$Ns," to ", tmp_ns,"\n",
+          "Change value for Nq from ",self$last_training$config$Nq," to ", tmp_nq
+          )
+      } else {
+        tmp_ns=self$last_training$config$Ns
+        tmp_nq=self$last_training$config$Nq
+      }
+
       # Set target column
       if (!private$model_config$require_one_hot) {
         target_column <- "labels"
@@ -704,8 +725,8 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         lr_min=self$last_training$config$lr_min,
         scheduler_type=self$last_training$config$lr_scheduler,
         amp=self$last_training$config$amp,
-        Ns = as.integer(self$last_training$config$Ns),
-        Nq = as.integer(self$last_training$config$Nq),
+        Ns = as.integer(tmp_ns),
+        Nq = as.integer(tmp_nq),
         loss_alpha = self$last_training$config$loss_alpha,
         loss_margin = self$last_training$config$loss_margin,
         trace = as.integer(self$last_training$config$ml_trace),
