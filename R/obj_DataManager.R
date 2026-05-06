@@ -580,16 +580,22 @@ DataManagerClassifier <- R6::R6Class(
         stop("Frequency of the smallest category respective class is", min_freq, ". At least
                    6 cases are necessary. Consider to remove this category/class.")
       } else {
-        if (min_freq / folds < 3L) {
-          fin_k_folds <- floor(min_freq / 3L)
-          warning("Frequency of the smallest category respective class is not sufficent to ensure
-                    at least 3 cases per fold. Adjusting number of folds from ", folds, "to", fin_k_folds, ".")
+        if (min_freq / folds < 4L) {
+          fin_k_folds <- floor(min_freq / 4)
+          if (fin_k_folds == 0L) {
+            stop("Frequency of the smallest category/label is to low. Please check your data.
+           Consider to remove all categories/labels with a very low absolute frequency.")
+          } else {
+            message("Frequency of the smallest category/label is not sufficent to ensure
+                  at least 4 cases per fold. Adjusting number of folds from ", folds, " to ", fin_k_folds, ".")
+          }
         } else {
           fin_k_folds <- folds
         }
       }
       return(fin_k_folds)
     },
+    #--------------------------------------------------------------------------
     add_matrix_form = function(dataset) {
       if (!is.null(dataset)) {
 

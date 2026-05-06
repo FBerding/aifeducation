@@ -423,16 +423,22 @@ get_folds <- function(target,
   categories <- names(freq_cat)
   min_freq <- min(freq_cat)
 
-  if (min_freq / k_folds < 1L) {
-    fin_k_folds <- min_freq
-    warning("Frequency of the smallest category/label is not sufficent to ensure
-                  at least 1 cases per fold. Adjusting number of folds from ", k_folds, " to ", fin_k_folds, ".")
-    if (fin_k_folds == 0L) {
-      stop("Frequency of the smallest category/label is to low. Please check your data.
-           Consider to remove all categories/labels with a very low absolute frequency.")
-    }
+  if (min_freq < 6L) {
+    stop("Frequency of the smallest category respective class is", min_freq, ". At least
+                   6 cases are necessary. Consider to remove this category/class.")
   } else {
-    fin_k_folds <- k_folds
+    if (min_freq / k_folds < 4L) {
+      fin_k_folds <- floor(min_freq / 4)
+      if (fin_k_folds == 0L) {
+        stop("Frequency of the smallest category/label is to low. Please check your data.
+           Consider to remove all categories/labels with a very low absolute frequency.")
+      } else {
+        warning("Frequency of the smallest category/label is not sufficent to ensure
+                  at least 4 cases per fold. Adjusting number of folds from ", k_folds, " to ", fin_k_folds, ".")
+      }
+    } else {
+      fin_k_folds <- k_folds
+    }
   }
 
   final_assignments <- NULL
