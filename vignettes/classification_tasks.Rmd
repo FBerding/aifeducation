@@ -1067,23 +1067,8 @@ base_model_bert$create_from_hf(
 )
 ```
 
-Now we can create the TextEmbeddingModel. Therefor we have to passe the base model
-to the parameter `base_model`.
-
-```{r, include = TRUE, eval = TRUE}
-bert_modeling <- TextEmbeddingModel$new()
-bert_modeling$configure(
-  model_label = "Text Embedding via BERT",
-  model_language = "english",
-  max_length = 512,
-  chunks = 4,
-  overlap = 30,
-  emb_layer_min = 6,
-  emb_layer_max = 8,
-  emb_pool_type = "Average",
-  base_model = base_model_bert
-)
-```
+Now we can create the TextEmbeddingModel. At the beginng we have to chose
+a value for `chunks` and for `overlap.` 
 
 Using a BERT model for text embedding is not a problem since your text
 does not provide more tokens than the transformer can process. This
@@ -1095,24 +1080,38 @@ first 512 tokens) could result in a problematic loss of information. To
 deal with these situations, you can configure a text embedding model in
 *aifecuation* to split long texts into several chunks which are
 processed by the base model. The maximum number of chunks is set with
-`chunks`. In our example above, the text embedding model would split a
-text consisting of 1024 tokens into two chunks with every chunk
-consisting of 512 tokens. For every chunk, a text embedding is
-calculated. As a result, you receive a sequence of embeddings. The first
-embedding characterizes the first part of the text and the second
-embedding characterizes the second part of the text (and so on). Thus,
-our sample text embedding model is able to process texts with about
-$4*512=2048$ tokens. This approach is inspired by the work by Pappagari
-et al. (2019).
+`chunks`. 
 
 Since transformers are able to account for the context, it may be useful
 to interconnect every chunk to bring context into the calculations. This
 can be done with `overlap` to determine how many tokens of the end of a
-prior chunk should be added to the next. In our example the last 30
-tokens of the prior chunks are added at the beginning of the following
-chunk. This can help to add the correct context of the text sections
-into the analysis. Altogether, this model can analyse a maximum
-of $512+(4-1)*(512-30)=1958$ tokens of a text.
+prior chunk should be added to the next.
+
+In order to support you in this decision the tokenizer of a BaseModel can 
+calculate how many chunks are necessary to cover a specific quantile of texts completely.
+We illustrate this with an example. Lets assume that we want an overlap of 128
+(`token_overlap`) tokens between each chunk. 
+Our BaseModel can process 512 tokens at maximum (`seq_len_tokens`). Passing 
+these values to the `calc_quantiles` method of the tokenizer of our BaseModel reveals the
+following quantiles:
+
+```{r, include = TRUE, eval = TRUE}
+chunk_quantile = base_model_bert$Tokenizer$calc_quantiles(
+  text_dataset = data_set_reviews_text, 
+  batch_size = 32L, 
+  seq_len_tokens = 512L,
+  token_overlap=128L,
+  trace=FALSE
+)
+print(chunk_quantile)
+```
+
+If we would like to ensure that about 90% of the texts are completely covered
+by our text embedding model we need `r chunk_quantile["90%"]` chunks. To ensure
+that 99.9% of the text are fully represented we need `r chunk_quantile["99.9%"]` 
+chunks. Here, we choose the 99.9% quantile which requires `r chunk_quantile["99.9%"]`.
+Altogether, this model can analyse a maximum
+of $512+(4-1)*(512-128)=1664$ tokens of a text.
 
 Finally, you have to decide from which hidden layer(s) the embeddings
 should be drawn. With `emb_layer_min` and `emb_layer_max` you can decide
@@ -1130,8 +1129,25 @@ within a layer are averaged except padding tokens.
 > The vignette [04 Model configuration and training](model_configuration.html)
 > provides details on how to configure a text embedding model.
 
-After deciding about the configuration, you can use your model.
+Do not forget to pass the base model to the parameter `base_model`.
 
+```{r, include = TRUE, eval = TRUE}
+bert_modeling <- TextEmbeddingModel$new()
+bert_modeling$configure(
+  model_label = "Text Embedding via BERT",
+  model_language = "english",
+  max_length = 512,
+  chunks = chunk_quantile["99.9%"],
+  overlap = 128,
+  emb_layer_min = 6,
+  emb_layer_max = 8,
+  emb_pool_type = "Average",
+  base_model = base_model_bert,
+  emb_insert_mask_tokens=0.15
+)
+```
+
+After deciding about the configuration, you can use your model.
 You can see the number of learnable parameters of the underlying base model with
 
 ```{r, include = TRUE, eval = TRUE}
