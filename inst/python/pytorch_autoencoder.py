@@ -467,7 +467,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       elc=elc
     )
     #Trace---------------------------------------------------------------------
-    Pgr.Ind.print_epoch_results(
+    PrgInd.print_epoch_results(
       trace=trace,
       loss_only=True,
       metric_storage=metric_storage,
