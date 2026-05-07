@@ -1602,7 +1602,7 @@ get_param_dict <- function() {
     min = NULL,
     max = NULL,
     allow_null = FALSE,
-    allowed_values = c("Max", "Min", "MinMax"),
+    allowed_values = c("Max", "Min", "MinMax","None"),
     desc = "Type of extracting intermediate features.",
     gui_box = "Classifiction Pooling Layer",
     gui_label = "Feature Extraction Method",
