@@ -106,46 +106,7 @@ def add_metrics(metrics,storage,cblock,epoch):
   for key in metrics.keys():
     storage[key][idx,epoch]=metrics[key]
 
-def print_epoch_results(trace,loss_only,metric_storage,epoch,epochs,metric_criterion,best_metric,best_loss):
-  if trace:
-    if (epoch+1)==epochs:
-      end_string="\n"
-    else:
-      end_string="\r"
-    if loss_only:
-      loss=metric_storage["loss"]
-      train_loss=loss[0,epoch]
-      val_loss=loss[1,epoch]
-      print("{:.4f} % | Train Loss {:.8f} | Val Loss {:.8f} Best {:.8f}".format(
-              (epoch+1)/epochs,
-              train_loss,
-              val_loss,
-              best_loss
-              ),
-            end=end_string
-      )
-    else:
-      metric=metric_storage[metric_criterion]
-      train_metric=metric[0,epoch]
-      val_metric=metric[1,epoch]
-      loss=metric_storage["loss"]
-      train_loss=loss[0,epoch]
-      val_loss=loss[1,epoch]
-      print("{:.4f} % | Train Loss {:.4f} {} {:.4f} | Val Loss {:.4f} Best {:.4f} {} {:.4f} Best {:.4f}".format(
-              (epoch+1)/epochs,
-              train_loss,
-              metric_criterion,
-              train_metric,
-              val_loss,
-              best_loss,
-              metric_criterion,
-              val_metric,
-              best_metric
-              ),
-            end=end_string
-      )
-
-def check_and_set_checkpoints_cls(use_callback,model,filepath,epoch,metric_storage,best_val_avg_iota,best_val_loss,best_acc,best_bacc,acc_val,bacc_val,avg_iota_val,val_loss):
+def check_and_set_checkpoints_cls(use_callback,model,filepath,epoch,metric_storage,best_val_avg_iota,best_val_loss,best_acc,best_bacc,acc_val,bacc_val,avg_iota_val,val_loss,elc):
   if use_callback==True:
       if (avg_iota_val>best_val_avg_iota) or (avg_iota_val==best_val_avg_iota and acc_val>best_acc) or (avg_iota_val==best_val_avg_iota and acc_val==best_acc and val_loss<best_val_loss):
         torch.save(model.state_dict(),filepath)
@@ -154,7 +115,8 @@ def check_and_set_checkpoints_cls(use_callback,model,filepath,epoch,metric_stora
         best_acc=acc_val
         best_val_loss=val_loss
         metric_storage["checkpoints"][epoch]=1
-  return best_val_loss, best_acc,best_bacc,best_val_avg_iota  
+        elc=epoch+1
+  return best_val_loss, best_acc,best_bacc,best_val_avg_iota,elc  
 
 
 def run_epoch_cls(model,dataloader,loss_fct,optimizer,scaler,scheduler,amp,epoch,n_classes,device,current_dtype,cblock,metric_storage,logger):
@@ -366,7 +328,10 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   best_acc=float('-inf')
   best_val_loss=float('inf')
   best_val_avg_iota=float('-inf')
+  elc=0
   #Logger
+  PrgInd=ProgressLogger()
+  PrgInd.set_start_time()
   total_steps=len(trainloader)+len(valloader)
   if not (test_data is None):
     total_steps=total_steps+len(testloader)
@@ -440,7 +405,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     logger.reset_value(level="bottom")
     logger.inc_value(level="middle")
     #Callback-------------------------------------------------------------------
-    best_val_loss, best_acc, best_bacc, best_val_avg_iota = check_and_set_checkpoints_cls(
+    best_val_loss, best_acc, best_bacc, best_val_avg_iota,elc = check_and_set_checkpoints_cls(
       use_callback=use_callback,
       model=model,
       filepath=filepath,
@@ -453,10 +418,11 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       acc_val=val_results["accuracy"],
       bacc_val=val_results["balanced_accuracy"],
       avg_iota_val=val_results["avg_iota"],
-      val_loss=val_results["loss"]
+      val_loss=val_results["loss"],
+      elc=elc
     )
     #Trace---------------------------------------------------------------------
-    print_epoch_results(
+    PrgInd.print_epoch_results(
       trace=trace,
       loss_only=False,
       metric_storage=metric_storage,
@@ -464,7 +430,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       epochs=epochs,
       metric_criterion="avg_iota",
       best_metric=best_val_avg_iota,
-      best_loss=best_val_loss
+      best_loss=best_val_loss,
+      elc=elc
     )
     #Check if there are furhter information for training-----------------------
     # If there are no addtiononal information. Stop training and continue
@@ -499,6 +466,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   best_acc=float('-inf')
   best_val_loss=float('inf')
   best_val_avg_iota=float('-inf')
+  elc=0
   #Set Up Loaders
   ProtoNetSampler_Train=MetaLernerBatchSampler(
   targets=train_data["labels"][range(0,len(train_data))],
@@ -539,7 +507,9 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     min_lr=lr_min
   )
   amp_scaler=torch.amp.GradScaler(device ,enabled=amp)
- #Logger
+  #Logger
+  PrgInd=ProgressLogger()
+  PrgInd.set_start_time()
   total_steps=len(trainloader)+len(valloader)
   if not (test_data is None):
     total_steps=total_steps+len(testloader)
@@ -619,7 +589,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     logger.reset_value(level="bottom")
     logger.inc_value(level="middle")
     #Callback-------------------------------------------------------------------
-    best_val_loss, best_acc, best_bacc, best_val_avg_iota = check_and_set_checkpoints_cls(
+    best_val_loss, best_acc, best_bacc, best_val_avg_iota, elc = check_and_set_checkpoints_cls(
       use_callback=use_callback,
       model=model,
       filepath=filepath,
@@ -632,10 +602,11 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       acc_val=val_results["accuracy"],
       bacc_val=val_results["balanced_accuracy"],
       avg_iota_val=val_results["avg_iota"],
-      val_loss=val_results["loss"]
+      val_loss=val_results["loss"],
+      elc=elc
     )
     #Trace---------------------------------------------------------------------
-    print_epoch_results(
+    PrgInd.print_epoch_results(
       trace=trace,
       loss_only=False,
       metric_storage=metric_storage,
@@ -643,7 +614,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       epochs=epochs,
       metric_criterion="avg_iota",
       best_metric=best_val_avg_iota,
-      best_loss=best_val_loss
+      best_loss=best_val_loss,
+      elc=elc
     )
     #Check if there are furhter information for training-----------------------
     # If there are no addtiononal information. Stop training and continue

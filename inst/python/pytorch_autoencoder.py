@@ -328,13 +328,14 @@ def run_epoch_autoencoder(model,dataloader,loss_fct,optimizer,scaler,scheduler,a
   )
   return results
 
-def check_and_set_checkpoints_loss(use_callback,model,filepath,epoch,metric_storage,best_val_loss,val_loss):
+def check_and_set_checkpoints_loss(use_callback,model,filepath,epoch,metric_storage,best_val_loss,val_loss,elc):
   if use_callback==True:
       if val_loss<=best_val_loss:
         torch.save(model.state_dict(),filepath)
         best_val_loss=val_loss
         metric_storage["checkpoints"][epoch]=1
-  return best_val_loss
+        elc=epoch+1
+  return best_val_loss, elc
     
 def AutoencoderTrain_PT_with_Datasets(model,optimizer_method,scheduler_type,amp, lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,batch_size,
 train_data,val_data,filepath,use_callback,
@@ -381,7 +382,10 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   )
   # Init checkpoint values
   best_val_loss=float('inf')
+  elc=0
   #Logger
+  PrgInd=ProgressLogger()
+  PrgInd.set_start_time()
   total_steps=len(trainloader)+len(valloader)
   if not (test_data is None):
     total_steps=total_steps+len(testloader)
@@ -452,17 +456,18 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     logger.reset_value(level="bottom")
     logger.inc_value(level="middle") 
     #Callback-------------------------------------------------------------------
-    best_val_loss=check_and_set_checkpoints_loss(
+    best_val_loss,elc=check_and_set_checkpoints_loss(
       use_callback=use_callback,
       model=model,
       filepath=filepath,
       epoch=epoch,
       metric_storage=metric_storage,
       best_val_loss=best_val_loss,
-      val_loss=val_results["loss"]
+      val_loss=val_results["loss"],
+      elc=elc
     )
     #Trace---------------------------------------------------------------------
-    print_epoch_results(
+    Pgr.Ind.print_epoch_results(
       trace=trace,
       loss_only=True,
       metric_storage=metric_storage,
@@ -470,7 +475,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       epochs=epochs,
       metric_criterion="loss",
       best_metric=None,
-      best_loss=best_val_loss
+      best_loss=best_val_loss,
+      elc=elc
     )
   #Finalize--------------------------------------------------------------------
   if use_callback==True:

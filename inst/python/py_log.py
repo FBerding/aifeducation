@@ -14,6 +14,7 @@
 
 import csv
 import time
+import datetime
 
 def _write_dict(file,
                 vt, tt, mt,
@@ -123,3 +124,57 @@ class LogWriter:
   def write_history_log(self,history_loss):
     if not (self.log_file is None):
       self.last_log_loss=write_log_performance_py(log_file=self.log_file_loss, history=history_loss.tolist(), last_log = self.last_log_loss, write_interval = self.write_interval)
+
+class ProgressLogger:
+  def set_start_time(self):
+    self.start_time=datetime.datetime.now()
+  def print_epoch_results(self,trace,loss_only,metric_storage,epoch,epochs,metric_criterion,best_metric,best_loss,elc):
+    if trace:
+      running_time=(datetime.datetime.now()-self.start_time)
+      rt=(epochs-epoch)*running_time/(epoch+1)
+      rt=rt.seconds
+      hours = rt // 3600
+      minutes = (rt - (hours * 3600)) // 60
+      seconds = rt - (minutes * 60)
+      remaining_time='{:04}:{:02}:{:02}'.format(int(hours), int(minutes), int(seconds))
+
+      if (epoch+1)==epochs:
+        end_string="\n"
+      else:
+        end_string="\r"
+      if loss_only:
+        loss=metric_storage["loss"]
+        train_loss=loss[0,epoch]
+        val_loss=loss[1,epoch]
+        print("{:.4f} % | Train Loss {:.8f} | Val Loss {:.8f} Best {:.8f} | ELC: {} | ETA {}".format(
+              (epoch+1)/epochs,
+              train_loss,
+              val_loss,
+              best_loss,
+              elc,
+              remaining_time
+              ),
+            end=end_string
+        )
+      else:
+        metric=metric_storage[metric_criterion]
+        train_metric=metric[0,epoch]
+        val_metric=metric[1,epoch]
+        loss=metric_storage["loss"]
+        train_loss=loss[0,epoch]
+        val_loss=loss[1,epoch]
+        print("{:.4f} % | Train Loss {:.4f} {} {:.4f} | Val Loss {:.4f} Best {:.4f} {} {:.4f} Best {:.4f} | ELC: {} | ETA {}".format(
+              (epoch+1)/epochs,
+              train_loss,
+              metric_criterion,
+              train_metric,
+              val_loss,
+              best_loss,
+              metric_criterion,
+              val_metric,
+              best_metric,
+              elc,
+              remaining_time
+              ),
+            end=end_string
+        )
