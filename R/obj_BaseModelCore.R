@@ -1098,10 +1098,13 @@ BaseModelCore <- R6::R6Class(
 
       return(results)
     },
+    #---------------------------------------------------------------------------
     #' @description Print method for classifiers.
     #' @return Prints a short description of the object.
     print=function(){
-      rows=c("Object","Configured","Trained", "Parameter","Seq. Len.","Features","N Layer", "Vocab Size", "Tokens/Word","Mask Token","Pad Token","Unk token")
+      rows=c("Object","Configured","Trained", "Parameter","Seq. Len.","Features",
+             "N Layer", "Vocab Size", "Tokens/Word","Mask Token","Pad Token",
+             "Unk token")
       padded_rows=pad_str(rows,width = NULL,pad=" ", end=": ")
       statistics=self$Tokenizer$get_tokenizer_statistics()
       special_tokens=self$Tokenizer$get_special_tokens()

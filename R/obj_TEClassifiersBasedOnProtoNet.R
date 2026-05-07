@@ -666,18 +666,14 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
       }
 
       #Adjust Ns and Nq to current frequencies
-      min_total_freq=min(
-        min(table(extract_column_from_py_dataset(py_dataset = train_data,column_name = "labels",format = "R"))),
-        min(table(extract_column_from_py_dataset(py_dataset = val_data,column_name = "labels",format = "R"))),
-        min(table(extract_column_from_py_dataset(py_dataset = test_data,column_name = "labels",format = "R")))
-      )
+      min_total_freq=min(table(extract_column_from_py_dataset(py_dataset = train_data,column_name = "labels",format = "R")))
       if(min_total_freq<(self$last_training$config$Ns+self$last_training$config$Nq)){
         factor=(self$last_training$config$Ns)*(self$last_training$config$Ns+self$last_training$config$Nq)
         tmp_ns=ceiling(min_total_freq*factor)
         tmp_ns=max(1,min(tmp_ns,min_total_freq-1))
         tmp_nq=min_total_freq-tmp_ns
         message(
-          "Absolute frequencies of all classes is not sufficent for the chosen Nq and Ns.\n",
+          "Absolute frequencies of some classes are not sufficent for the chosen Nq and Ns.\n",
           "Change value for Ns from ",self$last_training$config$Ns," to ", tmp_ns,"\n",
           "Change value for Nq from ",self$last_training$config$Nq," to ", tmp_nq
           )
