@@ -103,7 +103,7 @@ get_layer_dict <- function(layer) {
     features are concatenated to the tensor of the maximal features resulting in the shape $(Batch, Times, 2*Features)$ at the end of the first step.
     In the second step the
     number of requested features is halved. The first half is used for the maximal features and the second for the minimal
-    features.",
+    features. If this layer is disabled the sequence is projected to a vector with the specified number of features.",
     img = "layers_cls_pooling.png",
     references = NULL,
     param_prefix = "cls_pooling_"
@@ -116,7 +116,7 @@ get_layer_dict <- function(layer) {
     Second, the pooled tensors are combined by calculating their weighted sum. Different attention mechanism can be used
     to dynamically calculate the corresponding weights. This allows the model to decide which part of the data is most usefull.
     Finally, pooling over features is applied extracting a specific number of maximal and/or minimal features. A normalization of all input
-    at the begining of the layer is possible.",
+    at the begining of the layer is possible. If this layer is disabled the sequence is projected to a vector with the specified number of features.",
     img = "layers_merge.png",
     references = NULL,
     param_prefix = "merge_"
