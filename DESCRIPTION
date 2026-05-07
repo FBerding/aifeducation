@@ -48,7 +48,7 @@ Depends:
 Imports: 
     doParallel,
     foreach,
-    iotarelr(>= 0.1.9),
+    iotarelr (>= 0.1.9),
     methods,
     Rcpp (>= 1.0.10),
     reshape2,
