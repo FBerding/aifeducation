@@ -1878,7 +1878,7 @@ get_param_dict <- function() {
     min = 0L,
     max = Inf,
     allowed_values = NULL,
-    desc = "determining the number of attention heads for a self-attention layer. Only relevant if `attention_type='multihead'`",
+    desc = "determining the number of attention heads for a self-attention layer. Only relevant if `attention_type='MultiHead'`",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Number of Attention Heads",
     default_value = 2L,
