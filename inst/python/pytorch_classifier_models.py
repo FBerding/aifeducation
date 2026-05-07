@@ -27,7 +27,8 @@ class TEClassifierSequential(torch.nn.Module):
               device=None, dtype=None):
       super().__init__()
       self.inc_cls_head=inc_cls_head
- 
+      self.cls_pooling_type=cls_pooling_type
+
       self.masking_layer=masking_layer(
         pad_value=pad_value
       )
@@ -131,17 +132,34 @@ class TEClassifierSequential(torch.nn.Module):
             )
       else:
         self.stack_dense_layer=identity_layer(pad_value=pad_value,apply_masking=True)
-        
-      self.summarize_layer_time=exreme_pooling_over_time(
-        times=times,
-        features=feat_size,
-        pooling_type=cls_pooling_type,
-        pad_value=pad_value)
-        
-      self.summarize_layer_features=layer_adaptive_extreme_pooling_1d(
-        output_size=cls_pooling_features,
-        pooling_type=cls_pooling_type
-      )
+      
+      if self.cls_pooling_type != "None":   
+        self.summarize_layer_time=exreme_pooling_over_time(
+          times=times,
+          features=feat_size,
+          pooling_type=cls_pooling_type,
+          pad_value=pad_value)
+          
+        self.summarize_layer_features=layer_adaptive_extreme_pooling_1d(
+          output_size=cls_pooling_features,
+          pooling_type=cls_pooling_type
+        )
+      else:
+        self.summarize_layer_time=flatten_layer_with_mask(pad_value=0)
+        self.summarize_layer_features=dense_layer_with_mask(
+          input_size=int(times*feat_size),
+          output_size=cls_pooling_features,
+          times=1,
+          pad_value=pad_value,
+          connection_type="Regular",
+          act_fct="None",
+          normalization_type="None",
+          dropout=0.0,
+          bias=False,
+          parametrizations="None",
+          device=device, dtype=dtype,
+          residual_type="None"
+        )
       
       self.residual_connection=layer_residual_connection(skip_connection_type,pad_value)  
       
@@ -175,8 +193,14 @@ class TEClassifierSequential(torch.nn.Module):
     y,mask=self.stack_n_gram_convolution(y,mask)
     y,mask=self.stack_dense_layer(y,mask)
     y,mask=self.residual_connection(y_original,y,mask)
-    y=self.summarize_layer_time(y,get_FeatureMask_from_mask(mask,y.size(2)))
-    y=self.summarize_layer_features(y)
+    if  self.cls_pooling_type != "None":
+      y=self.summarize_layer_time(y,get_FeatureMask_from_mask(mask,y.size(2)))
+      y=self.summarize_layer_features(y) #(B,C)
+    else:
+      y,mask_flatten=self.summarize_layer_time(y,mask) #(B,T*F)
+      y=torch.unsqueeze(y, dim=1) #(B,1,T*F)
+      y,mask_flatten=self.summarize_layer_features(y,mask_times=torch.ones((y.size(0),1),dtype=torch.bool,device=y.device,requires_grad=False)) #(B,1,C)
+      y=torch.squeeze(y,dim=1) #(B,C)
     if self.inc_cls_head==True:
       y=self.classification_head(y)
     if prediction_mode==False:
@@ -392,7 +416,6 @@ class TEClassifierParallel(torch.nn.Module):
       else:
         self.stack_dense_layer=None
         self.features_resize_layer_dense=None
-
         
       self.merge_layer=merge_layer(
         times=times,
