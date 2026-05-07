@@ -669,7 +669,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
       min_total_freq=min(table(extract_column_from_py_dataset(py_dataset = train_data,column_name = "labels",format = "R")))
       if(min_total_freq<(self$last_training$config$Ns+self$last_training$config$Nq)){
         factor=(self$last_training$config$Ns)*(self$last_training$config$Ns+self$last_training$config$Nq)
-        tmp_ns=ceiling(min_total_freq*factor)
+        tmp_ns=floor(min_total_freq*factor)
         tmp_ns=max(1,min(tmp_ns,min_total_freq-1))
         tmp_nq=min_total_freq-tmp_ns
         message(
