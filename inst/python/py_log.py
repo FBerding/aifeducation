@@ -135,8 +135,8 @@ class ProgressLogger:
       rt=rt.seconds
       hours = rt // 3600
       minutes = (rt - (hours * 3600)) // 60
-      seconds = rt - (minutes * 60)
-      remaining_time='{:04}:{:02}:{:02}'.format(int(hours), int(minutes), int(seconds))
+      seconds = rt - (minutes * 60)- (hours * 3600)
+      remaining_time='{:04}::{:02}::{:02}'.format(int(hours), int(minutes), int(seconds))
 
       if (epoch+1)==epochs:
         end_string="\n"
