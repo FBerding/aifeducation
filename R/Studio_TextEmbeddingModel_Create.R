@@ -241,6 +241,14 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
             step = 1
           ),
           shiny::sliderInput(
+            inputId = ns("lm_insert_mask_tokens"),
+            label = "Insert Mask Tokens",
+            value = 0.15,
+            min = 0.0,
+            max = 0.50,
+            step = 0.01
+          ),
+          shiny::sliderInput(
             inputId = ns("lm_emb_layers"),
             label = "Layers for Embeddings",
             value = c(
@@ -349,6 +357,7 @@ TextEmbeddingModel_Create_Server <- function(id, log_dir, volumes) {
           emb_layer_min = input$lm_emb_layers[1],
           emb_layer_max = input$lm_emb_layers[2],
           emb_pool_type = input$lm_emb_pool_type,
+          emb_insert_mask_tokens = input$lm_insert_mask_tokens,
           base_model = base_model
         )
 
