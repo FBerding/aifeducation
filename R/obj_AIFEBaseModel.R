@@ -762,12 +762,12 @@ AIFEMaster <- R6::R6Class(
         y = c("model_name", "model_label", "model_language", "text_embeddings", "features")
       )
 
-      require_udate <- check_versions(
+      require_update <- check_versions(
         a = self$get_package_versions()$r_package_versions$aifeducation,
         operator = "<",
         b = "1.1.2"
       )
-      if (require_udate) {
+      if (require_update) {
         for (config_param in config_params) {
           # Search in public
           for (i in seq_along(config_file$public)) {
@@ -795,10 +795,21 @@ AIFEMaster <- R6::R6Class(
             }
           }
         }
+      }
 
+      require_update <- check_versions(
+        a = self$get_package_versions()$r_package_versions$aifeducation,
+        operator = "<",
+        b = "9.9.9"
+      )
+      if (require_update){
         # Update values for extensions
         # This in important for all cases that introduce new and additional parameters
         param_dict <- get_param_dict()
+        config_params <- setdiff(
+          x = rlang::fn_fmls_names(self$configure),
+          y = c("model_name", "model_label", "model_language", "text_embeddings", "features")
+        )
         if (is.function(self$configure)) {
           param_names_new <- config_params
           for (param in param_names_new) {
