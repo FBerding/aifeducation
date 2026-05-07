@@ -149,6 +149,20 @@ get_param_dict <- function() {
   param$chunks <- param$n_chunks
   param$chunks$min <- 2L
 
+  param$emb_insert_mask_tokens<- list(
+    type = "double",
+    min = 0.0,
+    max = 0.5,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "Percentage of mask tokens that should replace token in the sequence.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = 0.15,
+    default_historic = 0.0,
+    test_values = c(0.0,0.15)
+  )
+
   param$emb_layer_min <- list(
     type = "int",
     min = 1L,
