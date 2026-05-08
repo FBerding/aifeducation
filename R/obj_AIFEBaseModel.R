@@ -808,7 +808,7 @@ AIFEMaster <- R6::R6Class(
         param_dict <- get_param_dict()
         config_params <- setdiff(
           x = rlang::fn_fmls_names(self$configure),
-          y = c("model_name", "model_label", "model_language", "text_embeddings", "features")
+          y = c("model_name", "model_label", "model_language", "text_embeddings", "features","feature_extractor")
         )
         if (is.function(self$configure)) {
           param_names_new <- config_params
