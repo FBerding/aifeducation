@@ -2,8 +2,7 @@ url: https://fberding.github.io/aifeducation/
 template:
   math-rendering: katex
   light-switch: true
-  theme: gruvbox-light
-  theme-dark: gruvbox-dark
+  theme-dark: breeze-dark
   bootstrap: 5
 
 navbar:
