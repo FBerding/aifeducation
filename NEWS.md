@@ -4,6 +4,45 @@ editor_options:
     wrap: 72
 ---
 
+# aifeducation 1.1.6
+
+**General**
+
+- Add print method to all objects.
+- Change dependencies. The package requires now 'iotarelr>=0.1.9'.
+
+**BaseModels**
+
+- Add support for XML-Roberta.
+
+**Tokenizer**
+
+- Add Method to calculate the necessary number of parts/chunks to cover
+  a given quantile of texts completely.
+
+**Classifiers**
+
+- Classifiers with prototypes: Fixed a problem in 'MetaLernerBatchSampler'. 
+  Now all true classes are always part of a training step.
+- Changed the minimum absolute frequencies for every fold from 3 to 4.
+- Classifiers with prototypes: Ns and Nq are now adjusted to the minimal
+  absolute frequencies of the train test data set. This
+  ensures that Ns and Nq are equal for all classes.
+- Pooling ('cls_pooling_type' and 'merge_pooling_type') can now be disabled.
+- Improve progress indicator for training. It now displays the remaining time and the epoch of
+  the last checkpoint.
+
+**TEFeatureExtractor**
+
+- Add new progress indicator to extract_features_large of 'TEFeatureExtractor'.
+- Improve progress indicator for training. It now displays the remaining time and the epoch of
+  the last checkpoint.
+
+**TextEmbeddingModel**
+
+- Embeddings can now inject a specific amount of mask tokens to match training
+  and application contexts better.
+
 # aifeducation 1.1.5
 
 **General**
