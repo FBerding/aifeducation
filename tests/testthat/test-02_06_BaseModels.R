@@ -100,20 +100,58 @@ for (object_class_name in object_class_names) {
       )
     )
 
-    # Create and train model
+    #Create Base Model
     base_model <- create_object(object_class_name)
+
+    #Check config-------------------------------------------------------------
+    test_that(paste(
+      "config for configuration",
+      object_class_name,
+      get_current_args_for_print(config_args),
+      get_current_args_for_print(train_args)
+    ), {
+      expect_false(base_model$is_configured())
+    })
+
     suppressMessages(
       do.call(
         what = base_model$configure,
         args = config_args
       )
     )
+
+    test_that(paste(
+      "config after configuration",
+      object_class_name,
+      get_current_args_for_print(config_args),
+      get_current_args_for_print(train_args)
+    ), {
+      expect_true(base_model$is_configured())
+    })
+
+    #check trained -----------------------------------------------------------
+    test_that(paste(
+      "train field for training",
+      object_class_name,
+      get_current_args_for_print(config_args),
+      get_current_args_for_print(train_args)
+    ), {
+      expect_false(base_model$is_trained())
+    })
     suppressMessages(
       do.call(
         what = base_model$train,
         args = train_args
       )
     )
+    test_that(paste(
+      "train field after training",
+      object_class_name,
+      get_current_args_for_print(config_args),
+      get_current_args_for_print(train_args)
+    ), {
+      expect_true(base_model$is_trained())
+    })
 
     # Prepare directory
     tmp_dir <- paste0(test_art_tmp_path, "/", object_class_name)
