@@ -18,13 +18,13 @@ This function changes the level for logging information of the 'transformers' li
 output printed to console for creating and training transformer models as well as \link{TextEmbeddingModel}s.
 }
 \seealso{
-Other Installation and Configuration: 
-\code{\link{check_aif_py_modules}()},
-\code{\link{get_recommended_py_versions}()},
-\code{\link{install_aifeducation}()},
-\code{\link{install_aifeducation_studio}()},
-\code{\link{install_py_modules}()},
-\code{\link{prepare_session}()},
-\code{\link{update_aifeducation}()}
+Other Installation and Configuration:
+\code{\link[=check_aif_py_modules]{check_aif_py_modules()}},
+\code{\link[=get_recommended_py_versions]{get_recommended_py_versions()}},
+\code{\link[=install_aifeducation]{install_aifeducation()}},
+\code{\link[=install_aifeducation_studio]{install_aifeducation_studio()}},
+\code{\link[=install_py_modules]{install_py_modules()}},
+\code{\link[=prepare_session]{prepare_session()}},
+\code{\link[=update_aifeducation]{update_aifeducation()}}
 }
 \concept{Installation and Configuration}

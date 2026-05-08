@@ -16,10 +16,10 @@ Function for requesting a summary of the versions of all
 critical python components.
 }
 \seealso{
-Other Utils Python Developers: 
-\code{\link{get_py_package_version}()},
-\code{\link{load_all_py_scripts}()},
-\code{\link{load_py_scripts}()},
-\code{\link{run_py_file}()}
+Other Utils Python Developers:
+\code{\link[=get_py_package_version]{get_py_package_version()}},
+\code{\link[=load_all_py_scripts]{load_all_py_scripts()}},
+\code{\link[=load_py_scripts]{load_py_scripts()}},
+\code{\link[=run_py_file]{run_py_file()}}
 }
 \concept{Utils Python Developers}

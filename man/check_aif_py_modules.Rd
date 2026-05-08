@@ -19,13 +19,13 @@ This function checks if all  python modules necessary for the package 'aifeducat
 available.
 }
 \seealso{
-Other Installation and Configuration: 
-\code{\link{get_recommended_py_versions}()},
-\code{\link{install_aifeducation}()},
-\code{\link{install_aifeducation_studio}()},
-\code{\link{install_py_modules}()},
-\code{\link{prepare_session}()},
-\code{\link{set_transformers_logger}()},
-\code{\link{update_aifeducation}()}
+Other Installation and Configuration:
+\code{\link[=get_recommended_py_versions]{get_recommended_py_versions()}},
+\code{\link[=install_aifeducation]{install_aifeducation()}},
+\code{\link[=install_aifeducation_studio]{install_aifeducation_studio()}},
+\code{\link[=install_py_modules]{install_py_modules()}},
+\code{\link[=prepare_session]{prepare_session()}},
+\code{\link[=set_transformers_logger]{set_transformers_logger()}},
+\code{\link[=update_aifeducation]{update_aifeducation()}}
 }
 \concept{Installation and Configuration}
