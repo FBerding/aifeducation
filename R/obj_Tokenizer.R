@@ -54,7 +54,6 @@ TokenizerBase <- R6::R6Class(
     #' @param dir_path `r get_description("save_dir")`
     #' @param folder_name `r get_param_doc_desc("folder_name")`
     #' @return `r get_description("return_save_on_disk")`
-    #'
     #' @importFrom utils write.csv
     save = function(dir_path, folder_name) {
       check_type(object = dir_path, type = "string", FALSE)
@@ -74,15 +73,6 @@ TokenizerBase <- R6::R6Class(
       # Save Sustainability Data
       private$save_sustainability_data(dir_path = dir_path, folder_name = folder_name)
 
-      # Write vocab txt
-      # special_tokens <- self$get_special_tokens()
-      # special_tokens <- special_tokens[order(x = special_tokens[, "id"]), ]
-      # special_tokens <- unique(special_tokens[, "token"])
-      # write(
-      #  x = c(special_tokens, names(private$model$get_vocab())),
-      #  file = paste0(save_location, "/", "vocab.txt")
-      # )
-
       # Save Tokenizer
       file_paths <- private$model$save_pretrained(save_location)
     },
@@ -92,9 +82,6 @@ TokenizerBase <- R6::R6Class(
     #' @param dir_path `r get_description("load_dir")`
     #' @return `r get_description("return_load_on_disk")`
     load_from_disk = function(dir_path) {
-      # Load or reload python scripts
-
-
       # Load private and public config files
       private$load_config_file(dir_path)
 
@@ -336,8 +323,6 @@ TokenizerBase <- R6::R6Class(
     #' @param statistics_max_tokens_length `r get_param_doc_desc("statistics_max_tokens_length")`
     #' @param step `string` describing the context of the estimation.
     #' @returns Returns a `data.frame` containing the estimates.
-
-    #' @return Returns an 'int' counting the number of special tokens.
     calculate_statistics = function(text_dataset,
                                     statistics_max_tokens_length,
                                     step = "creation") {
@@ -378,7 +363,7 @@ TokenizerBase <- R6::R6Class(
     #' @param trace `r get_param_doc_desc("trace")`
     #' @returns Returns a `vector` containing the number of chunks to cover a given
     #' quantile of documents completely.
-    calc_quantiles = function(text_dataset, batch_size = 32L, seq_len_tokens = 512L,token_overlap=0L,trace=TRUE) {
+    calc_quantiles = function(text_dataset, batch_size = 32L, seq_len_tokens = 512L, token_overlap = 0L, trace = TRUE) {
       check_class_and_type(
         object = text_dataset,
         object_name = "text_dataset",
@@ -409,8 +394,8 @@ TokenizerBase <- R6::R6Class(
         max = NULL,
         allow_NULL = FALSE
       )
-      n_texts=text_dataset$n_rows()
-      results=vector(length = n_texts)
+      n_texts <- text_dataset$n_rows()
+      results <- vector(length = n_texts)
 
       # Get total number of batches for the loop
       total_number_of_bachtes <- ceiling(text_dataset$n_rows() / batch_size)
@@ -422,7 +407,7 @@ TokenizerBase <- R6::R6Class(
         zero_based = TRUE
       )
 
-      PgrInd=ProgressIndicator$new(
+      PgrInd <- ProgressIndicator$new(
         max_iter = total_number_of_bachtes,
         inc_absolute = TRUE,
         calc_eta = TRUE
@@ -430,35 +415,36 @@ TokenizerBase <- R6::R6Class(
 
       for (i in seq(total_number_of_bachtes)) {
         tmp_subset <- text_dataset$select(as.integer(batches_index[[i]]))
-        tmp_encodings=self$encode(
-          raw_text=extract_column_from_py_dataset(
-            py_dataset=tmp_subset,
+        tmp_encodings <- self$encode(
+          raw_text = extract_column_from_py_dataset(
+            py_dataset = tmp_subset,
             column_name = "text",
-            format = "R"),
-                              token_overlap = token_overlap,
-                              max_token_sequence_length = seq_len_tokens,
-                              n_chunks = 1L,
-                              token_encodings_only = FALSE,
-                              token_to_int = TRUE,
-                              return_token_type_ids = FALSE,
-                              trace = FALSE
+            format = "R"
+          ),
+          token_overlap = token_overlap,
+          max_token_sequence_length = seq_len_tokens,
+          n_chunks = 1L,
+          token_encodings_only = FALSE,
+          token_to_int = TRUE,
+          return_token_type_ids = FALSE,
+          trace = FALSE
         )
-        results[batches_index[[i]]+1]=tmp_encodings$total_chunks
+        results[batches_index[[i]] + 1] <- tmp_encodings$total_chunks
         if (trace) {
           PgrInd$print_step(
-            iter=i,
-            text_pre="Calculating Chunks",
-            text_post="done"
+            iter = i,
+            text_pre = "Calculating Chunks",
+            text_post = "done"
           )
         }
       }
       return(
         ceiling(
-        quantile(
-          x=results,
-          probs=c(.10,.20,.30,.40,.50,.60,.70,.75,.80,.85,.90,.95,.99,.999,1.0)
+          quantile(
+            x = results,
+            probs = c(.10, .20, .30, .40, .50, .60, .70, .75, .80, .85, .90, .95, .99, .999, 1.0)
           )
-      )
+        )
       )
     },
     #--------------------------------------------------------------------------
