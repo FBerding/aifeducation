@@ -437,9 +437,6 @@ BaseModelCore <- R6::R6Class(
         self$last_training$config$whole_word <- FALSE
       }
 
-      # Load or reload python scripts
-
-
       # set up logger
       private$set_up_logger(log_dir = args$log_dir, log_write_interval = args$log_write_interval)
       private$log_state$value_top <- 0L
@@ -499,6 +496,9 @@ BaseModelCore <- R6::R6Class(
         msg = "Finish",
         trace = self$last_training$config$trace
       )
+
+      #Set trained to TRUE
+      private$trained=TRUE
     }
   ),
   public = list(
@@ -1108,11 +1108,12 @@ BaseModelCore <- R6::R6Class(
       padded_rows=pad_str(rows,width = NULL,pad=" ", end=": ")
       statistics=self$Tokenizer$get_tokenizer_statistics()
       special_tokens=self$Tokenizer$get_special_tokens()
+
       cat(
         sep="",
         padded_rows[1L],class(self)[1L],"\n",
-        padded_rows[2L],private$configured,"\n",
-        padded_rows[3L],private$trained[1L],"\n",
+        padded_rows[2L],self$is_configured(),"\n",
+        padded_rows[3L],self$is_trained(),"\n",
         padded_rows[4L],self$count_parameter(),"\n",
         padded_rows[5L],self$get_model_config()$max_position_embeddings,"\n",
         padded_rows[6L],self$get_final_size(),"\n",
