@@ -14,8 +14,9 @@
 
 #' @title RoBERTa-XML
 #' @description Represents models based on RoBERTa-XML.
-#' @references Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., Levy, O., Lewis, M., Zettlemoyer, L., &
-#'   Stoyanov, V. (2019). RoBERTa: A Robustly Optimized BERT Pretraining Approach. \doi{10.48550/arXiv.1907.11692}
+#' @references Conneau, A., Khandelwal, K., Goyal, N., Chaudhary, V., Wenzek, G.,
+#' Guzmán, F., Grave, E., Ott, M., Zettlemoyer, L., & Stoyanov, V. (2019).
+#' Unsupervised Cross-lingual Representation Learning at Scale \doi{10.48550/arXiv.1911.02116}
 #' @return `r get_description("return_object")`
 #' @family Base Model
 #' @export
