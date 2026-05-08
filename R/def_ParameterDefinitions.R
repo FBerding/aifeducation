@@ -1429,6 +1429,7 @@ get_param_dict <- function() {
     desc = "Object of class [TEFeatureExtractor] which should be used in order to reduce
     the number of dimensions of the text embeddings. If no feature extractor should be applied set `NULL`.",
     gui_label = "Feature Extractor",
+    default_historic = NULL,
     default_value = NULL,
     test_values = NULL
   )
