@@ -105,7 +105,7 @@ for (object_class_name in object_class_names) {
 
     #Check config-------------------------------------------------------------
     test_that(paste(
-      "config for configuration",
+      "config field for configuration",
       object_class_name,
       get_current_args_for_print(config_args),
       get_current_args_for_print(train_args)
@@ -121,7 +121,7 @@ for (object_class_name in object_class_names) {
     )
 
     test_that(paste(
-      "config after configuration",
+      "config field after configuration",
       object_class_name,
       get_current_args_for_print(config_args),
       get_current_args_for_print(train_args)

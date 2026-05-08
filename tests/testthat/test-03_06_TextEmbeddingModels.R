@@ -190,11 +190,24 @@ for (base_model_type in base_model_type_list) {
     # Central methods--------------------------------------------------------
     # Create Model
     text_embedding_model <- TextEmbeddingModel$new()
+    test_that(paste(base_model_type, get_current_args_for_print(config), "config field for configuration"), {
+      expect_false(text_embedding_model$is_configured())
+    })
+
     suppressMessages(
       do.call(what = text_embedding_model$configure,
               args = config
       )
     )
+    test_that(paste(base_model_type, get_current_args_for_print(config), "config field after configuration"), {
+      expect_true(text_embedding_model$is_configured())
+    })
+
+    test_that(paste(base_model_type, get_current_args_for_print(config), "print method"), {
+      expect_no_error(text_embedding_model$print())
+      expect_no_error(print(text_embedding_model))
+    })
+
     # Check history
     test_that(paste(base_model_type, get_current_args_for_print(config), "history"), {
       history <- text_embedding_model$BaseModel$last_training$history
