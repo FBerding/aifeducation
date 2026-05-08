@@ -20,7 +20,8 @@ Other Base Model:
 \code{\link{BaseModelDebertaV2}},
 \code{\link{BaseModelFunnel}},
 \code{\link{BaseModelMPNet}},
-\code{\link{BaseModelRoberta}}
+\code{\link{BaseModelRoberta}},
+\code{\link{BaseModelRobertaXML}}
 }
 \concept{Base Model}
 \section{Super classes}{
