@@ -633,10 +633,10 @@ BaseModelCore <- R6::R6Class(
       }
 
       if (is.null_or_na(y_min)) {
-        y_min <- min(plot_data[, c("loss", "val_loss")])
+        y_min <- min(plot_data[, c("loss", "val_loss")], na.rm = TRUE)
       }
       if (is.null_or_na(y_max)) {
-        y_max <- max(plot_data[, c("loss", "val_loss")])
+        y_max <- max(plot_data[, c("loss", "val_loss")], na.rm = TRUE)
       }
 
       tmp_colnames <- c("epoch", "val_loss", "loss")
