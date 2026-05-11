@@ -78,8 +78,11 @@ Layer for combining the output of different layers. All inputs must be sequentia
 First, pooling over time is applied extracting the minimal and/or maximal features.
 Second, the pooled tensors are combined by calculating their weighted sum. Different attention mechanism can be used
 to dynamically calculate the corresponding weights. This allows the model to decide which part of the data is most usefull.
-Finally, pooling over features is applied extracting a specific number of maximal and/or minimal features. A normalization of all input
-at the begining of the layer is possible. If this layer is disabled the sequence is projected to a vector with the specified number of features. All parameters with the prefix \emph{merge_} can be used to configure this layer.
+Finally, pooling over features can be applied extracting a specific number of maximal and/or minimal features.
+Pooling over times is mandatory. Pooling over features is optional and can lead to a lose of information.
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{A normalization of all input at the begining of the layer is possible. All parameters with the prefix *merge_* can be used to configure this layer.
+}\if{html}{\out{</div>}}
 
 \strong{Training and Prediction}
 
@@ -214,7 +217,7 @@ Other Classification:
   merge_num_heads = 1L,
   merge_normalization_type = "LayerNorm",
   merge_pooling_features = 50L,
-  merge_pooling_type = "MinMax"
+  merge_pooling_type = "MinMaxTimes"
 )}
     \if{html}{\out{</div>}}
   }
@@ -280,8 +283,9 @@ indicating a higher category/class. For nominal data the order does not matter.}
       \item{\code{merge_attention_type}}{\code{string} Choose the attention type. Allowed values: 'Fourier', 'MultiHead'}
       \item{\code{merge_num_heads}}{\code{int} determining the number of attention heads for a self-attention layer. Only relevant if \code{attention_type='MultiHead'} Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
       \item{\code{merge_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values: 'LayerNorm', 'BatchNorm', 'PowerNorm', 'RMSNorm', 'None'}
-      \item{\code{merge_pooling_features}}{\code{int} Number of features to be extracted at the end of the model. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{merge_pooling_type}}{\code{string} Type of extracting intermediate features. Allowed values: 'Max', 'Min', 'MinMax', 'None'}
+      \item{\code{merge_pooling_features}}{\code{int} Number of features to be extracted at the end of the model.
+Only relevant if pooling type ist 'Max', 'Min' or 'MinMax'. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{merge_pooling_type}}{\code{string} Type of extracting intermediate features. Allowed values: 'Max', 'Min', 'MinMax', 'MaxTimes', 'MinMaxTimes'}
     }
     \if{html}{\out{</div>}}
   }

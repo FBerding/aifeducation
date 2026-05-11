@@ -76,16 +76,16 @@ PyTorchs implementation. All parameters with the prefix \emph{rec_} can be used 
 
 \emph{Description}
 
-Layer transforms sequences into a lower dimensional space that can be passed to dense layers. It
-performs two types of pooling. First, it extractes features across the time dimension selecting the maximal
+Layer transforms sequences into a lower dimensional space that can be passed to dense layers. It can
+perform two types of pooling. First, it extractes features across the time dimension selecting the maximal
 and/or minimal features. Second, it performs pooling over the remaining features selecting a specific number of
-the heighest and/or lowest features.
+the heighest and/or lowest features. Pooling over times is mandatory. Pooling over features is optional and can lead to a lose of information.
 
 In the case of selecting the minmal \emph{and} maximal features at the same time the minmal
 features are concatenated to the tensor of the maximal features resulting in the shape $(Batch, Times, 2*Features)$ at the end of the first step.
 In the second step the
 number of requested features is halved. The first half is used for the maximal features and the second for the minimal
-features. If this layer is disabled the sequence is projected to a vector with the specified number of features. All parameters with the prefix \emph{cls_pooling_} can be used to configure this layer.
+features. All parameters with the prefix \emph{cls_pooling_} can be used to configure this layer.
 
 \strong{Training and Prediction}
 
@@ -188,7 +188,7 @@ Other Classification:
   target_levels = NULL,
   skip_connection_type = "ResidualGate",
   cls_pooling_features = 50L,
-  cls_pooling_type = "MinMax",
+  cls_pooling_type = "MinMaxTimes",
   projection_type = "Regular",
   metric_type = "Euclidean",
   feat_act_fct = "ELU",
@@ -253,8 +253,9 @@ the number of dimensions of the text embeddings. If no feature extractor should 
 note that order matters. For ordinal data please ensure that the levels are sorted correctly with later levels
 indicating a higher category/class. For nominal data the order does not matter.}
       \item{\code{skip_connection_type}}{\code{string} Type of residual connenction for all layers and stack of layers. Allowed values: 'ResidualGate', 'Addition', 'None'}
-      \item{\code{cls_pooling_features}}{\code{int} Number of features to be extracted at the end of the model. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{cls_pooling_type}}{\code{string} Type of extracting intermediate features. Allowed values: 'Max', 'Min', 'MinMax', 'None'}
+      \item{\code{cls_pooling_features}}{\code{int} Number of features to be extracted at the end of the model.
+Only relevant if pooling type ist 'Max', 'Min' or 'MinMax'. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{cls_pooling_type}}{\code{string} Type of extracting intermediate features. Allowed values: 'Max', 'Min', 'MinMax', 'MaxTimes', 'MinMaxTimes'}
       \item{\code{projection_type}}{\code{string} Type of projection. Allowed values: 'Regular', 'PairwiseOrthogonal', 'PairwiseOrthogonalDense'}
       \item{\code{metric_type}}{\code{string} Type of metric used for calculating the distance. Allowed values: 'Euclidean', 'CosineDistance'}
       \item{\code{feat_act_fct}}{\code{string} Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}

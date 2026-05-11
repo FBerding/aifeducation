@@ -95,15 +95,15 @@ get_layer_dict <- function(layer) {
 
   documentation$cls_pooling_layer <- list(
     title = "Classifiction Pooling Layer",
-    desc = "Layer transforms sequences into a lower dimensional space that can be passed to dense layers. It
-    performs two types of pooling. First, it extractes features across the time dimension selecting the maximal
+    desc = "Layer transforms sequences into a lower dimensional space that can be passed to dense layers. It can
+    perform two types of pooling. First, it extractes features across the time dimension selecting the maximal
     and/or minimal features. Second, it performs pooling over the remaining features selecting a specific number of
-    the heighest and/or lowest features.
+    the heighest and/or lowest features. Pooling over times is mandatory. Pooling over features is optional and can lead to a lose of information.
     \n In the case of selecting the minmal *and* maximal features at the same time the minmal
     features are concatenated to the tensor of the maximal features resulting in the shape $(Batch, Times, 2*Features)$ at the end of the first step.
     In the second step the
     number of requested features is halved. The first half is used for the maximal features and the second for the minimal
-    features. If this layer is disabled the sequence is projected to a vector with the specified number of features.",
+    features.",
     img = "layers_cls_pooling.png",
     references = NULL,
     param_prefix = "cls_pooling_"
@@ -115,8 +115,9 @@ get_layer_dict <- function(layer) {
     First, pooling over time is applied extracting the minimal and/or maximal features.
     Second, the pooled tensors are combined by calculating their weighted sum. Different attention mechanism can be used
     to dynamically calculate the corresponding weights. This allows the model to decide which part of the data is most usefull.
-    Finally, pooling over features is applied extracting a specific number of maximal and/or minimal features. A normalization of all input
-    at the begining of the layer is possible. If this layer is disabled the sequence is projected to a vector with the specified number of features.",
+    Finally, pooling over features can be applied extracting a specific number of maximal and/or minimal features.
+    Pooling over times is mandatory. Pooling over features is optional and can lead to a lose of information.\n
+    A normalization of all input at the begining of the layer is possible.",
     img = "layers_merge.png",
     references = NULL,
     param_prefix = "merge_"

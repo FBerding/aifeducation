@@ -1561,7 +1561,8 @@ get_param_dict <- function() {
     min = 1L,
     max = Inf,
     allowed_values = NULL,
-    desc = "Number of features to be extracted at the end of the model.",
+    desc = "Number of features to be extracted at the end of the model.
+      Only relevant if pooling type ist 'Max', 'Min' or 'MinMax'.",
     gui_box = "Classifiction Pooling Layer",
     gui_label = "Size",
     default_value = 32L,
@@ -1617,11 +1618,11 @@ get_param_dict <- function() {
     min = NULL,
     max = NULL,
     allow_null = FALSE,
-    allowed_values = c("Max", "Min", "MinMax","None"),
+    allowed_values = c("Max", "Min", "MinMax","MaxTimes","MinMaxTimes"),
     desc = "Type of extracting intermediate features.",
     gui_box = "Classifiction Pooling Layer",
     gui_label = "Feature Extraction Method",
-    default_value = "MinMax",
+    default_value = "MinMaxTimes",
     default_historic = NULL,
     test_values = NULL
   )
