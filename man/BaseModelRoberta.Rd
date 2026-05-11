@@ -15,12 +15,14 @@ Stoyanov, V. (2019). RoBERTa: A Robustly Optimized BERT Pretraining Approach. \d
 }
 \seealso{
 Other Base Model:
+\code{\link{BaseModelAlbert}},
 \code{\link{BaseModelBert}},
 \code{\link{BaseModelDebertaV2}},
 \code{\link{BaseModelFunnel}},
 \code{\link{BaseModelMPNet}},
 \code{\link{BaseModelModernBert}},
-\code{\link{BaseModelRobertaXML}}
+\code{\link{BaseModelRobertaXML}},
+\code{\link{BaseModelXmod}}
 }
 \concept{Base Model}
 \section{Super classes}{

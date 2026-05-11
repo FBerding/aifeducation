@@ -16,12 +16,14 @@ Unsupervised Cross-lingual Representation Learning at Scale \doi{10.48550/arXiv.
 }
 \seealso{
 Other Base Model:
+\code{\link{BaseModelAlbert}},
 \code{\link{BaseModelBert}},
 \code{\link{BaseModelDebertaV2}},
 \code{\link{BaseModelFunnel}},
 \code{\link{BaseModelMPNet}},
 \code{\link{BaseModelModernBert}},
-\code{\link{BaseModelRoberta}}
+\code{\link{BaseModelRoberta}},
+\code{\link{BaseModelXmod}}
 }
 \concept{Base Model}
 \section{Super classes}{

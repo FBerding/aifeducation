@@ -15,12 +15,14 @@ for Efficient Language Processing. \doi{10.48550/arXiv.2006.03236}
 }
 \seealso{
 Other Base Model:
+\code{\link{BaseModelAlbert}},
 \code{\link{BaseModelBert}},
 \code{\link{BaseModelDebertaV2}},
 \code{\link{BaseModelMPNet}},
 \code{\link{BaseModelModernBert}},
 \code{\link{BaseModelRoberta}},
-\code{\link{BaseModelRobertaXML}}
+\code{\link{BaseModelRobertaXML}},
+\code{\link{BaseModelXmod}}
 }
 \concept{Base Model}
 \section{Super classes}{
