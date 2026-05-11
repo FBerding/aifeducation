@@ -671,6 +671,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         factor=(self$last_training$config$Ns)*(self$last_training$config$Ns+self$last_training$config$Nq)
         tmp_ns=floor(min_total_freq*factor)
         tmp_ns=max(1,min(tmp_ns,min_total_freq-1))
+        tmp_ns=min(tmp_ns,self$last_training$config$Ns)
         tmp_nq=min_total_freq-tmp_ns
         message(
           "Absolute frequencies of some classes are not sufficent for the chosen Nq and Ns.\n",
