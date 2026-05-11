@@ -139,7 +139,7 @@ TEClassifierParallel <- R6::R6Class(
                          merge_num_heads = 1L,
                          merge_normalization_type = "LayerNorm",
                          merge_pooling_features = 50L,
-                         merge_pooling_type = "MinMax") {
+                         merge_pooling_type = "MinMaxTimes") {
       private$do_configuration(args = get_called_args(n = 1L))
     }
   ),

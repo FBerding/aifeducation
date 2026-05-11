@@ -87,7 +87,7 @@ TEClassifierSequential <- R6::R6Class(
                          target_levels = NULL,
                          skip_connection_type = "ResidualGate",
                          cls_pooling_features = NULL,
-                         cls_pooling_type = "MinMax",
+                         cls_pooling_type = "MinMaxTimes",
                          cls_head_type = "Regular",
                          feat_act_fct = "ELU",
                          feat_size = 50L,
@@ -142,7 +142,7 @@ TEClassifierSequential <- R6::R6Class(
     create_reset_model = function() {
       private$check_config_for_TRUE()
 
-      
+
 
       private$model <- py$TEClassifierSequential(
         features = as.integer(private$model_config$features),
