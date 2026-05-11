@@ -518,8 +518,6 @@ BaseModelCore <- R6::R6Class(
 
       # Load the BaseModel
       tmp_model <- private$load_BaseModel(model_dir)
-      # transformers$AutoModelForMaskedLM$from_pretrained(model_dir)
-
       # Check if the model is the correct model type
       detected_model_type <- detect_base_model_type(tmp_model)
       if (detected_model_type != private$model_type) {
@@ -548,6 +546,9 @@ BaseModelCore <- R6::R6Class(
 
       # Set configured to TRUE to avoid changes in the model
       private$set_configuration_to_TRUE()
+
+      #Set trained to TRUE
+      private$trained=TRUE
     },
     #--------------------------------------------------------------------------
     #' @description Traines a BaseModel
