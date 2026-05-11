@@ -82,6 +82,7 @@ BaseModelXmod <- R6::R6Class(
     #' @param tokenizer `r get_param_doc_desc("tokenizer")`
     #' @param max_position_embeddings `r get_param_doc_desc("max_position_embeddings")`
     #' @param languages `r get_param_doc_desc("languages")`
+    #' @param default_language `r get_param_doc_desc("default_language")`
     #' @param hidden_size `r get_param_doc_desc("hidden_size")`
     #' @param num_hidden_layers `r get_param_doc_desc("num_hidden_layers")`
     #' @param num_attention_heads `r get_param_doc_desc("num_attention_heads")`

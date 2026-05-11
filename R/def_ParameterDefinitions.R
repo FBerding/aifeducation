@@ -668,7 +668,7 @@ get_param_dict <- function() {
     default_value = c("eng","deu"),
     test_values = "deu"
   )
-  param$default_language_languages <- list(
+  param$default_language <- list(
     type = "string",
     allow_null = FALSE,
     min = NULL,
