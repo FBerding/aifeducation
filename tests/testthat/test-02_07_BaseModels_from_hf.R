@@ -31,15 +31,7 @@ create_dir(test_tmp_data_base_model_path, FALSE)
 # Test Configuration
 object_class_names <- BaseModelsIndex
 if (check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "5.0.0")){
-  object_class_names <- c(
-    "BaseModelDebertaV2",
-    "BaseModelBert",
-    "BaseModelFunnel",
-    #"BaseModelLongformer",
-    "BaseModelModernBert",
-    "BaseModelRoberta"#,
-    #  "BaseModelMPNet"
-  )
+  object_class_names=setdiff(object_class_names,"BaseModelMPNet")
 }
 
 for (object_class_name in object_class_names) {
