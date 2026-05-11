@@ -28,7 +28,7 @@ editor_options:
 - Classifiers with prototypes: Ns and Nq are now adjusted to the minimal
   absolute frequencies of the train test data set. This
   ensures that Ns and Nq are equal for all classes.
-- Pooling ('cls_pooling_type' and 'merge_pooling_type') can now be disabled.
+- Pooling over features is now optional.
 - Improve progress indicator for training. It now displays the remaining time and the epoch of
   the last checkpoint.
 
