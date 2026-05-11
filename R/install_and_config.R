@@ -569,8 +569,8 @@ prepare_session <- function(env_type = "auto", envname = "aifeducation", check_s
     message(paste0(print_strings,c(pkg_versions,torch$cuda$is_available()),collapse = "\n"))
 
     if (check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "5.0.0")) {
-      message("Version of python package 'transformers' is 5.0.0 or higher. Some older models
-              from hugging face may not work.")
+      message("Version of python package 'transformers' is 5.0.0 or higher. ",
+              "Some older models from hugging face may not work.")
     }
   }
   message("Load all python objects and functions.")
