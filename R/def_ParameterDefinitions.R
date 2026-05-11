@@ -630,6 +630,57 @@ get_param_dict <- function() {
   )
   param$num_hidden_layer <- param$num_hidden_layers
 
+  param$num_hidden_groups <- list(
+    type = "int",
+    allow_null = FALSE,
+    min = 1L,
+    max = Inf,
+    allowed_values = NULL,
+    desc = "Number of groups for the hidden layers. Layers belonging to the same group share parameters.",
+    gui_box = "Transformer Encoder Layers",
+    gui_label = "Number of Hidden Groups",
+    default_value = 1L,
+    test_values = c(1L, 2L)
+  )
+
+  param$embedding_size <- list(
+    type = "int",
+    allow_null = FALSE,
+    min = 1L,
+    max = Inf,
+    allowed_values = NULL,
+    desc = "Dimensionality of the token embeddings.",
+    gui_box = "Transformer Encoder Layers",
+    gui_label = "Embedding Size",
+    default_value = 1L,
+    test_values = c(1L, 2L)
+  )
+
+  param$languages <- list(
+    type = "string",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = NULL,
+    desc = "`vector` of strings representing the Language codes. Must contain at least two codes.",
+    gui_box = "Transformer Encoder Layers",
+    gui_label = "Language Codes",
+    default_value = c("eng","deu"),
+    test_values = "deu"
+  )
+  param$default_language_languages <- list(
+    type = "string",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = NULL,
+    desc = "`string` representing the language code of the default language.",
+    gui_box = "Transformer Encoder Layers",
+    gui_label = "Default Language Codes",
+    default_value = "deu",
+    test_values = "deu"
+  )
+
   param$num_decoder_layers <- list(
     type = "int",
     allow_null = FALSE,
