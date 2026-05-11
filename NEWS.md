@@ -14,6 +14,8 @@ editor_options:
 **BaseModels**
 
 - Add support for XML-Roberta.
+- Add support for ALBERT.
+- Add support for Xmod.
 
 **Tokenizer**
 
