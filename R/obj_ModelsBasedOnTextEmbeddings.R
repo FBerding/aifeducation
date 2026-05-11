@@ -201,10 +201,10 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         }
       }
       if (is.null_or_na(y_min)) {
-        y_min <- min(plot_data[, data_colnames])
+        y_min <- min(plot_data[, data_colnames], na.rm = TRUE)
       }
       if (is.null_or_na(y_max)) {
-        y_max <- max(plot_data[, data_colnames])
+        y_max <- max(plot_data[, data_colnames], na.rm = TRUE)
       }
 
       tmp_plot <- ggplot2::ggplot(data = plot_data) +
