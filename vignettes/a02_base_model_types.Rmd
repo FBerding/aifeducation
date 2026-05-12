@@ -22,6 +22,9 @@ knitr::opts_chunk$set(
 library(aifeducation)
 ```
 
+> All models created with 'aifeducation' do **not** need 'sentencepiece' even if this
+> requirment is displayed in the table. 'aifeducation' uses a WordPieceTokenizer
+> for all newly created models.
 
 `r build_layer_overview_base_models()`
 
