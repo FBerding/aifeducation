@@ -266,8 +266,6 @@ install_aifeducation_studio <- function() {
 #' @param torcheval_version `string` determining the desired version of the python library 'torcheval'.
 #' @param accelerate_version `string` determining the desired version of the python library 'accelerate'.
 #' @param calflops_version `string` determining the desired version of the python library 'calflops'.
-#' @param sentencepiece_version `string` determining the desired version of the python library 'sentencepiece'.
-#' @param protobuf_version `string` determining the desired version of the python library 'google.protobuf'.
 #' @param pytorch_cuda_version `string` determining the desired version of 'cuda' for 'PyTorch'.
 #' To install 'PyTorch' without cuda set to `NULL`.
 #' @param python_version `string` Python version to use.
@@ -299,8 +297,6 @@ install_py_modules <- function(envname = "aifeducation",
                                torcheval_version = get_recommended_py_versions("torcheval"),
                                accelerate_version = get_recommended_py_versions("accelerate"),
                                calflops_version = get_recommended_py_versions("calflops"),
-                               sentencepiece_version=get_recommended_py_versions("sentencepiece"),
-                               protobuf_version=get_recommended_py_versions("google.protobuf"),
                                pytorch_cuda_version = "13.0",
                                python_version = "3.12",
                                remove_first = FALSE,
@@ -312,9 +308,7 @@ install_py_modules <- function(envname = "aifeducation",
     paste0("pandas", pandas_version),
     paste0("datasets", datasets_version),
     paste0("codecarbon", codecarbon_version),
-    paste0("calflops", calflops_version),
-    paste0("sentencepiece", sentencepiece_version),
-    paste0("protobuf", protobuf_version),
+    paste0("calflops", calflops_version)
   )
   relevant_modules_pt <- c(
     paste0("safetensors", safetensors_version),
@@ -427,8 +421,6 @@ check_aif_py_modules <- function(trace = TRUE) {
     "tokenizers",
     "datasets",
     "codecarbon",
-    "sentencepiece",
-    "google.protobuf",
     "calflops"
   )
   pytorch_modules <- c(
