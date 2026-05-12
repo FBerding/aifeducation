@@ -36,6 +36,8 @@ get_recommended_py_versions <- function(package_name = NULL) {
     safetensors = c("0.6.2", "0.7.0"),
     torcheval = c("0.0.7", "0.0.7"),
     accelerate = c("1.10.1", "1.13.0"),
+    sentencepiece = c("0.2.0", "0.2.1"),
+    google.protobuf = c("7.34.0", "7.34.1"),
     calflops = c("0.3.2", "0.3.2")
   )
 
@@ -264,6 +266,8 @@ install_aifeducation_studio <- function() {
 #' @param torcheval_version `string` determining the desired version of the python library 'torcheval'.
 #' @param accelerate_version `string` determining the desired version of the python library 'accelerate'.
 #' @param calflops_version `string` determining the desired version of the python library 'calflops'.
+#' @param sentencepiece_version `string` determining the desired version of the python library 'sentencepiece'.
+#' @param protobuf_version `string` determining the desired version of the python library 'google.protobuf'.
 #' @param pytorch_cuda_version `string` determining the desired version of 'cuda' for 'PyTorch'.
 #' To install 'PyTorch' without cuda set to `NULL`.
 #' @param python_version `string` Python version to use.
@@ -295,6 +299,8 @@ install_py_modules <- function(envname = "aifeducation",
                                torcheval_version = get_recommended_py_versions("torcheval"),
                                accelerate_version = get_recommended_py_versions("accelerate"),
                                calflops_version = get_recommended_py_versions("calflops"),
+                               sentencepiece_version=get_recommended_py_versions("sentencepiece"),
+                               protobuf_version=get_recommended_py_versions("google.protobuf"),
                                pytorch_cuda_version = "13.0",
                                python_version = "3.12",
                                remove_first = FALSE,
@@ -306,7 +312,9 @@ install_py_modules <- function(envname = "aifeducation",
     paste0("pandas", pandas_version),
     paste0("datasets", datasets_version),
     paste0("codecarbon", codecarbon_version),
-    paste0("calflops", calflops_version)
+    paste0("calflops", calflops_version),
+    paste0("sentencepiece", sentencepiece_version),
+    paste0("protobuf", protobuf_version),
   )
   relevant_modules_pt <- c(
     paste0("safetensors", safetensors_version),
@@ -336,7 +344,6 @@ install_py_modules <- function(envname = "aifeducation",
 
   if (!use_conda) {
     # Use virtualenv
-
     if (reticulate::virtualenv_exists(envname = envname)) {
       if (remove_first) {
         reticulate::virtualenv_remove(envname = envname, confirm = FALSE)
@@ -420,6 +427,8 @@ check_aif_py_modules <- function(trace = TRUE) {
     "tokenizers",
     "datasets",
     "codecarbon",
+    "sentencepiece",
+    "google.protobuf",
     "calflops"
   )
   pytorch_modules <- c(
@@ -597,4 +606,46 @@ detec_os <- function() {
   } else {
     return(sys_name)
   }
+}
+
+#' @title Install protocol buffer compiler
+#' @description This function is a support function to install the protocol buffer
+#' compiler which is necessary for using the python libraries 'protobuf' and
+#' 'sentencepiece'. Details can be found here
+#' <https://protobuf.dev/installation/>.
+#' @description On Windows the function uses Winget requiring Windows 10 or higher.
+#' On MacOS it uses Homebrew. On Linux it uses apt.
+#' @return This function does not return anything. It installs
+#' the protocol buffer compiler
+#' @family Installation and Configuration
+#' @export
+install_protocol_buffer_compiler=function(){
+  os=detec_os()
+  if(os=="windows"){
+    command="winget install protobuf"
+  } else if(os=="linux"){
+    command="apt install -y protobuf-compiler"
+  }else if(os=="mac"){
+    command="brew install protobuf"
+  } else {
+    stop("OS could not be detected.")
+  }
+  cat("Using the command'",command,"' to install.\n")
+  results=suppressWarnings(
+    system(
+      command=command,
+      intern = TRUE,
+      wait = TRUE,
+      invisible=FALSE,
+      show.output.on.console = FALSE
+    )
+  )
+  cat(toString(results),"\n")
+  version=system(
+    command="protoc --version",
+    intern = TRUE,
+    wait = TRUE,
+    invisible=FALSE,
+    show.output.on.console = FALSE)
+  return(toString(version))
 }
