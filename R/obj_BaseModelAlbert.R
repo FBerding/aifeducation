@@ -15,8 +15,8 @@
 #' @title ALBERT-Transformer
 #' @description Represents models based on ALBERT
 #' @references  Lan, Z., Chen, M., Goodman, S., Gimpel, K., Sharma, P., &
-#' Soricut, R. (2019). ALBERT: A Lite BERT for Self-supervised Learning of
-#' Language Representations. arXiv. \doi{10.48550/ARXIV.1909.11942"}
+#' Soricut, R. (2019). ALBERT; A Lite BERT for Self-supervised Learning of
+#' Language Representations. arXiv. \doi{10.48550/ARXIV.1909.11942}
 #' @return `r get_description("return_object")`
 #' @family Base Model
 #' @export
