@@ -59,7 +59,19 @@ install.packages("aifeducation")
 
 With this command, `aifeducation` is installed on your machine.
 
-## Step 2 - Install Python and optional R packages
+## Step 2 - Install Protocol Buffer Compiler
+
+Next you must install Protocol Buffer Compiler if it is not already on your system.
+This compiler is a prerequisite for two python packages ('protbuf' and 'sentencepiece') 
+some open source models need to work. These packages are also necessary to update
+older open source models to newer version of the library 'transformers'. 
+You can find installation instruction
+on (https://protobuf.dev/installation/)[https://protobuf.dev/installation/].
+
+As an alternative you can call `aifeducation::install_protocol_buffer_compiler()`
+for an automatic installation. 
+
+## Step 3 - Install Python and optional R packages
 
 Since natural language processing with neural nets is based on models
 which are computationally intensive, *PyTorch* is used within this
@@ -164,6 +176,13 @@ aifeducation::update_aifeducation(
 > Starting with version 1.1.2 the python package 'calflops' is necessary. If you
 > used aifeducation with version 1.1.1 or lower please 
 > install this package manually with `reticulate::py_install("calflops")` or call
+> `aifeducation::update_aifeducation`.
+
+> Starting with version 1.1.6 the python packages 'protobuf' and 'sentencepiece ' are necessary. If you
+> used aifeducation with version 1.1.5 or lower please 
+> install first Protocol Buffer Compiler via `install_protocol_buffer_compiler` or
+> (https://protobuf.dev/installation/)[https://protobuf.dev/installation/].
+> After that install the package manually with `reticulate::py_install(c("protobuf","sentencepiece"))` or call
 > `aifeducation::update_aifeducation`.
 
 # 5) Recommended Version of Python Packages
