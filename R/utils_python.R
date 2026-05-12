@@ -232,6 +232,8 @@ get_py_package_versions <- function() {
     "safetensors",
     "torcheval",
     "accelerate",
+    "sentencepiece",
+    "google.protobuf",
     "numpy"
   )
 
