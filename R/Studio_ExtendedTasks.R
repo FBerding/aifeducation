@@ -177,7 +177,7 @@ long_models <- function(args) {
     )
 
     # Create object or load object
-    if (args[[1L]]$meta_args$object_class %in% BaseModelsIndex) {
+    if (args[[1L]]$meta_args$object_class %in% get_entry_from_BaseModelsIndex("class_name")) {
       object <- load_from_disk(args[[1L]]$path_args$path_to_base_model)
     } else {
       object <- create_object(args[[1L]]$meta_args$object_class)
