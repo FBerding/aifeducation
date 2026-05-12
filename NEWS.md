@@ -115,9 +115,9 @@ editor_options:
 **Classifiers**
 
 - Added new normalization layers
-    - BatchNorm by [Loffe and Szegedy](https://doi.org/10.48550/arXiv.1502.03167)
-    - RMSNorm by [Zhang and Sennrich](https://doi.org/10.48550/arXiv.1910.07467)
-    - PowerNorm by [Shen et al.](https://doi.org/10.48550/arXiv.2003.07845)
+    - BatchNorm by [Loffe and Szegedy (2015)](https://doi.org/10.48550/arXiv.1502.03167)
+    - RMSNorm by [Zhang and Sennrich (2019)](https://doi.org/10.48550/arXiv.1910.07467)
+    - PowerNorm by [Shen et al. (2020)](https://doi.org/10.48550/arXiv.2003.07845)
 - Fixed bug in Masking Layer during the calculation of the mask for features.
 
 **FeatureExtractors**
@@ -144,7 +144,7 @@ editor_options:
 - Added new options for plotting training history.
 - Fixed an errors causing pseudo labeling to crash in some cases.
 - Added a new type of classification head: OLS-Layer described by 
-  [Li et al. 2020](https://doi.org/10.1109/TIP.2020.2990277). The new head
+  [Li et al. (2020)](https://doi.org/10.1109/TIP.2020.2990277). The new head
   is available for TEClassifierSequential and TEClassifierParallel. For the
   classifiers working with prototypes the layer can be used to change the
   projection into the embedding space (parameter projection_type).
