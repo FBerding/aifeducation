@@ -173,4 +173,10 @@ BaseModelMPNet <- R6::R6Class(
 )
 
 # Add the model to the user list
-BaseModelsIndex$MPNet <- ("BaseModelMPNet")
+BaseModelsIndex$MPNet <- list(
+  class_name="BaseModelMPNet",
+  model_type="mpnet",
+  reference="Song,K., Tan, X., Qin, T., Lu, J. & Liu, T.-Y. (2020). MPNet:
+  Masked and Permuted Pre-training for Language Understanding. doi: [10.48550/arXiv.2004.09297]",
+  req_sentencepiece=FALSE
+)

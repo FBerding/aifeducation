@@ -96,4 +96,11 @@ BaseModelAlbert <- R6::R6Class(
 )
 
 # Add the model to the user list
-BaseModelsIndex$Albert <- ("BaseModelAlbert")
+BaseModelsIndex$Albert <- list(
+  class_name="BaseModelAlbert",
+  model_type="albert",
+  reference="Lan, Z., Chen, M., Goodman, S., Gimpel, K., Sharma, P., &
+  Soricut, R. (2019). ALBERT; A Lite BERT for Self-supervised Learning of
+  Language Representations. arXiv. doi: [10.48550/ARXIV.1909.11942]",
+  req_sentencepiece=TRUE
+  )

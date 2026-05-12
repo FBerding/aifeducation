@@ -89,4 +89,11 @@ BaseModelRoberta <- R6::R6Class(
 )
 
 # Add the model to the user list
-BaseModelsIndex$roberta <- ("BaseModelRoberta")
+BaseModelsIndex$roberta <- list(
+  class_name="BaseModelRoberta",
+  model_type="roberta",
+  reference="Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., Levy, O.,
+  Lewis, M., Zettlemoyer, L., & Stoyanov, V. (2019). RoBERTa: A Robustly Optimized
+  BERT Pretraining Approach. doi: [10.48550/arXiv.1907.11692]",
+  req_sentencepiece=FALSE
+)

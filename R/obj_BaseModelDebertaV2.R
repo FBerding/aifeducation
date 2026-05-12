@@ -91,4 +91,10 @@ BaseModelDebertaV2 <- R6::R6Class(
 )
 
 # Add the model to the user list
-BaseModelsIndex$deberta_v2 <- ("BaseModelDebertaV2")
+BaseModelsIndex$deberta_v2 <- list(
+  class_name="BaseModelDebertaV2",
+  model_type="deberta_v2",
+  reference="He, P., Liu, X., Gao, J. & Chen, W. (2020). DeBERTa:
+  Decoding-enhanced BERT with Disentangled Attention. doi: [10.48550/arXiv.2006.03654]",
+  req_sentencepiece=FALSE
+)

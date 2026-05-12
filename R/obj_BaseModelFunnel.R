@@ -116,4 +116,10 @@ BaseModelFunnel <- R6::R6Class(
 )
 
 # Add the model to the user list
-BaseModelsIndex$Funnel <- ("BaseModelFunnel")
+BaseModelsIndex$Funnel <- list(
+  class_name="BaseModelFunnel",
+  model_type="funnel",
+  reference="Dai, Z., Lai, G., Yang, Y. & Le, Q. V. (2020). Funnel-Transformer:
+  Filtering out Sequential Redundancy for Efficient Language Processing. doi: [10.48550/arXiv.2006.03236]",
+  req_sentencepiece=FALSE
+)
