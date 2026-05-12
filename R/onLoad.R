@@ -34,5 +34,8 @@ calflops <- NULL
 # Message on load of the package
 packageStartupMessage(
   "This is version 1.1.6 of aifeducation. Start a new session with prepare_session().",
+  "\n\nPlease note that the package requires now two new python packages ('protbuf' and 'sentencepiece')",
+  " and the Protocol Buffer Compiler.",
+  "\n\nSee the vignette '01 Get started' for more details.",
   appendLF = TRUE
 )
