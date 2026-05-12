@@ -34,7 +34,7 @@ example_data <- imdb_movie_reviews
 raw_texts <- LargeDataSetForText$new(example_data)
 
 # Test Configuration
-object_class_names <- BaseModelsIndex
+object_class_names <- get_entry_from_BaseModelsIndex("class_name")
 if (check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "5.0.0")){
   object_class_names=setdiff(object_class_names,"BaseModelMPNet")
 }

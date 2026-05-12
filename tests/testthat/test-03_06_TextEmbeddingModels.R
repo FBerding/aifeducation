@@ -54,7 +54,7 @@ example_data_large_single$add_from_data.frame(example_data_for_large[1, ])
 
 # config
 # Set Chunks
-base_model_type_list <- BaseModelsIndex
+base_model_type_list <- get_entry_from_BaseModelsIndex("class_name")
 if (check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "5.0.0")){
   base_model_type_list=setdiff(x=BaseModelsIndex,y="BaseModelMPNet")
 }

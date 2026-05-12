@@ -25,7 +25,7 @@ create_dir(test_art_tmp_path, FALSE)
 test_tmp_data_base_model_path <- testthat::test_path("test_data","OpenSourceBaseModels")
 
 # Test Configuration
-object_class_names <- BaseModelsIndex
+object_class_names <- get_entry_from_BaseModelsIndex("class_name")
 if (check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "5.0.0")){
   object_class_names=setdiff(object_class_names,"BaseModelMPNet")
 }
