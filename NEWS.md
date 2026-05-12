@@ -8,10 +8,12 @@ editor_options:
 
 **General**
 
+- Change load and save methods to allow the usage of older models (created with 'transformers<5.0.0') with 
+  'transformers>=5.0.0'.
 - Add print method to all objects.
 - Change dependencies. The package requires now 'iotarelr>=0.1.9'.
-- Add dependencies to two new python packages ('protbuf' and 'sentencepiece') and 
-  the Protocol Buffer Compiler.
+- Add **optional** dependencies to two new python packages ('protbuf' and 'sentencepiece') and 
+  the Protocol Buffer Compiler. These are required for some of the new models.
 - Add function 'install_protocol_buffer_compiler' for installing the 
   Protocol Buffer Compiler.
 
