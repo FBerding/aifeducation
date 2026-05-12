@@ -662,7 +662,7 @@ get_param_dict <- function() {
     min = NULL,
     max = NULL,
     allowed_values = NULL,
-    desc = "`vector` of strings representing the Language codes. Must contain at least two codes.",
+    desc = "`vector` of strings representing the Language codes.",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Language Codes",
     default_value = c("eng","deu"),
