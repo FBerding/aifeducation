@@ -410,30 +410,38 @@ install_py_modules <- function(envname = "aifeducation",
 #'   available.
 #'
 #' @param trace `bool` `TRUE` if a list with all modules and their availability should be printed to the console.
+#' @param for_sentencepiece `bool` if `TRUE` checks only for 'sentencepiece' and 'google.protobuf'.
 #' @return The function prints a table with all relevant packages and shows which modules are available or unavailable.
 #' @return If all relevant modules are available, the functions returns `TRUE`. In all other cases it returns `FALSE`
 #' @family Installation and Configuration
 #' @export
-check_aif_py_modules <- function(trace = TRUE) {
-  general_modules <- c(
-    "os",
-    "transformers",
-    "tokenizers",
-    "datasets",
-    "codecarbon",
-    "calflops"
-  )
-  pytorch_modules <- c(
-    "torch",
-    "torcheval",
-    "safetensors",
-    "accelerate",
-    "pandas"
-  )
-  relevant_modules <- c(
-    general_modules,
-    pytorch_modules
-  )
+check_aif_py_modules <- function(trace = TRUE,for_sentencepiece=FALSE) {
+  if(for_sentencepiece){
+    relevant_modules <- c(
+      "sentencepiece",
+      "google.protobuf"
+    )
+  } else {
+    general_modules <- c(
+      "os",
+      "transformers",
+      "tokenizers",
+      "datasets",
+      "codecarbon",
+      "calflops"
+    )
+    pytorch_modules <- c(
+      "torch",
+      "torcheval",
+      "safetensors",
+      "accelerate",
+      "pandas"
+    )
+    relevant_modules <- c(
+      general_modules,
+      pytorch_modules
+    )
+  }
 
   matrix_overview <- matrix(
     data = NA,
@@ -560,7 +568,7 @@ prepare_session <- function(env_type = "auto", envname = "aifeducation", check_s
   message("Detected OS: ", detec_os())
   if (check_session) {
     message("Checking python packages. This can take a moment.")
-    if (check_aif_py_modules(trace = FALSE)) {
+    if (check_aif_py_modules(trace = FALSE,for_sentencepiece=FALSE)) {
       message("All necessary python packages are available.")
     } else {
       stop("Not all required python packages are available. Call check_aif_py_modules for details.")
@@ -568,6 +576,8 @@ prepare_session <- function(env_type = "auto", envname = "aifeducation", check_s
     pkg_versions <- get_py_package_versions()
     print_strings=pad_str(c(names(pkg_versions),"GPU Acceleration"),width = NULL,pad=" ", end=": ")
     message(paste0(print_strings,c(pkg_versions,torch$cuda$is_available()),collapse = "\n"))
+
+    message("sentencepiece available:",check_aif_py_modules(trace = FALSE,for_sentencepiece=TRUE))
 
     if (check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "5.0.0")) {
       message("Version of python package 'transformers' is 5.0.0 or higher. ",
