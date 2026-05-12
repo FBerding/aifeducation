@@ -222,6 +222,11 @@ get_current_venv <- function() {
 get_py_package_versions <- function(sentencepiece=FALSE) {
 
   if(sentencepiece){
+  list_of_packages <- c(
+      "sentencepiece",
+      "google.protobuf"
+    )
+  } else {
     list_of_packages <- c(
       "torch",
       "pyarrow",
@@ -235,11 +240,6 @@ get_py_package_versions <- function(sentencepiece=FALSE) {
       "torcheval",
       "accelerate",
       "numpy"
-    )
-  } else {
-    list_of_packages <- c(
-      "sentencepiece",
-      "google.protobuf"
     )
   }
 
