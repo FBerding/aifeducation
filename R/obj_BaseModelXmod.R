@@ -25,6 +25,7 @@ BaseModelXmod <- R6::R6Class(
   inherit = BaseModelCore,
   private = list(
     model_type = "xmod",
+    slow_tokenizer="XLMRobertaTokenizer",
     adjust_max_sequence_length = 4L,
     create_model = function(args) {
       configuration <- transformers$XmodConfig(

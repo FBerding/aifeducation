@@ -22,6 +22,7 @@ BaseModelCore <- R6::R6Class(
   inherit = AIFEBaseModel,
   private = list(
     model_type = NULL,
+    slow_tokenizer=NULL,
     adjust_max_sequence_length = 0L,
     return_token_type_ids = FALSE,
     sequence_mode = "equal",
@@ -541,7 +542,7 @@ BaseModelCore <- R6::R6Class(
 
       # Create and Load the Tokenizer
       tokenizer <- HuggingFaceTokenizer$new()
-      tokenizer$create_from_hf(tokenizer_dir)
+      tokenizer$create_from_hf(tokenizer_dir, private$slow_tokenizer)
       self$Tokenizer <- tokenizer
 
       # Set configured to TRUE to avoid changes in the model

@@ -24,6 +24,7 @@ BaseModelDebertaV2 <- R6::R6Class(
   inherit = BaseModelCore,
   private = list(
     model_type = "deberta_v2",
+    slow_tokenizer="DebertaV2Tokenizer",
     adjust_max_sequence_length = 4L,
     return_token_type_ids = FALSE,
     create_model = function(args) {

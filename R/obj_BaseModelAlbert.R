@@ -25,6 +25,7 @@ BaseModelAlbert <- R6::R6Class(
   inherit = BaseModelCore,
   private = list(
     model_type = "albert",
+    slow_tokenizer="AlbertTokenizer",
     create_model = function(args) {
       configuration <- transformers$AlbertConfig(
         vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())),

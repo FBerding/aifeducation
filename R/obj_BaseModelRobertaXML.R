@@ -25,6 +25,7 @@ BaseModelRobertaXML <- R6::R6Class(
   inherit = BaseModelCore,
   private = list(
     model_type = "robertaxml",
+    slow_tokenizer="XLMRobertaTokenizer",
     adjust_max_sequence_length = 4L,
     return_token_type_ids = FALSE,
     create_model = function(args) {

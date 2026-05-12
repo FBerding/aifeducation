@@ -24,6 +24,7 @@ BaseModelMPNet <- R6::R6Class(
   inherit = BaseModelCore,
   private = list(
     model_type = "mpnet",
+    slow_tokenizer="MPNetTokenizer",
     adjust_max_sequence_length = 2L,
     return_token_type_ids = FALSE,
     create_model = function(args) {

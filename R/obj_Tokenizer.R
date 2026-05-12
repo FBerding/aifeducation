@@ -86,7 +86,10 @@ TokenizerBase <- R6::R6Class(
       private$load_config_file(dir_path)
 
       # Load the tokenizer model
-      private$model <- transformers$PreTrainedTokenizerFast$from_pretrained(dir_path)
+      private$model <- try(transformers$PreTrainedTokenizerFast$from_pretrained(dir_path),silent=TRUE)
+        if(inherits(private$model,"try-error")){
+          private$model <- transformers$PreTrainedTokenizer$from_pretrained(dir_path)
+        }
 
       # Load Tokenizer Statistics
       private$load_tokenizer_statistics(dir_path)
@@ -650,10 +653,16 @@ HuggingFaceTokenizer <- R6::R6Class(
     #--------------------------------------------------------------------------
     #' @description Creates a tokenizer from a pretrained model
     #' @param model_dir `r get_description("model_dir")`
+    #' @param tokenizer_type `string` Name of the tokenizer belonging to a base
+    #' model (e.g. BertTokenizer). This parameter is only used if an error occurs during
+    #' loading as fall back option.
     #' @return `r get_description("return_object")`
-    create_from_hf = function(model_dir) {
+    create_from_hf = function(model_dir,tokenizer_type=NULL) {
       # Load the model
-      private$model <- transformers$AutoTokenizer$from_pretrained(model_dir)
+      private$model <- try(transformers$AutoTokenizer$from_pretrained(model_dir),silent=TRUE)
+      if(inherits(private$model,"try-error")){
+        private$model <- transformers[tokenizer_type]$from_pretrained(model_dir)
+      }
 
       # Set configured to TRUE to avoid changes in the model
       private$set_configuration_to_TRUE()

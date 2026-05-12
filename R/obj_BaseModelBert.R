@@ -25,6 +25,7 @@ BaseModelBert <- R6::R6Class(
   inherit = BaseModelCore,
   private = list(
     model_type = "bert",
+    slow_tokenizer="BertTokenizer",
     create_model = function(args) {
       configuration <- transformers$BertConfig(
         vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())),
