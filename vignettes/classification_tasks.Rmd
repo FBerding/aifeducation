@@ -21,7 +21,7 @@ running_num_figures <- 1
 # Clean examples folder
 example_folders <- setdiff(
   x = list.dirs(path = "examples"),
-  y = c("examples", "examples/bert_uncased")
+  y = c("examples", "examples/bert_uncased","examples/xml_roberta_fb")
 )
 unlink(x = example_folders, recursive = TRUE)
 script_time_start <- Sys.time()
@@ -1052,25 +1052,27 @@ the same.
 ## 4.2 Create a Text Embedding Model
 
 First you have to choose the base model that forms the foundation of
-your new text embedding model. In order to illustrate its use we 
+your new text embedding model. 
+In order to illustrate its use we 
 apply a pre-trained model from [Hugging Face](https://huggingface.co/) called 
-[BERT base model (uncased) ](https://huggingface.co/google-bert/bert-base-uncased) published by
-Devlin et al. (2019). Download all files into a new folder. Here we store the model in  `"examples/bert_uncased"`.
+[xlm-roberta-base](https://huggingface.co/FacebookAI/xlm-roberta-base) published by
+FacebookAI. It is based on the work by Conneau et al. (2019). 
+Download all files into a new folder. Here we store the model in  `"examples/xml_roberta_fb"`.
 
 We first load the base model as described in section 3.
 
 ```{r, include = TRUE, eval = TRUE}
-base_model_bert <- BaseModelBert$new()
-base_model_bert$create_from_hf(
-  model_dir = "examples/bert_uncased",
-  tokenizer_dir = "examples/bert_uncased"
+base_model <- BaseModelRobertaXML$new()
+base_model$create_from_hf(
+  model_dir = "examples/xml_roberta_fb",
+  tokenizer_dir = "examples/xml_roberta_fb"
 )
 ```
 
 Now we can create the TextEmbeddingModel. At the beginng we have to chose
 a value for `chunks` and for `overlap.` 
 
-Using a BERT model for text embedding is not a problem since your text
+Using a transformer model for text embedding is not a problem since your text
 does not provide more tokens than the transformer can process. This
 maximum value is set in the configuration of the transformer (see
 section 3.3). If the text produces more tokens, the last tokens are
@@ -1096,7 +1098,7 @@ these values to the `calc_quantiles` method of the tokenizer of our BaseModel re
 following quantiles:
 
 ```{r, include = TRUE, eval = TRUE}
-chunk_quantile = base_model_bert$Tokenizer$calc_quantiles(
+chunk_quantile = base_model$Tokenizer$calc_quantiles(
   text_dataset = data_set_reviews_text, 
   batch_size = 32L, 
   seq_len_tokens = 512L,
@@ -1132,9 +1134,9 @@ within a layer are averaged except padding tokens.
 Do not forget to pass the base model to the parameter `base_model`.
 
 ```{r, include = TRUE, eval = TRUE}
-bert_modeling <- TextEmbeddingModel$new()
-bert_modeling$configure(
-  model_label = "Text Embedding via BERT",
+tem <- TextEmbeddingModel$new()
+tem$configure(
+  model_label = "Text Embedding via RobertaXML",
   model_language = "english",
   max_length = 512,
   chunks = chunk_quantile["99.9%"],
@@ -1142,7 +1144,7 @@ bert_modeling$configure(
   emb_layer_min = 6,
   emb_layer_max = 8,
   emb_pool_type = "Average",
-  base_model = base_model_bert,
+  base_model = base_model,
   emb_insert_mask_tokens=0.15
 )
 ```
@@ -1151,11 +1153,11 @@ After deciding about the configuration, you can use your model.
 You can see the number of learnable parameters of the underlying base model with
 
 ```{r, include = TRUE, eval = TRUE}
-bert_modeling$BaseModel$count_parameter()
+tem$BaseModel$count_parameter()
 ```
 Another important value is the number of features which you can request by calling `get_n_features`.
 ```{r, include = TRUE, eval = TRUE}
-bert_modeling$get_n_features()
+tem$get_n_features()
 ```
 
 This number describes the number of dimensions for a text embedding. That is, the number
@@ -1168,7 +1170,7 @@ for the different models.
 You get a short summary of an object of this class with `print`.
 
 ```{r, include = TRUE, eval = TRUE}
-print(bert_modeling)
+print(tem)
 ```
 
 
@@ -1180,7 +1182,7 @@ a `LargeDataSetForText` to `text_dataset`. Relying on the sample data
 from section 2.3, we can use the movie reviews as raw texts.
 
 ```{r, include = TRUE, eval = TRUE}
-review_embeddings <- bert_modeling$embed_large(
+review_embeddings <- tem$embed_large(
   text_dataset = data_set_reviews_text,
   trace = TRUE
 )
@@ -1234,18 +1236,18 @@ that should be created in that directory to store the model.
 
 ```{r, include = TRUE, eval = TRUE}
 save_to_disk(
-  object = bert_modeling,
+  object = tem,
   dir_path = "examples",
-  folder_name = "bert_te_model"
+  folder_name = "robertxml_te_model"
 )
 ```
 
 In this example the model is saved in a folder at the location
-`examples/bert_te_model`. If you want to load your model
+`examples/robertxml_te_model`. If you want to load your model
 you can call `load_from_disk`.
 
 ```{r, include = TRUE, eval = TRUE}
-bert_modeling <- load_from_disk("examples/bert_te_model")
+tem <- load_from_disk("examples/robertxml_te_model")
 ```
 
 ## 4.6 Sustainability
@@ -1254,7 +1256,7 @@ In case the underlying model was trained with an active sustainability
 tracker (section 3.2 and 3.3) you can receive a table showing you the
 energy consumption, CO2 emissions, and hardware used during training by
 calling `BaseModel$get_sustainability_data("training")`. For our example this
-would be `bert_modeling$BaseModel$get_sustainability_data("training")`.
+would be `tem$BaseModel$get_sustainability_data("training")`.
 
 ## 4.7 Training History
 
@@ -1262,7 +1264,7 @@ If you would like to see the training history of the underlying base model you
 can call a special method.
 
 ```{r, include = TRUE, eval = FALSE}
-bert_modeling$BaseModel$plot_training_history(
+tem$BaseModel$plot_training_history(
   ind_best_model = TRUE
 )
 ```
@@ -1426,12 +1428,12 @@ classifier$configure(
   target_levels = c("neg", "pos"),
   skip_connection_type = "ResidualGate",
   cls_pooling_features = 50,
-  cls_pooling_type = "MinMax",
+  cls_pooling_type = "MinMaxTimes",
   cls_head_type = "PairwiseOrthogonalDense",
   feat_act_fct = "ELU",
   feat_size = 384,
   feat_bias = TRUE,
-  feat_dropout = 0.0,
+  feat_dropout = 0.10,
   feat_parametrizations = "None",
   feat_normalization_type = "PowerNorm",
   ng_conv_act_fct = "ELU",
@@ -1504,7 +1506,7 @@ calling the method `get_n_features` of the used text embedding model. In our exa
 this would be:
 
 ```{r, include = TRUE, eval = TRUE}
-bert_modeling$get_n_features()
+tem$get_n_features()
 ```
 
 The number for `feat_size` should be equal to or less than this value, since this layer
@@ -1526,9 +1528,12 @@ In our example we use only two n-gram layers (`ng_conv_n_layers = 1`) and
 one dense layers (`dense_n_layers = 0`). All other layers are omitted from the model
 by setting the number of layers to zero (`tf_n_layers = 0`,`rec_n_layers = 0`).
 
-As pooling method we use minimum and maximum (`cls_pooling_type="MinMax"`). 
-That is, the 25 highest and the 25 lowest features are used for calculating
-the classes/labels. The number of values can be determined with `cls_pooling_features=50`.
+As pooling method we use minimum and maximum over time (`cls_pooling_type="MinMaxTimes"`). 
+That is, the highest and the lowest features within every feature dimension are used for calculating
+the classes/labels. The `cls_pooling_features` is only relevant if you set `cls_pooling_type` to
+`"Min"`, `"Max"` or `"MinMax"`. These three options request an additional pooling
+over features which in most times leads to a lose of information. They are
+useful only if your classifier has to predict two classes/categories.
 
 In this example we use a special classification head (`cls_head_type = "PairwiseOrthogonal"`) proposed by (Li et al. (2020))[https://doi.org/10.1109/TIP.2020.2990277]. This layer allows every neuron only
 to establish a connection to a single class. In contrast to regular dense layers 
@@ -1581,7 +1586,7 @@ classifier$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
-  epochs = 800,
+  epochs = 2000,
   batch_size = 32,
   trace = TRUE,
   ml_trace = 0,
@@ -1863,10 +1868,10 @@ example classifier, we use our BERT model.
 
 ```{r, include = TRUE, eval = TRUE}
 # If our model is not loaded
-bert_modeling <- load_from_disk("examples/bert_te_model")
+tem <- load_from_disk("examples/robertxml_te_model")
 
 # Create a numerical representation of the text
-review_embeddings <- bert_modeling$embed_large(
+review_embeddings <- tem$embed_large(
   text_dataset = data_set_reviews_text,
   trace = TRUE
 )
@@ -1972,13 +1977,13 @@ classifier_prototype$configure(
   target_levels = c("neg", "pos"),
   skip_connection_type = "ResidualGate",
   cls_pooling_features = 50,
-  cls_pooling_type = "MinMax",
-  projection_type = "PairwiseOrthogonalDense",
+  cls_pooling_type = "MinMaxTimes",
+  projection_type = "Regular",
   metric_type = "Euclidean",
   feat_act_fct = "ELU",
   feat_size = 384,
   feat_bias = TRUE,
-  feat_dropout = 0.0,
+  feat_dropout = 0.10,
   feat_parametrizations = "None",
   feat_normalization_type = "PowerNorm",
   ng_conv_act_fct = "ELU",
@@ -2069,7 +2074,7 @@ classifier_prototype$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
-  epochs = 800,
+  epochs = 2000,
   batch_size = 32,
   Ns = 20,
   Nq = 5,
@@ -2326,14 +2331,14 @@ Now we must create text embeddings for the query and the sample data set. We hav
 to use the same embedding model as we used during training the classifier.
 
 ``` {r, include =TRUE, eval=TRUE }
-sample_embeddings <- bert_modeling$embed_large(
+sample_embeddings <- tem$embed_large(
   text_dataset = sample_texts,
   trace = TRUE
 )
 ``` 
 
 ``` {r, include =TRUE, eval=TRUE }
-query_embeddings <- bert_modeling$embed_large(
+query_embeddings <- tem$embed_large(
   text_dataset = query_texts,
   trace = TRUE
 )
@@ -2436,13 +2441,13 @@ You should use this value depending on the number of features of the underlying 
 embedding model. You can request this value by calling the method `get_n_features` like this:
 
 ```{r, include = TRUE, eval = TRUE}
-bert_modeling$get_n_features()
+tem$get_n_features()
 ```
 
 A study by Takeshita et al. (2025) shows that randomly dropping 50% of the dimensions
 leads only to a minor drop in performance in classification tasks. Thus, this value can serve as
 a rule of thumb for determining this parameter. Thus we reduce the number of features
-to 50 % or to `r floor(bert_modeling$get_n_features()/2)`.
+to 50 % or to `r floor(tem$get_n_features()/2)`.
 
 
 With `method` you determine the type of layer the feature extractor
@@ -2533,12 +2538,12 @@ classifier_with_fe$configure(
   target_levels = c("neg", "pos"),
   skip_connection_type = "ResidualGate",
   cls_pooling_features = 50,
-  cls_pooling_type = "MinMax",
+  cls_pooling_type = "MinMaxTimes",
   cls_head_type = "PairwiseOrthogonalDense",
   feat_act_fct = "ELU",
   feat_size = 128,
   feat_bias = TRUE,
-  feat_dropout = 0.0,
+  feat_dropout = 0.10,
   feat_parametrizations = "None",
   feat_normalization_type = "PowerNorm",
   ng_conv_act_fct = "ELU",
@@ -2971,6 +2976,10 @@ A Simple Framework for Contrastive Learning of Visual Representations.
 Chollet, F., Kalinowski, T., & Allaire, J. J. (2022). Deep learning with
 R (Second edition). Manning Publications Co.
 <https://learning.oreilly.com/library/view/-/9781633439849/?ar>
+
+Conneau, A., Khandelwal, K., Goyal, N., Chaudhary, V., Wenzek, G.,
+Guzmán, F., Grave, E., Ott, M., Zettlemoyer, L., & Stoyanov, V. (2019).
+Unsupervised Cross-lingual Representation Learning at Scale <https://doi.org/10.48550/arXiv.1911.02116>
 
 Dai, Z., Lai, G., Yang, Y. & Le, Q. V. (2020). Funnel-Transformer:
 Filtering out Sequential Redundancy for Efficient Language Processing.
