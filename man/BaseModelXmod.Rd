@@ -35,6 +35,8 @@ Other Base Model:
     \item \href{#method-BaseModelXmod-configure}{\code{BaseModelXmod$configure()}}
     \item \href{#method-BaseModelXmod-get_supported_languages}{\code{BaseModelXmod$get_supported_languages()}}
     \item \href{#method-BaseModelXmod-set_default_language}{\code{BaseModelXmod$set_default_language()}}
+    \item \href{#method-BaseModelXmod-get_default_language}{\code{BaseModelXmod$get_default_language()}}
+    \item \href{#method-BaseModelXmod-print}{\code{BaseModelXmod$print()}}
     \item \href{#method-BaseModelXmod-clone}{\code{BaseModelXmod$clone()}}
   }
 }
@@ -70,7 +72,6 @@ Other Base Model:
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_tokenizer_statistics"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_tokenizer_statistics'><code>BaseModelCore$get_tokenizer_statistics()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="load_from_disk"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-load_from_disk'><code>BaseModelCore$load_from_disk()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="plot_training_history"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-plot_training_history'><code>BaseModelCore$plot_training_history()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="print"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-print'><code>BaseModelCore$print()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="save"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-save'><code>BaseModelCore$save()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="set_publication_info"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-set_publication_info'><code>BaseModelCore$set_publication_info()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="train"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-train'><code>BaseModelCore$train()</code></a></span></li>
@@ -162,6 +163,36 @@ language codes.
   }
   \subsection{Returns}{
     Does nothing return.
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-BaseModelXmod-get_default_language"></a>}}
+\if{latex}{\out{\hypertarget{method-BaseModelXmod-get_default_language}{}}}
+\subsection{\code{BaseModelXmod$get_default_language()}}{
+  Get the default language of the model.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BaseModelXmod$get_default_language()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Returns a \code{string} representing the default language.
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-BaseModelXmod-print"></a>}}
+\if{latex}{\out{\hypertarget{method-BaseModelXmod-print}{}}}
+\subsection{\code{BaseModelXmod$print()}}{
+  Print method for classifiers.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BaseModelXmod$print()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Prints a short description of the object.
   }
 }
 

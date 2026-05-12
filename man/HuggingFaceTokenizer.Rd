@@ -64,13 +64,16 @@ Other Tokenizer:
   Creates a tokenizer from a pretrained model
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{HuggingFaceTokenizer$create_from_hf(model_dir)}
+    \preformatted{HuggingFaceTokenizer$create_from_hf(model_dir, tokenizer_type = NULL)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{model_dir}}{Path where the model is stored.}
+      \item{\code{tokenizer_type}}{\code{string} Name of the tokenizer belonging to a base
+model (e.g. BertTokenizer). This parameter is only used if an error occurs during
+loading as fall back option.}
     }
     \if{html}{\out{</div>}}
   }

@@ -4,10 +4,12 @@
 \alias{check_aif_py_modules}
 \title{Check if all necessary python modules are available}
 \usage{
-check_aif_py_modules(trace = TRUE)
+check_aif_py_modules(trace = TRUE, for_sentencepiece = FALSE)
 }
 \arguments{
 \item{trace}{\code{bool} \code{TRUE} if a list with all modules and their availability should be printed to the console.}
+
+\item{for_sentencepiece}{\code{bool} if \code{TRUE} checks only for 'sentencepiece' and 'google.protobuf'.}
 }
 \value{
 The function prints a table with all relevant packages and shows which modules are available or unavailable.

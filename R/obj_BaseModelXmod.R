@@ -125,7 +125,7 @@ BaseModelXmod <- R6::R6Class(
     #---------------------------------------------------------------------------
     #' @description Get the default language of the model.
     #' @return Returns a `string` representing the default language.
-    get_default_language=function(language_code){
+    get_default_language=function(){
       return(private$model$config$default_language)
     },
     #---------------------------------------------------------------------------

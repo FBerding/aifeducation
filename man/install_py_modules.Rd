@@ -15,8 +15,6 @@ install_py_modules(
   torcheval_version = get_recommended_py_versions("torcheval"),
   accelerate_version = get_recommended_py_versions("accelerate"),
   calflops_version = get_recommended_py_versions("calflops"),
-  sentencepiece_version = get_recommended_py_versions("sentencepiece"),
-  protobuf_version = get_recommended_py_versions("google.protobuf"),
   pytorch_cuda_version = "13.0",
   python_version = "3.12",
   remove_first = FALSE,
@@ -43,10 +41,6 @@ install_py_modules(
 \item{accelerate_version}{\code{string} determining the desired version of the python library 'accelerate'.}
 
 \item{calflops_version}{\code{string} determining the desired version of the python library 'calflops'.}
-
-\item{sentencepiece_version}{\code{string} determining the desired version of the python library 'sentencepiece'.}
-
-\item{protobuf_version}{\code{string} determining the desired version of the python library 'google.protobuf'.}
 
 \item{pytorch_cuda_version}{\code{string} determining the desired version of 'cuda' for 'PyTorch'.
 To install 'PyTorch' without cuda set to \code{NULL}.}

@@ -4,7 +4,11 @@
 \alias{get_py_package_versions}
 \title{Get versions of python components}
 \usage{
-get_py_package_versions()
+get_py_package_versions(sentencepiece = FALSE)
+}
+\arguments{
+\item{inc_sentencepiece}{\code{bool} If \code{TRUE} the packages 'google.protobuf' and
+'sentencepiece' are checked.}
 }
 \value{
 Returns a list that contains the version number of python and
