@@ -16,6 +16,12 @@ expect_no_error(
 )
 })
 
+test_that("build_layer_overview_base_models",{
+  expect_no_error(
+    build_layer_overview_base_models()
+  )
+})
+
 test_that("build_documentation_for_model",{
   expect_no_error(
     build_documentation_for_model(

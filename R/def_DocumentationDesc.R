@@ -561,6 +561,39 @@ build_aife_site <- function(clear_docs = FALSE) {
 }
 
 
+#' @title Generate documentation of supported BaseModels for an vignette or article
+#' @description Function for generating the whole documentation for an article
+#' used on the package's home page.
+#' @returns Returns a `string` containing the description written in rmarkdown.
+#' @note Function is designed to be used with inline r code in rmarkdown vignettes/articles.
+#' @family Utils Documentation
+#' @importFrom knitr kable
+#' @export
+build_layer_overview_base_models <- function() {
+  ov_clm_names=c("class_name","reference","req_sentencepiece")
+  final_clm_names=c("BaseModel","Reference","Require Sentencepiece")
+  overview_table=matrix(
+    nrow = length(BaseModelsIndex),
+    ncol = length(ov_clm_names),
+    dimnames =list(
+      NULL,
+      ov_clm_names
+    )
+  )
+  for (i in seq_along(BaseModelsIndex)) {
+   for (clm_name in ov_clm_names) {
+     overview_table[i,clm_name]=BaseModelsIndex[[i]][[clm_name]]
+   }
+  }
+  overview_table=overview_table[order(overview_table[,"class_name"]),]
+  colnames(overview_table)=final_clm_names
+  return(
+    knitr::kable(
+      x=overview_table
+    )
+  )
+}
+
 # ==============================================================================
 
 #' @keywords internal
