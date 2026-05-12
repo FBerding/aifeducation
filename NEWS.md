@@ -10,6 +10,10 @@ editor_options:
 
 - Add print method to all objects.
 - Change dependencies. The package requires now 'iotarelr>=0.1.9'.
+- Add dependencies to two new python packages ('protbuf' and 'sentencepiece') and 
+  the Protocol Buffer Compiler.
+- Add function 'install_protocol_buffer_compiler' for installing the 
+  Protocol Buffer Compiler.
 
 **BaseModels**
 
