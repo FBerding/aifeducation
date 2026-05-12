@@ -26,6 +26,7 @@ Function for generating the documentation of a specific core model.
 \seealso{
 Other Utils Documentation:
 \code{\link[=build_documentation_for_model]{build_documentation_for_model()}},
+\code{\link[=build_layer_overview_base_models]{build_layer_overview_base_models()}},
 \code{\link[=build_layer_stack_documentation_for_vignette]{build_layer_stack_documentation_for_vignette()}},
 \code{\link[=get_dict_cls_type]{get_dict_cls_type()}},
 \code{\link[=get_dict_core_models]{get_dict_core_models()}},

@@ -23,6 +23,7 @@ Other Installation and Configuration:
 \code{\link[=get_recommended_py_versions]{get_recommended_py_versions()}},
 \code{\link[=install_aifeducation]{install_aifeducation()}},
 \code{\link[=install_aifeducation_studio]{install_aifeducation_studio()}},
+\code{\link[=install_protocol_buffer_compiler]{install_protocol_buffer_compiler()}},
 \code{\link[=install_py_modules]{install_py_modules()}},
 \code{\link[=prepare_session]{prepare_session()}},
 \code{\link[=update_aifeducation]{update_aifeducation()}}

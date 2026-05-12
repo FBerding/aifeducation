@@ -10,9 +10,9 @@ Does return a new object of this class.
 Represents models based on ALBERT
 }
 \references{
-Devlin, J., Chang, M.‑W., Lee, K., & Toutanova, K. (2019). BERT: Pre-training of Deep Bidirectional
-Transformers for Language Understanding. In J. Burstein, C. Doran, & T. Solorio (Eds.), Proceedings of the 2019
-Conference of the North (pp. 4171--4186). Association for Computational Linguistics. \doi{10.18653/v1/N19-1423}
+Lan, Z., Chen, M., Goodman, S., Gimpel, K., Sharma, P., &
+Soricut, R. (2019). ALBERT; A Lite BERT for Self-supervised Learning of
+Language Representations. arXiv. \doi{10.48550/ARXIV.1909.11942}
 }
 \seealso{
 Other Base Model:

@@ -25,6 +25,7 @@ Other Installation and Configuration:
 \code{\link[=check_aif_py_modules]{check_aif_py_modules()}},
 \code{\link[=install_aifeducation]{install_aifeducation()}},
 \code{\link[=install_aifeducation_studio]{install_aifeducation_studio()}},
+\code{\link[=install_protocol_buffer_compiler]{install_protocol_buffer_compiler()}},
 \code{\link[=install_py_modules]{install_py_modules()}},
 \code{\link[=prepare_session]{prepare_session()}},
 \code{\link[=set_transformers_logger]{set_transformers_logger()}},

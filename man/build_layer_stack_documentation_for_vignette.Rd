@@ -19,6 +19,7 @@ Function is designed to be used with inline r code in rmarkdown vignettes/articl
 \seealso{
 Other Utils Documentation:
 \code{\link[=build_documentation_for_model]{build_documentation_for_model()}},
+\code{\link[=build_layer_overview_base_models]{build_layer_overview_base_models()}},
 \code{\link[=get_desc_for_core_model_architecture]{get_desc_for_core_model_architecture()}},
 \code{\link[=get_dict_cls_type]{get_dict_cls_type()}},
 \code{\link[=get_dict_core_models]{get_dict_core_models()}},

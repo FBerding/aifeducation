@@ -10,9 +10,9 @@ Does return a new object of this class.
 Represents models based on Xmod
 }
 \references{
-Devlin, J., Chang, M.‑W., Lee, K., & Toutanova, K. (2019). BERT: Pre-training of Deep Bidirectional
-Transformers for Language Understanding. In J. Burstein, C. Doran, & T. Solorio (Eds.), Proceedings of the 2019
-Conference of the North (pp. 4171--4186). Association for Computational Linguistics. \doi{10.18653/v1/N19-1423}
+Pfeiffer, J., Goyal, N., Lin, X. V., Li, X., Cross, J.,
+Riedel, S., & Artetxe, M. (2022). Lifting the Curse of Multilinguality
+by Pre-training Modular Transformers. arXiv. \doi{10.48550/ARXIV.2205.06266}
 }
 \seealso{
 Other Base Model:

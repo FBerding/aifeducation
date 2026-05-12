@@ -15,6 +15,8 @@ install_py_modules(
   torcheval_version = get_recommended_py_versions("torcheval"),
   accelerate_version = get_recommended_py_versions("accelerate"),
   calflops_version = get_recommended_py_versions("calflops"),
+  sentencepiece_version = get_recommended_py_versions("sentencepiece"),
+  protobuf_version = get_recommended_py_versions("google.protobuf"),
   pytorch_cuda_version = "13.0",
   python_version = "3.12",
   remove_first = FALSE,
@@ -41,6 +43,10 @@ install_py_modules(
 \item{accelerate_version}{\code{string} determining the desired version of the python library 'accelerate'.}
 
 \item{calflops_version}{\code{string} determining the desired version of the python library 'calflops'.}
+
+\item{sentencepiece_version}{\code{string} determining the desired version of the python library 'sentencepiece'.}
+
+\item{protobuf_version}{\code{string} determining the desired version of the python library 'google.protobuf'.}
 
 \item{pytorch_cuda_version}{\code{string} determining the desired version of 'cuda' for 'PyTorch'.
 To install 'PyTorch' without cuda set to \code{NULL}.}
@@ -73,6 +79,7 @@ Other Installation and Configuration:
 \code{\link[=get_recommended_py_versions]{get_recommended_py_versions()}},
 \code{\link[=install_aifeducation]{install_aifeducation()}},
 \code{\link[=install_aifeducation_studio]{install_aifeducation_studio()}},
+\code{\link[=install_protocol_buffer_compiler]{install_protocol_buffer_compiler()}},
 \code{\link[=prepare_session]{prepare_session()}},
 \code{\link[=set_transformers_logger]{set_transformers_logger()}},
 \code{\link[=update_aifeducation]{update_aifeducation()}}
