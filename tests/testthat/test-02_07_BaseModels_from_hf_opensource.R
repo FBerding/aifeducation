@@ -29,7 +29,7 @@ object_class_names <- BaseModelsIndex
 if (check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "5.0.0")){
   object_class_names=setdiff(object_class_names,"BaseModelMPNet")
 }
-object_class_names="BaseModelXmod"
+
 for (object_class_name in object_class_names) {
   # Data Management
   example_data <- imdb_movie_reviews
@@ -223,6 +223,11 @@ for (object_class_name in object_class_names) {
         base_model_reloaded$count_parameter()
       )
 
+      expect_equal(
+        base_model$count_parameter(),
+        base_model_reloaded$count_parameter()
+      )
+
       # Not available for models from hugging face
       # expect_equal(
       #  base_model$get_sustainability_data(),
@@ -238,6 +243,11 @@ for (object_class_name in object_class_names) {
       expect_equal(
         base_model$Tokenizer$get_sustainability_data(),
         base_model_reloaded$Tokenizer$get_sustainability_data()
+      )
+
+      expect_equal(
+        base_model$Tokenizer$encode("This is a test.",token_encodings_only =TRUE),
+        base_model_reloaded$Tokenizer$encode("This is a test.",token_encodings_only =TRUE)
       )
     })
 
