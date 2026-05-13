@@ -568,8 +568,8 @@ get_param_dict <- function() {
     allowed_values = NULL,
     desc = "Number of maximum position embeddings. This parameter also determines the maximum length of a sequence which
   can be processed with the model.",
-    gui_box = "Sequence Modeling",
-    gui_label = "Max Sequence Length",
+    gui_box = "Transformer Encoder Layers",
+    gui_label = "Max. Sequence Length",
     default_value = 512L,
     test_values = 512L
   )
@@ -655,8 +655,8 @@ get_param_dict <- function() {
     desc = "Dimensionality of the token embeddings.",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Embedding Size",
-    default_value = 1L,
-    test_values = c(1L, 2L)
+    default_value = 128L,
+    test_values = c(128L, 256L)
   )
 
   param$languages <- list(
@@ -691,9 +691,9 @@ get_param_dict <- function() {
     max = Inf,
     allowed_values = NULL,
     desc = "Number of decoding layers.",
-    gui_box = "Decoder Layers",
+    gui_box = "Transformer Encoder Layers",
     gui_label = "Number of Decoding Layers",
-    default_value = 7L,
+    default_value = 2L,
     test_values = c(1L, 2L)
   )
 
@@ -712,7 +712,8 @@ get_param_dict <- function() {
   )
 
   param$d_head <- param$target_hidden_size
-  param$d_head$desc <- "Number of neurons of the final layer."
+  param$d_head$gui_label <- "Dimension of the attention head."
+  param$d_head$desc <- "Number of neurons of the layer."
   param$d_head$default_value <- 64L
 
   param$hidden_dropout_prob <- list(
@@ -1939,7 +1940,7 @@ get_param_dict <- function() {
     desc = "determining the number of attention heads for a self-attention layer. Only relevant if `attention_type='MultiHead'`",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Number of Attention Heads",
-    default_value = 2L,
+    default_value = 4L,
     test_values = 2L
   )
   param$num_attention_heads <- param$self_attention_head

@@ -212,7 +212,7 @@ get_current_venv <- function() {
 #' @return Returns a list that contains the version number of python and
 #' the versions of critical python packages. If a package is not available
 #' version is set to `NA`.
-#' @param inc_sentencepiece `bool` If `TRUE` the packages 'google.protobuf' and
+#' @param sentencepiece `bool` If `TRUE` the packages 'google.protobuf' and
 #' 'sentencepiece' are checked.
 #' @family Utils Python Developers
 #' @importFrom reticulate py_module_available

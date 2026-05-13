@@ -93,9 +93,9 @@ BaseModelDistilBERT <- R6::R6Class(
 )
 
 # Add the model to the user list
-BaseModelsIndex$robertaxml <- list(
-  class_name="BaseModelRobertaXML",
-  model_type="robertaxml",
+BaseModelsIndex$distilbert <- list(
+  class_name="BaseModelDistilBERT",
+  model_type="distilbert",
   reference="Asnh, V., Debut, L., Chaumond, J. & Wolf, T. (2019).
   DistilBERT, a distilled version of BERT: smaller, faster, cheaper and lighter.
   doi: [10.48550/arXiv.1910.01108](https://doi.org/10.48550/arXiv.1910.01108)",

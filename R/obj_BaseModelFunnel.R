@@ -35,7 +35,7 @@ BaseModelFunnel <- R6::R6Class(
         num_decoder_layers = as.integer(args$num_decoder_layers),
         d_model = as.integer(args$hidden_size),
         n_head = as.integer(args$num_attention_heads),
-        d_head = as.integer(args$hidden_size),
+        d_head = as.integer(args$d_head),
         d_inner = as.integer(args$intermediate_size),
         hidden_act = tolower(args$hidden_act),
         hidden_dropout_prob = args$hidden_dropout_prob,
