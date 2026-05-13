@@ -239,6 +239,11 @@ for (object_class_name in object_class_names) {
     # )
 
     expect_equal(
+      base_model$Tokenizer$encode("This is a test.",token_encodings_only =TRUE),
+      base_model_reloaded$Tokenizer$encode("This is a test.",token_encodings_only =TRUE)
+    )
+
+    expect_equal(
       base_model$Tokenizer$get_sustainability_data(),
       base_model_reloaded$Tokenizer$get_sustainability_data()
     )
