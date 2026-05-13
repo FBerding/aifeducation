@@ -601,6 +601,7 @@ get_param_dict <- function() {
     test_values = c(12L, 20L)
   )
   param$d_model <- param$hidden_size
+  param$dim<- param$hidden_size
 
   param$hidden_act <- list(
     type = "string",
@@ -615,6 +616,7 @@ get_param_dict <- function() {
     test_values = NULL
   )
   param$hidden_activation <- param$hidden_act
+  param$activation<- param$hidden_act
 
   param$num_hidden_layers <- list(
     type = "int",
@@ -629,6 +631,7 @@ get_param_dict <- function() {
     test_values = c(2L, 4L)
   )
   param$num_hidden_layer <- param$num_hidden_layers
+  param$n_layers<- param$num_hidden_layers
 
   param$num_hidden_groups <- list(
     type = "int",
@@ -726,6 +729,8 @@ get_param_dict <- function() {
   )
   param$embedding_dropout <- param$hidden_dropout_prob
   param$embedding_dropout$desc <- "Dropout chance for the embeddings."
+
+  param$dropout <- param$hidden_dropout_prob
 
   param$mlp_dropout <- param$hidden_dropout_prob
   param$mlp_dropout$desc <- "Dropout rate for the mlp layer."
@@ -1939,6 +1944,7 @@ get_param_dict <- function() {
   )
   param$num_attention_heads <- param$self_attention_head
   param$n_head <- param$self_attention_head
+  param$n_heads <- param$self_attention_head
   param$tf_num_heads <- param$self_attention_head
 
   param$intermediate_size <- list(
@@ -1955,6 +1961,7 @@ get_param_dict <- function() {
   )
   param$tf_dense_dim <- param$intermediate_size
   param$d_inner <- param$intermediate_size
+  param$hidden_dim<- param$intermediate_size
 
   param$attention_type <- list(
     type = "string",

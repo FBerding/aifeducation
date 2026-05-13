@@ -263,6 +263,10 @@ print(type_string)
     return("albert")
   } else if (stringi::stri_detect(str = tolower(type_string), regex = "^xmod([:alnum:]*)")) {
     return("xmod")
+  }else if (stringi::stri_detect(str = tolower(type_string), regex = "^distilbert([:alnum:]*)")) {
+    return("distilbert")
+  }else if (stringi::stri_detect(str = tolower(type_string), regex = "^eurobert([:alnum:]*)")) {
+    return("eurobert")
   }else {
     stop("Architecture for the model could not be detected.")
   }
