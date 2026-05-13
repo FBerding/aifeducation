@@ -116,7 +116,7 @@ embedding. Allowed values: \ifelse{latex}{$1 <= x <= 2048$}{\ifelse{html}{\eqn{1
       \item{\code{num_attention_heads}}{\code{int} determining the number of attention heads for a self-attention layer. Only relevant if \code{attention_type='MultiHead'} Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
       \item{\code{intermediate_size}}{\code{int} determining the size of the projection layer within a each transformer encoder. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
       \item{\code{num_decoder_layers}}{\code{int} Number of decoding layers. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{d_head}}{\code{int} Number of neurons of the final layer. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{d_head}}{\code{int} Number of neurons of the layer. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
       \item{\code{funnel_pooling_type}}{\code{string} Method for pooling over the seqence length. Allowed values: 'Mean', 'Max'}
       \item{\code{hidden_act}}{\code{string} Name of the activation function. Allowed values: 'GELU', 'relu', 'silu', 'gelu_new'}
       \item{\code{hidden_dropout_prob}}{\code{double} Ratio of dropout. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{\eqn{0 <= x <= 0.6}}{`0 <= x <= 0.6`}}}

@@ -7,7 +7,7 @@
 get_py_package_versions(sentencepiece = FALSE)
 }
 \arguments{
-\item{inc_sentencepiece}{\code{bool} If \code{TRUE} the packages 'google.protobuf' and
+\item{sentencepiece}{\code{bool} If \code{TRUE} the packages 'google.protobuf' and
 'sentencepiece' are checked.}
 }
 \value{
