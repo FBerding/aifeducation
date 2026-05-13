@@ -1417,7 +1417,7 @@ add_missing_args <- function(args, path_args, meta_args) {
       complete_args[param] <- list(
         load_from_disk(path_args$path_to_textual_dataset)
       )
-    } else if (max(unlist(BaseModelsIndex) %in% current_param$type) && !is.null(path_args$path_to_base_model)) {
+    } else if (max(get_entry_from_BaseModelsIndex("class_name") %in% current_param$type) && !is.null(path_args$path_to_base_model)) {
       complete_args[param] <- list(
         load_from_disk(path_args$path_to_base_model)
       )

@@ -33,8 +33,6 @@
 #' @keywords internal
 #' @noRd
 #'
-
-# TODO (Yuliia): session has no visible binding
 create_process_modal <- function(ns,
                                  string_update_interval = "",
                                  title = "In progress. Please wait.",
@@ -192,12 +190,12 @@ start_and_monitor_long_task <- function(id,
     }
 
     args <- ExtendedTask_arguments
-    # print(args)
-    # save(args,
+     #print(args)
+     #save(args,
     #  file = paste0(getwd(), "/arguments.rda")
     # )
     future::plan(future::multisession)
-    # future::plan(future::sequential)
+     #future::plan(future::sequential)
 
     # Start ExtendedTask
     CurrentTask <- NULL
