@@ -1,5 +1,12 @@
 testthat::skip_on_cran()
 
+test_tmp_data_base_model_path <- testthat::test_path("test_data","OpenSourceBaseModels")
+
+testthat::skip_if_not(
+  condition = dir.exists(test_tmp_data_base_model_path),
+  message = "Folder with open source models not available."
+)
+
 testthat::skip_if_not(
   condition = check_aif_py_modules(trace = FALSE),
   message = "Necessary python modules not available"
@@ -21,8 +28,6 @@ test_art_path <- testthat::test_path("test_artefacts")
 test_art_tmp_path <- testthat::test_path("test_artefacts/base_models")
 create_dir(test_art_path, FALSE)
 create_dir(test_art_tmp_path, FALSE)
-
-test_tmp_data_base_model_path <- testthat::test_path("test_data","OpenSourceBaseModels")
 
 # Test Configuration
 object_class_names <- get_entry_from_BaseModelsIndex("class_name")
