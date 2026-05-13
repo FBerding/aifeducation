@@ -14,6 +14,11 @@
 
 #' @title Xmod-Transformer
 #' @description Represents models based on Xmod
+#' @description Xmod models support different languages. Before starting to
+#' work with this model set the correct language with the method
+#' `set_default_language`. You receive a list with all supported languages
+#' by calling `get_supported_languages`.
+#'
 #' @references Pfeiffer, J., Goyal, N., Lin, X. V., Li, X., Cross, J.,
 #' Riedel, S., & Artetxe, M. (2022). Lifting the Curse of Multilinguality
 #' by Pre-training Modular Transformers. arXiv. \doi{10.48550/ARXIV.2205.06266}

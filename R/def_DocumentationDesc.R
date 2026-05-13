@@ -567,9 +567,9 @@ build_aife_site <- function(clear_docs = FALSE) {
 #' @returns Returns a `string` containing the description written in rmarkdown.
 #' @note Function is designed to be used with inline r code in rmarkdown vignettes/articles.
 #' @family Utils Documentation
-#' @importFrom knitr kable
 #' @export
 build_layer_overview_base_models <- function() {
+  requireNamespace("knitr")
   ov_clm_names=c("class_name","reference","req_sentencepiece")
   final_clm_names=c("BaseModel","Reference","Require Sentencepiece")
   overview_table=matrix(

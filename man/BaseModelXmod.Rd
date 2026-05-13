@@ -8,6 +8,11 @@ Does return a new object of this class.
 }
 \description{
 Represents models based on Xmod
+
+Xmod models support different languages. Before starting to
+work with this model set the correct language with the method
+\code{set_default_language}. You receive a list with all supported languages
+by calling \code{get_supported_languages}.
 }
 \references{
 Pfeiffer, J., Goyal, N., Lin, X. V., Li, X., Cross, J.,
@@ -108,7 +113,7 @@ guidelines:
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{tokenizer}}{\code{TokenizerBase} Tokenizer for the model.}
-      \item{\code{languages}}{\code{string} \code{vector} of strings representing the Language codes. Must contain at least two codes. Allowed values: any}
+      \item{\code{languages}}{\code{string} \code{vector} of strings representing the Language codes. Allowed values: any}
       \item{\code{default_language}}{\code{string} \code{string} representing the language code of the default language. Allowed values: any}
       \item{\code{max_position_embeddings}}{\code{int} Number of maximum position embeddings. This parameter also determines the maximum length of a sequence which
 can be processed with the model. Allowed values: \ifelse{latex}{$10 <= x <= 4048$}{\ifelse{html}{\eqn{10 <= x <= 4048}}{`10 <= x <= 4048`}}}
