@@ -48,7 +48,7 @@ jobs:
 
          envname<-"r-reticulate"
 
-         transformer_version = "<=5.2.0"
+         transformer_version = "<=5.8.1"
          tokenizers_version = "<=0.22.2"
          pandas_version = "<=3.0.2"
          datasets_version = "<=4.8.4"
