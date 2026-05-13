@@ -17,6 +17,8 @@ Decoding-enhanced BERT with Disentangled Attention. \doi{10.48550/arXiv.2006.036
 Other Base Model:
 \code{\link{BaseModelAlbert}},
 \code{\link{BaseModelBert}},
+\code{\link{BaseModelDistilBERT}},
+\code{\link{BaseModelEuroBert}},
 \code{\link{BaseModelFunnel}},
 \code{\link{BaseModelMPNet}},
 \code{\link{BaseModelModernBert}},

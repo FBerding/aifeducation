@@ -18,6 +18,8 @@ Language Representations. arXiv. \doi{10.48550/ARXIV.1909.11942}
 Other Base Model:
 \code{\link{BaseModelBert}},
 \code{\link{BaseModelDebertaV2}},
+\code{\link{BaseModelDistilBERT}},
+\code{\link{BaseModelEuroBert}},
 \code{\link{BaseModelFunnel}},
 \code{\link{BaseModelMPNet}},
 \code{\link{BaseModelModernBert}},

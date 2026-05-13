@@ -18,6 +18,8 @@ Other Base Model:
 \code{\link{BaseModelAlbert}},
 \code{\link{BaseModelBert}},
 \code{\link{BaseModelDebertaV2}},
+\code{\link{BaseModelDistilBERT}},
+\code{\link{BaseModelEuroBert}},
 \code{\link{BaseModelMPNet}},
 \code{\link{BaseModelModernBert}},
 \code{\link{BaseModelRoberta}},
