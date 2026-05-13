@@ -74,6 +74,7 @@ for (object_class_name in object_class_names) {
   # Prepare directory
   dir_path_new <- paste0(test_art_tmp_path, "/", generate_id(10))
   tmp_dir <- paste0(dir_path_new, "/", object_class_name)
+
   # Clear directory for next test
   unlink(paste0(tmp_dir, "/", object_class_name), recursive = TRUE)
   create_dir(tmp_dir, trace = FALSE)
