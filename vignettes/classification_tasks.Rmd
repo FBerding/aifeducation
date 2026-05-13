@@ -782,8 +782,8 @@ vignette we use a BERT (Devlin et al. 2019) model which can be created
 with the function `aife_transformer.make`. 
 
 ```{r, include = TRUE, eval = TRUE}
-base_model <- BaseModelBert$new()
-base_model$configure(
+base_model_bert <- BaseModelBert$new()
+base_model_bert$configure(
   tokenizer = tokenizer,
   max_position_embeddings = 512,
   hidden_size = 64,
@@ -828,8 +828,8 @@ If you would like to train a new base model (see section 3.2) for the
 first time or want to adapt a pre-trained model to a domain-specific
 language or task, you can call the corresponding `train`-method. 
 
-```{r base_model$train, include = TRUE, eval = TRUE}
-base_model$train(
+```{r base_model_bert$train, include = TRUE, eval = TRUE}
+base_model_bert$train(
   text_dataset = data_set_reviews_text,
   p_mask = 0.30,
   whole_word = TRUE,
@@ -891,21 +891,21 @@ After training has finished you can save the entire model with `save_to_disk`.
 
 ```{r, include = TRUE, eval = TRUE}
 save_to_disk(
-  object = base_model,
+  object = base_model_bert,
   dir_path = "examples",
-  folder_name = "example_base_model"
+  folder_name = "example_base_model_bert"
 )
 ```
 
 To use the model you can load it with
 ```{r, include = TRUE, eval = TRUE}
-base_model <- load_from_disk("examples/example_base_model")
+base_model_bert <- load_from_disk("examples/example_base_model_bert")
 ```
 
 In order to use the model for the fill-mask task you can call `fill_mask`.
 
 ```{r, include = TRUE, eval = TRUE}
-base_model$fill_mask(
+base_model_bert$fill_mask(
   masked_text = "This is a [MASK] movie.",
   n_solutions = 5
 )
@@ -918,7 +918,7 @@ replace the mask token with.
 You get a short summary of an object of this class with `print`.
 
 ```{r, include = TRUE, eval = TRUE}
-print(base_model)
+print(base_model_bert)
 ```
 
 ## 3.4 Analyzing a BaseModel
@@ -930,7 +930,7 @@ If you would like to further investigate a base model you can use some specific 
 A plot of the training history of the last training can be shown as follows:
 
 ```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Example of a Training History for a BaseModel.")}
-base_model$plot_training_history(
+base_model_bert$plot_training_history(
   ind_best_model = TRUE
 )
 ```
@@ -946,7 +946,7 @@ call `get_sustainability_data("training")`.
 
 ```{r, include = TRUE, eval = TRUE}
 # We use t() to improve the readability of the table
-t(base_model$get_sustainability_data("training"))
+t(base_model_bert$get_sustainability_data("training"))
 ```
 
 The resulting table provides you detailed information on every single training run with
@@ -959,7 +959,7 @@ consumption and CO2-emission during inference. You can estimate the ecological i
 by calling the method `estimate_sustainability_inference_fill_mask`.
 
 ```{r, include = TRUE, eval = TRUE}
-base_model$estimate_sustainability_inference_fill_mask(
+base_model_bert$estimate_sustainability_inference_fill_mask(
   text_dataset = data_set_reviews_text,
   n = 30,
   sustain_iso_code = "DEU",
@@ -977,7 +977,7 @@ The results of every run can be accessed via `get_sustainability_data("inference
 
 ```{r, include = TRUE, eval = TRUE}
 # We use t() to improve the readability of the table
-t(base_model$get_sustainability_data("inference"))
+t(base_model_bert$get_sustainability_data("inference"))
 ```
 
 **FLOPS Estimates**
@@ -988,7 +988,7 @@ table.
 
 ```{r, include = TRUE, eval = TRUE}
 # We use t() to improve the readability of the table
-t(base_model$get_flops_estimates())
+t(base_model_bert$get_flops_estimates())
 ```
 
 At the moment only an architecture-based approach is available. The number of FLOPS
@@ -1014,8 +1014,8 @@ create a base model as follows:
   the model and the tokenizer.
 
 ```{r, include = TRUE, eval = FALSE}
-base_model_bert <- BaseModelBert$new()
-base_model_bert$create_from_hf(
+base_model_bert_hf <- BaseModelBert$new()
+base_model_bert_hf$create_from_hf(
   model_dir = "examples/bert_uncased",
   tokenizer_dir = "examples/bert_uncased"
 )
@@ -1062,8 +1062,8 @@ Download all files into a new folder. Here we store the model in  `"examples/xml
 We first load the base model as described in section 3.
 
 ```{r, include = TRUE, eval = TRUE}
-base_model <- BaseModelRobertaXML$new()
-base_model$create_from_hf(
+base_model_roberta_xml <- BaseModelRobertaXML$new()
+base_model_roberta_xml$create_from_hf(
   model_dir = "examples/xml_roberta_fb",
   tokenizer_dir = "examples/xml_roberta_fb"
 )
@@ -1098,7 +1098,7 @@ these values to the `calc_quantiles` method of the tokenizer of our BaseModel re
 following quantiles:
 
 ```{r, include = TRUE, eval = TRUE}
-chunk_quantile = base_model$Tokenizer$calc_quantiles(
+chunk_quantile = base_model_roberta_xml$Tokenizer$calc_quantiles(
   text_dataset = data_set_reviews_text, 
   batch_size = 32L, 
   seq_len_tokens = 512L,
@@ -1144,7 +1144,7 @@ tem$configure(
   emb_layer_min = 6,
   emb_layer_max = 8,
   emb_pool_type = "Average",
-  base_model = base_model,
+  base_model = base_model_roberta_xml,
   emb_insert_mask_tokens=0.15
 )
 ```
@@ -2750,7 +2750,7 @@ best generalization abilities. Unlike the classifiers, this is also the final st
 The `text_size` argument allows you to increase or decrease the size of the text within the graphic.
 
 ```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Example of a Training History for a BaseModel emphasizing the Best Model State.")}
-base_model$plot_training_history(
+base_model_bert$plot_training_history(
   x_min = NULL,
   x_max = NULL,
   y_min = NULL,
