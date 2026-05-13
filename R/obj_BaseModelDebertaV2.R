@@ -96,6 +96,6 @@ BaseModelsIndex$deberta_v2 <- list(
   class_name="BaseModelDebertaV2",
   model_type="deberta_v2",
   reference="He, P., Liu, X., Gao, J. & Chen, W. (2020). DeBERTa:
-  Decoding-enhanced BERT with Disentangled Attention. doi: [10.48550/arXiv.2006.03654]",
+  Decoding-enhanced BERT with Disentangled Attention. doi: [10.48550/arXiv.2006.03654](https://doi.org/10.48550/arXiv.2006.03654)",
   req_sentencepiece=FALSE
 )

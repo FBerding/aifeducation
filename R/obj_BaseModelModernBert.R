@@ -123,6 +123,6 @@ BaseModelsIndex$ModernBert <- list(
   Gallagher, A., Biswas, R., Ladhak, F., Aarsen, T., Cooper, N., Adams, G.,
   Howard, J. & Poli, I. (2024). Smarter, Better, Faster, Longer: A Modern Bidirectional
   Encoder for Fast, Memory Efficient, and Long Context Finetuning and Inference.
-  doi: [10.48550/arXiv.2412.13663]",
+  doi: [10.48550/arXiv.2412.13663](https://doi.org/10.48550/arXiv.2412.13663)",
   req_sentencepiece=FALSE
 )

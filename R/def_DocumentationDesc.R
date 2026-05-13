@@ -566,6 +566,7 @@ build_aife_site <- function(clear_docs = FALSE) {
 #' used on the package's home page.
 #' @returns Returns a `string` containing the description written in rmarkdown.
 #' @note Function is designed to be used with inline r code in rmarkdown vignettes/articles.
+#' @importFrom stringi stri_replace_all
 #' @family Utils Documentation
 #' @export
 build_layer_overview_base_models <- function() {
@@ -582,7 +583,11 @@ build_layer_overview_base_models <- function() {
   )
   for (i in seq_along(BaseModelsIndex)) {
    for (clm_name in ov_clm_names) {
-     overview_table[i,clm_name]=BaseModelsIndex[[i]][[clm_name]]
+     overview_table[i,clm_name]=stringi::stri_replace_all(
+       str=BaseModelsIndex[[i]][[clm_name]],
+       replacement = "",
+       regex = "\\n"
+     )
    }
   }
   overview_table=overview_table[order(overview_table[,"class_name"]),]

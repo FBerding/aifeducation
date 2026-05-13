@@ -121,6 +121,6 @@ BaseModelsIndex$Funnel <- list(
   class_name="BaseModelFunnel",
   model_type="funnel",
   reference="Dai, Z., Lai, G., Yang, Y. & Le, Q. V. (2020). Funnel-Transformer:
-  Filtering out Sequential Redundancy for Efficient Language Processing. doi: [10.48550/arXiv.2006.03236]",
+  Filtering out Sequential Redundancy for Efficient Language Processing. doi: [10.48550/arXiv.2006.03236](https://doi.org/10.48550/arXiv.2006.03236)",
   req_sentencepiece=FALSE
 )

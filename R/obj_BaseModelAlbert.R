@@ -102,6 +102,6 @@ BaseModelsIndex$Albert <- list(
   model_type="albert",
   reference="Lan, Z., Chen, M., Goodman, S., Gimpel, K., Sharma, P., &
   Soricut, R. (2019). ALBERT; A Lite BERT for Self-supervised Learning of
-  Language Representations. arXiv. doi: [10.48550/ARXIV.1909.11942]",
+  Language Representations. arXiv. doi: [10.48550/ARXIV.1909.11942](https://doi.org/10.48550/ARXIV.1909.11942)",
   req_sentencepiece=TRUE
   )
