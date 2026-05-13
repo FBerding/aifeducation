@@ -10,7 +10,7 @@ Does return a new object of this class.
 Represents models based on Modern Bert.
 }
 \references{
-Warner, B., Chaffin, A., Clavié, B., Weller, O., Hallström, O., Taghadouini, S.,
+Warner, B., Chaffin, A., Clavie, B., Weller, O., Hallstroem, O., Taghadouini, S.,
 Gallagher, A., Biswas, R., Ladhak, F., Aarsen, T., Cooper, N., Adams, G.,
 Howard, J. & Poli, I. (2024). Smarter, Better, Faster, Longer: A Modern Bidirectional
 Encoder for Fast, Memory Efficient, and Long Context Finetuning and Inference.

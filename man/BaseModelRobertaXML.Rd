@@ -11,7 +11,7 @@ Represents models based on RoBERTa-XML.
 }
 \references{
 Conneau, A., Khandelwal, K., Goyal, N., Chaudhary, V., Wenzek, G.,
-Guzmán, F., Grave, E., Ott, M., Zettlemoyer, L., & Stoyanov, V. (2019).
+Guzman, F., Grave, E., Ott, M., Zettlemoyer, L., & Stoyanov, V. (2019).
 Unsupervised Cross-lingual Representation Learning at Scale \doi{10.48550/arXiv.1911.02116}
 }
 \seealso{

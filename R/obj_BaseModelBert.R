@@ -14,7 +14,7 @@
 
 #' @title BERT-Transformer
 #' @description Represents models based on BERT.
-#' @references Devlin, J., Chang, M.‑W., Lee, K., & Toutanova, K. (2019). BERT: Pre-training of Deep Bidirectional
+#' @references Devlin, J., Chang, M.-W., Lee, K., & Toutanova, K. (2019). BERT: Pre-training of Deep Bidirectional
 #'   Transformers for Language Understanding. In J. Burstein, C. Doran, & T. Solorio (Eds.), Proceedings of the 2019
 #'   Conference of the North (pp. 4171--4186). Association for Computational Linguistics. \doi{10.18653/v1/N19-1423}
 #' @return `r get_description("return_object")`
@@ -92,7 +92,7 @@ BaseModelBert <- R6::R6Class(
 BaseModelsIndex$Bert <- list(
   class_name="BaseModelBert",
   model_type="bert",
-  reference="Devlin, J., Chang, M.‑W., Lee, K., & Toutanova, K. (2019). BERT: Pre-training of Deep Bidirectional
+  reference="Devlin, J., Chang, M.-W., Lee, K., & Toutanova, K. (2019). BERT: Pre-training of Deep Bidirectional
   Transformers for Language Understanding. In J. Burstein, C. Doran, & T. Solorio (Eds.), Proceedings of the 2019
   Conference of the North (pp. 4171--4186). Association for Computational Linguistics. doi: [10.18653/v1/N19-1423]",
   req_sentencepiece=FALSE
