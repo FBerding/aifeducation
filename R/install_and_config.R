@@ -28,7 +28,7 @@
 get_recommended_py_versions <- function(package_name = NULL) {
   check_class_and_type(object = package_name, object_name = "package_name", type_classes = "string", allow_NULL = TRUE)
   py_versions <- list(
-    transformers = c("4.56.0", "5.8.0"),
+    transformers = c("4.56.0", "5.8.1"),
     tokenizers = c("0.22.0", "0.22.2"),
     pandas = c("2.3.2", "3.0.2"),
     datasets = c("3.6.0", "4.8.4"),
