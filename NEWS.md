@@ -13,14 +13,16 @@ editor_options:
 - Add print method to all objects.
 - Change dependencies. The package requires now 'iotarelr>=0.1.9'.
 - Add **optional** dependencies to two new python packages ('protbuf' and 'sentencepiece') and 
-  the Protocol Buffer Compiler. These are required for some of the new models.
+  the Protocol Buffer Compiler. These are required for some of the open source models.
 - Add function 'install_protocol_buffer_compiler' for installing the 
   Protocol Buffer Compiler.
 
 **BaseModels**
 
-- Add support for XML-Roberta.
 - Add support for ALBERT.
+- Add support for EuroBert.
+- Add support for DistilBert..
+- Add support for XML-Roberta.
 - Add support for Xmod.
 
 **Tokenizer**
@@ -50,6 +52,12 @@ editor_options:
 
 - Embeddings can now inject a specific amount of mask tokens to match training
   and application contexts better.
+  
+**AI for Education - Studio**
+
+- Tab for creating a TextEmbeddingModel now supports the calculation of 
+  quantiles for ensuring that a specific percentage of documents is 
+  fully covered by a model.
 
 # aifeducation 1.1.5
 
