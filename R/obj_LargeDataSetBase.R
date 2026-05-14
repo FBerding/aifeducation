@@ -205,8 +205,8 @@ LargeDataSetBase <- R6::R6Class(
       current_colnames=self$get_colnames()
       rows=c("Object","Columns","Rows")
       padded_rows=pad_str(rows,width = NULL,pad=" ", end=": ")
-      cat(
-        sep="",
+      message(
+        appendLF=FALSE,
         padded_rows[1L],class(self)[1L],"\n",
         padded_rows[2L],toString(current_colnames),"\n",
         padded_rows[3L],self$n_rows(),"\n"

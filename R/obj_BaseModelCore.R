@@ -1111,8 +1111,8 @@ BaseModelCore <- R6::R6Class(
       statistics=self$Tokenizer$get_tokenizer_statistics()
       special_tokens=self$Tokenizer$get_special_tokens()
 
-      cat(
-        sep="",
+      message(
+        appendLF=FALSE,
         padded_rows[1L],class(self)[1L],"\n",
         padded_rows[2L],self$is_configured(),"\n",
         padded_rows[3L],self$is_trained(),"\n",

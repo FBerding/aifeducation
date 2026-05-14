@@ -463,8 +463,8 @@ TEFeatureExtractor <- R6::R6Class(
     print=function(){
       rows=c("Object","ID","Label","Configured","Trained","Times","Features In","Features Out", "Parameter")
       padded_rows=pad_str(rows,width = NULL,pad=" ", end=": ")
-      cat(
-        sep="",
+      message(
+        appendLF=FALSE,
         padded_rows[1L],class(self)[1L],"\n",
         padded_rows[2L],private$model_info$model_name,"\n",
         padded_rows[3L],private$model_info$model_label,"\n",

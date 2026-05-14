@@ -737,8 +737,8 @@ TextEmbeddingModel <- R6::R6Class(
       statistics=self$BaseModel$Tokenizer$get_tokenizer_statistics()
       special_tokens=self$BaseModel$Tokenizer$get_special_tokens()
       model_config=self$get_model_config()
-      cat(
-        sep="",
+      message(
+        appendLF=FALSE,
         padded_rows[1L],class(self)[1L],"\n",
         padded_rows[2L],self$get_model_info()$model_label,"\n",
         padded_rows[3L],self$is_configured(),"\n",

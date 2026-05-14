@@ -458,8 +458,8 @@ TokenizerBase <- R6::R6Class(
       padded_rows <- pad_str(rows, width = NULL, pad = " ", end = ": ")
       statistics <- self$get_tokenizer_statistics()
       special_tokens <- self$get_special_tokens()
-      cat(
-        sep = "",
+      message(
+        appendLF=FALSE,
         padded_rows[1L], class(self)[1L], "\n",
         padded_rows[2L], private$configured, "\n",
         padded_rows[3L], private$trained[1L], "\n",

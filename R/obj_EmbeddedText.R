@@ -529,8 +529,8 @@ EmbeddedText <- R6::R6Class(
     print=function(){
       rows=c("Object","Rows","Times","Features", "Pad Value")
       padded_rows=pad_str(rows,width = NULL,pad=" ", end=": ")
-      cat(
-        sep="",
+      message(
+        appendLF=FALSE,
         padded_rows[1L],class(self)[1L],"\n",
         padded_rows[2L],self$n_rows(),"\n",
         padded_rows[3L],self$get_times(),"\n",
