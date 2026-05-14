@@ -309,9 +309,11 @@ for (object_class_name in object_class_names) {
       get_current_args_for_print(config_args),
       get_current_args_for_print(train_args)
     ), {
-      if (base_model$get_model_type() != "funnel") {
+      if (!any(base_model$get_model_type() %in% c("funnel","distilbert"))) {
         expect_gte(base_model$get_n_layers(), config_args$num_hidden_layers)
-      } else if (base_model$get_model_type() == "funnel") {
+      } else if(base_model$get_model_type() == "distilbert"){
+        expect_gte(base_model$get_n_layers(), config_args$n_layers)
+      }else if (base_model$get_model_type() == "funnel") {
         if (is.null(config_args$block_repeats)) {
           expected <- sum(config_args$block_sizes)
         } else {
