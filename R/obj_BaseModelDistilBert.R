@@ -38,7 +38,7 @@ BaseModelDistilBERT <- R6::R6Class(
         dim= as.integer(args$dim),
         hidden_dim= as.integer(args$hidden_dim),
         dropout= args$dropout,
-        activation= args$activation,
+        activation= tolower(args$activation),
         attention_dropout  = args$attention_dropout,
         initializer_range = 0.02,
         qa_dropout =0.1,
@@ -55,8 +55,8 @@ BaseModelDistilBERT <- R6::R6Class(
     },
     #---------------------------------------------------------------------------
     check_arg_combinations = function(args) {
-      if (args$hidden_size %% args$num_attention_heads != 0L) {
-        stop("hidden_size must be a multiple auf num_attention_heads.")
+      if (args$hidden_dim %% args$n_heads != 0L) {
+        stop("hidden_dim must be a multiple auf n_heads")
       }
     }
   ),
@@ -65,7 +65,7 @@ BaseModelDistilBERT <- R6::R6Class(
     #' @description Configures a new object of this class.
     #' Please ensure that your chosen configuration comply with the following
     #' guidelines:
-    #' * hidden_size is a multiple of num_attention_heads.
+    #' * hidden_dim is a multiple of n_heads
     #'
     #' @param tokenizer `r get_param_doc_desc("tokenizer")`
     #' @param max_position_embeddings `r get_param_doc_desc("max_position_embeddings")`
@@ -88,6 +88,20 @@ BaseModelDistilBERT <- R6::R6Class(
                          attention_dropout = 0.1) {
       arguments <- get_called_args(n = 1L)
       private$do_configuration(args = arguments)
+    },
+    #--------------------------------------------------------------------------
+    #' @description Number of layers.
+    #' @return Returns an `int` describing the number of layers available for
+    #' embedding.
+    get_n_layers = function() {
+      return(private$model$config$n_layers)
+    },
+    #--------------------------------------------------------------------------
+    #' @description Size of the final layer.
+    #' @return Returns an `int` describing the number of dimensions of the last
+    #' hidden layer.
+    get_final_size = function() {
+      return(private$model$config$dim)
     }
   )
 )
