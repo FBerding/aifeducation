@@ -86,10 +86,14 @@ get_depr_obj_names <- function() {
 #' @export
 create_object <- function(class) {
   # Create list of all objects on user level
+
+  base_model=get_entry_from_BaseModelsIndex("class_name")
+  names(base_model)=get_entry_from_BaseModelsIndex("model_type")
+
   object_list <- c(
     DataSetsIndex,
     TokenizerIndex,
-    get_entry_from_BaseModelsIndex("class_name"),
+    base_model,
     TextEmbeddingObjectsIndex,
     TEClassifiers_class_names
   )
