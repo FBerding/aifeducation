@@ -204,8 +204,12 @@ for (base_model_type in base_model_type_list) {
     })
 
     test_that(paste(base_model_type, get_current_args_for_print(config), "print method"), {
-      expect_no_error(text_embedding_model$print())
-      expect_no_error(print(text_embedding_model))
+      suppressMessages(
+        expect_no_error(text_embedding_model$print())
+      )
+      suppressMessages(
+        expect_no_error(print(text_embedding_model))
+      )
     })
 
     # Check history

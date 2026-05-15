@@ -127,9 +127,12 @@ test_that("LargeDataSetForTexts - print method", {
     param_pad_value = -100,
     embeddings = imdb_embeddings$embeddings
   )
-
-  expect_no_error(new_embedded_text$print())
-  expect_no_error(print(new_embedded_text))
+  suppressMessages(
+    expect_no_error(new_embedded_text$print())
+  )
+  suppressMessages(
+    expect_no_error(print(new_embedded_text))
+  )
 })
 
 # Test basic parameters--------------------------------------------------------

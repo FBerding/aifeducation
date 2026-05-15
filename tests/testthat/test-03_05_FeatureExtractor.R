@@ -53,8 +53,13 @@ for (framework in ml_frameworks) {
           orthogonal_method = "matrix_exp",
           noise_factor = 0.2
         )
-        expect_no_error(extractor$print())
-        expect_no_error(print(extractor))
+
+        suppressMessages(
+          expect_no_error(extractor$print())
+        )
+        suppressMessages(
+          expect_no_error(print(extractor))
+        )
       })
 
       # Create----------------------------------------------------------------

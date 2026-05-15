@@ -130,8 +130,12 @@ for (object_class_name in object_class_names) {
       }
 
       #print method
+      suppressMessages(
         expect_no_error(tokenizer$print())
+      )
+      suppressMessages(
         expect_no_error(print(tokenizer))
+      )
 
       # Clear directory for next test
       unlink(paste0(test_art_tmp_path, "/", "WordPieceTokenizer"), recursive = TRUE)

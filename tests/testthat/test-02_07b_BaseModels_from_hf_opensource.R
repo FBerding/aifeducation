@@ -86,8 +86,12 @@ for (object_class_name in object_class_names) {
       object_class_name,
       get_current_args_for_print(train_args)
     ), {
-      expect_no_error(base_model$print())
-      expect_no_error(print(base_model))
+      suppressMessages(
+        expect_no_error(base_model$print())
+      )
+      suppressMessages(
+        expect_no_error(print(base_model))
+      )
     })
 
 

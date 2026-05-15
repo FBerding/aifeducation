@@ -164,8 +164,12 @@ test_that("LargeDataSetForTexts - print method", {
     param_pad_value = -100
   )
   new_dataset$add_embeddings_from_array(imdb_embeddings$embeddings)
-  expect_no_error(new_dataset$print())
-  expect_no_error(print(new_dataset))
+  suppressMessages(
+    expect_no_error(new_dataset$print())
+  )
+  suppressMessages(
+    expect_no_error(print(new_dataset))
+  )
 })
 
 #-----------------------------------------------------------------------------

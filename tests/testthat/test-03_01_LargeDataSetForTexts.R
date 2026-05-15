@@ -37,8 +37,12 @@ test_that("LargeDataSetForTexts - print method", {
       trace = FALSE
     )
   )
-  expect_no_error(new_dataset$print())
-  expect_no_error(print(new_dataset))
+  suppressMessages(
+    expect_no_error(new_dataset$print())
+  )
+  suppressMessages(
+    expect_no_error(print(new_dataset))
+  )
 })
 
 test_that("LargeDataSetForTexts - Add txt", {

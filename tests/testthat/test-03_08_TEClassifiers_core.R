@@ -116,8 +116,12 @@ for (object_class_name in object_class_names) {
       })
 
       test_that(paste("print method", object_class_name, get_current_args_for_print(test_combination)), {
-        expect_no_error(classifier$print())
-        expect_no_error(print(classifier))
+        suppressMessages(
+          expect_no_error(classifier$print())
+        )
+        suppressMessages(
+          expect_no_error(print(classifier))
+        )
       })
 
       test_that(paste("Predictions", object_class_name, get_current_args_for_print(test_combination)), {
