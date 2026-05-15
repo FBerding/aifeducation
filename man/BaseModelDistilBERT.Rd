@@ -35,6 +35,8 @@ Other Base Model:
 \subsection{Public methods}{
   \itemize{
     \item \href{#method-BaseModelDistilBERT-configure}{\code{BaseModelDistilBERT$configure()}}
+    \item \href{#method-BaseModelDistilBERT-get_n_layers}{\code{BaseModelDistilBERT$get_n_layers()}}
+    \item \href{#method-BaseModelDistilBERT-get_final_size}{\code{BaseModelDistilBERT$get_final_size()}}
     \item \href{#method-BaseModelDistilBERT-clone}{\code{BaseModelDistilBERT$clone()}}
   }
 }
@@ -61,11 +63,9 @@ Other Base Model:
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="create_from_hf"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-create_from_hf'><code>BaseModelCore$create_from_hf()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="estimate_sustainability_inference_fill_mask"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-estimate_sustainability_inference_fill_mask'><code>BaseModelCore$estimate_sustainability_inference_fill_mask()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="fill_mask"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-fill_mask'><code>BaseModelCore$fill_mask()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_final_size"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_final_size'><code>BaseModelCore$get_final_size()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_flops_estimates"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_flops_estimates'><code>BaseModelCore$get_flops_estimates()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_model"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_model'><code>BaseModelCore$get_model()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_model_type"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_model_type'><code>BaseModelCore$get_model_type()</code></a></span></li>
-  <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_n_layers"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_n_layers'><code>BaseModelCore$get_n_layers()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_special_tokens"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_special_tokens'><code>BaseModelCore$get_special_tokens()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="get_tokenizer_statistics"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-get_tokenizer_statistics'><code>BaseModelCore$get_tokenizer_statistics()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="BaseModelCore" data-id="load_from_disk"><a href='../../aifeducation/html/BaseModelCore.html#method-BaseModelCore-load_from_disk'><code>BaseModelCore$load_from_disk()</code></a></span></li>
@@ -84,7 +84,7 @@ Other Base Model:
 Please ensure that your chosen configuration comply with the following
 guidelines:
 \itemize{
-\item hidden_size is a multiple of num_attention_heads.
+\item hidden_dim is a multiple of n_heads
 }
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
@@ -120,6 +120,38 @@ embedding. Allowed values: \ifelse{latex}{$1 <= x <= 2048$}{\ifelse{html}{\eqn{1
   }
   \subsection{Returns}{
     Does nothing return.
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-BaseModelDistilBERT-get_n_layers"></a>}}
+\if{latex}{\out{\hypertarget{method-BaseModelDistilBERT-get_n_layers}{}}}
+\subsection{\code{BaseModelDistilBERT$get_n_layers()}}{
+  Number of layers.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BaseModelDistilBERT$get_n_layers()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Returns an \code{int} describing the number of layers available for
+embedding.
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-BaseModelDistilBERT-get_final_size"></a>}}
+\if{latex}{\out{\hypertarget{method-BaseModelDistilBERT-get_final_size}{}}}
+\subsection{\code{BaseModelDistilBERT$get_final_size()}}{
+  Size of the final layer.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BaseModelDistilBERT$get_final_size()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Returns an \code{int} describing the number of dimensions of the last
+hidden layer.
   }
 }
 
