@@ -2543,7 +2543,7 @@ classifier_with_fe$configure(
   feat_act_fct = "ELU",
   feat_size = 128,
   feat_bias = TRUE,
-  feat_dropout = 0.10,
+  feat_dropout = 0.00,
   feat_parametrizations = "None",
   feat_normalization_type = "PowerNorm",
   ng_conv_act_fct = "ELU",

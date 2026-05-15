@@ -3,13 +3,14 @@ pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   a01_layers_stacks: a01_layers_stacks.html
+  a02_base_model_types: a02_base_model_types.html
   aifeducation: aifeducation.html
   classification_tasks: classification_tasks.html
   gui_aife_studio: gui_aife_studio.html
   model_configuration: model_configuration.html
   sharing_and_publishing: sharing_and_publishing.html
   transformers: transformers.html
-last_built: 2026-04-25T08:50Z
+last_built: 2026-05-14T18:17Z
 urls:
   reference: https://fberding.github.io/aifeducation/reference
   article: https://fberding.github.io/aifeducation/articles

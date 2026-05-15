@@ -11,7 +11,8 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- katex math --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script><script src="../katex-auto.js"></script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -21,11 +22,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top " aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">aifeducation</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,6 +47,7 @@
     <li><a class="dropdown-item" href="../articles/model_configuration.html">04 Model configuration</a></li>
     <li><a class="dropdown-item" href="../articles/sharing_and_publishing.html">05 Sharing and Using Trained AI/Models</a></li>
     <li><a class="dropdown-item" href="../articles/a01_layers_stacks.html">Appendix 01 Layers and Stacks</a></li>
+    <li><a class="dropdown-item" href="../articles/a02_base_model_types.html">Appendix 02 supported Base Models</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -126,13 +128,13 @@ all layers and stack layers. Allowed values:</p>
 <code>'LayerNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1607.06450" class="external-link">Ba, Kiros, and Hinton
 (2016)</a>. Implementation supports masking of sequences.</li>
 <li>
-<code>'BatchNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1502.03167" class="external-link">Loffe and Szegedy</a>.
-Implementation supports masking of sequences.</li>
+<code>'BatchNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1502.03167" class="external-link">Loffe and Szegedy
+(2015)</a>. Implementation supports masking of sequences.</li>
 <li>
-<code>'RMSNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1910.07467" class="external-link">Zhang and Sennrich</a>.
-Implementation supports masking of sequences.</li>
+<code>'RMSNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1910.07467" class="external-link">Zhang and Sennrich
+(2019)</a>. Implementation supports masking of sequences.</li>
 <li>
-<code>'PowerNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.2003.07845" class="external-link">Shen et al.</a>.
+<code>'PowerNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.2003.07845" class="external-link">Shen et al. (2020)</a>.
 Implementation supports masking of sequences.</li>
 <li>
 <code>'None'</code>: Applies no normalization.</li>
@@ -183,7 +185,7 @@ attention mechanism within the transformer encoder layers.</p></li>
 projection within the transformer encoder layers.</p></li>
 <li><p><em>tf_num_heads</em>: determining the number of attention heads
 for a self-attention layer. Only relevant if
-<code>attention_type='multihead'</code></p></li>
+<code>attention_type='MultiHead'</code></p></li>
 <li><p><em>tf_dense_dim</em>: determining the size of the projection
 layer within a each transformer encoder.</p></li>
 <li>
@@ -246,13 +248,13 @@ to all layers and stack layers. Allowed values:</p>
 <code>'LayerNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1607.06450" class="external-link">Ba, Kiros, and Hinton
 (2016)</a>. Implementation supports masking of sequences.</li>
 <li>
-<code>'BatchNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1502.03167" class="external-link">Loffe and Szegedy</a>.
-Implementation supports masking of sequences.</li>
+<code>'BatchNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1502.03167" class="external-link">Loffe and Szegedy
+(2015)</a>. Implementation supports masking of sequences.</li>
 <li>
-<code>'RMSNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1910.07467" class="external-link">Zhang and Sennrich</a>.
-Implementation supports masking of sequences.</li>
+<code>'RMSNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1910.07467" class="external-link">Zhang and Sennrich
+(2019)</a>. Implementation supports masking of sequences.</li>
 <li>
-<code>'PowerNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.2003.07845" class="external-link">Shen et al.</a>.
+<code>'PowerNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.2003.07845" class="external-link">Shen et al. (2020)</a>.
 Implementation supports masking of sequences.</li>
 <li>
 <code>'None'</code>: Applies no normalization.</li>
@@ -328,13 +330,13 @@ to all layers and stack layers. Allowed values:</p>
 <code>'LayerNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1607.06450" class="external-link">Ba, Kiros, and Hinton
 (2016)</a>. Implementation supports masking of sequences.</li>
 <li>
-<code>'BatchNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1502.03167" class="external-link">Loffe and Szegedy</a>.
-Implementation supports masking of sequences.</li>
+<code>'BatchNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1502.03167" class="external-link">Loffe and Szegedy
+(2015)</a>. Implementation supports masking of sequences.</li>
 <li>
-<code>'RMSNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1910.07467" class="external-link">Zhang and Sennrich</a>.
-Implementation supports masking of sequences.</li>
+<code>'RMSNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1910.07467" class="external-link">Zhang and Sennrich
+(2019)</a>. Implementation supports masking of sequences.</li>
 <li>
-<code>'PowerNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.2003.07845" class="external-link">Shen et al.</a>.
+<code>'PowerNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.2003.07845" class="external-link">Shen et al. (2020)</a>.
 Implementation supports masking of sequences.</li>
 <li>
 <code>'None'</code>: Applies no normalization.</li>
@@ -428,13 +430,13 @@ applied to all layers and stack layers. Allowed values:</p>
 <code>'LayerNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1607.06450" class="external-link">Ba, Kiros, and Hinton
 (2016)</a>. Implementation supports masking of sequences.</li>
 <li>
-<code>'BatchNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1502.03167" class="external-link">Loffe and Szegedy</a>.
-Implementation supports masking of sequences.</li>
+<code>'BatchNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1502.03167" class="external-link">Loffe and Szegedy
+(2015)</a>. Implementation supports masking of sequences.</li>
 <li>
-<code>'RMSNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1910.07467" class="external-link">Zhang and Sennrich</a>.
-Implementation supports masking of sequences.</li>
+<code>'RMSNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1910.07467" class="external-link">Zhang and Sennrich
+(2019)</a>. Implementation supports masking of sequences.</li>
 <li>
-<code>'PowerNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.2003.07845" class="external-link">Shen et al.</a>.
+<code>'PowerNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.2003.07845" class="external-link">Shen et al. (2020)</a>.
 Implementation supports masking of sequences.</li>
 <li>
 <code>'None'</code>: Applies no normalization.</li>
@@ -515,13 +517,13 @@ all layers and stack layers. Allowed values:</p>
 <code>'LayerNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1607.06450" class="external-link">Ba, Kiros, and Hinton
 (2016)</a>. Implementation supports masking of sequences.</li>
 <li>
-<code>'BatchNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1502.03167" class="external-link">Loffe and Szegedy</a>.
-Implementation supports masking of sequences.</li>
+<code>'BatchNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1502.03167" class="external-link">Loffe and Szegedy
+(2015)</a>. Implementation supports masking of sequences.</li>
 <li>
-<code>'RMSNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1910.07467" class="external-link">Zhang and Sennrich</a>.
-Implementation supports masking of sequences.</li>
+<code>'RMSNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1910.07467" class="external-link">Zhang and Sennrich
+(2019)</a>. Implementation supports masking of sequences.</li>
 <li>
-<code>'PowerNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.2003.07845" class="external-link">Shen et al.</a>.
+<code>'PowerNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.2003.07845" class="external-link">Shen et al. (2020)</a>.
 Implementation supports masking of sequences.</li>
 <li>
 <code>'None'</code>: Applies no normalization.</li>
@@ -576,23 +578,24 @@ layer.</p></li>
 </div>
 <p><strong>Description</strong></p>
 <p>Layer transforms sequences into a lower dimensional space that can be
-passed to dense layers. It performs two types of pooling. First, it
+passed to dense layers. It can perform two types of pooling. First, it
 extractes features across the time dimension selecting the maximal
 and/or minimal features. Second, it performs pooling over the remaining
 features selecting a specific number of the heighest and/or lowest
-features.</p>
+features. Pooling over times is mandatory. Pooling over features is
+optional and can lead to a lose of information.</p>
 <p>In the case of selecting the minmal <em>and</em> maximal features at
 the same time the minmal features are concatenated to the tensor of the
-maximal features resulting in the shape
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>B</mi><mi>a</mi><mi>t</mi><mi>c</mi><mi>h</mi><mo>,</mo><mi>T</mi><mi>i</mi><mi>m</mi><mi>e</mi><mi>s</mi><mo>,</mo><mn>2</mn><mo>*</mo><mi>F</mi><mi>e</mi><mi>a</mi><mi>t</mi><mi>u</mi><mi>r</mi><mi>e</mi><mi>s</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(Batch, Times, 2*Features)</annotation></semantics></math>
-at the end of the first step. In the second step the number of requested
-features is halved. The first half is used for the maximal features and
-the second for the minimal features. All parameters with the prefix
+maximal features resulting in the shape <span class="math inline">(Batch, Times, 2*Features)</span> at the end of the
+first step. In the second step the number of requested features is
+halved. The first half is used for the maximal features and the second
+for the minimal features. All parameters with the prefix
 <em>cls_pooling_</em> can be used to configure this layer.</p>
 <p><strong>Parameters</strong></p>
 <ul>
 <li><p><em>cls_pooling_features</em>: Number of features to be extracted
-at the end of the model.</p></li>
+at the end of the model. Only relevant if pooling type ist ‘Max’, ‘Min’
+or ‘MinMax’.</p></li>
 <li><p><em>cls_pooling_type</em>: Type of extracting intermediate
 features.</p></li>
 </ul>
@@ -611,11 +614,11 @@ over time is applied extracting the minimal and/or maximal features.
 Second, the pooled tensors are combined by calculating their weighted
 sum. Different attention mechanism can be used to dynamically calculate
 the corresponding weights. This allows the model to decide which part of
-the data is most usefull. Finally, pooling over features is applied
-extracting a specific number of maximal and/or minimal features. A
-normalization of all input at the begining of the layer is possible. All
-parameters with the prefix <em>merge_</em> can be used to configure this
-layer.</p>
+the data is most usefull. Finally, pooling over features can be applied
+extracting a specific number of maximal and/or minimal features. Pooling
+over times is mandatory. Pooling over features is optional and can lead
+to a lose of information.</p>
+<pre><code>A normalization of all input at the begining of the layer is possible. All parameters with the prefix *merge_* can be used to configure this layer.</code></pre>
 <p><strong>Parameters</strong></p>
 <ul>
 <li>
@@ -626,20 +629,21 @@ to all layers and stack layers. Allowed values:</p>
 <code>'LayerNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1607.06450" class="external-link">Ba, Kiros, and Hinton
 (2016)</a>. Implementation supports masking of sequences.</li>
 <li>
-<code>'BatchNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1502.03167" class="external-link">Loffe and Szegedy</a>.
-Implementation supports masking of sequences.</li>
+<code>'BatchNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1502.03167" class="external-link">Loffe and Szegedy
+(2015)</a>. Implementation supports masking of sequences.</li>
 <li>
-<code>'RMSNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1910.07467" class="external-link">Zhang and Sennrich</a>.
-Implementation supports masking of sequences.</li>
+<code>'RMSNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.1910.07467" class="external-link">Zhang and Sennrich
+(2019)</a>. Implementation supports masking of sequences.</li>
 <li>
-<code>'PowerNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.2003.07845" class="external-link">Shen et al.</a>.
+<code>'PowerNorm'</code>: Applies normalization as described by <a href="https://doi.org/10.48550/arXiv.2003.07845" class="external-link">Shen et al. (2020)</a>.
 Implementation supports masking of sequences.</li>
 <li>
 <code>'None'</code>: Applies no normalization.</li>
 </ul>
 </li>
 <li><p><em>merge_pooling_features</em>: Number of features to be
-extracted at the end of the model.</p></li>
+extracted at the end of the model. Only relevant if pooling type ist
+‘Max’, ‘Min’ or ‘MinMax’.</p></li>
 <li><p><em>merge_pooling_type</em>: Type of extracting intermediate
 features.</p></li>
 <li>
@@ -658,7 +662,7 @@ al. (2021)</a>.</li>
 </li>
 <li><p><em>merge_num_heads</em>: determining the number of attention
 heads for a self-attention layer. Only relevant if
-<code>attention_type='multihead'</code></p></li>
+<code>attention_type='MultiHead'</code></p></li>
 </ul>
 </div>
 </div>
