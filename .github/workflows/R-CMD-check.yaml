@@ -91,7 +91,6 @@ jobs:
           reticulate::conda_install(
             packages = c("pip"),
             envname = envname,
-            #channel = c("pytorch", "nvidia"),
             conda = "auto",
             pip = FALSE
           )
