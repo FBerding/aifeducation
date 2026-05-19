@@ -16,6 +16,7 @@ editor_options:
   the Protocol Buffer Compiler. These are required for some of the open source models.
 - Add function 'install_protocol_buffer_compiler' for installing the 
   Protocol Buffer Compiler.
+- Add a faster version for calculating CosineDistance.
 
 **BaseModels**
 
@@ -58,6 +59,7 @@ editor_options:
 - Tab for creating a TextEmbeddingModel now supports the calculation of 
   quantiles for ensuring that a specific percentage of documents is 
   fully covered by a model.
+- Fix error in tab for creating BaseModels.
 
 # aifeducation 1.1.5
 
