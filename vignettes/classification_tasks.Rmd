@@ -2445,7 +2445,7 @@ text embeddings from section 4.
 feature_extractor <- TEFeatureExtractor$new()
 feature_extractor$configure(
   name = "feature_extractor_bert_movie_reviews",
-  label = "Feature extractor for Text Embeddings via BERT",
+  label = "Feature extractor for Text Embeddings",
   text_embeddings = review_embeddings,
   features = 384,
   method = "Dense",
