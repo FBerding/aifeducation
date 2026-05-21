@@ -21,7 +21,7 @@ running_num_figures <- 1
 # Clean examples folder
 example_folders <- setdiff(
   x = list.dirs(path = "examples"),
-  y = c("examples", "examples/bert_uncased","examples/xml_roberta_fb")
+  y = c("examples", "examples/bert_uncased","examples/xml_roberta_fb","examples/EuroBERT-210m")
 )
 unlink(x = example_folders, recursive = TRUE)
 script_time_start <- Sys.time()
@@ -1055,27 +1055,33 @@ First you have to choose the base model that forms the foundation of
 your new text embedding model. 
 In order to illustrate its use we 
 apply a pre-trained model from [Hugging Face](https://huggingface.co/) called 
-[xlm-roberta-base](https://huggingface.co/FacebookAI/xlm-roberta-base) published by
-FacebookAI. It is based on the work by Conneau et al. (2019). 
-Download all files into a new folder. Here we store the model in  `"examples/xml_roberta_fb"`.
+[EuroBERT-210m](https://huggingface.co/EuroBERT/EuroBERT-210m).
+It is based on the work by Boizard et al. (2025). 
+Download all files into a new folder. Here we store the model in  `"examples/EuroBERT-210m"`.
 
 We first load the base model as described in section 3.
 
 ```{r, include = TRUE, eval = TRUE}
-base_model_roberta_xml <- BaseModelRobertaXML$new()
-base_model_roberta_xml$create_from_hf(
-  model_dir = "examples/xml_roberta_fb",
-  tokenizer_dir = "examples/xml_roberta_fb"
+base_model_eurobert <- BaseModelEuroBert$new()
+base_model_eurobert$create_from_hf(
+  model_dir = "examples/EuroBERT-210m",
+  tokenizer_dir = "examples/EuroBERT-210m"
 )
 ```
 
-Now we can create the TextEmbeddingModel. At the beginng we have to chose
-a value for `chunks` and for `overlap.` 
-
+Now we can create the TextEmbeddingModel. At the beginning we have to chose
+a value for `chunks` and for `overlap`.
 Using a transformer model for text embedding is not a problem since your text
 does not provide more tokens than the transformer can process. This
 maximum value is set in the configuration of the transformer (see
-section 3.3). If the text produces more tokens, the last tokens are
+section 3.3). We can request a base model's maximum sequence length with:
+
+```{r, include = TRUE, eval = TRUE}
+total_max_seq_len=base_model_eurobert$get_max_seq_len()
+total_max_seq_len
+```
+
+If the text produces more tokens, the last tokens are
 ignored. In some instances you might want to analyze long texts. In
 these situations, reducing the text to the first tokens (e.g. only the
 first 512 tokens) could result in a problematic loss of information. To
@@ -1093,12 +1099,14 @@ In order to support you in this decision the tokenizer of a BaseModel can
 calculate how many chunks are necessary to cover a specific quantile of texts completely.
 We illustrate this with an example. Lets assume that we want an overlap of 128
 (`token_overlap`) tokens between each chunk. 
-Our BaseModel can process 512 tokens at maximum (`seq_len_tokens`). Passing 
+Our BaseModel can process `r total_max_seq_len` tokens at maximum. 
+In this example we use only 512 tokens as the foundation of every text embedding.
+Passing 
 these values to the `calc_quantiles` method of the tokenizer of our BaseModel reveals the
 following quantiles:
 
 ```{r, include = TRUE, eval = TRUE}
-chunk_quantile = base_model_roberta_xml$Tokenizer$calc_quantiles(
+chunk_quantile = base_model_eurobert$Tokenizer$calc_quantiles(
   text_dataset = data_set_reviews_text, 
   batch_size = 32L, 
   seq_len_tokens = 512L,
@@ -1109,19 +1117,40 @@ print(chunk_quantile)
 ```
 
 If we would like to ensure that about 90% of the texts are completely covered
-by our text embedding model we need `r chunk_quantile["90%"]` chunks. To ensure
+by our text embedding model with the given configuration we need
+`r chunk_quantile["90%"]` chunks. To ensure
 that 99.9% of the text are fully represented we need `r chunk_quantile["99.9%"]` 
 chunks. Here, we choose the 99.9% quantile which requires `r chunk_quantile["99.9%"]`.
 Altogether, this model can analyse a maximum
-of $512+(4-1)*(512-128)=1664$ tokens of a text.
+of `r 512+(chunk_quantile["99.9%"]-1)*(512-128)` tokens of a text.
 
 Finally, you have to decide from which hidden layer(s) the embeddings
 should be drawn. With `emb_layer_min` and `emb_layer_max` you can decide
 from which layers the average value for every token should be
 calculated. Please note that the calculation considers all layers
-between `emb_layer_min` and `emb_layer_max`. In their initial work,
+between `emb_layer_min` and `emb_layer_max`. The maximum number 
+of available layers can be requested with:
+
+```{r, include = TRUE, eval = TRUE}
+num_layers=base_model_eurobert$get_n_layers()
+num_layers
+```
+
+In their initial work,
 Devlin et al. (2019) used the hidden states of different layers for
-classification.
+classification. A study conducted by Liu et al. (2019, p. 1078)
+investigates the performance of models on 16 linguistic tasks, revealing
+that for transformers, there is no single best layer, but the best
+layers are located in an area in the middle and up to the two-thirds
+layer. Thus, we use the following layers:
+
+```{r, include = TRUE, eval = TRUE}
+eurobert_min_layer=floor(0.5*num_layers)
+eurobert_min_layer
+
+eurobert_max_layer=ceiling(2/3*num_layers)
+eurobert_max_layer
+```
 
 With `emb_pool_type,` you decide which tokens are used for pooling
 within every layer. In the case of `emb_pool_type="CLS",` only the cls
@@ -1136,15 +1165,15 @@ Do not forget to pass the base model to the parameter `base_model`.
 ```{r, include = TRUE, eval = TRUE}
 tem <- TextEmbeddingModel$new()
 tem$configure(
-  model_label = "Text Embedding via RobertaXML",
+  model_label = "Text Embedding via EuroBert - 210m",
   model_language = "english",
   max_length = 512,
   chunks = chunk_quantile["99.9%"],
   overlap = 128,
-  emb_layer_min = 6,
-  emb_layer_max = 8,
+  emb_layer_min = eurobert_min_layer,
+  emb_layer_max = eurobert_max_layer,
   emb_pool_type = "Average",
-  base_model = base_model_roberta_xml,
+  base_model = base_model_eurobert,
   emb_insert_mask_tokens=0.15
 )
 ```
@@ -2961,6 +2990,13 @@ Intelligence in Educational Settings.: Introducing a New Reliability
 Concept Based on Content Analysis. Frontiers in Education, 1--21.
 <https://doi.org/10.3389/feduc.2022.818365>
 
+Boizard, N., Gisserot-Boukhlef, H., Alves, D. M., Martins, A.,
+Hammal, A., Corro, C., Hudelot, C., Malherbe, E., Malaboeuf, E.,
+Jourdan, F., Hautreux, G., Alves, J., El-Haddad, K., Faysse, M.,
+Peyrard, M., Guerreiro, N. M., Fernandes, P.,
+Rei, R. & Colombo, P. (2025). EuroBERT: Scaling Multilingual Encoders for
+European Languages. <https://doi.org/10.48550/arXiv.2503.05500>
+
 Campesato, O. (2021). Natural Language Processing Fundamentals for
 Developers. Mercury Learning & Information.
 <https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=6647713>
@@ -3057,6 +3093,13 @@ Mixing Tokens with Fourier Transforms.
 Li, X., Chang, D., Ma, Z., Tan, Z.‑H., Xue, J.‑H., Cao, J., Yu, J. & Guo, J. (2020). 
 OSLNet: Deep Small-Sample Classification With an Orthogonal Softmax Layer. 
 IEEE Transactions on Image Processing, 29, 6482–6495. <https://doi.org/10.1109/TIP.2020.2990277>
+
+Liu, N. F., Gardner, M., Belinkov, Y., Peters, M. E., & Smith, N. A.
+(2019). Linguistic Knowledge and Transferability of Contextual
+Representations. In J. Burstein, C. Doran, & T. Solorio (Eds.),
+Proceedings of the 2019 Conference of the North (pp. 1073–1094).
+Association for Computational Linguistics.
+<https://doi.org/10.18653/v1/N19-1112>
 
 Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., Levy, O.,
 Lewis, M., Zettlemoyer, L., & Stoyanov, V. (2019). RoBERTa: A Robustly
