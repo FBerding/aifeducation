@@ -93,6 +93,14 @@ for (object_class_name in object_class_names) {
     )
   })
 
+  test_that(paste(
+    "get_max_seq_len",
+    object_class_name,
+    get_current_args_for_print(train_args)
+  ), {
+    expect_gte(base_model$get_max_seq_len(),1L)
+  })
+
 
   test_that(paste(
     "Save Model",

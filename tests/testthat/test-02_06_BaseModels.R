@@ -140,7 +140,16 @@ for (object_class_name in object_class_names) {
       get_current_args_for_print(config_args),
       get_current_args_for_print(train_args)
     ), {
-      expect_true(base_model$is_trained())
+      expect_gt(base_model$is_trained(),0L)
+    })
+
+    test_that(paste(
+      "get_max_seq_len",
+      object_class_name,
+      get_current_args_for_print(config_args),
+      get_current_args_for_print(train_args)
+    ), {
+      expect_gte(base_model$get_max_seq_len(),1L)
     })
 
     # Prepare directory
@@ -365,8 +374,11 @@ for (object_class_name in object_class_names) {
 
     #---------------------------------------------------------------------------
     # Re-Load Base Model and compare with the initial model
-    base_model_reloaded <- load_from_disk(
-      dir_path = tmp_dir
+
+      base_model_reloaded <-  suppressMessages(
+        load_from_disk(
+        dir_path = tmp_dir
+      )
     )
 
     test_that(paste(
