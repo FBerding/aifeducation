@@ -104,7 +104,7 @@ as the maximal postional embeddings for the model. Allowed values: \ifelse{latex
       \item{\code{overlap}}{\code{int} Number of tokens from the previous chunk that should be added at the beginng of the next chunk. Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
       \item{\code{emb_layer_min}}{\code{int} Minimal layer from which the embeddings should be calculated. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
       \item{\code{emb_layer_max}}{\code{int} Maximal layer from which the embeddings should be calculated. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{emb_insert_mask_tokens}}{\code{double} Percentage of mask tokens that should replace token in the sequence. Allowed values: \ifelse{latex}{$0 <= x <= 0.5$}{\ifelse{html}{\eqn{0 <= x <= 0.5}}{`0 <= x <= 0.5`}}}
+      \item{\code{emb_insert_mask_tokens}}{\code{double} Percentage of mask tokens that should replace tokens in the sequence. Replaces every 1/emb_insert_mask_tokens token. Allowed values: \ifelse{latex}{$0 <= x <= 0.5$}{\ifelse{html}{\eqn{0 <= x <= 0.5}}{`0 <= x <= 0.5`}}}
       \item{\code{emb_pool_type}}{\code{string} Method to summarize the embedding of single tokens into a text embedding.
 In the case of \code{'CLS'} all cls-tokens between \code{emb_layer_min} and \code{emb_layer_max} are averaged.
 In the case of \code{'Average'} the embeddings of all tokens are averaged.
