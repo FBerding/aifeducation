@@ -34,7 +34,7 @@ calflops <- NULL
 # Message on load of the package
 packageStartupMessage(
   "This is version 1.1.6 of aifeducation. Start a new session with prepare_session().",
-  "\n\nPlease note that some of the new BaseModels require 'sentencepiece', 'protobuf' and Protocol Buffer Compiler.",
+  "\n\nPlease note that some of the new BaseModels require 'sentencepiece', 'protobuf', and Protocol Buffer Compiler.",
   "\nSee the vignette '01 Get started' and 'A02 Supported Base Models' for more details.",
   appendLF = TRUE
 )
