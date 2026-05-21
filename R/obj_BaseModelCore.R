@@ -909,6 +909,14 @@ BaseModelCore <- R6::R6Class(
       return(private$model$config$num_hidden_layers)
     },
     #--------------------------------------------------------------------------
+    #' @description Maximum sequence length.
+    #' @return Returns an `int` describing the maximum sequence length.
+    get_max_seq_len=function(){
+      return(
+        self$get_model_config()$max_position_embeddings
+      )
+    },
+    #--------------------------------------------------------------------------
     #' @description Flop estimates
     #' @return Returns a `data.frame` containing statistics about the flops.
     get_flops_estimates = function() {
@@ -1117,7 +1125,7 @@ BaseModelCore <- R6::R6Class(
         padded_rows[2L],self$is_configured(),"\n",
         padded_rows[3L],self$is_trained(),"\n",
         padded_rows[4L],self$count_parameter(),"\n",
-        padded_rows[5L],self$get_model_config()$max_position_embeddings,"\n",
+        padded_rows[5L],self$get_max_seq_len(),"\n",
         padded_rows[6L],self$get_final_size(),"\n",
         padded_rows[7L],self$get_n_layers(),"\n",
         padded_rows[8L],self$Tokenizer$get_vocab_size(),"\n",
