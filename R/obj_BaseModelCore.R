@@ -517,6 +517,9 @@ BaseModelCore <- R6::R6Class(
         tokenizer_dir <- model_dir
       }
 
+      #Set transformers logger
+      set_transformers_logger("ERROR")
+
       # Load the BaseModel
       tmp_model <- private$load_BaseModel(model_dir)
       # Check if the model is the correct model type
@@ -550,6 +553,9 @@ BaseModelCore <- R6::R6Class(
 
       #Set trained to TRUE
       private$trained=TRUE
+
+      #Set transformers logger
+      set_transformers_logger("INFO")
     },
     #--------------------------------------------------------------------------
     #' @description Traines a BaseModel
