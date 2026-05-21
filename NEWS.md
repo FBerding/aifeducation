@@ -25,6 +25,8 @@ editor_options:
 - Add support for DistilBert..
 - Add support for XML-Roberta.
 - Add support for Xmod.
+- Add method get_max_seq_len to BaseModels allowing to request the maximum number
+  of tokens a model supports.
 
 **Tokenizer**
 

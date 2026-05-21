@@ -49,6 +49,7 @@ Objects of class \code{TokenizerBase}.}
     \item \href{#method-BaseModelCore-get_model_type}{\code{BaseModelCore$get_model_type()}}
     \item \href{#method-BaseModelCore-get_final_size}{\code{BaseModelCore$get_final_size()}}
     \item \href{#method-BaseModelCore-get_n_layers}{\code{BaseModelCore$get_n_layers()}}
+    \item \href{#method-BaseModelCore-get_max_seq_len}{\code{BaseModelCore$get_max_seq_len()}}
     \item \href{#method-BaseModelCore-get_flops_estimates}{\code{BaseModelCore$get_flops_estimates()}}
     \item \href{#method-BaseModelCore-set_publication_info}{\code{BaseModelCore$set_publication_info()}}
     \item \href{#method-BaseModelCore-estimate_sustainability_inference_fill_mask}{\code{BaseModelCore$estimate_sustainability_inference_fill_mask()}}
@@ -382,6 +383,21 @@ hidden layer.
   \subsection{Returns}{
     Returns an \code{int} describing the number of layers available for
 embedding.
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-BaseModelCore-get_max_seq_len"></a>}}
+\if{latex}{\out{\hypertarget{method-BaseModelCore-get_max_seq_len}{}}}
+\subsection{\code{BaseModelCore$get_max_seq_len()}}{
+  Maximum sequence length.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BaseModelCore$get_max_seq_len()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Returns an \code{int} describing the maximum sequence length.
   }
 }
 
