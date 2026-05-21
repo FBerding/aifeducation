@@ -1157,6 +1157,12 @@ within every layer. In the case of `emb_pool_type="CLS",` only the cls
 token is used. In the case of `emb_pool_type="Average"` all tokens
 within a layer are averaged except padding tokens.
 
+With `emb_insert_mask_tokens` you can request that a specific percentage of tokens
+is replaced with the model's masking token. This can increase the performance
+on subsequent tasks. The reason is that the mask language modeling applied during
+training does not match the conditions during application since working
+with texts outside training does not require to mask tokens (Meng et al. 2024, p. 1). 
+
 > The vignette [04 Model configuration and training](model_configuration.html)
 > provides details on how to configure a text embedding model.
 
@@ -3115,6 +3121,10 @@ Technologies (pp. 142–150). Association for Computational Linguistics.
 
 Masters, D. & Luschi, C. (2018). Revisiting Small Batch Training for Deep Neural Networks.
 <https://doi.org/10.48550/arXiv.1804.07612>
+
+Meng, Y., Krishnan, J., Wang, S., Wang, Q., Mao, Y., Fang, H., Ghazvininejad, M., 
+Han, J., & Zettlemoyer, L. (2023). Representation Deficiency in Masked Language Modeling. arXiv. 
+<https://doi.org/10.48550/ARXIV.2302.02060>
 
 Oreshkin, B. N., Rodriguez, P., & Lacoste, A. (2018). TADAM: Task
 dependent adaptive metric for improved few-shot learning. Advance online
