@@ -155,7 +155,7 @@ get_param_dict <- function() {
     max = 0.5,
     allow_null = FALSE,
     allowed_values = NULL,
-    desc = "Percentage of mask tokens that should replace token in the sequence.",
+    desc = "Percentage of mask tokens that should replace tokens in the sequence. Replaces every 1/emb_insert_mask_tokens token.",
     gui_box = NULL,
     gui_label = NULL,
     default_value = 0.15,
