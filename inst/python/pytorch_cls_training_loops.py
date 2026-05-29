@@ -148,7 +148,7 @@ def run_epoch_cls(model,dataloader,loss_fct,optimizer,scaler,scheduler,amp,epoch
         optimizer.zero_grad()
       with torch.autocast(device_type=device, dtype=None, enabled=amp):  
         outputs=model(inputs,prediction_mode=False)
-        loss=loss_fct(outputs,labels)*sample_weights
+        loss=loss_fct(outputs,labels)*sample_weights.detach()
         loss=loss.mean()
       if cblock=="train":
         scaler.scale(loss).backward()
@@ -436,6 +436,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     #Check if there are furhter information for training-----------------------
     # If there are no addtiononal information. Stop training and continue
     if train_results["loss"]<1e-3 and train_results["accuracy"]==1 and train_results["balanced_accuracy"]==1 and train_results["avg_iota"]==1:
+      if trace:
+        print("\n")
       break
   #Finalize--------------------------------------------------------------------
   if use_callback==True:
@@ -620,6 +622,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     #Check if there are furhter information for training-----------------------
     # If there are no addtiononal information. Stop training and continue
     if train_results["loss"]<1e-3 and train_results["accuracy"]==1 and train_results["balanced_accuracy"]==1 and train_results["avg_iota"]==1:
+      if trace:
+        print("\n")
       break
   #Finalize--------------------------------------------------------------------
   if use_callback==True:
