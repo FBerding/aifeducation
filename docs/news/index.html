@@ -26,7 +26,7 @@
     <li><a class="dropdown-item" href="../articles/model_configuration.html">04 Model configuration</a></li>
     <li><a class="dropdown-item" href="../articles/sharing_and_publishing.html">05 Sharing and Using Trained AI/Models</a></li>
     <li><a class="dropdown-item" href="../articles/a01_layers_stacks.html">Appendix 01 Layers and Stacks</a></li>
-    <li><a class="dropdown-item" href="../articles/a02_base_model_types.html">Appendix 02 supported Base Models</a></li>
+    <li><a class="dropdown-item" href="../articles/a02_base_model_types.html">Appendix 02 Supported Base Models</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -52,12 +52,14 @@
 <li>Change dependencies. The package requires now ‘iotarelr&gt;=0.1.9’.</li>
 <li>Add <strong>optional</strong> dependencies to two new python packages (‘protbuf’ and ‘sentencepiece’) and the Protocol Buffer Compiler. These are required for some of the open source models.</li>
 <li>Add function ‘install_protocol_buffer_compiler’ for installing the Protocol Buffer Compiler.</li>
+<li>Add a faster version for calculating CosineDistance.</li>
 </ul><p><strong>BaseModels</strong></p>
 <ul><li>Add support for ALBERT.</li>
 <li>Add support for EuroBert.</li>
 <li>Add support for DistilBert..</li>
 <li>Add support for XML-Roberta.</li>
 <li>Add support for Xmod.</li>
+<li>Add method get_max_seq_len to BaseModels allowing to request the maximum number of tokens a model supports.</li>
 </ul><p><strong>Tokenizer</strong></p>
 <ul><li>Add Method to calculate the necessary number of parts/chunks to cover a given quantile of texts completely.</li>
 </ul><p><strong>Classifiers</strong></p>
@@ -73,6 +75,7 @@
 <ul><li>Embeddings can now inject a specific amount of mask tokens to match training and application contexts better.</li>
 </ul><p><strong>AI for Education - Studio</strong></p>
 <ul><li>Tab for creating a TextEmbeddingModel now supports the calculation of quantiles for ensuring that a specific percentage of documents is fully covered by a model.</li>
+<li>Fix error in tab for creating BaseModels.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.1.5" id="aifeducation-115">aifeducation 1.1.5<a class="anchor" aria-label="anchor" href="#aifeducation-115"></a></h2><p class="text-muted">CRAN release: 2026-04-25</p>

@@ -26,7 +26,7 @@
     <li><a class="dropdown-item" href="../articles/model_configuration.html">04 Model configuration</a></li>
     <li><a class="dropdown-item" href="../articles/sharing_and_publishing.html">05 Sharing and Using Trained AI/Models</a></li>
     <li><a class="dropdown-item" href="../articles/a01_layers_stacks.html">Appendix 01 Layers and Stacks</a></li>
-    <li><a class="dropdown-item" href="../articles/a02_base_model_types.html">Appendix 02 supported Base Models</a></li>
+    <li><a class="dropdown-item" href="../articles/a02_base_model_types.html">Appendix 02 Supported Base Models</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -98,6 +98,7 @@ Objects of class <code>TokenizerBase</code>.</p></dd>
 <li><p><a href="#method-BaseModelCore-get_model_type"><code>BaseModelCore$get_model_type()</code></a></p></li>
 <li><p><a href="#method-BaseModelCore-get_final_size"><code>BaseModelCore$get_final_size()</code></a></p></li>
 <li><p><a href="#method-BaseModelCore-get_n_layers"><code>BaseModelCore$get_n_layers()</code></a></p></li>
+<li><p><a href="#method-BaseModelCore-get_max_seq_len"><code>BaseModelCore$get_max_seq_len()</code></a></p></li>
 <li><p><a href="#method-BaseModelCore-get_flops_estimates"><code>BaseModelCore$get_flops_estimates()</code></a></p></li>
 <li><p><a href="#method-BaseModelCore-set_publication_info"><code>BaseModelCore$set_publication_info()</code></a></p></li>
 <li><p><a href="#method-BaseModelCore-estimate_sustainability_inference_fill_mask"><code>BaseModelCore$estimate_sustainability_inference_fill_mask()</code></a></p></li>
@@ -439,13 +440,25 @@ embedding.</p>
 
 </div>
 
+<p></p><hr><a id="method-BaseModelCore-get_max_seq_len"></a><div class="section">
+<h3 id="basemodelcore-get-max-seq-len-"><code>BaseModelCore$get_max_seq_len()</code><a class="anchor" aria-label="anchor" href="#basemodelcore-get-max-seq-len-"></a></h3>
+<p>Maximum sequence length.</p><div class="section">
+<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BaseModelCore</span><span class="op">$</span><span class="fu">get_max_seq_len</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
+<h4 id="returns-13">Returns<a class="anchor" aria-label="anchor" href="#returns-13"></a></h4>
+<p>Returns an <code>int</code> describing the maximum sequence length.</p>
+</div>
+
+</div>
+
 <p></p><hr><a id="method-BaseModelCore-get_flops_estimates"></a><div class="section">
 <h3 id="basemodelcore-get-flops-estimates-"><code>BaseModelCore$get_flops_estimates()</code><a class="anchor" aria-label="anchor" href="#basemodelcore-get-flops-estimates-"></a></h3>
 <p>Flop estimates</p><div class="section">
-<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
+<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BaseModelCore</span><span class="op">$</span><span class="fu">get_flops_estimates</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
-<h4 id="returns-13">Returns<a class="anchor" aria-label="anchor" href="#returns-13"></a></h4>
+<h4 id="returns-14">Returns<a class="anchor" aria-label="anchor" href="#returns-14"></a></h4>
 <p>Returns a <code>data.frame</code> containing statistics about the flops.</p>
 </div>
 
@@ -454,7 +467,7 @@ embedding.</p>
 <p></p><hr><a id="method-BaseModelCore-set_publication_info"></a><div class="section">
 <h3 id="basemodelcore-set-publication-info-"><code>BaseModelCore$set_publication_info()</code><a class="anchor" aria-label="anchor" href="#basemodelcore-set-publication-info-"></a></h3>
 <p>Method for setting the bibliographic information of the model.</p><div class="section">
-<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
+<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BaseModelCore</span><span class="op">$</span><span class="fu">set_publication_info</span><span class="op">(</span><span class="va">type</span>, <span class="va">authors</span>, <span class="va">citation</span>, url <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
@@ -474,7 +487,7 @@ embedding.</p>
 
 </dl><p></p></div>
 </div><p></p><div class="section">
-<h4 id="returns-14">Returns<a class="anchor" aria-label="anchor" href="#returns-14"></a></h4>
+<h4 id="returns-15">Returns<a class="anchor" aria-label="anchor" href="#returns-15"></a></h4>
 <p>Function does not return a value. It is used to set the private
 members for publication information of the model.</p>
 </div>
@@ -484,7 +497,7 @@ members for publication information of the model.</p>
 <p></p><hr><a id="method-BaseModelCore-estimate_sustainability_inference_fill_mask"></a><div class="section">
 <h3 id="basemodelcore-estimate-sustainability-inference-fill-mask-"><code>BaseModelCore$estimate_sustainability_inference_fill_mask()</code><a class="anchor" aria-label="anchor" href="#basemodelcore-estimate-sustainability-inference-fill-mask-"></a></h3>
 <p>Calculates the energy consumption for inference of the given task.</p><div class="section">
-<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
+<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BaseModelCore</span><span class="op">$</span><span class="fu">estimate_sustainability_inference_fill_mask</span><span class="op">(</span></span>
 <span>  text_dataset <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  n_samples <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -523,7 +536,7 @@ codecarbon for more information. <a href="https://docs.codecarbon.io/latest/" cl
 
 </dl><p></p></div>
 </div><p></p><div class="section">
-<h4 id="returns-15">Returns<a class="anchor" aria-label="anchor" href="#returns-15"></a></h4>
+<h4 id="returns-16">Returns<a class="anchor" aria-label="anchor" href="#returns-16"></a></h4>
 <p>Returns nothing. Method saves the statistics internally.
 The statistics can be accessed with the method <code>get_sustainability_data("inference")</code></p>
 </div>
@@ -533,7 +546,7 @@ The statistics can be accessed with the method <code>get_sustainability_data("in
 <p></p><hr><a id="method-BaseModelCore-calc_flops_architecture_based"></a><div class="section">
 <h3 id="basemodelcore-calc-flops-architecture-based-"><code>BaseModelCore$calc_flops_architecture_based()</code><a class="anchor" aria-label="anchor" href="#basemodelcore-calc-flops-architecture-based-"></a></h3>
 <p>Calculates FLOPS based on model's architecture.</p><div class="section">
-<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
+<h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BaseModelCore</span><span class="op">$</span><span class="fu">calc_flops_architecture_based</span><span class="op">(</span><span class="va">batch_size</span>, <span class="va">n_batches</span>, <span class="va">n_epoch</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
@@ -549,7 +562,7 @@ The statistics can be accessed with the method <code>get_sustainability_data("in
 
 </dl><p></p></div>
 </div><p></p><div class="section">
-<h4 id="returns-16">Returns<a class="anchor" aria-label="anchor" href="#returns-16"></a></h4>
+<h4 id="returns-17">Returns<a class="anchor" aria-label="anchor" href="#returns-17"></a></h4>
 <p>Returns a <code>data.frame</code> storing the estimates.</p>
 </div>
 
@@ -558,10 +571,10 @@ The statistics can be accessed with the method <code>get_sustainability_data("in
 <p></p><hr><a id="method-BaseModelCore-print"></a><div class="section">
 <h3 id="basemodelcore-print-"><code>BaseModelCore$print()</code><a class="anchor" aria-label="anchor" href="#basemodelcore-print-"></a></h3>
 <p>Print method for classifiers.</p><div class="section">
-<h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
+<h4 id="usage-18">Usage<a class="anchor" aria-label="anchor" href="#usage-18"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BaseModelCore</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
-<h4 id="returns-17">Returns<a class="anchor" aria-label="anchor" href="#returns-17"></a></h4>
+<h4 id="returns-18">Returns<a class="anchor" aria-label="anchor" href="#returns-18"></a></h4>
 <p>Prints a short description of the object.</p>
 </div>
 
@@ -570,7 +583,7 @@ The statistics can be accessed with the method <code>get_sustainability_data("in
 <p></p><hr><a id="method-BaseModelCore-clone"></a><div class="section">
 <h3 id="basemodelcore-clone-"><code>BaseModelCore$clone()</code><a class="anchor" aria-label="anchor" href="#basemodelcore-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-18">Usage<a class="anchor" aria-label="anchor" href="#usage-18"></a></h4>
+<h4 id="usage-19">Usage<a class="anchor" aria-label="anchor" href="#usage-19"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BaseModelCore</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments-9">Arguments<a class="anchor" aria-label="anchor" href="#arguments-9"></a></h4>
