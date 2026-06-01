@@ -209,7 +209,11 @@ def run_epoch_cls_pt(model,dataloader,loss_fct,optimizer,scaler, scheduler,amp,e
         query_classes = query_classes.to(device,dtype=current_dtype)
 
         optimizer.zero_grad()
-        with torch.autocast(device_type=device, dtype=None, enabled=amp):
+        if torch.cuda.is_available() and torch.cuda.is_bf16_supported():
+          amp_dtype=torch.bfloat16
+        else:
+          amp_dtype=None
+        with torch.autocast(device_type=device, dtype=amp_dtype, enabled=amp):
           outputs=model(
             input_q=query_inputs,
             classes_q=query_classes,
@@ -236,7 +240,11 @@ def run_epoch_cls_pt(model,dataloader,loss_fct,optimizer,scaler, scheduler,amp,e
       else:
         inputs = inputs.to(device,dtype=current_dtype)
         labels=labels.to(device,dtype=current_dtype)
-        with torch.autocast(device_type=device, dtype=None, enabled=amp):
+        if torch.cuda.is_available() and torch.cuda.is_bf16_supported():
+          amp_dtype=torch.bfloat16
+        else:
+          amp_dtype=None
+        with torch.autocast(device_type=device, dtype=amp_dtype, enabled=amp):
           outputs=model(input_q=inputs,classes_q=labels,prediction_mode=False)
           loss=loss_fct(
             classes_q=outputs[2],

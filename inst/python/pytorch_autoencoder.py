@@ -300,7 +300,11 @@ def run_epoch_autoencoder(model,dataloader,loss_fct,optimizer,scaler,scheduler,a
       labels=labels.to(device,dtype=current_dtype)
       if cblock=="train":
         optimizer.zero_grad()
-      with torch.autocast(device_type=device, dtype=None, enabled=amp):  
+      if torch.cuda.is_available() and torch.cuda.is_bf16_supported():
+        amp_dtype=torch.bfloat16
+      else:
+        amp_dtype=None  
+      with torch.autocast(device_type=device, dtype=amp_dtype, enabled=amp):  
         outputs=model(inputs,encoder_mode=False)
         loss=loss_fct(outputs,labels)
       if cblock=="train":
