@@ -1604,7 +1604,7 @@ classifier$train(
   data_embeddings = review_embeddings,
   data_targets = review_labels,
   data_folds = 5,
-  data_val_size = 0.25,
+  data_val_size = 0.40,
   loss_balance_class_weights = TRUE,
   loss_balance_sequence_length = TRUE,
   loss_cls_fct_name = "FocalLoss",
@@ -1621,19 +1621,19 @@ classifier$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
-  epochs = 2000,
-  batch_size = 32,
+  epochs = 6000,
+  batch_size = 64,
   trace = TRUE,
   ml_trace = 0,
   log_dir = NULL,
   log_write_interval = 10,
   n_cores = auto_n_cores(),
-  lr_rate = 1e-3,
-  lr_min = 1e-4,
+  lr_rate = 5e-5,
+  lr_min = 1e-5,
   lr_scheduler="Linear",
   lr_warm_up_ratio = 0.05,
   optimizer = "AdamW",
-  amp = FALSE
+  amp = TRUE
 )
 ```
 
@@ -2127,7 +2127,7 @@ classifier_prototype$train(
   lr_scheduler = "None",
   lr_warm_up_ratio = 0.05,
   optimizer = "AdamW",
-  amp = FALSE
+  amp = TRUE
 )
 ```
 
@@ -2524,7 +2524,7 @@ feature_extractor$train(
   trace = TRUE,
   ml_trace = 0,
   optimizer = "AdamW",
-  amp = FALSE,
+  amp = TRUE,
   lr_warm_up_ratio = 0.10
 )
 ```
@@ -2660,7 +2660,7 @@ classifier_with_fe$train(
   lr_scheduler = "Linear",
   lr_warm_up_ratio = 0.05,
   optimizer = "AdamW",
-  amp = FALSE
+  amp = TRUE
 )
 ```
 
