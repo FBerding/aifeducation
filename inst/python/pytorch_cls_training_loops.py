@@ -18,6 +18,7 @@ import numpy as np
 import math
 import safetensors
 
+
 #Functions that are part of the training loop
 def get_device():
   return 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -83,7 +84,21 @@ def create_metric_storage(metric_names,epochs,inc_test):
   storage["checkpoints"]=np.zeros((epochs))
   return storage
 
-def calc_cls_performance_measures(confusion_matrix,n_classes):
+prob=torch.from_numpy(np.array([[1,2,3],[2,3,4],[3,4,5],[4,5,6],[5,6,7]]))
+
+def create_p_confusion_matrix(prob,label_idx,num_classes):
+  with torch.no_grad():
+    one_hot=torch.nn.functional.one_hot(label_idx, num_classes=num_classes) # B,T
+    one_hot=torch.unsqueeze(one_hot,dim=2) # B, T, 1
+    one_hot=one_hot.expand((one_hot.size(0),one_hot.size(1),one_hot.size(1))) #B,T,A
+
+    prob_exp=torch.unsqueeze(prob,dim=1) # B,1,A
+    prob_exp=prob_exp.expand(one_hot.size()) #B,T,A
+    
+    confusion_matrix=torch.sum(one_hot*prob_exp,dim=0) # T, A
+  return confusion_matrix
+
+def calc_cls_performance_measures(confusion_matrix,prob_confusion_matrix,n_classes):
   with torch.no_grad():
     diagonal=torch.diagonal(confusion_matrix) #(n_classes)
     total_sum=torch.sum(confusion_matrix) #()
@@ -94,7 +109,15 @@ def calc_cls_performance_measures(confusion_matrix,n_classes):
     bacc=torch.sum(diagonal/true_classes)/n_classes
     avg_iota=diagonal/(col_sum+true_classes-diagonal)
     avg_iota=torch.sum(avg_iota)/n_classes
-  return {"accuracy":acc, "balanced_accuracy":bacc, "avg_iota":avg_iota}
+    
+    diagonal_p=torch.diagonal(prob_confusion_matrix) #(n_classes)
+    true_classes_p=torch.sum(prob_confusion_matrix,dim=1) #(n_classes)
+    col_sum_p=torch.sum(prob_confusion_matrix,dim=0) #(n_classes)
+    
+    avg_iota_p=diagonal_p/(col_sum_p+true_classes_p-diagonal_p)
+    avg_iota_p=torch.sum(avg_iota_p)/n_classes
+    
+  return {"accuracy":acc, "balanced_accuracy":bacc, "avg_iota":avg_iota, "s_avg_iota":avg_iota_p}
 
 def add_metrics(metrics,storage,cblock,epoch):
   if cblock=="train":
@@ -122,6 +145,7 @@ def check_and_set_checkpoints_cls(use_callback,model,filepath,epoch,metric_stora
 def run_epoch_cls(model,dataloader,loss_fct,optimizer,scaler,scheduler,amp,epoch,n_classes,device,current_dtype,cblock,metric_storage,logger):
   total_loss=0.0
   confusion_matrix=torch.zeros(size=(n_classes,n_classes),device=device,dtype=current_dtype)
+  prob_confusion_matrix=torch.zeros(size=(n_classes,n_classes),device=device,dtype=current_dtype)
 
   if cblock=="train":
     optimizer.zero_grad()
@@ -162,6 +186,7 @@ def run_epoch_cls(model,dataloader,loss_fct,optimizer,scaler,scheduler,amp,epoch
       total_loss +=loss.item()
       label_idx=labels.max(dim=1).indices
     confusion_matrix+=multiclass_confusion_matrix(input=outputs,target=label_idx,num_classes=n_classes,normalize = None)
+    prob_confusion_matrix+=create_p_confusion_matrix(torch.nn.Softmax(dim=1)(outputs),label_idx=label_idx,num_classes=n_classes)
     
     #Update log file
     logger.inc_value("bottom")
@@ -170,6 +195,7 @@ def run_epoch_cls(model,dataloader,loss_fct,optimizer,scaler,scheduler,amp,epoch
   #Calc final metrics for epoch
   results=calc_cls_performance_measures(
     confusion_matrix=confusion_matrix,
+    prob_confusion_matrix=prob_confusion_matrix,
     n_classes=n_classes
   )
   results.update({"loss":total_loss/len(dataloader)})
@@ -185,6 +211,7 @@ def run_epoch_cls(model,dataloader,loss_fct,optimizer,scaler,scheduler,amp,epoch
 def run_epoch_cls_pt(model,dataloader,loss_fct,optimizer,scaler, scheduler,amp,epoch,Ns,Nq,n_classes,device,current_dtype,cblock,metric_storage,logger):
   total_loss=0.0
   confusion_matrix=torch.zeros(size=(n_classes,n_classes),device=device,dtype=current_dtype)
+  prob_confusion_matrix=torch.zeros(size=(n_classes,n_classes),device=device,dtype=current_dtype)
 
   if cblock=="train":
     optimizer.zero_grad()
@@ -256,6 +283,8 @@ def run_epoch_cls_pt(model,dataloader,loss_fct,optimizer,scaler, scheduler,amp,e
         pred_idx=outputs[0].max(dim=1).indices.to(dtype=torch.long,device=device)
         label_idx=outputs[2].to(dtype=torch.long,device=device)
     confusion_matrix+=multiclass_confusion_matrix(input=pred_idx,target=label_idx,num_classes=n_classes,normalize = None)
+    prob_confusion_matrix+=create_p_confusion_matrix(torch.nn.Softmax(dim=1)(outputs[0]),label_idx=label_idx,num_classes=n_classes)
+    
     #Update log file
     logger.inc_value("bottom")
     logger.write_log()
@@ -277,6 +306,7 @@ def run_epoch_cls_pt(model,dataloader,loss_fct,optimizer,scaler, scheduler,amp,e
   #Calc final metrics for epoch
   results=calc_cls_performance_measures(
     confusion_matrix=confusion_matrix,
+    prob_confusion_matrix=prob_confusion_matrix,
     n_classes=n_classes
   )
   results.update({"loss":total_loss/len(dataloader)})
@@ -327,7 +357,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   amp_scaler=torch.amp.GradScaler(device ,enabled=amp)
   #Numpys for Saving Training History
   metric_storage=create_metric_storage(
-    metric_names=["loss","accuracy","balanced_accuracy","avg_iota"],
+    metric_names=["loss","accuracy","balanced_accuracy","avg_iota","s_avg_iota"],
     epochs=epochs,
     inc_test=True if not (test_data is None) else False
   )
@@ -425,7 +455,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       best_bacc=best_bacc,
       acc_val=val_results["accuracy"],
       bacc_val=val_results["balanced_accuracy"],
-      avg_iota_val=val_results["avg_iota"],
+      avg_iota_val=val_results["s_avg_iota"],
       val_loss=val_results["loss"],
       elc=elc
     )
@@ -436,7 +466,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       metric_storage=metric_storage,
       epoch=epoch,
       epochs=epochs,
-      metric_criterion="avg_iota",
+      metric_criterion="s_avg_iota",
       best_metric=best_val_avg_iota,
       best_loss=best_val_loss,
       elc=elc
@@ -467,7 +497,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   )
   #Numpys for Saving Training History
   metric_storage=create_metric_storage(
-    metric_names=["loss","accuracy","balanced_accuracy","avg_iota"],
+    metric_names=["loss","accuracy","balanced_accuracy","avg_iota","s_avg_iota"],
     epochs=epochs,
     inc_test=True if not (test_data is None) else False
   )
@@ -611,7 +641,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       best_bacc=best_bacc,
       acc_val=val_results["accuracy"],
       bacc_val=val_results["balanced_accuracy"],
-      avg_iota_val=val_results["avg_iota"],
+      avg_iota_val=val_results["s_avg_iota"],
       val_loss=val_results["loss"],
       elc=elc
     )
@@ -622,7 +652,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       metric_storage=metric_storage,
       epoch=epoch,
       epochs=epochs,
-      metric_criterion="avg_iota",
+      metric_criterion="s_avg_iota",
       best_metric=best_val_avg_iota,
       best_loss=best_val_loss,
       elc=elc
