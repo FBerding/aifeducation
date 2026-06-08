@@ -7,15 +7,14 @@
 set_transformers_logger(level = "ERROR")
 }
 \arguments{
-\item{level}{\code{string} Minimal level that should be printed to console. Four levels are available: INFO, WARNING,
-ERROR and DEBUG}
+\item{level}{\code{string} Minimal level that should be printed to console.
+Four levels are available: \code{"INFO"}, \code{"WARNING"}, \code{"ERROR"}, and \code{"DEBUG"}.}
 }
 \value{
 This function does not return anything. It is used for its side effects.
 }
 \description{
-This function changes the level for logging information of the 'transformers' library. It influences the
-output printed to console for creating and training transformer models as well as \link{TextEmbeddingModel}s.
+This function changes the level for logging information of the 'transformers' library. .
 }
 \seealso{
 Other Installation and Configuration:
@@ -26,6 +25,7 @@ Other Installation and Configuration:
 \code{\link[=install_protocol_buffer_compiler]{install_protocol_buffer_compiler()}},
 \code{\link[=install_py_modules]{install_py_modules()}},
 \code{\link[=prepare_session]{prepare_session()}},
+\code{\link[=set_codecarbon_logger]{set_codecarbon_logger()}},
 \code{\link[=update_aifeducation]{update_aifeducation()}}
 }
 \concept{Installation and Configuration}

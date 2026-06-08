@@ -7,7 +7,8 @@
 prepare_session(
   env_type = "auto",
   envname = "aifeducation",
-  check_session = TRUE
+  check_session = TRUE,
+  set_logger_level = TRUE
 )
 }
 \arguments{
@@ -23,6 +24,9 @@ the default virtual environment is used.}
 available. Set this argument to \code{FALSE} can speed up sessions' preparation.
 Set this argument to \code{FALSE} only if you are certain that the requirements for the
 package are satisfied.}
+
+\item{set_logger_level}{\code{bool} If \code{TRUE} the logger level of all python packages is set to "Error" and
+all prints to the console are disabled.}
 }
 \value{
 Function does not return anything. It is used for preparing python and R.
@@ -39,6 +43,7 @@ Other Installation and Configuration:
 \code{\link[=install_aifeducation_studio]{install_aifeducation_studio()}},
 \code{\link[=install_protocol_buffer_compiler]{install_protocol_buffer_compiler()}},
 \code{\link[=install_py_modules]{install_py_modules()}},
+\code{\link[=set_codecarbon_logger]{set_codecarbon_logger()}},
 \code{\link[=set_transformers_logger]{set_transformers_logger()}},
 \code{\link[=update_aifeducation]{update_aifeducation()}}
 }

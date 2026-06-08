@@ -122,8 +122,8 @@ is used as the final model.
   log_dir = NULL,
   log_write_interval = 10L,
   n_cores = auto_n_cores(),
-  lr_rate = 0.001,
-  lr_min = 1e-04,
+  lr_rate = 0,
+  lr_min = 0,
   lr_scheduler = "None",
   lr_warm_up_ratio = 0.02,
   optimizer = "AdamW",
@@ -141,7 +141,7 @@ named and has to use the same names as used in in the embeddings. .}
       \item{\code{data_val_size}}{\code{double} between 0 and 1, indicating the proportion of cases which should be
 used for the validation sample during the estimation of the model.
 The remaining cases are part of the training data. Allowed values: \ifelse{latex}{$0 < x < 1$}{\ifelse{html}{\eqn{0 < x < 1}}{`0 < x < 1`}}}
-      \item{\code{loss_pt_fct_name}}{\code{string} Name of the loss function to use during training. Allowed values: 'MultiWayContrastiveLoss', 'MultiWayContrastiveLossFC'}
+      \item{\code{loss_pt_fct_name}}{\code{string} Name of the loss function to use during training. Allowed values: 'MultiWayContrastiveLoss', 'MultiWayContrastiveLossFC', 'FocalLoss'}
       \item{\code{use_sc}}{\code{bool} \code{TRUE} if the estimation should integrate synthetic cases. \code{FALSE} if not.}
       \item{\code{sc_method}}{\code{string} containing the method for generating synthetic cases. Allowed values: 'knnor'}
       \item{\code{sc_min_k}}{\code{int} determining the minimal number of k which is used for creating synthetic units. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
@@ -183,8 +183,10 @@ If no logging is desired set this argument to \code{NULL}. Allowed values: any}
       \item{\code{log_write_interval}}{\code{int} Time in seconds determining the interval in which the logger should try to update
 the log files. Only relevant if \code{log_dir} is not \code{NULL}. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
       \item{\code{n_cores}}{\code{int} Number of cores which should be used during the calculation of synthetic cases. Only relevant if \code{use_sc=TRUE}. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{lr_rate}}{\code{double} Initial learning rate for the training. Sets the maximal learning rate. Allowed values: \ifelse{latex}{$0 < x <= 1$}{\ifelse{html}{\eqn{0 < x <= 1}}{`0 < x <= 1`}}}
-      \item{\code{lr_min}}{\code{double} Minimal learning rate during training. Allowed values: \ifelse{latex}{$0 < x <= 1$}{\ifelse{html}{\eqn{0 < x <= 1}}{`0 < x <= 1`}}}
+      \item{\code{lr_rate}}{\code{double} Initial learning rate for the training. Sets the maximal learning rate.
+Set this value to \code{0.0} requests an automatic search for a good learning rate. Allowed values: \ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
+      \item{\code{lr_min}}{\code{double} Minimal learning rate during training.
+Set this value to \code{0.0} requests an automatic search for a good learning rate. Allowed values: \ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
       \item{\code{lr_scheduler}}{\code{string} Learning rate scheduler. To use a constant learning rate for the whole training set this parameter to 'None'. Allowed values: 'None', 'Linear', 'Cyclic'}
       \item{\code{lr_warm_up_ratio}}{\code{double} Number of epochs used for warm up. To disable warm up set this value to 0.0. Allowed values: \ifelse{latex}{$0 < x < 0.5$}{\ifelse{html}{\eqn{0 < x < 0.5}}{`0 < x < 0.5`}}}
       \item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values: 'Adam', 'RMSprop', 'AdamW', 'SGD'}

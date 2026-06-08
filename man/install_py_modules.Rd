@@ -75,6 +75,7 @@ Other Installation and Configuration:
 \code{\link[=install_aifeducation_studio]{install_aifeducation_studio()}},
 \code{\link[=install_protocol_buffer_compiler]{install_protocol_buffer_compiler()}},
 \code{\link[=prepare_session]{prepare_session()}},
+\code{\link[=set_codecarbon_logger]{set_codecarbon_logger()}},
 \code{\link[=set_transformers_logger]{set_transformers_logger()}},
 \code{\link[=update_aifeducation]{update_aifeducation()}}
 }

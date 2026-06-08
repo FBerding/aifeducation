@@ -79,7 +79,7 @@ PyTorchs implementation. All parameters with the prefix \emph{rec_} can be used 
 Layer transforms sequences into a lower dimensional space that can be passed to dense layers. It can
 perform two types of pooling. First, it extractes features across the time dimension selecting the maximal
 and/or minimal features. Second, it performs pooling over the remaining features selecting a specific number of
-the heighest and/or lowest features. Pooling over times is mandatory. Pooling over features is optional and can lead to a lose of information.
+the heighest and/or lowest features. Pooling over time is mandatory. Pooling over features is optional and can lead to a lose of information.
 
 In the case of selecting the minmal \emph{and} maximal features at the same time the minmal
 features are concatenated to the tensor of the maximal features resulting in the shape $(Batch, Times, 2*Features)$ at the end of the first step.

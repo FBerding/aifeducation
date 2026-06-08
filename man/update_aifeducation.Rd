@@ -50,6 +50,7 @@ Other Installation and Configuration:
 \code{\link[=install_protocol_buffer_compiler]{install_protocol_buffer_compiler()}},
 \code{\link[=install_py_modules]{install_py_modules()}},
 \code{\link[=prepare_session]{prepare_session()}},
+\code{\link[=set_codecarbon_logger]{set_codecarbon_logger()}},
 \code{\link[=set_transformers_logger]{set_transformers_logger()}}
 }
 \concept{Installation and Configuration}
