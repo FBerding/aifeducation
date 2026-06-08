@@ -139,8 +139,8 @@ TEFeatureExtractor <- R6::R6Class(
                      ml_trace = 1L,
                      log_dir = NULL,
                      log_write_interval = 10L,
-                     lr_rate = 1e-3,
-                     lr_min=1e-4,
+                     lr_rate = 0.00,
+                     lr_min=0.00,
                      lr_warm_up_ratio = 0.02,
                      lr_scheduler="None",
                      optimizer = "AdamW",
@@ -206,6 +206,9 @@ TEFeatureExtractor <- R6::R6Class(
 
       # Start Sustainability Tracking-------------------------------------------
       private$init_and_start_sustainability_tracking()
+
+      #Calculate Learning Rate
+      private$calculate_learning_rate(extractor_dataset$train)
 
       # Start Training----------------------------------------------------------
       self$last_training$history <- py$AutoencoderTrain_PT_with_Datasets(
@@ -509,6 +512,27 @@ TEFeatureExtractor <- R6::R6Class(
       } else {
         return(name)
       }
+    },
+    #--------------------------------------------------------------------------
+    estimate_learning_rates=function(dataset){
+      lr_estimation_results=py$calc_lr_rate(
+        trace=self$last_training$config$ml_trace,
+        model=private$model,
+        filepath=file.path(private$dir_checkpoint, "best_weights.pt"),
+        optimizer_method=self$last_training$config$optimizer,
+        loss_fct_name="MSELoss",
+        dataset=dataset,
+        batch_size=as.integer(self$last_training$config$batch_size),
+        class_weights=NULL,
+        Ns=NULL,
+        Nq=NULL,
+        separate=NULL,
+        shuffle=NULL,
+        alpha=NULL,
+        margin=NULL,
+        n_classes=NULL
+      )
+      return(lr_estimation_results)
     }
   )
 )

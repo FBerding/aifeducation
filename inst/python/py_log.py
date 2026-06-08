@@ -128,6 +128,26 @@ class LogWriter:
 class ProgressLogger:
   def set_start_time(self):
     self.start_time=datetime.datetime.now()
+  def print_progress(self,trace,epoch,epochs):
+      if trace:
+        running_time=(datetime.datetime.now()-self.start_time)
+        rt=(epochs-epoch)*running_time/(epoch+1)
+        rt=rt.seconds
+        hours = rt // 3600
+        minutes = (rt - (hours * 3600)) // 60
+        seconds = rt - (minutes * 60)- (hours * 3600)
+        remaining_time='{:04}::{:02}::{:02}'.format(int(hours), int(minutes), int(seconds))
+  
+        if (epoch+1)==epochs:
+          end_string="\n"
+        else:
+          end_string="\r"
+        print("{:.4f} % | ETA {}".format(
+            (epoch+1)/epochs,
+            remaining_time
+            ),
+          end=end_string
+        )  
   def print_epoch_results(self,trace,loss_only,metric_storage,epoch,epochs,metric_criterion,best_metric,best_loss,elc):
     if trace:
       running_time=(datetime.datetime.now()-self.start_time)

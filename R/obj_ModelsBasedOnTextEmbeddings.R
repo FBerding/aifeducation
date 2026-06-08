@@ -838,6 +838,67 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
                      the same framework as during creation.")
         }
       }
+    },
+    #-------------------------------------------------------------------------
+    calculate_learning_rate=function(data_manager){
+      if(self$last_training$config$lr_rate==0.0 || self$last_training$config$lr_min==0.0){
+        print_message(
+          msg = "Estimating Learning Rates",
+          trace = self$last_training$config$trace
+        )
+        estimates=private$estimate_learning_rates(data_manager)
+        private$lr_statistics=private$select_learning_rates(estimates)
+      }
+    },
+    #--------------------------------------------------------------------------
+    select_learning_rates=function(lr_estimation_results){
+      lr_estimation_results=t(lr_estimation_results)
+      lr_estimation_results=lr_estimation_results[order(lr_estimation_results[,1]),]
+      colnames(lr_estimation_results)=c("lr_rate","n_improvments","start_loss","final_loss")
+      lr_estimation_results=as.data.frame(lr_estimation_results)
+      lr_estimation_results$improved=lr_estimation_results$final_loss<lr_estimation_results$start_loss
+      lr_estimation_results$delta=lr_estimation_results$start_loss-lr_estimation_results$final_loss
+
+      range_length=vector(length = nrow(lr_estimation_results))
+      for (i in 1:nrow(lr_estimation_results)) {
+        continious=TRUE
+        counter=0
+        for(j in i:nrow(lr_estimation_results)){
+          if(lr_estimation_results$improved[j]&&continious){
+            counter=counter+1
+          } else {
+            continious=FALSE
+          }
+        }
+        range_length[i]=counter
+      }
+      best_range=vector(length = length(range_length))
+      best_range[]=FALSE
+      start_idx=which(range_length==max(range_length))
+      range=range_length[start_idx]
+      best_range[start_idx:(start_idx+range-1)]=TRUE
+      lr_estimation_results$best_range=best_range
+      relevant_range=subset(
+        x=lr_estimation_results,
+        subset= lr_estimation_results$best_range
+      )
+      min_lr=min(relevant_range$lr_rate)
+      max_lr=max(relevant_range$lr_rate)
+      best=relevant_range$lr_rate[which(relevant_range$delta==max(relevant_range$delta))]
+      self$last_training$config$lr_rate=(max_lr+best)/2
+      self$last_training$config$lr_min=(min_lr+best)/2
+
+      print_message(
+        msg = paste0(
+          "Set lr_rate to ",
+          format(self$last_training$config$lr_rate,scientific=TRUE),
+          " and lr_min to ",
+          format(self$last_training$config$lr_min,scientific=TRUE),
+          "."
+        ),
+        trace = self$last_training$config$trace
+      )
+      return(lr_estimation_results)
     }
   )
 )

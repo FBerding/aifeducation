@@ -293,6 +293,9 @@ AIFEMaster <- R6::R6Class(
       message_top = NA
     ),
 
+    #Object stores estimates for calculating learning rates
+    lr_statistics=data.frame(),
+
     # Variable for checking if the object is successfully configured. Only if
     # this is TRUE the object can be used
     configured = FALSE,
