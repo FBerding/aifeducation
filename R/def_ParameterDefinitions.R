@@ -1142,11 +1142,12 @@ get_param_dict <- function() {
     test_values = NULL
   )
   param$loss_pt_fct_name <- param$loss_cls_fct_name
-  param$loss_pt_fct_name$allowed_values <- c("MultiWayContrastiveLoss","MultiWayContrastiveLossFC")
+  param$loss_pt_fct_name$allowed_values <- c("MultiWayContrastiveLoss","MultiWayContrastiveLossFC","FocalLoss")
   param$loss_pt_fct_name$values_desc <- list(
     MultiWayContrastiveLoss = "Applies the loss described by [Zhang et al. 2019](https://doi.org/10.1007/978-3-030-16145-3_24).",
     MultiWayContrastiveLossFC = "Applies the sum of the loss described by [Zhang et al. 2019](https://doi.org/10.1007/978-3-030-16145-3_24) and the
-    Focal Loss described by [Lin et al. 2017](https://doi.org/10.48550/arXiv.1708.02002)."
+    Focal Loss described by [Lin et al. 2017](https://doi.org/10.48550/arXiv.1708.02002).",
+    FocalLoss = "Applies the focal loss described by [Lin et al. 2017](https://doi.org/10.48550/arXiv.1708.02002)."
   )
   param$loss_pt_fct_name$default_value <- "MultiWayContrastiveLoss"
   param$loss_pt_fct_name$gui_box <- "General Settings"
@@ -1202,29 +1203,31 @@ get_param_dict <- function() {
   )
 
   param$lr_rate <- list(
-    type = "(double",
+    type = "double",
     allow_null = FALSE,
     min = 0L,
     max = 1L,
-    desc = "Initial learning rate for the training. Sets the maximal learning rate.",
+    desc = "Initial learning rate for the training. Sets the maximal learning rate.
+    Set this value to `0.0` requests an automatic search for a good learning rate.",
     magnitude = 0.1,
     gui_box = "Learning Rate",
     gui_label = "Learning Rate",
-    default_value = 1e-3,
-    test_values = 1e-3
+    default_value = 0.0,
+    test_values = 0.0
   )
   param$learning_rate <- param$lr_rate
   param$lr_min <- list(
-    type = "(double",
+    type = "double",
     allow_null = FALSE,
     min = 0L,
     max = 1L,
-    desc = "Minimal learning rate during training.",
+    desc = "Minimal learning rate during training.
+    Set this value to `0.0` requests an automatic search for a good learning rate.",
     magnitude = 0.1,
     gui_box = "Learning Rate",
     gui_label = "Minimal Learning Rate",
-    default_value = 1e-4,
-    test_values = 1e-4
+    default_value = 0.0,
+    test_values = 0.0
   )
   param$lr_scheduler <- list(
     type = "string",
