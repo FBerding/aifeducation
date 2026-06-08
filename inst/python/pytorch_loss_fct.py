@@ -98,3 +98,18 @@ class multi_way_contrastive_loss_fc(torch.nn.Module):
     loss=(loss_mw+loss_fc)/2
     return loss
     
+class focal_loss_pt(torch.nn.Module):
+  def __init__(self,class_weights=None,gamma=2):
+    super().__init__()
+    self.class_weights=class_weights
+    self.gamma=gamma
+    
+    self.focal_loss=focal_loss(class_weights=self.class_weights,gamma=self.gamma)
+  
+  def forward(self,classes_q,distance_matrix,metric_scale_factor):
+    target_focal=torch.nn.functional.one_hot(classes_q.long(), num_classes=distance_matrix.size(1))
+    loss=self.focal_loss(
+      prediction=-distance_matrix,
+      target=target_focal.float()
+    ).mean()
+    return loss
