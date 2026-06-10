@@ -17,6 +17,7 @@ editor_options:
 - Add function 'install_protocol_buffer_compiler' for installing the 
   Protocol Buffer Compiler.
 - Add a faster version for calculating CosineDistance.
+- Improved error messages for string arguments.
 
 **BaseModels**
 
@@ -44,12 +45,17 @@ editor_options:
 - Pooling over features is now optional.
 - Improve progress indicator for training. It now displays the remaining time and the epoch of
   the last checkpoint.
+- Add FocalLoss to classifiers based on prototypes.
+- Add automatic detection of learning rates and a method for plotting the corresponding analysis.
+- Replaced average_iota with a smoothed version of average_iota for an improved detection of
+  good checkpoints.
 
 **TEFeatureExtractor**
 
 - Add new progress indicator to extract_features_large of 'TEFeatureExtractor'.
 - Improve progress indicator for training. It now displays the remaining time and the epoch of
   the last checkpoint.
+- Add automatic detection of learning rates and a method for plotting the corresponding analysis.  
 
 **TextEmbeddingModel**
 
