@@ -475,17 +475,9 @@ check_aif_py_modules <- function(trace = TRUE, for_sentencepiece = FALSE) {
 #' @family Installation and Configuration
 #' @export
 set_transformers_logger <- function(level = "ERROR") {
-  valid_levels <- c("ERROR", "WARNING", "INFO", "DEBUG")
+  valid_levels <- c("INFO", "WARNING", "ERROR", "DEBUG")
   if (level %in% valid_levels) {
-    if (level == "ERROR") {
-      transformers$utils$logging$set_verbosity_error()
-    } else if (level == "WARNING") {
-      transformers$utils$logging$set_verbosity_warning()
-    } else if (level == "INFO") {
-      transformers$utils$logging$set_verbosity_info()
-    } else if (level == "DEBUG") {
-      transformers$utils$logging$set_verbosity_debug()
-    }
+      transformers$utils$logging$set_verbosity(as.integer(transformers$utils$logging$log_levels[tolower(level)]))
   } else {
     stop("Valid levels are: ", toString(valid_levels))
   }
@@ -620,6 +612,8 @@ prepare_session <- function(env_type = "auto",
     }
   }
 
+  message("Load all python objects and functions.")
+  load_all_py_scripts()
   # Set logger level of python packages
   if (set_logger_level) {
     message("Set logger level of python packages.")
@@ -627,9 +621,6 @@ prepare_session <- function(env_type = "auto",
     datasets$disable_progress_bars()
     set_codecarbon_logger("ERROR")
   }
-
-  message("Load all python objects and functions.")
-  load_all_py_scripts()
   message("Location for Temporary Files:", create_and_get_tmp_dir())
 }
 
