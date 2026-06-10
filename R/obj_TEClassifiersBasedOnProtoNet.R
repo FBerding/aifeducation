@@ -29,13 +29,13 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
   inherit = ClassifiersBasedOnTextEmbeddings,
   public = list(
     #-------------------------------------------------------------------------
-    #' @description Method for training a neural net.
+    #' @description Method for training classifier based on prototypes.
     #'
-    #'   Training includes a routine for early stopping. In the case that loss<0.0001 and Accuracy=1.00 and Average
-    #'   Iota=1.00 training stops. The history uses the values of the last trained epoch for the remaining epochs.
+    #' Training loop uses an early stopping mechanism. Training stops
+    #' if the performance on the validation set does not increase within 250 epochs
     #'
-    #'   After training the model with the best values for Average Iota, Accuracy, and Loss on the validation data set
-    #'   is used as the final model.
+    #' After training the model with the best values for smoothed Average Iota
+    #' on the validation data set is used as the final model.
     #'
     #' @param data_embeddings `r get_param_doc_desc("data_embeddings")`
     #' @param data_targets `r get_param_doc_desc("data_targets")`.
@@ -645,7 +645,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
       )
     },
     #--------------------------------------------------------------------------
-    estimate_learning_rates=function(data_manager){
+    estimate_learning_rates=function(data_manager,total_epochs){
       data_manager$set_state(
         iteration = self$last_training$config$n_folds+1L,
         step = NULL
@@ -693,6 +693,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
 
       lr_estimation_results=py$calc_lr_rate(
         trace=self$last_training$config$ml_trace,
+        epochs=as.integer(total_epochs),
         model=private$model,
         filepath=file.path(private$dir_checkpoint, "best_weights.pt"),
         optimizer_method=self$last_training$config$optimizer,

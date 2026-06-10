@@ -1484,7 +1484,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       return(sample_weights)
     },
     #-------------------------------------------------------------------------
-    estimate_learning_rates=function(data_manager){
+    estimate_learning_rates=function(data_manager,total_epochs){
       data_manager$set_state(
         iteration = self$last_training$config$n_folds+1L,
         step = NULL
@@ -1523,6 +1523,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
 
       lr_estimation_results=py$calc_lr_rate(
         trace=self$last_training$config$ml_trace,
+        epochs=as.integer(total_epochs),
         model=private$model,
         filepath=file.path(private$dir_checkpoint, "best_weights.pt"),
         optimizer_method=self$last_training$config$optimizer,

@@ -103,7 +103,11 @@ TEFeatureExtractor <- R6::R6Class(
     },
 
     #-------------------------------------------------------------------------
-    #' @description Method for training a neural net.
+    #' @description Method for training a TEFeatureExtractor.
+    #'
+    #' @description Training loop uses an early stopping mechanism. Training stops
+    #' if the performance on the validation set does not increase within 50 epochs.
+    #'
     #' @param data_embeddings `r get_param_doc_desc("data_embeddings")`
     #' @param data_val_size `r get_param_doc_desc("data_val_size")`
     #' @param sustain_track `r get_param_doc_desc("sustain_track")`
@@ -514,9 +518,10 @@ TEFeatureExtractor <- R6::R6Class(
       }
     },
     #--------------------------------------------------------------------------
-    estimate_learning_rates=function(dataset){
+    estimate_learning_rates=function(dataset,total_epochs){
       lr_estimation_results=py$calc_lr_rate(
         trace=self$last_training$config$ml_trace,
+        epochs=as.integer(total_epochs),
         model=private$model,
         filepath=file.path(private$dir_checkpoint, "best_weights.pt"),
         optimizer_method=self$last_training$config$optimizer,
