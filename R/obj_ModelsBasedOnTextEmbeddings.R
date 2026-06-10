@@ -157,6 +157,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       plot_data_all <- data_prepared$aggregated
       # Select the performance measure to display
       plot_data <- plot_data_all[[measure]]
+      checkpoints=data_prepared[["checkpoints"]]
 
       # Create Plot
       if (measure == "loss") {
@@ -167,6 +168,8 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         y_label <- "Balanced Accuracy"
       } else if (measure == "avg_iota") {
         y_label <- "Average Iota"
+      } else if (measure == "s_avg_iota") {
+        y_label <- "Smoothed Average Iota"
       }
 
       # set x_min and x_max if they are NULL
@@ -280,7 +283,8 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         if (ind_selected_model) {
           selected_state_point <- get_used_state_point(
             plot_data = plot_data_all,
-            measure = measure
+            measure = measure,
+            checkpoints=checkpoints
           )
           tmp_plot <- add_point(
             plot_object = tmp_plot,
@@ -324,7 +328,8 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         if (ind_selected_model) {
           selected_states <- get_selected_states_from_folds(
             data_folds = data_prepared$folds,
-            measure = measure
+            measure = measure,
+            checkpoints=checkpoints
           )
           tmp_plot <- add_point(
             plot_object = tmp_plot,
@@ -364,6 +369,42 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       }
 
       return(tmp_plot)
+    },
+    #--------------------------------------------------------------------------
+    #' @description Method for requesting a plot that shows the analysis for selecting
+    #' a good learning rate.
+    #' @return Returns a plot of class `ggplot` visualizing the training process.
+    plot_learning_rate=function(){
+      plot_data=private$lr_statistics
+      if(is.null_or_na(plot_data)){
+        stop("Calculation of learning rates was not requested during training.")
+      } else {
+        if(nrow(plot_data)<=0L){
+          stop("Calculation of learning rates was not requested during training.")
+        } else {
+          plot_data$lr_rate=as.factor(plot_data$lr_rate)
+          plot_data$rel_improvment=(plot_data$delta)/plot_data$start_loss
+          #Create plot
+          tmp_plot=ggplot2::ggplot(data=plot_data)+
+            ggplot2::geom_bar(
+              stat = "identity",
+              ggplot2::aes(
+              x=lr_rate,
+              y=rel_improvment
+            ))+
+            ggplot2::geom_point(
+              ggplot2::aes(
+                x=lr_rate,
+                y=imp_per_epoch
+              )
+            )+
+            ggplot2::xlab("Learning Rate")+
+            ggplot2::ylab("Change in %")+
+            ggplot2::coord_flip()+
+            ggplot2::theme_classic()
+          return(tmp_plot)
+        }
+      }
     }
   ),
   private = list(
@@ -659,18 +700,32 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         if (!use_pl) {
           measures <- names(plot_data[[1L]])
           n_sample_type <- nrow(plot_data[[1L]][[measures[1L]]])
+          checkpoints=list()
+          for(i in seq.int(n_folds)){
+            checkpoints[i]=list(
+              plot_data[[i]][["checkpoints"]]
+            )
+          }
         } else {
           measures <- names(plot_data[[1L]][[1L]])
           n_sample_type <- nrow(plot_data[[1L]][[as.numeric(pl_step)]][[measures[1L]]])
+          checkpoints=list()
+          for(i in seq.int(n_folds)){
+            checkpoints[i]=list(
+              plot_data[[i]][[as.numeric(pl_step)]][["checkpoints"]]
+            )
+          }
         }
       } else {
         n_folds <- 1L
         if (!use_pl) {
           measures <- names(plot_data[[index_final]])
           n_sample_type <- nrow(plot_data[[index_final]][[measures[1L]]])
+          checkpoints=plot_data[[index_final]][["checkpoints"]]
         } else {
           measures <- names(plot_data[[index_final]][[1L]])
           n_sample_type <- nrow(plot_data[[index_final]][[as.numeric(pl_step)]][[measures[1L]]])
+          checkpoints=plot_data[[index_final]][[as.numeric(pl_step)]][["checkpoints"]]
         }
       }
 
@@ -786,7 +841,8 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       return(
         list(
           aggregated = result_list,
-          folds = results_folds
+          folds = results_folds,
+          checkpoints=checkpoints
         )
       )
     },
@@ -846,19 +902,26 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
           msg = "Estimating Learning Rates",
           trace = self$last_training$config$trace
         )
-        estimates=private$estimate_learning_rates(data_manager)
-        private$lr_statistics=private$select_learning_rates(estimates)
+        total_epochs=30L
+        estimates=private$estimate_learning_rates(
+          data_manager,
+          total_epochs=total_epochs
+          )
+        private$lr_statistics=private$select_learning_rates(
+          estimates,
+          total_epochs = total_epochs
+          )
       }
     },
     #--------------------------------------------------------------------------
-    select_learning_rates=function(lr_estimation_results){
+    select_learning_rates=function(lr_estimation_results,total_epochs){
       lr_estimation_results=t(lr_estimation_results)
       lr_estimation_results=lr_estimation_results[order(lr_estimation_results[,1]),]
       colnames(lr_estimation_results)=c("lr_rate","n_improvments","start_loss","final_loss")
       lr_estimation_results=as.data.frame(lr_estimation_results)
       lr_estimation_results$improved=lr_estimation_results$final_loss<lr_estimation_results$start_loss
-      lr_estimation_results$delta=lr_estimation_results$start_loss-lr_estimation_results$final_loss
-
+      lr_estimation_results$delta=lr_estimation_results$final_loss-lr_estimation_results$start_loss
+      lr_estimation_results$imp_per_epoch=lr_estimation_results$n_improvments/total_epochs
       range_length=vector(length = nrow(lr_estimation_results))
       for (i in 1:nrow(lr_estimation_results)) {
         continious=TRUE
@@ -885,9 +948,10 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       min_lr=min(relevant_range$lr_rate)
       max_lr=max(relevant_range$lr_rate)
       best=relevant_range$lr_rate[which(relevant_range$delta==max(relevant_range$delta))]
-      self$last_training$config$lr_rate=(max_lr+best)/2
-      self$last_training$config$lr_min=(min_lr+best)/2
-
+      #self$last_training$config$lr_rate=best
+      #self$last_training$config$lr_min=(min_lr+best)/2
+      self$last_training$config$lr_rate=10^((log10(max_lr)+log10(best))/2)
+      self$last_training$config$lr_min=10^((log10(min_lr)+log10(best))/2)
       print_message(
         msg = paste0(
           "Set lr_rate to ",
