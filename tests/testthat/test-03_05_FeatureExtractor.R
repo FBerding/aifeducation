@@ -100,6 +100,10 @@ for (framework in ml_frameworks) {
       })
       gc()
 
+      test_that(paste(framework, method, data_type, "plot_learning_rate"), {
+        expect_s3_class(object = extractor$plot_learning_rate(), class = "ggplot")
+      })
+
       test_that(paste(framework, method, data_type, "train with log"), {
         train_path <- paste0(root_path_results, "/", "train_", generate_id())
         create_dir(train_path, FALSE)
