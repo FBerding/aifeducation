@@ -945,23 +945,43 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         x=lr_estimation_results,
         subset= lr_estimation_results$best_range
       )
-      min_lr=min(relevant_range$lr_rate)
-      max_lr=max(relevant_range$lr_rate)
-      best=relevant_range$lr_rate[which(relevant_range$delta==max(relevant_range$delta))]
-      #self$last_training$config$lr_rate=best
-      #self$last_training$config$lr_min=(min_lr+best)/2
-      self$last_training$config$lr_rate=10^((log10(max_lr)+log10(best))/2)
-      self$last_training$config$lr_min=10^((log10(min_lr)+log10(best))/2)
-      print_message(
-        msg = paste0(
-          "Set lr_rate to ",
-          format(self$last_training$config$lr_rate,scientific=TRUE),
-          " and lr_min to ",
-          format(self$last_training$config$lr_min,scientific=TRUE),
-          "."
-        ),
-        trace = self$last_training$config$trace
-      )
+
+      if(nrow(relevant_range)>0L){
+        relevant_range=relevant_range[order(relevant_range$lr_rate,decreasing=TRUE),]
+        min_lr=min(relevant_range$lr_rate)
+        max_lr=max(relevant_range$lr_rate)
+        best_idx=min(which(relevant_range$delta==max(relevant_range$delta)))
+        best=relevant_range$lr_rate[floor((1L+best_idx)/2)]
+        final_min=relevant_range$lr_rate[ceiling((best_idx+nrow(relevant_range))/2)]
+
+        self$last_training$config$lr_rate=best
+        self$last_training$config$lr_min=final_min
+
+        print_message(
+          msg = paste0(
+            "Set lr_rate to ",
+            format(self$last_training$config$lr_rate,scientific=TRUE),
+            " and lr_min to ",
+            format(self$last_training$config$lr_min,scientific=TRUE),
+            "."
+          ),
+          trace = self$last_training$config$trace
+        )
+      } else {
+        print_message(
+          msg = paste0(
+            "No good learning rates could be identified. ",
+            "Set lr_rate to ",
+            format(self$last_training$config$lr_rate,scientific=TRUE),
+            " and lr_min to ",
+            format(self$last_training$config$lr_min,scientific=TRUE),
+            "."
+          ),
+          trace = self$last_training$config$trace
+        )
+        self$last_training$config$lr_rate=1e-3
+        self$last_training$config$lr_min=1e-4
+      }
       return(lr_estimation_results)
     }
   )
