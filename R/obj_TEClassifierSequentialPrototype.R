@@ -155,9 +155,6 @@ TEClassifierSequentialPrototype <- R6::R6Class(
     # Private--------------------------------------------------------------------------
     create_reset_model = function() {
       private$check_config_for_TRUE()
-
-
-
       private$model <- py$TEClassifierPrototype(
         features = as.integer(private$model_config$features),
         times = as.integer(private$model_config$times),
@@ -215,6 +212,8 @@ TEClassifierSequentialPrototype <- R6::R6Class(
         embedding_dim = as.integer(private$model_config$embedding_dim),
         core_net_type = private$model_config$core_net_type
       )
+      # Apply orthogonal initialization
+      private$model$apply(py$init_weights_orthogonal)
 
       private$set_random_prototypes()
     },

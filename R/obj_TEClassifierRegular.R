@@ -99,9 +99,6 @@ TEClassifierRegular <- R6::R6Class(
     #--------------------------------------------------------------------------
     create_reset_model = function() {
       private$check_config_for_TRUE()
-
-
-
       private$model <- py$TextEmbeddingClassifier_PT(
         features = as.integer(private$model_config$features),
         times = as.integer(private$model_config$times),
@@ -125,6 +122,8 @@ TEClassifierRegular <- R6::R6Class(
         act_fct = private$model_config$act_fct,
         parametrizations = private$model_config$parametrizations
       )
+      # Apply orthogonal initialization
+      private$model$apply(py$init_weights_orthogonal)
     },
     #--------------------------------------------------------------------------
     check_param_combinations_configuration = function() {
