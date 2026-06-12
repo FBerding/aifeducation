@@ -17,6 +17,13 @@ import numpy as np
 import math
 import safetensors
 
+def init_weights_orthogonal(m):
+    # Check if the layer type has a weight attribute
+    if isinstance(m, (torch.nn.Linear, torch.nn.Conv2d, torch.nn.Conv3d)):
+        nn.init.orthogonal_(m.weight, gain=1.0)
+        if m.bias is not None:
+            nn.init.constant_(m.bias, 0.0)
+
 class TEClassifierSequential(torch.nn.Module):
   def __init__(self,times, features, cls_pooling_features, pad_value,n_target_levels,inc_cls_head=True,skip_connection_type="ResidualGate",cls_type="Regular",cls_pooling_type="MinMax", 
               feat_act_fct="ELU",feat_size=50,feat_bias=True,feat_dropout=0.0,feat_parametrizations="None",feat_normalization_type="LayerNorm",
@@ -650,7 +657,7 @@ class TEClassifierPrototype(torch.nn.Module):
     self.embedding_dim=embedding_dim
     self.classes=torch.from_numpy(np.copy(target_levels))
     self.n_classes=n_target_levels
-    
+
     self.trained_prototypes=torch.ones(1)
     self.class_labels=torch.ones(1)
     self.projection_type=projection_type
@@ -711,21 +718,23 @@ class TEClassifierPrototype(torch.nn.Module):
 
       #Calculate Prototypes      
       prototypes=self.calc_prototypes(input_s=input_s,classes=sample_classes,total_classes=n_classes)
-
+      
     #Query set
     query_embeddings=self.embed(input_q)
 
     #Calc distance from query embeddings to global prototypes
     distances=self.metric(x=query_embeddings,prototypes=prototypes)
-    probabilities=torch.nn.Softmax(dim=1)(torch.exp(-distances))
-      
+    logits=torch.exp(-distances)
+
     if prediction_mode==False:
       if classes_q==None:
         query_classes=None
       else:
         query_classes=self.recode_classes(classes_q,class_labels)
+      probabilities=logits  
       return probabilities, distances, query_classes, query_embeddings, prototypes
     else:
+      probabilities=torch.nn.Softmax(dim=1)(logits)
       return probabilities
     
   def recode_classes(self,class_vector,class_labels):
