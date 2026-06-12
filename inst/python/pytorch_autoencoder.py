@@ -482,12 +482,17 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       best_loss=best_val_loss,
       elc=elc
     )
+    #Check if there are furhter information for training-----------------------
+    # If there are no addtiononal information. Stop training and continue
+    if (epoch+1-elc)>=max(50,0.25*epochs):
+      if trace:
+        print("\n")
+      break  
   #Finalize--------------------------------------------------------------------
   if use_callback==True:
     if trace>=1:
       print("Load Best Weights from {}".format(filepath))
     model.load_state_dict(torch.load(filepath,weights_only=True))
-
   return metric_storage
 
 @torch.inference_mode()
