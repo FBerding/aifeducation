@@ -35,16 +35,16 @@ def _write_history(file, history):
   writer = csv.writer(f, dialect = 'unix')
   writer.writerows(history)
   f.close()
-  
+
 def _write(write_fn, args_fn,
            last_log, write_interval):
 
   if args_fn["file"] == None:
     return None
-  
+
   log_time = None
   diff = float("inf") if last_log == None else time.time() - last_log
-        
+
   if diff > write_interval:
     try:
       write_fn(**args_fn)
@@ -54,24 +54,24 @@ def _write(write_fn, args_fn,
 
   return log_time
 
-def write_log_py(log_file, 
+def write_log_py(log_file,
                  value_top = 0, total_top = 1, message_top = "NA",
                  value_middle = 0, total_middle = 1, message_middle = "NA",
                  value_bottom = 0, total_bottom = 1, message_bottom = "NA",
                  last_log = None, write_interval = 2):
-                   
+
   args_fn = { "file": log_file,
-              "vt": value_top, "tt": total_top, "mt": message_top, 
+              "vt": value_top, "tt": total_top, "mt": message_top,
               "vm": value_middle, "tm": total_middle, "mm": message_middle,
               "vb": value_bottom, "tb": total_bottom, "mb": message_bottom }
-              
+
   return _write(_write_dict, args_fn, last_log, write_interval)
 
-def write_log_performance_py(log_file, history, 
+def write_log_performance_py(log_file, history,
                              last_log = None, write_interval = 2):
-                               
+
   args_fn = { "file": log_file, "history": history }
-              
+
   return _write(_write_history, args_fn, last_log, write_interval)
 
 
@@ -113,7 +113,7 @@ class LogWriter:
     elif level=="middle":
       self.value_middle=0
     elif level=="bottom":
-      self.value_bottom=0   
+      self.value_bottom=0
   def set_history_loss(self,history_loss):
     self.history_loss=history_loss
   def write_log(self):
@@ -137,7 +137,7 @@ class ProgressLogger:
         minutes = (rt - (hours * 3600)) // 60
         seconds = rt - (minutes * 60)- (hours * 3600)
         remaining_time='{:04}::{:02}::{:02}'.format(int(hours), int(minutes), int(seconds))
-  
+
         if (epoch+1)==epochs:
           end_string="\n"
         else:
@@ -147,7 +147,8 @@ class ProgressLogger:
             remaining_time
             ),
           end=end_string
-        )  
+        )
+
   def print_epoch_results(self,trace,loss_only,metric_storage,epoch,epochs,metric_criterion,best_metric,best_loss,elc):
     if trace:
       running_time=(datetime.datetime.now()-self.start_time)
@@ -199,12 +200,20 @@ class ProgressLogger:
             end=end_string
         )
   def print_final_performance(self,trace,metric_storage,elc):
-    loss=metric_storage["loss"][2,elc-1]
-    acc=metric_storage["acc"][2,elc-1]
-    bacc=metric_storage["bacc"][2,elc-1]
-    avg_iota=metric_storage["avg_iota"][2,elc-1]
-    s_avg_iota=metric_storage["s_avg_iota"][2,elc-1]
-    print("ELC:{} Loss {:.4f} ACC: {:.4f} BACC: {:.4f} Avg. Iota: {:.4f} Smoothed Avg. Iota: {:.4f}".format(
+
+    if metric_storage["loss"].shape[0]==3:
+      index=2
+      dataset_type="Test"
+    else:
+      index=1
+      dataset_type="Validation"
+    loss=metric_storage["loss"][index,elc-1]
+    acc=metric_storage["accuracy"][index,elc-1]
+    bacc=metric_storage["balanced_accuracy"][index,elc-1]
+    avg_iota=metric_storage["avg_iota"][index,elc-1]
+    s_avg_iota=metric_storage["s_avg_iota"][index,elc-1]
+    print("Data Set Type: {} | ELC: {} | Loss {:.4f} | ACC: {:.4f} | BACC: {:.4f} | Avg. Iota: {:.4f} | Smoothed Avg. Iota: {:.4f}".format(
+      dataset_type,
       elc,
       loss,
       acc,
