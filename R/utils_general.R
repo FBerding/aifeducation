@@ -242,7 +242,7 @@ detect_base_model_type <- function(model) {
   } else {
     type_string <- model$config
   }
-print(type_string)
+
   if (stringi::stri_detect(str = tolower(type_string), regex = "^funnel([:alnum:]*)")) {
     return("funnel")
   } else if (stringi::stri_detect(str = tolower(type_string), regex = "^bert([:alnum:]*)")) {
