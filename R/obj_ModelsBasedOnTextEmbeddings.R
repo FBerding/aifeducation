@@ -912,7 +912,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
           msg = "Estimating Learning Rates",
           trace = self$last_training$config$trace
         )
-        total_epochs=10L
+        total_epochs=20L
         estimates=private$estimate_learning_rates(
           data_manager,
           total_epochs=total_epochs
@@ -960,7 +960,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         relevant_range=relevant_range[order(relevant_range$lr_rate,decreasing=TRUE),]
         #min_lr=min(relevant_range$lr_rate)
         #max_lr=max(relevant_range$lr_rate)
-        best_idx=min(which(relevant_range$delta==min(relevant_range$delta)))
+        best_idx=min(which(relevant_range$delta==min(relevant_range$delta)))[0L]
         best=relevant_range$lr_rate[floor((1L+best_idx)/2)]
         final_min=relevant_range$lr_rate[ceiling((best_idx+nrow(relevant_range))/2)]
 
