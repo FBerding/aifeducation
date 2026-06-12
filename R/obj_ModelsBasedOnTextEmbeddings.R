@@ -384,6 +384,14 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         } else {
           plot_data$lr_rate=as.factor(plot_data$lr_rate)
           plot_data$rel_improvment=(plot_data$delta)/plot_data$start_loss
+          relevant_range=subset(
+            x=plot_data,
+            subset=plot_data$best_range
+          )
+          best_idx=min(which(relevant_range$delta==min(relevant_range$delta)))
+          best=relevant_range$lr_rate[floor((1L+best_idx)/2)]
+          final_min=relevant_range$lr_rate[ceiling((best_idx+nrow(relevant_range))/2)]
+
           #Create plot
           tmp_plot=ggplot2::ggplot(data=plot_data)+
             ggplot2::geom_bar(
@@ -400,6 +408,8 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
             )+
             ggplot2::xlab("Learning Rate")+
             ggplot2::ylab("Change in %")+
+            ggplot2::geom_vline(xintercept=best)+
+            ggplot2::geom_vline(xintercept=final_min)+
             ggplot2::coord_flip()+
             ggplot2::theme_classic()
           return(tmp_plot)
@@ -902,7 +912,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
           msg = "Estimating Learning Rates",
           trace = self$last_training$config$trace
         )
-        total_epochs=30L
+        total_epochs=10L
         estimates=private$estimate_learning_rates(
           data_manager,
           total_epochs=total_epochs
@@ -948,9 +958,9 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
 
       if(nrow(relevant_range)>0L){
         relevant_range=relevant_range[order(relevant_range$lr_rate,decreasing=TRUE),]
-        min_lr=min(relevant_range$lr_rate)
-        max_lr=max(relevant_range$lr_rate)
-        best_idx=min(which(relevant_range$delta==max(relevant_range$delta)))
+        #min_lr=min(relevant_range$lr_rate)
+        #max_lr=max(relevant_range$lr_rate)
+        best_idx=min(which(relevant_range$delta==min(relevant_range$delta)))
         best=relevant_range$lr_rate[floor((1L+best_idx)/2)]
         final_min=relevant_range$lr_rate[ceiling((best_idx+nrow(relevant_range))/2)]
 

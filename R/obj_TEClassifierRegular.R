@@ -122,8 +122,6 @@ TEClassifierRegular <- R6::R6Class(
         act_fct = private$model_config$act_fct,
         parametrizations = private$model_config$parametrizations
       )
-      # Apply orthogonal initialization
-      private$model$apply(py$init_weights_orthogonal)
     },
     #--------------------------------------------------------------------------
     check_param_combinations_configuration = function() {

@@ -196,8 +196,6 @@ TEClassifierSequential <- R6::R6Class(
         tf_normalization_position = private$model_config$tf_normalization_position,
         tf_residual_type = private$model_config$tf_residual_type
       )
-      # Apply orthogonal initialization
-      private$model$apply(py$init_weights_orthogonal)
     },
     #--------------------------------------------------------------------------
     check_param_combinations_configuration = function() {

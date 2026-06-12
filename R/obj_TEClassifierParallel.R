@@ -205,8 +205,6 @@ TEClassifierParallel <- R6::R6Class(
         merge_pooling_features = as.integer(private$model_config$merge_pooling_features),
         merge_pooling_type = private$model_config$merge_pooling_type
       )
-      # Apply orthogonal initialization
-      private$model$apply(py$init_weights_orthogonal)
     },
     #--------------------------------------------------------------------------
     check_param_combinations_configuration = function() {

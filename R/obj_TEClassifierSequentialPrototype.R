@@ -212,9 +212,6 @@ TEClassifierSequentialPrototype <- R6::R6Class(
         embedding_dim = as.integer(private$model_config$embedding_dim),
         core_net_type = private$model_config$core_net_type
       )
-      # Apply orthogonal initialization
-      private$model$apply(py$init_weights_orthogonal)
-
       private$set_random_prototypes()
     },
     #--------------------------------------------------------------------------
