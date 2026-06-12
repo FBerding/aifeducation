@@ -477,7 +477,7 @@ check_aif_py_modules <- function(trace = TRUE, for_sentencepiece = FALSE) {
 set_transformers_logger <- function(level = "ERROR") {
   valid_levels <- c("INFO", "WARNING", "ERROR", "DEBUG")
   if (level %in% valid_levels) {
-      transformers$utils$logging$set_verbosity(as.integer(transformers$utils$logging$log_levels[tolower(level)]))
+    transformers$logging$set_verbosity(as.integer(transformers$utils$logging$log_levels[tolower(level)]))
   } else {
     stop("Valid levels are: ", toString(valid_levels))
   }
@@ -617,8 +617,9 @@ prepare_session <- function(env_type = "auto",
   # Set logger level of python packages
   if (set_logger_level) {
     message("Set logger level of python packages.")
-    set_transformers_logger("ERROR")
     datasets$disable_progress_bars()
+    transformers$logging$disable_progress_bar()
+    set_transformers_logger("ERROR")
     set_codecarbon_logger("ERROR")
   }
   message("Location for Temporary Files:", create_and_get_tmp_dir())
