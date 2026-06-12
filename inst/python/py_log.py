@@ -183,7 +183,7 @@ class ProgressLogger:
         loss=metric_storage["loss"]
         train_loss=loss[0,epoch]
         val_loss=loss[1,epoch]
-        print("{:.4f} % | Train Loss {:.4f} {} {:.4f} | Val Loss {:.4f} Best {:.4f} {} {:.4f} Best {:.4f} | ELC: {} | ETA {}".format(
+        print("{:.4f} % | Train Loss {:.6f} {} {:.3f} | Val Loss {:.6f} Best {:.6f} {} {:.3f} Best {:.3f} | ELC: {} | ETA {}".format(
               (epoch+1)/epochs,
               train_loss,
               metric_criterion,
@@ -198,3 +198,18 @@ class ProgressLogger:
               ),
             end=end_string
         )
+  def print_final_performance(self,trace,metric_storage,elc):
+    loss=metric_storage["loss"][2,elc-1]
+    acc=metric_storage["acc"][2,elc-1]
+    bacc=metric_storage["bacc"][2,elc-1]
+    avg_iota=metric_storage["avg_iota"][2,elc-1]
+    s_avg_iota=metric_storage["s_avg_iota"][2,elc-1]
+    print("ELC:{} Loss {:.4f} ACC: {:.4f} BACC: {:.4f} Avg. Iota: {:.4f} Smoothed Avg. Iota: {:.4f}".format(
+      elc,
+      loss,
+      acc,
+      bacc,
+      avg_iota,
+      s_avg_iota
+      )
+    )
