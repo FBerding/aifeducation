@@ -677,6 +677,7 @@ tokenizer$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
+  sustain_log_level = "error",
   trace = TRUE
 )
 ```
@@ -844,6 +845,7 @@ base_model_bert$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
+  sustain_log_level = "error",
   trace = TRUE,
   pytorch_trace = 0,
   log_dir = NULL,
@@ -1114,6 +1116,7 @@ chunk_quantile = base_model_eurobert$Tokenizer$calc_quantiles(
   trace=FALSE
 )
 print(chunk_quantile)
+max_chunks=chunk_quantile["99.9%"]
 ```
 
 If we would like to ensure that about 90% of the texts are completely covered
@@ -1174,7 +1177,7 @@ tem$configure(
   model_label = "Text Embedding via EuroBert - 210m",
   model_language = "english",
   max_length = 512,
-  chunks = chunk_quantile["99.9%"],
+  chunks = max_chunks,
   overlap = 128,
   emb_layer_min = eurobert_min_layer,
   emb_layer_max = eurobert_max_layer,
@@ -1462,27 +1465,27 @@ classifier$configure(
   feature_extractor = NULL,
   target_levels = c("neg", "pos"),
   skip_connection_type = "ResidualGate",
-  cls_pooling_features = 50,
-  cls_pooling_type = "MinMaxTimes",
-  cls_head_type = "PairwiseOrthogonal",
+  cls_pooling_features = 20,
+  cls_pooling_type = "Max",
+  cls_head_type = "Regular",
   feat_act_fct = "ELU",
   feat_size = 384,
   feat_bias = TRUE,
-  feat_dropout = 0.10,
+  feat_dropout = 0.0,
   feat_parametrizations = "None",
   feat_normalization_type = "PowerNorm",
   ng_conv_act_fct = "ELU",
-  ng_conv_n_layers = 2,
+  ng_conv_n_layers = 1,
   ng_conv_ks_min = 2,
-  ng_conv_ks_max = 4,
+  ng_conv_ks_max = max_chunks,
   ng_conv_bias = FALSE,
-  ng_conv_dropout = 0.10,
+  ng_conv_dropout = 0.33,
   ng_conv_parametrizations = "None",
   ng_conv_normalization_type = "PowerNorm",
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "ELU",
   dense_n_layers = 2,
-  dense_dropout = 0.20,
+  dense_dropout = 0.33,
   dense_bias = FALSE,
   dense_parametrizations = "None",
   dense_normalization_type = "PowerNorm",
@@ -1560,7 +1563,7 @@ for classification. Thus, this value acts as a filter.
 > provides details on how to configure a classifier.
 
 In our example we use only two n-gram layers (`ng_conv_n_layers = 1`) and 
-one dense layers (`dense_n_layers = 0`). All other layers are omitted from the model
+two dense layers (`dense_n_layers = 2`). All other layers are omitted from the model
 by setting the number of layers to zero (`tf_n_layers = 0`,`rec_n_layers = 0`).
 
 As pooling method we use minimum and maximum over time (`cls_pooling_type="MinMaxTimes"`). 
@@ -1603,8 +1606,8 @@ cannot be matched are omitted from training.
 classifier$train(
   data_embeddings = review_embeddings,
   data_targets = review_labels,
-  data_folds = 5,
-  data_val_size = 0.40,
+  data_folds = 10,
+  data_val_size = 0.25,
   loss_balance_class_weights = TRUE,
   loss_balance_sequence_length = TRUE,
   loss_cls_fct_name = "FocalLoss",
@@ -1621,15 +1624,16 @@ classifier$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
-  epochs = 6000,
-  batch_size = 64,
+  sustain_log_level = "error",
+  epochs = 3000,
+  batch_size = 32,
   trace = TRUE,
   ml_trace = 0,
   log_dir = NULL,
   log_write_interval = 10,
   n_cores = auto_n_cores(),
-  lr_rate = 5e-5,
-  lr_min = 1e-5,
+  lr_rate = 0.0,
+  lr_min = 0.0,
   lr_scheduler="Linear",
   lr_warm_up_ratio = 0.05,
   optimizer = "AdamW",
@@ -1662,6 +1666,9 @@ A study conducted by Masters and Luschi (2018) suggests ways to achieve good
 batch size for using `"SGD"` as optimizer. Their study shows that smaller batch sizes
 offer more stable and reliable training and at the same time achieve better
 generalisation performance. Batch sizes between 4 and 32 lead to the best performance.
+
+We set `lr_rate = 0.0` and `lr_min = 0.0` to request an automatic calculation
+for a good learning rate.
 
 To speed up computations we activate automatic mixed precision (amp) 
 with gradient scaling by setting `amp = TRUE`. In general we recommend to activate
@@ -1754,6 +1761,29 @@ running_num_figures <- running_num_figures + 1
 Average iota ranges between `0`and `1` and indicates how good the 
 predictions represent the true values. Higher values indicate a better performance.
 
+Since measures such as average iota are measures for discrete values that can heavily fluctuate
+you can plot a smoothed version of average iota which is more precise.
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier during Performance Estimation Stage (smoothed iota)"),fig.align="center"}
+classifier$plot_training_history(
+  final_training = FALSE,
+  pl_step = NULL,
+  measure = "s_avg_iota",
+  ind_best_model = FALSE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = 1L,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
 To see the training process of the final training stage you have to set 
 `final_training=TRUE` as shown in the two following Figures. 
 
@@ -1798,6 +1828,49 @@ classifier$plot_training_history(
   text_size = 10
 )
 ```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier during Final Training Stage (smoothed iota)"),fig.align="center"}
+classifier$plot_training_history(
+  final_training = TRUE,
+  pl_step = NULL,
+  measure = "s_avg_iota",
+  ind_best_model = FALSE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = 1L,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+In order to have a deeper insight into training you can request a plot that
+visualizes the calculation of the learning rate. Please note that this plot is only
+available if you have set `lr_rate = 0.0` or `lr_min = 0.0`.
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Analysis of Different Learning Rates"),fig.align="center"}
+classifier$plot_learning_rate()
+```
+
+The bars of the plot shows how much the loss increases or decreases compared
+to the initial model state. The values express the degree in percentage to the initial loss.
+A decrease is desired.
+The points of the plot shows how many epochs yield a smaller loss compared 
+to the loss of the epoch before. They express the percentage of improved epochs on all epochs. 
+You can interpret this as a measure of stability.
+The automatic calculation selects the learning rate from the longest range of learning rates.
+That is, the used learning rate is selected from the mean index position of the highest learning rate
+and the index with the strongest decrease of loss. The minimum learning rate is selected from
+the mean index position of the lowest learning rate and the index with the strongest decrease of loss.
 
 ```{r, include = FALSE}
 running_num_figures <- running_num_figures + 1
@@ -2006,33 +2079,33 @@ us first create and configure the new classifier.
 ```{r, include = TRUE, eval=TRUE}
 classifier_prototype <- TEClassifierSequentialPrototype$new()
 classifier_prototype$configure(
-  label = "ProtoNet classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+   label = "ProtoNet classifier for Estimating a Postive or Negative Rating of Movie Reviews",
   text_embeddings = review_embeddings,
   feature_extractor = NULL,
   target_levels = c("neg", "pos"),
   skip_connection_type = "ResidualGate",
-  cls_pooling_features = 50,
-  cls_pooling_type = "MinMaxTimes",
-  projection_type = "PairwiseOrthogonal",
+  cls_pooling_features = 20,
+  cls_pooling_type = "Max",
+  projection_type = "PairwiseOrthogonalDense",
   metric_type = "Euclidean",
   feat_act_fct = "ELU",
   feat_size = 384,
   feat_bias = TRUE,
-  feat_dropout = 0.10,
+  feat_dropout = 0.0,
   feat_parametrizations = "None",
   feat_normalization_type = "PowerNorm",
   ng_conv_act_fct = "ELU",
-  ng_conv_n_layers = 2,
+  ng_conv_n_layers = 1,
   ng_conv_ks_min = 2,
-  ng_conv_ks_max = 4,
+  ng_conv_ks_max = max_chunks,
   ng_conv_bias = FALSE,
-  ng_conv_dropout = 0.10,
+  ng_conv_dropout = 0.33,
   ng_conv_parametrizations = "None",
   ng_conv_normalization_type = "PowerNorm",
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "ELU",
   dense_n_layers = 2,
-  dense_dropout = 0.20,
+  dense_dropout = 0.33,
   dense_bias = FALSE,
   dense_parametrizations = "None",
   dense_normalization_type = "PowerNorm",
@@ -2041,7 +2114,7 @@ classifier_prototype$configure(
   rec_n_layers = 0,
   rec_type = "GRU",
   rec_bidirectional = FALSE,
-  rec_dropout = 0.1,
+  rec_dropout = 0.2,
   rec_bias = FALSE,
   rec_parametrizations = "None",
   rec_normalization_type = "PowerNorm",
@@ -2091,9 +2164,9 @@ structure. Let us see how this changes when we train the model.
 
 ```{r classifier_prototype$train, include = TRUE, eval=TRUE}
 classifier_prototype$train(
-  data_embeddings = review_embeddings,
+ data_embeddings = review_embeddings,
   data_targets = review_labels,
-  data_folds = 5,
+  data_folds = 10,
   data_val_size = 0.25,
   loss_pt_fct_name = "MultiWayContrastiveLossFC",
   use_sc = FALSE,
@@ -2109,11 +2182,12 @@ classifier_prototype$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
-  epochs = 2000,
+  sustain_log_level = "error",
+  epochs = 3000,
   batch_size = 32,
-  Ns = 20,
+  Ns = 30,
   Nq = 5,
-  loss_alpha = 0.5,
+  loss_alpha = 0.75,
   loss_margin = 0.10,
   sampling_separate = FALSE,
   sampling_shuffle = TRUE,
@@ -2122,8 +2196,8 @@ classifier_prototype$train(
   log_dir = NULL,
   log_write_interval = 10,
   n_cores = auto_n_cores(),
-  lr_rate = 1e-4,
-  lr_min = 1e-4,
+  lr_rate = 0.0,
+  lr_min = 0.0,
   lr_scheduler = "None",
   lr_warm_up_ratio = 0.05,
   optimizer = "AdamW",
@@ -2172,7 +2246,18 @@ result in better performing classifiers.
 > and classes of the training data set (sample and query). These classes and prototypes are used
 > for the case that no sample data is provided.
 
-First we plot the training history for the loss and average iota during 
+
+First we plot the analysis of learning rates.
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Analysis of Different Learning Rates"),fig.align="center"}
+classifier_prototype$plot_learning_rate()
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+Second we plot the training history for the loss and average iota during 
 performance estimation stage. 
 
 ```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Prototypes during Performance Estimation Stage (loss)"),fig.align="center"}
@@ -2200,6 +2285,26 @@ classifier_prototype$plot_training_history(
   final_training = FALSE,
   pl_step = NULL,
   measure = "avg_iota",
+  ind_best_model = FALSE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = NULL,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Prototypes during Performance Estimation Stage (smoothed iota)"),fig.align="center"}
+classifier_prototype$plot_training_history(
+  final_training = FALSE,
+  pl_step = NULL,
+  measure = "s_avg_iota",
   ind_best_model = FALSE,
   ind_selected_model = TRUE,
   x_min = NULL,
@@ -2243,6 +2348,26 @@ classifier_prototype$plot_training_history(
   final_training = TRUE,
   pl_step = NULL,
   measure = "avg_iota",
+  ind_best_model = FALSE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = NULL,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Prototypes during Final Training Stage (smoothed iota)"),fig.align="center"}
+classifier_prototype$plot_training_history(
+  final_training = TRUE,
+  pl_step = NULL,
+  measure = "s_avg_iota",
   ind_best_model = FALSE,
   ind_selected_model = TRUE,
   x_min = NULL,
@@ -2516,10 +2641,11 @@ feature_extractor$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
-  epochs = 1000,
+  sustain_log_level = "error",
+  epochs = 3000,
   batch_size = 64,
-  lr_rate = 1e-3,
-  lr_min = 1e-4,
+  lr_rate = 0.0,
+  lr_min = 0.0,
   lr_scheduler = "Linear",
   trace = TRUE,
   ml_trace = 0,
@@ -2532,6 +2658,14 @@ feature_extractor$train(
 > In this example we use the same text embeddings as we use to train the classifier.
 > It can be beneficial if you use a larger sample of texts for training a `TEFeatureExtractor`
 > to improve performance and/or to allow a broad application of the feature extractor. 
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Analysis of Different Learning Rates"),fig.align="center"}
+feature_extractor$plot_learning_rate()
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
 
 You can plot the training history of the model with:
 
@@ -2567,32 +2701,32 @@ For the classifier described in section 6 this would look like:
 ```{r, include = TRUE, eval=TRUE}
 classifier_with_fe <- TEClassifierSequential$new()
 classifier_with_fe$configure(
-  label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+ label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
   text_embeddings = review_embeddings,
   feature_extractor = feature_extractor,
   target_levels = c("neg", "pos"),
   skip_connection_type = "ResidualGate",
-  cls_pooling_features = 50,
-  cls_pooling_type = "MinMaxTimes",
-  cls_head_type = "PairwiseOrthogonal",
+  cls_pooling_features = 20,
+  cls_pooling_type = "Max",
+  cls_head_type = "PairwiseOrthogonalDense",
   feat_act_fct = "ELU",
   feat_size = 128,
   feat_bias = TRUE,
-  feat_dropout = 0.00,
+  feat_dropout = 0.0,
   feat_parametrizations = "None",
   feat_normalization_type = "PowerNorm",
   ng_conv_act_fct = "ELU",
-  ng_conv_n_layers = 2,
+  ng_conv_n_layers = 1,
   ng_conv_ks_min = 2,
-  ng_conv_ks_max = 4,
+  ng_conv_ks_max = max_chunks,
   ng_conv_bias = FALSE,
-  ng_conv_dropout = 0.10,
+  ng_conv_dropout = 0.33,
   ng_conv_parametrizations = "None",
   ng_conv_normalization_type = "PowerNorm",
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "ELU",
   dense_n_layers = 2,
-  dense_dropout = 0.20,
+  dense_dropout = 0.33,
   dense_bias = FALSE,
   dense_parametrizations = "None",
   dense_normalization_type = "PowerNorm",
@@ -2628,9 +2762,9 @@ feature extractor manually. This is done automatically for all classifiers.
 
 ```{r classifier_with_fe$train, include = TRUE, eval=TRUE}
 classifier_with_fe$train(
-  data_embeddings = review_embeddings,
+data_embeddings = review_embeddings,
   data_targets = review_labels,
-  data_folds = 5,
+  data_folds = 10,
   data_val_size = 0.25,
   loss_balance_class_weights = TRUE,
   loss_balance_sequence_length = TRUE,
@@ -2648,15 +2782,16 @@ classifier_with_fe$train(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
-  epochs = 2000,
+  sustain_log_level = "error",
+  epochs = 3000,
   batch_size = 32,
   trace = TRUE,
   ml_trace = 0,
   log_dir = NULL,
   log_write_interval = 10,
   n_cores = auto_n_cores(),
-  lr_rate = 1e-3,
-  lr_min = 1e-4,
+  lr_rate = 0.0,
+  lr_min = 0.0,
   lr_scheduler = "Linear",
   lr_warm_up_ratio = 0.05,
   optimizer = "AdamW",
@@ -2734,6 +2869,26 @@ classifier_with_fe$plot_training_history(
   final_training = TRUE,
   pl_step = NULL,
   measure = "avg_iota",
+  ind_best_model = FALSE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = NULL,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Feature Extractor during Final Training Stage (smoothed iota)"),fig.align="center"}
+classifier_with_fe$plot_training_history(
+  final_training = TRUE,
+  pl_step = NULL,
+  measure = "s_avg_iota",
   ind_best_model = FALSE,
   ind_selected_model = TRUE,
   x_min = NULL,
@@ -3189,7 +3344,7 @@ S.-J. Huang (Eds.), Lecture Notes in Computer Science. Advances in
 Knowledge Discovery and Data Mining (Vol. 11440, pp. 305–317). Springer
 International Publishing. <https://doi.org/10.1007/978-3-030-16145-3_24>
 
-ou, L. (2023). Meta-Learning: Theory, Algorithms and Applications.
+Zou, L. (2023). Meta-Learning: Theory, Algorithms and Applications.
 Elsevier Science & Technology.
 <https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=7134465>
 
