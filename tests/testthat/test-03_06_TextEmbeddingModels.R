@@ -169,7 +169,7 @@ for (base_model_type in base_model_type_list) {
     n_CI = max_samples_CI
   )) {
     # Load a BaseModel
-    base_model <- load_from_disk(model_path)
+    base_model <- suppressMessages(load_from_disk(model_path))
 
     config <- generate_args_for_tests(
       object_name = "TextEmbeddingModel",
