@@ -78,6 +78,7 @@ Other Text Embedding:
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ModelsBasedOnTextEmbeddings" data-id="get_text_embedding_model"><a href='../../aifeducation/html/ModelsBasedOnTextEmbeddings.html#method-ModelsBasedOnTextEmbeddings-get_text_embedding_model'><code>ModelsBasedOnTextEmbeddings$get_text_embedding_model()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ModelsBasedOnTextEmbeddings" data-id="get_text_embedding_model_name"><a href='../../aifeducation/html/ModelsBasedOnTextEmbeddings.html#method-ModelsBasedOnTextEmbeddings-get_text_embedding_model_name'><code>ModelsBasedOnTextEmbeddings$get_text_embedding_model_name()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ModelsBasedOnTextEmbeddings" data-id="load_from_disk"><a href='../../aifeducation/html/ModelsBasedOnTextEmbeddings.html#method-ModelsBasedOnTextEmbeddings-load_from_disk'><code>ModelsBasedOnTextEmbeddings$load_from_disk()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ModelsBasedOnTextEmbeddings" data-id="plot_learning_rate"><a href='../../aifeducation/html/ModelsBasedOnTextEmbeddings.html#method-ModelsBasedOnTextEmbeddings-plot_learning_rate'><code>ModelsBasedOnTextEmbeddings$plot_learning_rate()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ModelsBasedOnTextEmbeddings" data-id="save"><a href='../../aifeducation/html/ModelsBasedOnTextEmbeddings.html#method-ModelsBasedOnTextEmbeddings-save'><code>ModelsBasedOnTextEmbeddings$save()</code></a></span></li>
 </ul>
 </details>}}
@@ -124,7 +125,12 @@ be added to the input during training. Allowed values: \ifelse{latex}{$0 <= x <=
 \if{html}{\out{<a id="method-TEFeatureExtractor-train"></a>}}
 \if{latex}{\out{\hypertarget{method-TEFeatureExtractor-train}{}}}
 \subsection{\code{TEFeatureExtractor$train()}}{
-  Method for training a neural net.
+  Method for training a TEFeatureExtractor.
+
+
+  Training loop uses an early stopping mechanism. Training stops
+if the performance on the validation set does not increase within 50 epochs or
+within 25 \% of the maximum number of epochs after the last checkpoint.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
     \preformatted{TEFeatureExtractor$train(

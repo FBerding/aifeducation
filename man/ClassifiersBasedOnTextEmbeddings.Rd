@@ -101,6 +101,7 @@ recall, and f1 for every fold.
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="count_parameter"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-count_parameter'><code>AIFEBaseModel$count_parameter()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ModelsBasedOnTextEmbeddings" data-id="get_text_embedding_model"><a href='../../aifeducation/html/ModelsBasedOnTextEmbeddings.html#method-ModelsBasedOnTextEmbeddings-get_text_embedding_model'><code>ModelsBasedOnTextEmbeddings$get_text_embedding_model()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ModelsBasedOnTextEmbeddings" data-id="get_text_embedding_model_name"><a href='../../aifeducation/html/ModelsBasedOnTextEmbeddings.html#method-ModelsBasedOnTextEmbeddings-get_text_embedding_model_name'><code>ModelsBasedOnTextEmbeddings$get_text_embedding_model_name()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ModelsBasedOnTextEmbeddings" data-id="plot_learning_rate"><a href='../../aifeducation/html/ModelsBasedOnTextEmbeddings.html#method-ModelsBasedOnTextEmbeddings-plot_learning_rate'><code>ModelsBasedOnTextEmbeddings$plot_learning_rate()</code></a></span></li>
 </ul>
 </details>}}
 \if{html}{\out{<hr>}}

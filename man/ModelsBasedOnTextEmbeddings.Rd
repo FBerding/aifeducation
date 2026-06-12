@@ -40,6 +40,7 @@ Other R6 Classes for Developers:
     \item \href{#method-ModelsBasedOnTextEmbeddings-save}{\code{ModelsBasedOnTextEmbeddings$save()}}
     \item \href{#method-ModelsBasedOnTextEmbeddings-load_from_disk}{\code{ModelsBasedOnTextEmbeddings$load_from_disk()}}
     \item \href{#method-ModelsBasedOnTextEmbeddings-plot_training_history}{\code{ModelsBasedOnTextEmbeddings$plot_training_history()}}
+    \item \href{#method-ModelsBasedOnTextEmbeddings-plot_learning_rate}{\code{ModelsBasedOnTextEmbeddings$plot_learning_rate()}}
     \item \href{#method-ModelsBasedOnTextEmbeddings-clone}{\code{ModelsBasedOnTextEmbeddings$clone()}}
   }
 }
@@ -203,6 +204,22 @@ with active pseudo labeling.}
       \item{\code{add_min_max}}{\code{bool} If \code{TRUE} the minimal and maximal values during performance estimation are port of the plot. If \code{FALSE} only the mean values are shown. Parameter is ignored if \code{final_training=TRUE}.}
       \item{\code{text_size}}{\code{int} Size of text elements. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
     }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Returns a plot of class \code{ggplot} visualizing the training process.
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-ModelsBasedOnTextEmbeddings-plot_learning_rate"></a>}}
+\if{latex}{\out{\hypertarget{method-ModelsBasedOnTextEmbeddings-plot_learning_rate}{}}}
+\subsection{\code{ModelsBasedOnTextEmbeddings$plot_learning_rate()}}{
+  Method for requesting a plot that shows the analysis for selecting
+a good learning rate.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ModelsBasedOnTextEmbeddings$plot_learning_rate()}
     \if{html}{\out{</div>}}
   }
   \subsection{Returns}{

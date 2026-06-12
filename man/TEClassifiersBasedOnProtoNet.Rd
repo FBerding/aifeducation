@@ -64,6 +64,7 @@ Other R6 Classes for Developers:
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEBaseModel" data-id="count_parameter"><a href='../../aifeducation/html/AIFEBaseModel.html#method-AIFEBaseModel-count_parameter'><code>AIFEBaseModel$count_parameter()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ModelsBasedOnTextEmbeddings" data-id="get_text_embedding_model"><a href='../../aifeducation/html/ModelsBasedOnTextEmbeddings.html#method-ModelsBasedOnTextEmbeddings-get_text_embedding_model'><code>ModelsBasedOnTextEmbeddings$get_text_embedding_model()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ModelsBasedOnTextEmbeddings" data-id="get_text_embedding_model_name"><a href='../../aifeducation/html/ModelsBasedOnTextEmbeddings.html#method-ModelsBasedOnTextEmbeddings-get_text_embedding_model_name'><code>ModelsBasedOnTextEmbeddings$get_text_embedding_model_name()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ModelsBasedOnTextEmbeddings" data-id="plot_learning_rate"><a href='../../aifeducation/html/ModelsBasedOnTextEmbeddings.html#method-ModelsBasedOnTextEmbeddings-plot_learning_rate'><code>ModelsBasedOnTextEmbeddings$plot_learning_rate()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="adjust_target_levels"><a href='../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-adjust_target_levels'><code>ClassifiersBasedOnTextEmbeddings$adjust_target_levels()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="check_embedding_model"><a href='../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-check_embedding_model'><code>ClassifiersBasedOnTextEmbeddings$check_embedding_model()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="check_feature_extractor_object_type"><a href='../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-check_feature_extractor_object_type'><code>ClassifiersBasedOnTextEmbeddings$check_feature_extractor_object_type()</code></a></span></li>
@@ -80,13 +81,13 @@ Other R6 Classes for Developers:
 \if{html}{\out{<a id="method-TEClassifiersBasedOnProtoNet-train"></a>}}
 \if{latex}{\out{\hypertarget{method-TEClassifiersBasedOnProtoNet-train}{}}}
 \subsection{\code{TEClassifiersBasedOnProtoNet$train()}}{
-  Method for training a neural net.
+  Method for training classifier based on prototypes.
 
-Training includes a routine for early stopping. In the case that loss<0.0001 and Accuracy=1.00 and Average
-Iota=1.00 training stops. The history uses the values of the last trained epoch for the remaining epochs.
+Training loop uses an early stopping mechanism. Training stops
+if the performance on the validation set does not increase within 250 epochs
 
-After training the model with the best values for Average Iota, Accuracy, and Loss on the validation data set
-is used as the final model.
+After training the model with the best values for smoothed Average Iota
+on the validation data set is used as the final model.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
     \preformatted{TEClassifiersBasedOnProtoNet$train(
