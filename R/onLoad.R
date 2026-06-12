@@ -15,22 +15,9 @@ calflops <- NULL
 .onLoad <- function(libname, pkgname) {
   # use superassignment to update the global reference
   os <<- reticulate::import("os", delay_load = TRUE)
-  transformers <<- reticulate::import("transformers", delay_load = list(
-    on_load = function() {
-      transformers$logging$set_verbosity_error()
-      transformers$utils$logging$set_verbosity(as.integer(transformers$utils$logging$log_levels[tolower("ERROR")]))
-    }
-  ))
-  codecarbon <<- reticulate::import("codecarbon", delay_load = list(
-    on_load = function() {
-      codecarbon$core$config$logger$setLevel("ERROR")
-    }
-  ))
-  datasets <<- reticulate::import("datasets", delay_load = list(
-    on_load = function() {
-      datasets$disable_progress_bars()
-    }
-  ))
+  transformers <<- reticulate::import("transformers", delay_load = TRUE)
+  codecarbon <<- reticulate::import("codecarbon", delay_load =TRUE)
+  datasets <<- reticulate::import("datasets", delay_load = TRUE)
   tok <<- reticulate::import("tokenizers", delay_load = TRUE)
   np <<- reticulate::import("numpy", delay_load = TRUE)
   torch <<- reticulate::import("torch", delay_load = TRUE)
@@ -39,7 +26,6 @@ calflops <- NULL
   safetensors <<- reticulate::import("safetensors", delay_load = TRUE)
   pandas <<- reticulate::import("pandas", delay_load = TRUE)
   pyarrow <<- reticulate::import("pyarrow", delay_load = TRUE)
-
   calflops <<- reticulate::import("calflops", delay_load = TRUE)
 }
 
