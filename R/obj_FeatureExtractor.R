@@ -237,11 +237,14 @@ TEFeatureExtractor <- R6::R6Class(
         log_top_message = log_top_message
       )
       rownames(self$last_training$history$loss) <- c("train", "val")
-      self$last_training$history=replace(
-        x=self$last_training$history,
-        list=(self$last_training$history==-100L),
-        values = NA
-      )
+      for (i in seq_along(self$last_training$history)){
+        self$last_training$history[[i]]=replace(
+          x=self$last_training$history[[i]],
+          list=(self$last_training$history[[i]]==-100L),
+          values = NA
+        )
+      }
+
       self$last_training$history <- list(self$last_training$history)
 
       # Stop sustainability tracking if requested
@@ -513,8 +516,6 @@ TEFeatureExtractor <- R6::R6Class(
           orthogonal_method = private$model_config$orthogonal_method
         )
       }
-      # Apply orthogonal initialization
-      private$model$apply(py$init_weights_orthogonal)
     },
     #--------------------------------------------------------------------------
     generate_model_id = function(name) {
