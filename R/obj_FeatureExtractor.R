@@ -106,7 +106,8 @@ TEFeatureExtractor <- R6::R6Class(
     #' @description Method for training a TEFeatureExtractor.
     #'
     #' @description Training loop uses an early stopping mechanism. Training stops
-    #' if the performance on the validation set does not increase within 50 epochs.
+    #' if the performance on the validation set does not increase within 50 epochs or
+    #' within 25 % of the maximum number of epochs after the last checkpoint.
     #'
     #' @param data_embeddings `r get_param_doc_desc("data_embeddings")`
     #' @param data_val_size `r get_param_doc_desc("data_val_size")`
