@@ -50,7 +50,7 @@ class multi_way_contrastive_loss(torch.nn.Module):
     self.alpha=alpha
     self.margin=margin
   
-  def forward(self,classes_q,distance_matrix,metric_scale_factor):
+  def forward(self,classes_q,distance_matrix,metric_scale_factor,logits=None):
     #Total number of classes
     K=distance_matrix.size()[1]
     current_margin=metric_scale_factor*self.margin
@@ -83,7 +83,7 @@ class multi_way_contrastive_loss_fc(torch.nn.Module):
     self.mw_contrastive_loss=multi_way_contrastive_loss(alpha=self.alpha,margin=self.margin)
     self.focal_loss=focal_loss(class_weights=self.class_weights,gamma=self.gamma)
   
-  def forward(self,classes_q,distance_matrix,metric_scale_factor):
+  def forward(self,classes_q,distance_matrix,metric_scale_factor,logits):
     loss_mw=self.mw_contrastive_loss(
       classes_q=classes_q,
       distance_matrix=distance_matrix,
@@ -92,7 +92,7 @@ class multi_way_contrastive_loss_fc(torch.nn.Module):
 
     target_focal=torch.nn.functional.one_hot(classes_q.long(), num_classes=distance_matrix.size(1))
     loss_fc=self.focal_loss(
-      prediction=-distance_matrix,
+      prediction=logits,
       target=target_focal.float()
     ).mean()
     loss=(loss_mw+loss_fc)/2
@@ -106,10 +106,10 @@ class focal_loss_pt(torch.nn.Module):
     
     self.focal_loss=focal_loss(class_weights=self.class_weights,gamma=self.gamma)
   
-  def forward(self,classes_q,distance_matrix,metric_scale_factor):
+  def forward(self,classes_q,distance_matrix,metric_scale_factor,logits):
     target_focal=torch.nn.functional.one_hot(classes_q.long(), num_classes=distance_matrix.size(1))
     loss=self.focal_loss(
-      prediction=-distance_matrix,
+      prediction=logits,
       target=target_focal.float()
     ).mean()
     return loss

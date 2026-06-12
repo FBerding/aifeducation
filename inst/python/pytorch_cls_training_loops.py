@@ -188,7 +188,8 @@ def calc_lr_rate_loss(model,device,current_dtype,optimizer,loss_fct,dataloader,n
         loss=loss_fct(
           classes_q=outputs[2],
           distance_matrix=outputs[1],
-          metric_scale_factor=model.get_metric_scale_factor().detach()
+          metric_scale_factor=model.get_metric_scale_factor().detach(),
+          logits=outputs[0]
         )
         if train_mode:
           loss.backward()
@@ -211,7 +212,7 @@ def calc_lr_rate_loss(model,device,current_dtype,optimizer,loss_fct,dataloader,n
         loss_complete+=loss
     return loss_complete
 
-def calc_lr_rate(trace,model,filepath,optimizer_method,loss_fct_name,dataset,batch_size,class_weights,Ns=None,Nq=None,n_classes=None,separate=None,shuffle=None,alpha=None,margin=None):
+def calc_lr_rate(trace,model,epochs,filepath,optimizer_method,loss_fct_name,dataset,batch_size,class_weights,Ns=None,Nq=None,n_classes=None,separate=None,shuffle=None,alpha=None,margin=None):
   #Prepare objects
   device=get_device()
   current_dtype=get_dtype(device)
@@ -260,8 +261,7 @@ def calc_lr_rate(trace,model,filepath,optimizer_method,loss_fct_name,dataset,bat
       counter+=1
 
   results=np.zeros((4,30))
-  epochs=20
-  
+
   #Set up logger
   PrgInd=ProgressLogger()
   PrgInd.set_start_time()
@@ -443,7 +443,8 @@ def run_epoch_cls_pt(model,dataloader,loss_fct,optimizer,scaler, scheduler,amp,e
           loss=loss_fct(
             classes_q=outputs[2],
             distance_matrix=outputs[1],
-            metric_scale_factor=model.get_metric_scale_factor().detach()
+            metric_scale_factor=model.get_metric_scale_factor().detach(),
+            logits=outputs[0]
           )
         scaler.scale(loss).backward()
         scaler.step(optimizer)
@@ -468,7 +469,8 @@ def run_epoch_cls_pt(model,dataloader,loss_fct,optimizer,scaler, scheduler,amp,e
           loss=loss_fct(
             classes_q=outputs[2],
             distance_matrix=outputs[1],
-            metric_scale_factor=model.get_metric_scale_factor().detach()
+            metric_scale_factor=model.get_metric_scale_factor().detach(),
+            logits=outputs[0]
           )
         #Metrics
         total_loss +=loss.item()
@@ -665,11 +667,13 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     )
     #Check if there are furhter information for training-----------------------
     # If there are no addtiononal information. Stop training and continue
-    if train_results["loss"]<1e-3 and train_results["accuracy"]==1 and train_results["balanced_accuracy"]==1 and train_results["s_avg_iota"]>=.98:
+    if train_results["loss"]<1e-3 and train_results["s_avg_iota"]>=.98:
       if trace:
         print("\n")
       break
   #Finalize--------------------------------------------------------------------
+  PrgInd.print_final_performance(trace=trace,metric_storage=metric_storage,elc=elc)
+  
   if use_callback==True:
     model.load_state_dict(torch.load(filepath,weights_only=True))
   return metric_storage
@@ -851,11 +855,12 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     )
     #Check if there are furhter information for training-----------------------
     # If there are no addtiononal information. Stop training and continue
-    if train_results["loss"]<1e-3 and train_results["accuracy"]==1 and train_results["balanced_accuracy"]==1 and train_results["s_avg_iota"]>=.98:
+    if (epoch+1-elc)>=max(50,0.25*epochs):
       if trace:
         print("\n")
       break
   #Finalize--------------------------------------------------------------------
+  PrgInd.print_final_performance(trace=trace,metric_storage=metric_storage,elc=elc)
   if use_callback==True:
     model.load_state_dict(torch.load(filepath,weights_only=True))
   return metric_storage
