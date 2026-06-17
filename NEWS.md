@@ -18,6 +18,7 @@ editor_options:
   Protocol Buffer Compiler.
 - Add a faster version for calculating CosineDistance.
 - Improved error messages for string arguments.
+- Fixed an error in calculating the breaks for training histories.
 
 **BaseModels**
 
