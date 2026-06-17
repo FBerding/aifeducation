@@ -73,7 +73,6 @@ Suggests:
     shinyWidgets,
     shinycssloaders,
     sortable,
-    knitr,
     testthat (>= 3.0.0)
 LinkingTo: 
     Rcpp,
@@ -87,4 +86,4 @@ Roxygen: list(markdown = TRUE, r6 = TRUE)
 SystemRequirements: PyTorch (see vignette "Get started")
 Config/Needs/website: rmarkdown
 Config/roxygen2/version: 8.0.0
-RoxygenNote: 7.3.3
+RoxygenNote: 8.0.0
