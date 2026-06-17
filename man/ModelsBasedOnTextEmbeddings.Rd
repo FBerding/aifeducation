@@ -41,6 +41,7 @@ Other R6 Classes for Developers:
     \item \href{#method-ModelsBasedOnTextEmbeddings-load_from_disk}{\code{ModelsBasedOnTextEmbeddings$load_from_disk()}}
     \item \href{#method-ModelsBasedOnTextEmbeddings-plot_training_history}{\code{ModelsBasedOnTextEmbeddings$plot_training_history()}}
     \item \href{#method-ModelsBasedOnTextEmbeddings-plot_learning_rate}{\code{ModelsBasedOnTextEmbeddings$plot_learning_rate()}}
+    \item \href{#method-ModelsBasedOnTextEmbeddings-get_lr_statistics}{\code{ModelsBasedOnTextEmbeddings$get_lr_statistics()}}
     \item \href{#method-ModelsBasedOnTextEmbeddings-clone}{\code{ModelsBasedOnTextEmbeddings$clone()}}
   }
 }
@@ -224,6 +225,21 @@ a good learning rate.
   }
   \subsection{Returns}{
     Returns a plot of class \code{ggplot} visualizing the training process.
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-ModelsBasedOnTextEmbeddings-get_lr_statistics"></a>}}
+\if{latex}{\out{\hypertarget{method-ModelsBasedOnTextEmbeddings-get_lr_statistics}{}}}
+\subsection{\code{ModelsBasedOnTextEmbeddings$get_lr_statistics()}}{
+  Method for requesting the learning rate statistics.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ModelsBasedOnTextEmbeddings$get_lr_statistics()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Returns a \code{data.frame}.
 Prepare history data of objects
 Function for preparing the history data of a model in order to be plotted in AI for Education - Studio.
 
