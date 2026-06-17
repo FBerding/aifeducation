@@ -225,8 +225,10 @@ for (object_class_name in object_class_names) {
 
   #---------------------------------------------------------------------------
   # Re-Load Base Model and compare with the initial model
-  base_model_reloaded <- load_from_disk(
+  base_model_reloaded <- suppressMessages(
+    load_from_disk(
     dir_path = tmp_dir
+    )
   )
 
   test_that(paste(

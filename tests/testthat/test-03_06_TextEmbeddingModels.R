@@ -69,7 +69,9 @@ for (base_model_type in base_model_type_list) {
 
   # Error Checking: Max layer greater as the number of layers
   # Load a BaseModel
-  base_model <- load_from_disk(model_path)
+  base_model <- suppressMessages(
+    load_from_disk(model_path)
+  )
 
   config <- generate_args_for_tests(
     object_name = "TextEmbeddingModel",
@@ -99,7 +101,9 @@ for (base_model_type in base_model_type_list) {
 
   # Error Checking: min layer is smaller 1
   # Load a BaseModel
-  base_model <- load_from_disk(model_path)
+  base_model <- suppressMessages(
+    load_from_disk(model_path)
+  )
 
   config <- generate_args_for_tests(
     object_name = "TextEmbeddingModel",
@@ -129,7 +133,9 @@ for (base_model_type in base_model_type_list) {
 
   # Error Checking: Configuration already set
   # Load a BaseModel
-  base_model <- load_from_disk(model_path)
+  base_model <- suppressMessages(
+    load_from_disk(model_path)
+  )
 
   config <- generate_args_for_tests(
     object_name = "TextEmbeddingModel",
