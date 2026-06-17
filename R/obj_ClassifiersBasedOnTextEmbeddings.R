@@ -1034,7 +1034,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
 
       # Reset model if requested
       if (reset_model) {
-        private$create_reset_model()
+        private$load_init_weights()
       }
 
       # Set loss function
@@ -1211,7 +1211,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       private$set_configuration_to_TRUE()
 
       # Create_Model
-      private$create_reset_model()
+      private$init_model()
     },
     #---------------------------------------------------------------------------
     check_param_combinations_training = function() {
@@ -1346,6 +1346,9 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
 
       # Check and create temporary directory for checkpoints
       private$create_checkpoint_directory()
+
+      # Save init weights of the model
+      private$save_init_weights()
 
       # Start-------------------------------------------------------------------
       if (self$last_training$config$trace) {

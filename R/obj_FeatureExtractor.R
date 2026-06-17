@@ -99,15 +99,11 @@ TEFeatureExtractor <- R6::R6Class(
       private$set_configuration_to_TRUE()
 
       # Create_Model
-      private$create_reset_model()
+      private$init_model()
     },
 
     #-------------------------------------------------------------------------
     #' @description Method for training a TEFeatureExtractor.
-    #'
-    #' @description Training loop uses an early stopping mechanism. Training stops
-    #' if the performance on the validation set does not increase within 50 epochs or
-    #' within 25 % of the maximum number of epochs after the last checkpoint.
     #'
     #' @param data_embeddings `r get_param_doc_desc("data_embeddings")`
     #' @param data_val_size `r get_param_doc_desc("data_val_size")`
@@ -496,7 +492,7 @@ TEFeatureExtractor <- R6::R6Class(
   private = list(
     trained = FALSE,
     #--------------------------------------------------------------------------
-    create_reset_model = function() {
+    init_model = function() {
 
       private$check_config_for_TRUE()
 

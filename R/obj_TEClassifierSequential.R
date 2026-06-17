@@ -139,7 +139,7 @@ TEClassifierSequential <- R6::R6Class(
   # Private---------------------------------------------------------------------
   private = list(
     #--------------------------------------------------------------------------
-    create_reset_model = function() {
+    init_model = function() {
       private$check_config_for_TRUE()
 
       private$model <- py$TEClassifierSequential(

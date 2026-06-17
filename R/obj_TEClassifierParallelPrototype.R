@@ -160,7 +160,7 @@ TEClassifierParallelPrototype <- R6::R6Class(
   ),
   private = list(
     # Private--------------------------------------------------------------------------
-    create_reset_model = function() {
+    init_model = function() {
       private$check_config_for_TRUE()
       private$model <- py$TEClassifierPrototype(
         features = as.integer(private$model_config$features),

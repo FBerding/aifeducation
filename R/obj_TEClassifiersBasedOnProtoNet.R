@@ -701,8 +701,8 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         dataset=lr_dataset,
         batch_size=as.integer(self$last_training$config$batch_size),
         class_weights=NULL,
-        Ns=as.integer(self$last_training$config$Ns),
-        Nq=as.integer(self$last_training$config$Nq),
+        Ns=as.integer(tmp_ns),
+        Nq=as.integer(tmp_nq),
         separate=self$last_training$config$sampling_separate,
         shuffle=self$last_training$config$sampling_shuffle,
         alpha = self$last_training$config$loss_alpha,
@@ -728,7 +728,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
 
       # Reset model if requested
       if (reset_model) {
-        private$create_reset_model()
+        private$init_model()
       }
 
       #Adjust Ns and Nq to current frequencies

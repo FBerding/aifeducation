@@ -322,7 +322,7 @@ TEClassifierProtoNet <- R6::R6Class(
   ),
   private = list(
     # Private--------------------------------------------------------------------------
-    create_reset_model = function() {
+    init_model = function() {
       private$check_config_for_TRUE()
 
 
@@ -369,7 +369,7 @@ TEClassifierProtoNet <- R6::R6Class(
 
       # Reset model if requested
       if (reset_model) {
-        private$create_reset_model()
+        private$init_model()
       }
 
       # Set loss function
