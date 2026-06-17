@@ -295,7 +295,18 @@ performance measure becomes unstable.
 
 In *aifeducation* you can use a learning rater finder by setting the argument `lr_rate = 0.0` or
 `lr_min = 0.0`. Please note, that the packages is based on Smith's (2015) idea but uses
-a different implementation. 
+a different implementation:
+
+- For every learning rate the model is trained for a specific number of
+  epochs without changing the learning rate during training.
+- For every learning rate the model uses the same initial weights and parameters. 
+- The resulting statistics is smoothed.
+- All calculations are done with the smoothed data.
+- Learning rates are chosen from the largest range of stable values.
+- The maximum learning rate is the learning rate at the turning point of the 
+  smoothed loss distribution. The minimum learning rate is the smallest learning
+  rate within the selection range.
+  
 
 Based on these results we **recommend to use the learning rate finder**. If you want to
 set the learning rate manually start with `batch_size = 32`. For calculating

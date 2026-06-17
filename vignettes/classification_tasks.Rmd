@@ -1637,7 +1637,7 @@ classifier$train(
   n_cores = auto_n_cores(),
   lr_rate = 0.0,
   lr_min = 0.0,
-  lr_scheduler="None",
+  lr_scheduler = "None",
   lr_warm_up_ratio = 0.05,
   optimizer = "Adam",
   amp = TRUE
@@ -2106,7 +2106,7 @@ classifier_prototype$configure(
   ng_conv_parametrizations = "None",
   ng_conv_normalization_type = "PowerNorm",
   ng_conv_residual_type = "ResidualGate",
-  dense_act_fct = "ELU",
+  dense_act_fct = "Tanh",
   dense_n_layers = 2,
   dense_dropout = 0.10,
   dense_bias = FALSE,
