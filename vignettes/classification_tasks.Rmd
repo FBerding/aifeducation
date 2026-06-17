@@ -967,6 +967,7 @@ base_model_bert$estimate_sustainability_inference_fill_mask(
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
+  sustain_log_level = "error",
   trace = TRUE
 )
 ```
@@ -1469,7 +1470,7 @@ classifier$configure(
   cls_pooling_type = "Max",
   cls_head_type = "Regular",
   feat_act_fct = "ELU",
-  feat_size = 384,
+  feat_size = 64,
   feat_bias = TRUE,
   feat_dropout = 0.0,
   feat_parametrizations = "None",
@@ -1479,13 +1480,13 @@ classifier$configure(
   ng_conv_ks_min = 2,
   ng_conv_ks_max = max_chunks,
   ng_conv_bias = FALSE,
-  ng_conv_dropout = 0.33,
+  ng_conv_dropout = 0.25,
   ng_conv_parametrizations = "None",
   ng_conv_normalization_type = "PowerNorm",
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "ELU",
   dense_n_layers = 2,
-  dense_dropout = 0.33,
+  dense_dropout = 0.10,
   dense_bias = FALSE,
   dense_parametrizations = "None",
   dense_normalization_type = "PowerNorm",
@@ -1500,13 +1501,13 @@ classifier$configure(
   rec_normalization_type = "PowerNorm",
   rec_residual_type = "ResidualGate",
   tf_act_fct = "ELU",
-  tf_dense_dim = 400,
+  tf_dense_dim = 1.25*64,
   tf_n_layers = 0,
   tf_dropout_rate_1 = 0.1,
   tf_dropout_rate_2 = 0.3,
   tf_attention_type = "MultiHead",
   tf_positional_type = "absolute",
-  tf_num_heads = 1,
+  tf_num_heads = 12,
   tf_bias = FALSE,
   tf_parametrizations = "None",
   tf_normalization_type = "PowerNorm",
@@ -1573,10 +1574,12 @@ the classes/labels. The `cls_pooling_features` is only relevant if you set `cls_
 over features which in most times leads to a lose of information. They are
 useful only if your classifier has to predict two classes/categories.
 
-In this example we use a special classification head (`cls_head_type = "PairwiseOrthogonal"`) proposed by (Li et al. (2020))[https://doi.org/10.1109/TIP.2020.2990277]. This layer allows every neuron only
-to establish a connection to a single class. In contrast to regular dense layers 
-(`cls_head_type = "Regular"`) where all neurons of the previous layer are connected
-all classes. We add a dense layer before the classification head (`cls_head_type = "PairwiseOrthogonalDense"`) in 
+In this example we use a regular classification head (`cls_head_type = "Regular"`) 
+where all neurons of the previous layer are connected all classes. 
+Li et al. (2020)[https://doi.org/10.1109/TIP.2020.2990277] proposed a special 
+classification head (`cls_head_type = "PairwiseOrthogonal"`). This layer allows every neuron only
+to establish a connection to a single class. For this special layer you can add 
+a dense layer before the classification head (`cls_head_type = "PairwiseOrthogonalDense"`) in 
 order to improve performance with high rates for dropout in the previous layers.
 
 You receive a short summary of the classifier by calling `print`.
@@ -1625,7 +1628,7 @@ classifier$train(
   sustain_region = NULL,
   sustain_interval = 15,
   sustain_log_level = "error",
-  epochs = 3000,
+  epochs = 2000,
   batch_size = 32,
   trace = TRUE,
   ml_trace = 0,
@@ -1634,9 +1637,9 @@ classifier$train(
   n_cores = auto_n_cores(),
   lr_rate = 0.0,
   lr_min = 0.0,
-  lr_scheduler="Linear",
+  lr_scheduler="None",
   lr_warm_up_ratio = 0.05,
-  optimizer = "AdamW",
+  optimizer = "Adam",
   amp = TRUE
 )
 ```
@@ -1785,7 +1788,7 @@ running_num_figures <- running_num_figures + 1
 ```
 
 To see the training process of the final training stage you have to set 
-`final_training=TRUE` as shown in the two following Figures. 
+`final_training=TRUE` as shown in the following Figures. 
 
 ```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier during Final Training Stage (loss)"),fig.align="center"}
 classifier$plot_training_history(
@@ -1862,15 +1865,15 @@ classifier$plot_learning_rate()
 ```
 
 The bars of the plot shows how much the loss increases or decreases compared
-to the initial model state. The values express the degree in percentage to the initial loss.
-A decrease is desired.
-The points of the plot shows how many epochs yield a smaller loss compared 
-to the loss of the epoch before. They express the percentage of improved epochs on all epochs. 
-You can interpret this as a measure of stability.
-The automatic calculation selects the learning rate from the longest range of learning rates.
-That is, the used learning rate is selected from the mean index position of the highest learning rate
-and the index with the strongest decrease of loss. The minimum learning rate is selected from
-the mean index position of the lowest learning rate and the index with the strongest decrease of loss.
+to the initial loss. The values express the degree in percentage to the initial loss.
+A decrease is desired.The points of the plot show a smoothed distribution of the loss. 
+All calculations for selecting a good maximum and minimum learning rate are based on
+the smoothed data. 
+The automatic calculation selects the learning rate from the longest range of learning rates 
+that lead to a decreased loss. The maximum learning rate is set as the learning 
+rate where the decrease in the loss has a turning point. The minimum is set to 
+the learning rate that has the smallest reduction of the loss. 
+
 
 ```{r, include = FALSE}
 running_num_figures <- running_num_figures + 1
@@ -2086,10 +2089,10 @@ classifier_prototype$configure(
   skip_connection_type = "ResidualGate",
   cls_pooling_features = 20,
   cls_pooling_type = "Max",
-  projection_type = "PairwiseOrthogonalDense",
+  projection_type = "Regular",
   metric_type = "Euclidean",
   feat_act_fct = "ELU",
-  feat_size = 384,
+  feat_size = 64,
   feat_bias = TRUE,
   feat_dropout = 0.0,
   feat_parametrizations = "None",
@@ -2099,13 +2102,13 @@ classifier_prototype$configure(
   ng_conv_ks_min = 2,
   ng_conv_ks_max = max_chunks,
   ng_conv_bias = FALSE,
-  ng_conv_dropout = 0.33,
+  ng_conv_dropout = 0.25,
   ng_conv_parametrizations = "None",
   ng_conv_normalization_type = "PowerNorm",
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "ELU",
   dense_n_layers = 2,
-  dense_dropout = 0.33,
+  dense_dropout = 0.10,
   dense_bias = FALSE,
   dense_parametrizations = "None",
   dense_normalization_type = "PowerNorm",
@@ -2120,13 +2123,13 @@ classifier_prototype$configure(
   rec_normalization_type = "PowerNorm",
   rec_residual_type = "ResidualGate",
   tf_act_fct = "ELU",
-  tf_dense_dim = 400,
+  tf_dense_dim = 1.25*64,
   tf_n_layers = 0,
   tf_dropout_rate_1 = 0.1,
   tf_dropout_rate_2 = 0.3,
   tf_attention_type = "MultiHead",
   tf_positional_type = "absolute",
-  tf_num_heads = 1,
+  tf_num_heads = 12,
   tf_bias = FALSE,
   tf_parametrizations = "None",
   tf_normalization_type = "PowerNorm",
@@ -2183,10 +2186,10 @@ classifier_prototype$train(
   sustain_region = NULL,
   sustain_interval = 15,
   sustain_log_level = "error",
-  epochs = 3000,
+  epochs = 2000,
   batch_size = 32,
-  Ns = 30,
-  Nq = 5,
+  Ns = 9,
+  Nq = 3,
   loss_alpha = 0.75,
   loss_margin = 0.10,
   sampling_separate = FALSE,
@@ -2200,7 +2203,7 @@ classifier_prototype$train(
   lr_min = 0.0,
   lr_scheduler = "None",
   lr_warm_up_ratio = 0.05,
-  optimizer = "AdamW",
+  optimizer = "Adam",
   amp = TRUE
 )
 ```
@@ -2642,14 +2645,14 @@ feature_extractor$train(
   sustain_region = NULL,
   sustain_interval = 15,
   sustain_log_level = "error",
-  epochs = 3000,
+  epochs = 2000,
   batch_size = 64,
   lr_rate = 0.0,
   lr_min = 0.0,
-  lr_scheduler = "Linear",
+  lr_scheduler = "None",
   trace = TRUE,
   ml_trace = 0,
-  optimizer = "AdamW",
+  optimizer = "Adam",
   amp = TRUE,
   lr_warm_up_ratio = 0.10
 )
@@ -2708,7 +2711,7 @@ classifier_with_fe$configure(
   skip_connection_type = "ResidualGate",
   cls_pooling_features = 20,
   cls_pooling_type = "Max",
-  cls_head_type = "PairwiseOrthogonalDense",
+  cls_head_type = "Regular",
   feat_act_fct = "ELU",
   feat_size = 128,
   feat_bias = TRUE,
@@ -2720,13 +2723,13 @@ classifier_with_fe$configure(
   ng_conv_ks_min = 2,
   ng_conv_ks_max = max_chunks,
   ng_conv_bias = FALSE,
-  ng_conv_dropout = 0.33,
+  ng_conv_dropout = 0.25,
   ng_conv_parametrizations = "None",
   ng_conv_normalization_type = "PowerNorm",
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "ELU",
   dense_n_layers = 2,
-  dense_dropout = 0.33,
+  dense_dropout = 0.10,
   dense_bias = FALSE,
   dense_parametrizations = "None",
   dense_normalization_type = "PowerNorm",
@@ -2741,13 +2744,13 @@ classifier_with_fe$configure(
   rec_normalization_type = "PowerNorm",
   rec_residual_type = "ResidualGate",
   tf_act_fct = "ELU",
-  tf_dense_dim = 256,
+  tf_dense_dim = 1.25*64,
   tf_n_layers = 0,
   tf_dropout_rate_1 = 0.1,
   tf_dropout_rate_2 = 0.3,
   tf_attention_type = "MultiHead",
   tf_positional_type = "absolute",
-  tf_num_heads = 1,
+  tf_num_heads = 12,
   tf_bias = FALSE,
   tf_parametrizations = "None",
   tf_normalization_type = "PowerNorm",
@@ -2783,7 +2786,7 @@ data_embeddings = review_embeddings,
   sustain_region = NULL,
   sustain_interval = 15,
   sustain_log_level = "error",
-  epochs = 3000,
+  epochs = 2000,
   batch_size = 32,
   trace = TRUE,
   ml_trace = 0,
@@ -2792,9 +2795,9 @@ data_embeddings = review_embeddings,
   n_cores = auto_n_cores(),
   lr_rate = 0.0,
   lr_min = 0.0,
-  lr_scheduler = "Linear",
+  lr_scheduler = "None",
   lr_warm_up_ratio = 0.05,
-  optimizer = "AdamW",
+  optimizer = "Adam",
   amp = TRUE
 )
 ```
@@ -2826,6 +2829,26 @@ classifier_with_fe$plot_training_history(
   final_training = FALSE,
   pl_step = NULL,
   measure = "avg_iota",
+  ind_best_model = FALSE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = NULL,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Feature Extractor during Performance Estimation Stage (smoothed iota)"),fig.align="center"}
+classifier_with_fe$plot_training_history(
+  final_training = FALSE,
+  pl_step = NULL,
+  measure = "s_avg_iota",
   ind_best_model = FALSE,
   ind_selected_model = TRUE,
   x_min = NULL,
