@@ -136,13 +136,10 @@ def add_metrics(metrics,storage,cblock,epoch):
 
 #=============================================================
 
-def calc_lr_rate_loss(model,device,current_dtype,optimizer,loss_fct,dataloader,n_classes=None,Ns=None,Nq=None,train_mode=True):
+def calc_lr_rate_loss(model,device,current_dtype,optimizer,loss_fct,dataloader,n_classes=None,Ns=None,Nq=None,start_mode=True):
     loss_complete=0
-    if train_mode:     
-      model.train()
-    else:
-      model.eval()
-      
+    model.train()
+
     if isinstance(model,TEClassifierSequential) or isinstance(model,TEClassifierParallel):
       for batch in dataloader:
         inputs=batch["input"]
@@ -155,12 +152,12 @@ def calc_lr_rate_loss(model,device,current_dtype,optimizer,loss_fct,dataloader,n
           sample_weights=sample_weights.to(device,dtype=current_dtype)
         else:
            sample_weights=torch.ones((inputs.size(0)),device=device,dtype=current_dtype)/inputs.size(0)
-        if train_mode:
+        if not start_mode:
           optimizer.zero_grad()
         outputs=model(inputs,prediction_mode=False)
         loss=loss_fct(outputs,labels)*sample_weights.detach()
         loss=loss.mean()
-        if train_mode:
+        if not start_mode:
           loss.backward()
           optimizer.step()
         loss_complete+=loss
@@ -176,7 +173,7 @@ def calc_lr_rate_loss(model,device,current_dtype,optimizer,loss_fct,dataloader,n
         query_inputs = query_inputs.to(device,dtype=current_dtype)
         sample_classes = sample_classes.to(device,dtype=current_dtype)
         query_classes = query_classes.to(device,dtype=current_dtype)
-        if train_mode:
+        if not start_mode:
           optimizer.zero_grad()
         outputs=model(
           input_q=query_inputs,
@@ -191,7 +188,7 @@ def calc_lr_rate_loss(model,device,current_dtype,optimizer,loss_fct,dataloader,n
           metric_scale_factor=model.get_metric_scale_factor().detach(),
           logits=outputs[0]
         )
-        if train_mode:
+        if not start_mode:
           loss.backward()
           optimizer.step()      
         loss_complete+=loss
@@ -201,12 +198,12 @@ def calc_lr_rate_loss(model,device,current_dtype,optimizer,loss_fct,dataloader,n
         labels=batch["labels"]
         inputs = inputs.to(device,dtype=current_dtype)
         labels=labels.to(device,dtype=current_dtype)
-        if train_mode:
+        if not start_mode:
           optimizer.zero_grad()
         outputs=model(inputs,encoder_mode=False)
         loss=loss_fct(outputs,labels)
         loss=loss.mean()
-        if train_mode:
+        if not start_mode:
           loss.backward()
           optimizer.step()
         loss_complete+=loss
@@ -255,9 +252,14 @@ def calc_lr_rate(trace,model,epochs,filepath,optimizer_method,loss_fct_name,data
   
   counter=0
   learning_rates=np.zeros((30))
-  for i in range(1,11):
-    for j in range(0,3):
-      learning_rates[counter]=(1/2**j)/10**i
+  for i in range(1,6):
+    if i==0:
+      tmp_range=range(0,3)
+    else:
+      tmp_range=range(0,4)
+    for j in tmp_range:
+      base=(j+1)/4
+      learning_rates[counter]=base/(10**i)
       counter+=1
 
   results=np.zeros((4,30))
@@ -268,7 +270,7 @@ def calc_lr_rate(trace,model,epochs,filepath,optimizer_method,loss_fct_name,data
   total_iter=len(learning_rates)
   for j in range(0,total_iter):
     #Reset model
-    model.load_state_dict(torch.load(filepath,weights_only=True))
+    model.load_state_dict(torch.load(filepath,weights_only=False))
     #set learning rate
     tmp_lr_rate=learning_rates[j]
     #Create a new Optimizer for every test
@@ -288,7 +290,7 @@ def calc_lr_rate(trace,model,epochs,filepath,optimizer_method,loss_fct_name,data
       optimizer=optimizer,
       loss_fct=loss_fct,
       dataloader=dataloader,
-      train_mode=False
+      start_mode=True
     )
     start_loss=start_loss/len(dataloader) 
     # Calculate tranining data
@@ -304,7 +306,7 @@ def calc_lr_rate(trace,model,epochs,filepath,optimizer_method,loss_fct_name,data
         optimizer=optimizer,
         loss_fct=loss_fct,
         dataloader=dataloader,
-        train_mode=True
+        start_mode=False
       )
       epoch_loss=epoch_loss/len(dataloader)
       #Count improvments
@@ -855,7 +857,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     )
     #Check if there are furhter information for training-----------------------
     # If there are no addtiononal information. Stop training and continue
-    if (epoch+1-elc)>=max(50,0.25*epochs):
+    if train_results["loss"]<1e-3 and train_results["s_avg_iota"]>=.98:
       if trace:
         print("\n")
       break
