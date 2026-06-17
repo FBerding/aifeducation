@@ -383,14 +383,15 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
           stop("Calculation of learning rates was not requested during training.")
         } else {
           plot_data$lr_rate=as.factor(plot_data$lr_rate)
-          plot_data$rel_improvment=(plot_data$delta)/plot_data$start_loss
+          #plot_data$rel_improvment=(plot_data$delta)/plot_data$start_loss
           relevant_range=subset(
             x=plot_data,
             subset=plot_data$best_range
           )
-          best_idx=min(which(relevant_range$delta==min(relevant_range$delta)))
-          best=relevant_range$lr_rate[floor((1L+best_idx)/2)]
-          final_min=relevant_range$lr_rate[ceiling((best_idx+nrow(relevant_range))/2)]
+          selected=which(plot_data$selected)
+          if(length(selected)<=1L){
+            selected=c(selected,selected)
+          }
 
           #Create plot
           tmp_plot=ggplot2::ggplot(data=plot_data)+
@@ -398,23 +399,29 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
               stat = "identity",
               ggplot2::aes(
               x=lr_rate,
-              y=rel_improvment
+              y=delta
             ))+
             ggplot2::geom_point(
               ggplot2::aes(
                 x=lr_rate,
-                y=imp_per_epoch
+                y=smoothed_delta
               )
             )+
             ggplot2::xlab("Learning Rate")+
             ggplot2::ylab("Change in %")+
-            ggplot2::geom_vline(xintercept=best)+
-            ggplot2::geom_vline(xintercept=final_min)+
+            ggplot2::geom_vline(xintercept=plot_data$lr_rate[selected[1L]])+
+            ggplot2::geom_vline(xintercept=plot_data$lr_rate[selected[2L]])+
             ggplot2::coord_flip()+
             ggplot2::theme_classic()
           return(tmp_plot)
         }
       }
+    },
+    #----------------------------------------------------------------------------
+    #' @description Method for requesting the learning rate statistics.
+    #' @return Returns a `data.frame`.
+    get_lr_statistics=function(){
+      return(private$lr_statistics)
     }
   ),
   private = list(
@@ -886,7 +893,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       # Load the model---------------------------------------------------------
       path_pt <- paste0(dir_path, "/", "model_data", ".pt")
       path_safe_tensors <- paste0(dir_path, "/", "model_data", ".safetensors")
-      private$create_reset_model()
+      private$init_model()
       private$model$to("cpu", dtype = torch$float32)
 
       if (file.exists(path_safe_tensors)) {
@@ -912,7 +919,11 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
           msg = "Estimating Learning Rates",
           trace = self$last_training$config$trace
         )
-        total_epochs=20L
+        if(is_on_CI()){
+          total_epochs=2L
+        } else {
+          total_epochs=20L
+        }
         estimates=private$estimate_learning_rates(
           data_manager,
           total_epochs=total_epochs
@@ -925,19 +936,47 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     select_learning_rates=function(lr_estimation_results,total_epochs){
+
       lr_estimation_results=t(lr_estimation_results)
-      lr_estimation_results=lr_estimation_results[order(lr_estimation_results[,1]),]
+      lr_estimation_results=lr_estimation_results[order(lr_estimation_results[,1],decreasing=TRUE),]
       colnames(lr_estimation_results)=c("lr_rate","n_improvments","start_loss","final_loss")
       lr_estimation_results=as.data.frame(lr_estimation_results)
-      lr_estimation_results$improved=lr_estimation_results$final_loss<lr_estimation_results$start_loss
-      lr_estimation_results$delta=lr_estimation_results$final_loss-lr_estimation_results$start_loss
-      lr_estimation_results$imp_per_epoch=lr_estimation_results$n_improvments/total_epochs
+      lr_estimation_results=subset(
+        x=lr_estimation_results,
+        subset=lr_estimation_results$lr_rate!=0.0
+      )
+      lr_estimation_results$index=seq.int(from=1L,to=nrow(lr_estimation_results))
+      lr_estimation_results$selected=FALSE
+      #Smooth data distribution
+      lr_estimation_results$delta=(lr_estimation_results$final_loss-lr_estimation_results$start_loss)/lr_estimation_results$start_loss*100
+      smoothed_fct=loess(delta~index,data=lr_estimation_results)
+      lr_estimation_results$smoothed_delta=predict(smoothed_fct)
+      lr_estimation_results$smoothed_delta_imp=lr_estimation_results$smoothed_delta<0.0
+      #Calculate gradient and calculate turning point
+      gradient=vector(length = nrow(lr_estimation_results))
+      gradient[]=NA
+      for(i in nrow(lr_estimation_results):2L){
+        gradient[i-1L]=lr_estimation_results$smoothed_delta[i-1L]-lr_estimation_results$smoothed_delta[i]
+      }
+      lr_estimation_results$gradient=gradient
+
+      turning_points=vector(length = nrow(lr_estimation_results))
+      for(i in (nrow(lr_estimation_results)-1L):2L){
+        condition_one=lr_estimation_results$gradient[i-1L]<=lr_estimation_results$gradient[i]
+        if(condition_one){
+          turning_points[i]=TRUE
+        } else {
+          turning_points[i]=FALSE
+        }
+      }
+      lr_estimation_results$turning_points=turning_points
+      # identify stable range
       range_length=vector(length = nrow(lr_estimation_results))
       for (i in 1:nrow(lr_estimation_results)) {
         continious=TRUE
         counter=0
         for(j in i:nrow(lr_estimation_results)){
-          if(lr_estimation_results$improved[j]&&continious){
+          if(lr_estimation_results$smoothed_delta_imp[j]&&continious){
             counter=counter+1
           } else {
             continious=FALSE
@@ -953,19 +992,36 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       lr_estimation_results$best_range=best_range
       relevant_range=subset(
         x=lr_estimation_results,
-        subset= lr_estimation_results$best_range
+        subset= (lr_estimation_results$best_range & lr_estimation_results$smoothed_delta_imp)
       )
-
+      #Selecht the best values from the increasing side of the graph
       if(nrow(relevant_range)>0L){
-        relevant_range=relevant_range[order(relevant_range$lr_rate,decreasing=TRUE),]
-        #min_lr=min(relevant_range$lr_rate)
-        #max_lr=max(relevant_range$lr_rate)
-        best_idx=min(which(relevant_range$delta==min(relevant_range$delta)))[0L]
-        best=relevant_range$lr_rate[floor((1L+best_idx)/2)]
-        final_min=relevant_range$lr_rate[ceiling((best_idx+nrow(relevant_range))/2)]
+        best_idx=min(which(relevant_range$delta==min(relevant_range$delta)))
+        relevant_range=relevant_range[best_idx:nrow(relevant_range),]
 
-        self$last_training$config$lr_rate=best
-        self$last_training$config$lr_min=final_min
+        relevant_range=relevant_range[order(relevant_range$lr_rate,decreasing=TRUE),]
+
+        if(any(relevant_range$turning_points)){
+          best_idx=min(which(relevant_range$turning_points))
+        } else {
+          best_idx=min(which(relevant_range$delta==min(relevant_range$delta)))
+        }
+
+        best=relevant_range$lr_rate[best_idx]
+
+        lr_idx=max(which(relevant_range$delta==max(relevant_range$delta)))
+        lr=relevant_range$lr_rate[lr_idx]
+
+        if(best>lr){
+          self$last_training$config$lr_rate=best
+          self$last_training$config$lr_min=lr
+        } else {
+          self$last_training$config$lr_rate=lr
+          self$last_training$config$lr_min=best
+        }
+
+        lr_estimation_results$selected[which(lr_estimation_results$lr_rate==self$last_training$config$lr_rate)]=TRUE
+        lr_estimation_results$selected[which(lr_estimation_results$lr_rate==self$last_training$config$lr_min)]=TRUE
 
         print_message(
           msg = paste0(
@@ -993,6 +1049,22 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         self$last_training$config$lr_min=1e-4
       }
       return(lr_estimation_results)
+    },
+    #--------------------------------------------------------------------------
+    save_init_weights=function(){
+      torch$save(
+        obj=private$model$state_dict(),
+        f=file.path(private$dir_checkpoint, "init_weights.pt")
+        )
+    },
+    #--------------------------------------------------------------------------
+    load_init_weights=function(){
+      private$model$load_state_dict(
+        torch$load(
+          file.path(private$dir_checkpoint, "init_weights.pt"),
+          weights_only=TRUE
+          )
+        )
     }
   )
 )
