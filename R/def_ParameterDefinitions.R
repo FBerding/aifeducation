@@ -1213,7 +1213,7 @@ get_param_dict <- function() {
     gui_box = "Learning Rate",
     gui_label = "Learning Rate",
     default_value = 0.0,
-    test_values = 0.0
+    test_values = 1e-3
   )
   param$learning_rate <- param$lr_rate
   param$lr_min <- list(
@@ -1227,7 +1227,7 @@ get_param_dict <- function() {
     gui_box = "Learning Rate",
     gui_label = "Minimal Learning Rate",
     default_value = 0.0,
-    test_values = 0.0
+    test_values = c(0.0,1e-4)
   )
   param$lr_scheduler <- list(
     type = "string",
