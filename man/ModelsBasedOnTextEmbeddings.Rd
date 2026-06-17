@@ -239,7 +239,18 @@ a good learning rate.
     \if{html}{\out{</div>}}
   }
   \subsection{Returns}{
-    Returns a \code{data.frame}.
+    Returns a \code{data.frame} with the following columns
+\itemize{
+\item index: Index of the learning rate
+\item lr_rate: Learning rate as \code{factor}.
+\item start_loss: Loss before any training.
+\item final_loss: Loss after the complete training.
+\item delta: Normalized loss as (final_loss-start_loss)/start_loss.
+\item smoothed_delta: Smoothed normalized loss.
+\item best_range: \code{bool} indicating if the learning rate is part of the best range.
+\item selected: \code{bool} indicating if the learning rate is selected for further training.
+}
+
 Prepare history data of objects
 Function for preparing the history data of a model in order to be plotted in AI for Education - Studio.
 
