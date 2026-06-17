@@ -56,6 +56,7 @@ special conditions of the educational and social sciences.
 -   Implements the advantages of the python library 'datasets',
     increasing computational speed and allowing the use of very large data
     sets.
+-   Automatic calculation of learning rates.    
 -   Uses safetensors for saving models in 'PyTorch'.
 -   Supports pre-trained language models from Hugging Face. 
 -   Supports ModernBERT, MPNet, BERT, RoBERTa, DeBERTa, Funnel
