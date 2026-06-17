@@ -304,7 +304,6 @@ add_breaks <- function(plot_object, x_min, x_max, y_min, y_max, special_x = NULL
     distances_y=(max(breaks_y)-min(breaks_y))/5
     for (sp_y in special_y) {
       y_selection=!((breaks_y> (sp_y-distances_y)) & (breaks_y<(sp_y+distances_y)))
-      print(y_selection)
       breaks_y <- breaks_y[y_selection]
     }
     breaks_y <- c(breaks_y, special_y)
