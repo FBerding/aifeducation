@@ -494,7 +494,9 @@ for (base_model_type in base_model_type_list) {
         folder_name = folder_name
       ))
       # Load Model
-      text_embedding_model_reloaded <- load_from_disk(dir_path = save_location)
+      text_embedding_model_reloaded <- suppressMessages(
+        load_from_disk(dir_path = save_location)
+      )
 
       # embeddings after loading saving
       embeddings_2 <- text_embedding_model_reloaded$embed(
