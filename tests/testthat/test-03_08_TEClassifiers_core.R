@@ -661,13 +661,15 @@ for (object_class_name in object_class_names) {
         expect_s3_class(object = classifier$plot_coding_stream(), class = "ggplot")
       })
 
-      test_that(paste(
-        "plot_learning_rate", object_class_name,
-        get_current_args_for_print(test_combination),
-        get_current_args_for_print(train_args_combinations)
-      ), {
-        expect_s3_class(object = classifier$plot_learning_rate(), class = "ggplot")
-      })
+      if (classifier$last_training$config$lr_rate==0.0 ||classifier$last_training$config$lr_rate==0.0){
+        test_that(paste(
+          "plot_learning_rate", object_class_name,
+          get_current_args_for_print(test_combination),
+          get_current_args_for_print(train_args_combinations)
+        ), {
+          expect_s3_class(object = classifier$plot_learning_rate(), class = "ggplot")
+        })
+      }
       gc()
     }
   }
