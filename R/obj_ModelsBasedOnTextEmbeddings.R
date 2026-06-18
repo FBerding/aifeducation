@@ -419,7 +419,16 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     },
     #----------------------------------------------------------------------------
     #' @description Method for requesting the learning rate statistics.
-    #' @return Returns a `data.frame`.
+    #' @return Returns a `data.frame` with the following columns
+    #' * index: Index of the learning rate
+    #' * lr_rate: Learning rate as `factor`.
+    #' * start_loss: Loss before any training.
+    #' * final_loss: Loss after the complete training.
+    #' * delta: Normalized loss as (final_loss-start_loss)/start_loss.
+    #' * smoothed_delta: Smoothed normalized loss.
+    #' * best_range: `bool` indicating if the learning rate is part of the best range.
+    #' * selected: `bool` indicating if the learning rate is selected for further training.
+    #'
     get_lr_statistics=function(){
       return(private$lr_statistics)
     }
@@ -1048,6 +1057,17 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         self$last_training$config$lr_rate=1e-3
         self$last_training$config$lr_min=1e-4
       }
+      #Reduce to relevant columns
+      lr_estimation_results=lr_estimation_results[c(
+        "index",
+        "lr_rate",
+        "start_loss",
+        "final_loss",
+        "delta",
+        "smoothed_delta",
+        "best_range",
+        "selected"
+      )]
       return(lr_estimation_results)
     },
     #--------------------------------------------------------------------------
