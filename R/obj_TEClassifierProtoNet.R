@@ -326,7 +326,6 @@ TEClassifierProtoNet <- R6::R6Class(
       private$check_config_for_TRUE()
 
 
-
       private$model <- py$TextEmbeddingClassifierProtoNet_PT(
         features = as.integer(private$model_config$features),
         times = as.integer(private$model_config$times),
@@ -411,8 +410,8 @@ TEClassifierProtoNet <- R6::R6Class(
         optimizer_method = self$last_training$config$optimizer,
         lr_rate = self$last_training$config$lr_rate,
         lr_warm_up_ratio = self$last_training$config$lr_warm_up_ratio,
-        lr_min=self$last_training$config$lr_min,
-        scheduler_type=self$last_training$config$lr_scheduler,
+        lr_min = self$last_training$config$lr_min,
+        scheduler_type = self$last_training$config$lr_scheduler,
         Ns = as.integer(self$last_training$config$Ns),
         Nq = as.integer(self$last_training$config$Nq),
         loss_alpha = self$last_training$config$loss_alpha,

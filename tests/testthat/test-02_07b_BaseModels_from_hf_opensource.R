@@ -1,6 +1,6 @@
 testthat::skip_on_cran()
 
-test_tmp_data_base_model_path <- testthat::test_path("test_data","OpenSourceBaseModels")
+test_tmp_data_base_model_path <- testthat::test_path("test_data", "OpenSourceBaseModels")
 
 testthat::skip_if_not(
   condition = dir.exists(test_tmp_data_base_model_path),
@@ -31,8 +31,8 @@ create_dir(test_art_tmp_path, FALSE)
 
 # Test Configuration
 object_class_names <- get_entry_from_BaseModelsIndex("class_name")
-if (check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "5.0.0")){
-  object_class_names=setdiff(object_class_names,"BaseModelMPNet")
+if (check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "5.0.0")) {
+  object_class_names <- setdiff(object_class_names, "BaseModelMPNet")
 }
 
 for (object_class_name in object_class_names) {
@@ -44,7 +44,7 @@ for (object_class_name in object_class_names) {
 
   base_to_existing_base_mode <- file.path(test_tmp_data_base_model_path, object_class_name)
 
-  if (dir.exists(base_to_existing_base_mode)){
+  if (dir.exists(base_to_existing_base_mode)) {
     train_args <- generate_args_for_tests(
       object_name = object_class_name,
       method = "train",
@@ -66,12 +66,12 @@ for (object_class_name in object_class_names) {
       )
     )
 
-    #suppressMessages(
+    # suppressMessages(
     #  do.call(
     #    what = base_model$train,
     #    args = train_args
     #  )
-    #)
+    # )
 
     # Prepare directory
     dir_path_new <- paste0(test_art_tmp_path, "/", generate_id(10))
@@ -99,7 +99,7 @@ for (object_class_name in object_class_names) {
       object_class_name,
       get_current_args_for_print(train_args)
     ), {
-      expect_gte(base_model$get_max_seq_len(),1L)
+      expect_gte(base_model$get_max_seq_len(), 1L)
     })
 
 
@@ -117,23 +117,23 @@ for (object_class_name in object_class_names) {
       )
     })
 
-    #test_that(paste(
+    # test_that(paste(
     #  "Sustainability Tracking",
     #  object_class_name,
     #  get_current_args_for_print(train_args)
-    #), {
+    # ), {
     #  if (train_args$sustain_track == TRUE) {
     #    expect_gte(nrow(base_model$get_sustainability_data()), 1)
     #  } else {
     #    expect_gte(nrow(base_model$get_sustainability_data()), 0)
     #  }
-    #})
+    # })
 
-    #test_that(paste(
+    # test_that(paste(
     #  "History Plot",
     #  object_class_name,
     #  get_current_args_for_print(train_args)
-    #), {
+    # ), {
     #  history <- base_model$last_training$history
     #  expect_equal(nrow(history), 2)
     #  expect_equal(ncol(history), 3)
@@ -145,7 +145,7 @@ for (object_class_name in object_class_names) {
     #  expect_s3_class(object = base_model$plot_training_history(y_min = 0, y_max = NULL), class = "ggplot")
     #  expect_s3_class(object = base_model$plot_training_history(y_min = 0, y_max = 10), class = "ggplot")
     #  expect_s3_class(object = base_model$plot_training_history(y_min = NULL, y_max = 10), class = "ggplot")
-    #})
+    # })
 
     test_that(paste(
       "Fill-Mask",
@@ -212,21 +212,21 @@ for (object_class_name in object_class_names) {
       }
     })
 
-    #test_that(paste(
+    # test_that(paste(
     #  "Flops Estimates",
     #  object_class_name,
     #  get_current_args_for_print(train_args)
-    #), {
+    # ), {
     #  expect_equal(nrow(base_model$get_flops_estimates()), 1)
     #  expect_gt(base_model$get_flops_estimates()$flops_bp_1, 0)
     #  expect_gt(base_model$get_flops_estimates()$flops_bp_2, 0)
     #  expect_gt(base_model$get_flops_estimates()$flops_bp_3, 0)
     #  expect_gt(base_model$get_flops_estimates()$flops_bp_4, 0)
-    #})
+    # })
 
     #---------------------------------------------------------------------------
     # Re-Load Base Model and compare with the initial model
-    base_model_reloaded <-suppressMessages(
+    base_model_reloaded <- suppressMessages(
       load_from_disk(
         dir_path = tmp_dir
       )
@@ -265,11 +265,10 @@ for (object_class_name in object_class_names) {
       )
 
       expect_equal(
-        base_model$Tokenizer$encode("This is a test.",token_encodings_only =TRUE),
-        base_model_reloaded$Tokenizer$encode("This is a test.",token_encodings_only =TRUE)
+        base_model$Tokenizer$encode("This is a test.", token_encodings_only = TRUE),
+        base_model_reloaded$Tokenizer$encode("This is a test.", token_encodings_only = TRUE)
       )
     })
-
 
 
     # Clear directory for next test

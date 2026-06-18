@@ -16,7 +16,7 @@ calflops <- NULL
   # use superassignment to update the global reference
   os <<- reticulate::import("os", delay_load = TRUE)
   transformers <<- reticulate::import("transformers", delay_load = TRUE)
-  codecarbon <<- reticulate::import("codecarbon", delay_load =TRUE)
+  codecarbon <<- reticulate::import("codecarbon", delay_load = TRUE)
   datasets <<- reticulate::import("datasets", delay_load = TRUE)
   tok <<- reticulate::import("tokenizers", delay_load = TRUE)
   np <<- reticulate::import("numpy", delay_load = TRUE)

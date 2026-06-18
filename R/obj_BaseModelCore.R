@@ -22,7 +22,7 @@ BaseModelCore <- R6::R6Class(
   inherit = AIFEBaseModel,
   private = list(
     model_type = NULL,
-    slow_tokenizer=NULL,
+    slow_tokenizer = NULL,
     adjust_max_sequence_length = 0L,
     return_token_type_ids = FALSE,
     sequence_mode = "equal",
@@ -186,8 +186,7 @@ BaseModelCore <- R6::R6Class(
             mlm_probability = self$last_training$config$p_mask,
             return_tensors = "pt"
           )
-        }
-        else if (check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "4.49.0") &&
+        } else if (check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "4.49.0") &&
           check_versions(a = get_py_package_version("transformers"), operator = "<", b = "5.0.0")
         ) {
           tmp_data_collator <- transformers$DataCollatorForLanguageModeling(
@@ -211,7 +210,7 @@ BaseModelCore <- R6::R6Class(
             return_tensors = "pt"
           )
         } else {
-          stop("Version not implemented. Version of transformers is ",get_py_package_version("transformers"))
+          stop("Version not implemented. Version of transformers is ", get_py_package_version("transformers"))
         }
       }
 
@@ -498,8 +497,8 @@ BaseModelCore <- R6::R6Class(
         trace = self$last_training$config$trace
       )
 
-      #Set trained to TRUE
-      private$trained=TRUE
+      # Set trained to TRUE
+      private$trained <- TRUE
     }
   ),
   public = list(
@@ -548,8 +547,8 @@ BaseModelCore <- R6::R6Class(
       # Set configured to TRUE to avoid changes in the model
       private$set_configuration_to_TRUE()
 
-      #Set trained to TRUE
-      private$trained=TRUE
+      # Set trained to TRUE
+      private$trained <- TRUE
     },
     #--------------------------------------------------------------------------
     #' @description Traines a BaseModel
@@ -911,7 +910,7 @@ BaseModelCore <- R6::R6Class(
     #--------------------------------------------------------------------------
     #' @description Maximum sequence length.
     #' @return Returns an `int` describing the maximum sequence length.
-    get_max_seq_len=function(){
+    get_max_seq_len = function() {
       return(
         self$get_model_config()$max_position_embeddings
       )
@@ -1111,28 +1110,30 @@ BaseModelCore <- R6::R6Class(
     #---------------------------------------------------------------------------
     #' @description Print method for classifiers.
     #' @return Prints a short description of the object.
-    print=function(){
-      rows=c("Object","Configured","Trained", "Parameter","Seq. Len.","Features",
-             "N Layer", "Vocab Size", "Tokens/Word","Mask Token","Pad Token",
-             "Unk token")
-      padded_rows=pad_str(rows,width = NULL,pad=" ", end=": ")
-      statistics=self$Tokenizer$get_tokenizer_statistics()
-      special_tokens=self$Tokenizer$get_special_tokens()
+    print = function() {
+      rows <- c(
+        "Object", "Configured", "Trained", "Parameter", "Seq. Len.", "Features",
+        "N Layer", "Vocab Size", "Tokens/Word", "Mask Token", "Pad Token",
+        "Unk token"
+      )
+      padded_rows <- pad_str(rows, width = NULL, pad = " ", end = ": ")
+      statistics <- self$Tokenizer$get_tokenizer_statistics()
+      special_tokens <- self$Tokenizer$get_special_tokens()
 
       message(
-        appendLF=FALSE,
-        padded_rows[1L],class(self)[1L],"\n",
-        padded_rows[2L],self$is_configured(),"\n",
-        padded_rows[3L],self$is_trained(),"\n",
-        padded_rows[4L],self$count_parameter(),"\n",
-        padded_rows[5L],self$get_max_seq_len(),"\n",
-        padded_rows[6L],self$get_final_size(),"\n",
-        padded_rows[7L],self$get_n_layers(),"\n",
-        padded_rows[8L],self$Tokenizer$get_vocab_size(),"\n",
-        padded_rows[9L],statistics[1L,"mu_g"],"\n",
-        padded_rows[10L],special_tokens["mask_token","token"],"\n",
-        padded_rows[11L],special_tokens["pad_token","token"],"\n",
-        padded_rows[12L],special_tokens["unk_token","token"],"\n"
+        appendLF = FALSE,
+        padded_rows[1L], class(self)[1L], "\n",
+        padded_rows[2L], self$is_configured(), "\n",
+        padded_rows[3L], self$is_trained(), "\n",
+        padded_rows[4L], self$count_parameter(), "\n",
+        padded_rows[5L], self$get_max_seq_len(), "\n",
+        padded_rows[6L], self$get_final_size(), "\n",
+        padded_rows[7L], self$get_n_layers(), "\n",
+        padded_rows[8L], self$Tokenizer$get_vocab_size(), "\n",
+        padded_rows[9L], statistics[1L, "mu_g"], "\n",
+        padded_rows[10L], special_tokens["mask_token", "token"], "\n",
+        padded_rows[11L], special_tokens["pad_token", "token"], "\n",
+        padded_rows[12L], special_tokens["unk_token", "token"], "\n"
       )
     }
   )

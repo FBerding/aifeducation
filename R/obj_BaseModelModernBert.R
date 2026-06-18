@@ -27,7 +27,7 @@ BaseModelModernBert <- R6::R6Class(
   inherit = BaseModelCore,
   private = list(
     model_type = "modernbert",
-    slow_tokenizer=NULL,
+    slow_tokenizer = NULL,
     create_model = function(args) {
       configuration <- transformers$ModernBertConfig(
         vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())),
@@ -117,12 +117,12 @@ BaseModelModernBert <- R6::R6Class(
 
 # Add the model to the user list
 BaseModelsIndex$ModernBert <- list(
-  class_name="BaseModelModernBert",
-  model_type="modernbert",
-  reference="Warner, B., Chaffin, A., Clavie, B., Weller, O., Hallstroem, O., Taghadouini, S.,
+  class_name = "BaseModelModernBert",
+  model_type = "modernbert",
+  reference = "Warner, B., Chaffin, A., Clavie, B., Weller, O., Hallstroem, O., Taghadouini, S.,
   Gallagher, A., Biswas, R., Ladhak, F., Aarsen, T., Cooper, N., Adams, G.,
   Howard, J. & Poli, I. (2024). Smarter, Better, Faster, Longer: A Modern Bidirectional
   Encoder for Fast, Memory Efficient, and Long Context Finetuning and Inference.
   doi: [10.48550/arXiv.2412.13663](https://doi.org/10.48550/arXiv.2412.13663)",
-  req_sentencepiece=FALSE
+  req_sentencepiece = FALSE
 )

@@ -25,28 +25,28 @@ BaseModelDistilBERT <- R6::R6Class(
   inherit = BaseModelCore,
   private = list(
     model_type = "distilbert",
-    slow_tokenizer="BertTokenizer",
+    slow_tokenizer = "BertTokenizer",
     adjust_max_sequence_length = 0L,
     return_token_type_ids = FALSE,
     create_model = function(args) {
       configuration <- transformers$DistilBertConfig(
         vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())),
         max_position_embeddings = as.integer(args$max_position_embeddings),
-        sinusoidal_pos_embds =FALSE,
-        n_layers= as.integer(args$n_layers),
-        n_heads= as.integer(args$n_heads),
-        dim= as.integer(args$dim),
-        hidden_dim= as.integer(args$hidden_dim),
-        dropout= args$dropout,
-        activation= tolower(args$activation),
-        attention_dropout  = args$attention_dropout,
+        sinusoidal_pos_embds = FALSE,
+        n_layers = as.integer(args$n_layers),
+        n_heads = as.integer(args$n_heads),
+        dim = as.integer(args$dim),
+        hidden_dim = as.integer(args$hidden_dim),
+        dropout = args$dropout,
+        activation = tolower(args$activation),
+        attention_dropout = args$attention_dropout,
         initializer_range = 0.02,
-        qa_dropout =0.1,
-        seq_classif_dropout =0.2,
+        qa_dropout = 0.1,
+        seq_classif_dropout = 0.2,
         pad_token_id = as.integer(args$tokenizer$get_tokenizer()["pad_token_id"]),
-        bos_token_id =as.integer(args$tokenizer$get_tokenizer()["bos_token_id"]),
-        eos_token_id =as.integer(args$tokenizer$get_tokenizer()["eos_token_id"]),
-        tie_word_embeddings =TRUE
+        bos_token_id = as.integer(args$tokenizer$get_tokenizer()["bos_token_id"]),
+        eos_token_id = as.integer(args$tokenizer$get_tokenizer()["eos_token_id"]),
+        tie_word_embeddings = TRUE
       )
       private$model <- transformers$DistilBertForMaskedLM(configuration)
     },
@@ -79,10 +79,10 @@ BaseModelDistilBERT <- R6::R6Class(
     #' @return `r get_description("return_nothing")`
     configure = function(tokenizer,
                          max_position_embeddings = 512L,
-                         dim  = 768L,
+                         dim = 768L,
                          n_layers = 12L,
                          n_heads = 12L,
-                         hidden_dim  = 3072L,
+                         hidden_dim = 3072L,
                          activation = "GELU",
                          dropout = 0.1,
                          attention_dropout = 0.1) {
@@ -108,10 +108,10 @@ BaseModelDistilBERT <- R6::R6Class(
 
 # Add the model to the user list
 BaseModelsIndex$distilbert <- list(
-  class_name="BaseModelDistilBERT",
-  model_type="distilbert",
-  reference="Asnh, V., Debut, L., Chaumond, J. & Wolf, T. (2019).
+  class_name = "BaseModelDistilBERT",
+  model_type = "distilbert",
+  reference = "Asnh, V., Debut, L., Chaumond, J. & Wolf, T. (2019).
   DistilBERT, a distilled version of BERT: smaller, faster, cheaper and lighter.
   doi: [10.48550/arXiv.1910.01108](https://doi.org/10.48550/arXiv.1910.01108)",
-  req_sentencepiece=FALSE
+  req_sentencepiece = FALSE
 )

@@ -1243,8 +1243,8 @@ create_widget_card <- function(id,
 
 
   # Create Main Card
-  tmp_cards["width"]=list("350px")
-  tmp_cards["heights_equal"]=list("row")
+  tmp_cards["width"] <- list("350px")
+  tmp_cards["heights_equal"] <- list("row")
   main_card <- bslib::card(
     bslib::card_header(box_title),
     bslib::card_body(

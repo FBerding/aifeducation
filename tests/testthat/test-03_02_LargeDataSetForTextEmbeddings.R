@@ -122,28 +122,28 @@ test_that("LargeDataSetForTextEmbeddings - No FeatureExtractor", {
   multiple_cases <- new_dataset$select(c(0, 1, 2, 3))
   expect_equal(multiple_cases$num_rows, 4)
 
-  #Column extraction test
+  # Column extraction test
   expect_all_true(
     inherits(
-      new_dataset$extract_column("input",format="R"),
+      new_dataset$extract_column("input", format = "R"),
       "array"
     )
   )
   expect_all_true(
     inherits(
-      new_dataset$extract_column("input",format="torch"),
+      new_dataset$extract_column("input", format = "torch"),
       "torch.Tensor"
     )
   )
   expect_all_true(
     inherits(
-      new_dataset$extract_column("input",format="numpy"),
+      new_dataset$extract_column("input", format = "numpy"),
       "numpy.ndarray"
     )
   )
 })
 
-#Print Method-------------------------------------------------------------------
+# Print Method-------------------------------------------------------------------
 test_that("LargeDataSetForTexts - print method", {
   new_dataset <- LargeDataSetForTextEmbeddings$new()
   new_dataset$configure(

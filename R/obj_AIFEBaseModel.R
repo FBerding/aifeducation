@@ -293,8 +293,8 @@ AIFEMaster <- R6::R6Class(
       message_top = NA
     ),
 
-    #Object stores estimates for calculating learning rates
-    lr_statistics=data.frame(),
+    # Object stores estimates for calculating learning rates
+    lr_statistics = data.frame(),
 
     # Variable for checking if the object is successfully configured. Only if
     # this is TRUE the object can be used
@@ -805,13 +805,13 @@ AIFEMaster <- R6::R6Class(
         operator = "<",
         b = "9.9.9"
       )
-      if (require_update){
+      if (require_update) {
         # Update values for extensions
         # This in important for all cases that introduce new and additional parameters
         param_dict <- get_param_dict()
         config_params <- setdiff(
           x = rlang::fn_fmls_names(self$configure),
-          y = c("model_name", "model_label", "model_language", "text_embeddings", "features","feature_extractor")
+          y = c("model_name", "model_label", "model_language", "text_embeddings", "features", "feature_extractor")
         )
         if (is.function(self$configure)) {
           param_names_new <- config_params

@@ -107,9 +107,9 @@ TEClassifiersBasedOnRegular <- R6::R6Class(
                      log_write_interval = 10L,
                      n_cores = auto_n_cores(),
                      lr_rate = 1e-3,
-                     lr_min=1e-4,
+                     lr_min = 1e-4,
                      lr_warm_up_ratio = 0.02,
-                     lr_scheduler="None",
+                     lr_scheduler = "None",
                      optimizer = "AdamW",
                      amp = FALSE) {
       private$do_training(args = get_called_args(n = 1L))

@@ -571,30 +571,30 @@ build_aife_site <- function(clear_docs = FALSE) {
 #' @export
 build_layer_overview_base_models <- function() {
   requireNamespace("knitr")
-  ov_clm_names=c("class_name","reference","req_sentencepiece")
-  final_clm_names=c("BaseModel","Reference","Require Sentencepiece")
-  overview_table=matrix(
+  ov_clm_names <- c("class_name", "reference", "req_sentencepiece")
+  final_clm_names <- c("BaseModel", "Reference", "Require Sentencepiece")
+  overview_table <- matrix(
     nrow = length(BaseModelsIndex),
     ncol = length(ov_clm_names),
-    dimnames =list(
+    dimnames = list(
       NULL,
       ov_clm_names
     )
   )
   for (i in seq_along(BaseModelsIndex)) {
-   for (clm_name in ov_clm_names) {
-     overview_table[i,clm_name]=stringi::stri_replace_all(
-       str=BaseModelsIndex[[i]][[clm_name]],
-       replacement = "",
-       regex = "\\n"
-     )
-   }
+    for (clm_name in ov_clm_names) {
+      overview_table[i, clm_name] <- stringi::stri_replace_all(
+        str = BaseModelsIndex[[i]][[clm_name]],
+        replacement = "",
+        regex = "\\n"
+      )
+    }
   }
-  overview_table=overview_table[order(overview_table[,"class_name"]),]
-  colnames(overview_table)=final_clm_names
+  overview_table <- overview_table[order(overview_table[, "class_name"]), ]
+  colnames(overview_table) <- final_clm_names
   return(
     knitr::kable(
-      x=overview_table
+      x = overview_table
     )
   )
 }

@@ -526,16 +526,16 @@ EmbeddedText <- R6::R6Class(
     },
     #' @description Print method for classifiers.
     #' @return Prints a short description of the object.
-    print=function(){
-      rows=c("Object","Rows","Times","Features", "Pad Value")
-      padded_rows=pad_str(rows,width = NULL,pad=" ", end=": ")
+    print = function() {
+      rows <- c("Object", "Rows", "Times", "Features", "Pad Value")
+      padded_rows <- pad_str(rows, width = NULL, pad = " ", end = ": ")
       message(
-        appendLF=FALSE,
-        padded_rows[1L],class(self)[1L],"\n",
-        padded_rows[2L],self$n_rows(),"\n",
-        padded_rows[3L],self$get_times(),"\n",
-        padded_rows[4L],self$get_features(),"\n",
-        padded_rows[5L],self$get_pad_value(),"\n"
+        appendLF = FALSE,
+        padded_rows[1L], class(self)[1L], "\n",
+        padded_rows[2L], self$n_rows(), "\n",
+        padded_rows[3L], self$get_times(), "\n",
+        padded_rows[4L], self$get_features(), "\n",
+        padded_rows[5L], self$get_pad_value(), "\n"
       )
     }
   )

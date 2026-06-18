@@ -117,19 +117,19 @@ for (object_class_name in object_class_names) {
       )
 
       # Calculate quantiles
-      quantiles=tokenizer$calc_quantiles(
-        text_dataset=raw_texts,
+      quantiles <- tokenizer$calc_quantiles(
+        text_dataset = raw_texts,
         batch_size = 32L,
         seq_len_tokens = 512L,
-        token_overlap=256L,
-        trace=FALSE
-        )
-      expect_equal(object=length(quantiles),expected=15L)
+        token_overlap = 256L,
+        trace = FALSE
+      )
+      expect_equal(object = length(quantiles), expected = 15L)
       for (i in seq_along(quantiles)) {
-        expect_gte(quantiles[i],1L)
+        expect_gte(quantiles[i], 1L)
       }
 
-      #print method
+      # print method
       suppressMessages(
         expect_no_error(tokenizer$print())
       )

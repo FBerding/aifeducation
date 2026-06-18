@@ -219,10 +219,9 @@ get_current_venv <- function() {
 #' @importFrom reticulate py_config
 #' @importFrom reticulate import
 #' @export
-get_py_package_versions <- function(sentencepiece=FALSE) {
-
-  if(sentencepiece){
-  list_of_packages <- c(
+get_py_package_versions <- function(sentencepiece = FALSE) {
+  if (sentencepiece) {
+    list_of_packages <- c(
       "sentencepiece",
       "google.protobuf"
     )

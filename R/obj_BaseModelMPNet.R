@@ -24,7 +24,7 @@ BaseModelMPNet <- R6::R6Class(
   inherit = BaseModelCore,
   private = list(
     model_type = "mpnet",
-    slow_tokenizer="MPNetTokenizer",
+    slow_tokenizer = "MPNetTokenizer",
     adjust_max_sequence_length = 2L,
     return_token_type_ids = FALSE,
     create_model = function(args) {
@@ -51,27 +51,27 @@ BaseModelMPNet <- R6::R6Class(
       if (
         check_versions(a = get_py_package_version("transformers"), operator = "<", b = "4.49.0")
       ) {
-        transformers_version_controll=0L
-      }
-      else if (check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "4.49.0") &&
-               check_versions(a = get_py_package_version("transformers"), operator = "<", b = "5.0.0")
+        transformers_version_controll <- 0L
+      } else if (check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "4.49.0") &&
+        check_versions(a = get_py_package_version("transformers"), operator = "<", b = "5.0.0")
       ) {
-        transformers_version_controll=1L
+        transformers_version_controll <- 1L
       } else if (
         check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "5.0.0")
       ) {
-        transformers_version_controll=2L
+        transformers_version_controll <- 2L
         stop(
           "MPNet with transformers of version 5.0.0 and higher is temporarily not available. ",
-          "This will change in future versions of aifeducation.")
+          "This will change in future versions of aifeducation."
+        )
       } else {
-        stop("Version not implemented. Version of transformers is ",get_py_package_version("transformers"))
+        stop("Version not implemented. Version of transformers is ", get_py_package_version("transformers"))
       }
 
       collator_maker <- py$CollatorMaker_PT(
         tokenizer = self$Tokenizer$get_tokenizer(),
         mlm = TRUE,
-        transformers_version_controll=transformers_version_controll,
+        transformers_version_controll = transformers_version_controll,
         max_length = as.integer(private$model$config$max_position_embeddings - private$adjust_max_sequence_length),
         mlm_probability = self$last_training$config$p_mask,
         plm_probability = self$last_training$config$p_perm,
@@ -175,9 +175,9 @@ BaseModelMPNet <- R6::R6Class(
 
 # Add the model to the user list
 BaseModelsIndex$MPNet <- list(
-  class_name="BaseModelMPNet",
-  model_type="mpnet",
-  reference="Song,K., Tan, X., Qin, T., Lu, J. & Liu, T.-Y. (2020). MPNet:
+  class_name = "BaseModelMPNet",
+  model_type = "mpnet",
+  reference = "Song,K., Tan, X., Qin, T., Lu, J. & Liu, T.-Y. (2020). MPNet:
   Masked and Permuted Pre-training for Language Understanding. doi: [10.48550/arXiv.2004.09297](https://doi.org/110.48550/arXiv.2004.09297)",
-  req_sentencepiece=FALSE
+  req_sentencepiece = FALSE
 )

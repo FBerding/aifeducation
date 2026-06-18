@@ -25,7 +25,7 @@ BaseModelBert <- R6::R6Class(
   inherit = BaseModelCore,
   private = list(
     model_type = "bert",
-    slow_tokenizer="BertTokenizer",
+    slow_tokenizer = "BertTokenizer",
     create_model = function(args) {
       configuration <- transformers$BertConfig(
         vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())),
@@ -90,10 +90,10 @@ BaseModelBert <- R6::R6Class(
 
 # Add the model to the user list
 BaseModelsIndex$Bert <- list(
-  class_name="BaseModelBert",
-  model_type="bert",
-  reference="Devlin, J., Chang, M.-W., Lee, K., & Toutanova, K. (2019). BERT: Pre-training of Deep Bidirectional
+  class_name = "BaseModelBert",
+  model_type = "bert",
+  reference = "Devlin, J., Chang, M.-W., Lee, K., & Toutanova, K. (2019). BERT: Pre-training of Deep Bidirectional
   Transformers for Language Understanding. In J. Burstein, C. Doran, & T. Solorio (Eds.), Proceedings of the 2019
   Conference of the North (pp. 4171--4186). Association for Computational Linguistics. doi: [10.18653/v1/N19-1423](https://doi.org/10.18653/v1/N19-1423)",
-  req_sentencepiece=FALSE
+  req_sentencepiece = FALSE
 )

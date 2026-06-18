@@ -25,7 +25,7 @@ BaseModelAlbert <- R6::R6Class(
   inherit = BaseModelCore,
   private = list(
     model_type = "albert",
-    slow_tokenizer="AlbertTokenizer",
+    slow_tokenizer = "AlbertTokenizer",
     create_model = function(args) {
       configuration <- transformers$AlbertConfig(
         vocab_size = as.integer(length(args$tokenizer$get_tokenizer()$get_vocab())),
@@ -45,8 +45,8 @@ BaseModelAlbert <- R6::R6Class(
         layer_norm_eps = 1e-12,
         classifier_dropout_prob = 0.1,
         pad_token_id = as.integer(args$tokenizer$get_tokenizer()["pad_token_id"]),
-        bos_token_id =as.integer(args$tokenizer$get_tokenizer()["bos_token_id"]),
-        eos_token_id =as.integer(args$tokenizer$get_tokenizer()["eos_token_id"]),
+        bos_token_id = as.integer(args$tokenizer$get_tokenizer()["bos_token_id"]),
+        eos_token_id = as.integer(args$tokenizer$get_tokenizer()["eos_token_id"]),
         tie_word_embeddings = TRUE
       )
       private$model <- transformers$AlbertForMaskedLM(configuration)
@@ -98,10 +98,10 @@ BaseModelAlbert <- R6::R6Class(
 
 # Add the model to the user list
 BaseModelsIndex$Albert <- list(
-  class_name="BaseModelAlbert",
-  model_type="albert",
-  reference="Lan, Z., Chen, M., Goodman, S., Gimpel, K., Sharma, P., &
+  class_name = "BaseModelAlbert",
+  model_type = "albert",
+  reference = "Lan, Z., Chen, M., Goodman, S., Gimpel, K., Sharma, P., &
   Soricut, R. (2019). ALBERT; A Lite BERT for Self-supervised Learning of
   Language Representations. arXiv. doi: [10.48550/ARXIV.1909.11942](https://doi.org/10.48550/ARXIV.1909.11942)",
-  req_sentencepiece=TRUE
-  )
+  req_sentencepiece = TRUE
+)

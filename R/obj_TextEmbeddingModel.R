@@ -194,7 +194,6 @@ TextEmbeddingModel <- R6::R6Class(
                          emb_pool_type = "Average",
                          pad_value = -100L,
                          base_model = NULL) {
-
       # Check if the object is not configured
       private$check_config_for_FALSE()
 
@@ -726,39 +725,37 @@ TextEmbeddingModel <- R6::R6Class(
     #---------------------------------------------------------------------------
     #' @description Print method for classifiers.
     #' @return Prints a short description of the object.
-    print=function(){
-      rows=c("Object","Label","Configured",
-             "BaseModel Type", "BaseModel Parameter","Seq. Len.", "Features",
-             "N Layer", "Vocab Size",
-             "Tokens/Word","Mask Token","Pad Token", "Unk token",
-            "Chunks", "Min Layer","Max Layer","Pooling Type"
-             )
-      padded_rows=pad_str(rows,width = NULL,pad=" ", end=": ")
-      statistics=self$BaseModel$Tokenizer$get_tokenizer_statistics()
-      special_tokens=self$BaseModel$Tokenizer$get_special_tokens()
-      model_config=self$get_model_config()
+    print = function() {
+      rows <- c(
+        "Object", "Label", "Configured",
+        "BaseModel Type", "BaseModel Parameter", "Seq. Len.", "Features",
+        "N Layer", "Vocab Size",
+        "Tokens/Word", "Mask Token", "Pad Token", "Unk token",
+        "Chunks", "Min Layer", "Max Layer", "Pooling Type"
+      )
+      padded_rows <- pad_str(rows, width = NULL, pad = " ", end = ": ")
+      statistics <- self$BaseModel$Tokenizer$get_tokenizer_statistics()
+      special_tokens <- self$BaseModel$Tokenizer$get_special_tokens()
+      model_config <- self$get_model_config()
       message(
-        appendLF=FALSE,
-        padded_rows[1L],class(self)[1L],"\n",
-        padded_rows[2L],self$get_model_info()$model_label,"\n",
-        padded_rows[3L],self$is_configured(),"\n",
-
-        padded_rows[4L],class(self$BaseModel)[1L],"\n",
-        padded_rows[5L],self$BaseModel$count_parameter(),"\n",
-        padded_rows[6L],self$BaseModel$get_model_config()$max_position_embeddings,"\n",
-        padded_rows[7L],self$BaseModel$get_final_size(),"\n",
-        padded_rows[8L],self$BaseModel$get_n_layers(),"\n",
-
-        padded_rows[9L],self$BaseModel$Tokenizer$get_vocab_size(),"\n",
-        padded_rows[10L],statistics[1L,"mu_g"],"\n",
-        padded_rows[11L],special_tokens["mask_token","token"],"\n",
-        padded_rows[12L],special_tokens["pad_token","token"],"\n",
-        padded_rows[13L],special_tokens["unk_token","token"],"\n",
-
-        padded_rows[14L],model_config$chunks,"\n",
-        padded_rows[15L],model_config$emb_layer_min,"\n",
-        padded_rows[16L],model_config$emb_layer_max,"\n",
-        padded_rows[17L],model_config$emb_pool_type,"\n"
+        appendLF = FALSE,
+        padded_rows[1L], class(self)[1L], "\n",
+        padded_rows[2L], self$get_model_info()$model_label, "\n",
+        padded_rows[3L], self$is_configured(), "\n",
+        padded_rows[4L], class(self$BaseModel)[1L], "\n",
+        padded_rows[5L], self$BaseModel$count_parameter(), "\n",
+        padded_rows[6L], self$BaseModel$get_model_config()$max_position_embeddings, "\n",
+        padded_rows[7L], self$BaseModel$get_final_size(), "\n",
+        padded_rows[8L], self$BaseModel$get_n_layers(), "\n",
+        padded_rows[9L], self$BaseModel$Tokenizer$get_vocab_size(), "\n",
+        padded_rows[10L], statistics[1L, "mu_g"], "\n",
+        padded_rows[11L], special_tokens["mask_token", "token"], "\n",
+        padded_rows[12L], special_tokens["pad_token", "token"], "\n",
+        padded_rows[13L], special_tokens["unk_token", "token"], "\n",
+        padded_rows[14L], model_config$chunks, "\n",
+        padded_rows[15L], model_config$emb_layer_min, "\n",
+        padded_rows[16L], model_config$emb_layer_max, "\n",
+        padded_rows[17L], model_config$emb_pool_type, "\n"
       )
     }
   )

@@ -25,7 +25,7 @@ BaseModelRobertaXML <- R6::R6Class(
   inherit = BaseModelCore,
   private = list(
     model_type = "robertaxml",
-    slow_tokenizer="XLMRobertaTokenizer",
+    slow_tokenizer = "XLMRobertaTokenizer",
     adjust_max_sequence_length = 4L,
     return_token_type_ids = FALSE,
     create_model = function(args) {
@@ -43,13 +43,13 @@ BaseModelRobertaXML <- R6::R6Class(
         initializer_range = 0.02,
         layer_norm_eps = 1e-12,
         pad_token_id = as.integer(args$tokenizer$get_tokenizer()["pad_token_id"]),
-        bos_token_id =as.integer(args$tokenizer$get_tokenizer()["bos_token_id"]),
-        eos_token_id =as.integer(args$tokenizer$get_tokenizer()["eos_token_id"]),
-        classifier_dropout =0.0,
+        bos_token_id = as.integer(args$tokenizer$get_tokenizer()["bos_token_id"]),
+        eos_token_id = as.integer(args$tokenizer$get_tokenizer()["eos_token_id"]),
+        classifier_dropout = 0.0,
         is_decoder = FALSE,
         use_cache = TRUE,
-        add_cross_attention=FALSE,
-        tie_word_embeddings=TRUE,
+        add_cross_attention = FALSE,
+        tie_word_embeddings = TRUE,
       )
       private$model <- transformers$XLMRobertaForMaskedLM(configuration)
     },
@@ -97,11 +97,11 @@ BaseModelRobertaXML <- R6::R6Class(
 
 # Add the model to the user list
 BaseModelsIndex$robertaxml <- list(
-  class_name="BaseModelRobertaXML",
-  model_type="robertaxml",
-  reference="Conneau, A., Khandelwal, K., Goyal, N., Chaudhary, V., Wenzek, G.,
+  class_name = "BaseModelRobertaXML",
+  model_type = "robertaxml",
+  reference = "Conneau, A., Khandelwal, K., Goyal, N., Chaudhary, V., Wenzek, G.,
   Guzman, F., Grave, E., Ott, M., Zettlemoyer, L., & Stoyanov, V. (2019).
   Unsupervised Cross-lingual Representation Learning at Scale.
   doi: [10.48550/arXiv.1911.02116](https://doi.org/10.48550/arXiv.1911.02116)",
-  req_sentencepiece=TRUE
+  req_sentencepiece = TRUE
 )

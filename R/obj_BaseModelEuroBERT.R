@@ -28,7 +28,7 @@ BaseModelEuroBert <- R6::R6Class(
   inherit = BaseModelCore,
   private = list(
     model_type = "eurobert",
-    slow_tokenizer=NULL,
+    slow_tokenizer = NULL,
     adjust_max_sequence_length = 0L,
     return_token_type_ids = FALSE,
     create_model = function(args) {
@@ -40,21 +40,21 @@ BaseModelEuroBert <- R6::R6Class(
         num_attention_heads = as.integer(args$num_attention_heads),
         num_key_value_heads = as.integer(args$num_attention_heads),
         hidden_act = tolower(args$hidden_act),
-         max_position_embeddings = as.integer(args$max_position_embeddings),
+        max_position_embeddings = as.integer(args$max_position_embeddings),
         initializer_range = 0.02,
-        rms_norm_eps=1e-05,
+        rms_norm_eps = 1e-05,
         use_cache = TRUE,
         pad_token_id = as.integer(args$tokenizer$get_tokenizer()["pad_token_id"]),
-        bos_token_id =as.integer(args$tokenizer$get_tokenizer()["bos_token_id"]),
-        eos_token_id =as.integer(args$tokenizer$get_tokenizer()["eos_token_id"]),
-        pretraining_tp =1L,
-        tie_word_embeddings =FALSE,
-        attention_bias =FALSE,
-        attention_dropout=args$attention_dropout,
-        mlp_bias =FALSE,
-        head_dim =NULL,
-        mask_token_id =as.integer(args$tokenizer$get_tokenizer()["mask_token_id"]),
-        classifier_pooling ="late"
+        bos_token_id = as.integer(args$tokenizer$get_tokenizer()["bos_token_id"]),
+        eos_token_id = as.integer(args$tokenizer$get_tokenizer()["eos_token_id"]),
+        pretraining_tp = 1L,
+        tie_word_embeddings = FALSE,
+        attention_bias = FALSE,
+        attention_dropout = args$attention_dropout,
+        mlp_bias = FALSE,
+        head_dim = NULL,
+        mask_token_id = as.integer(args$tokenizer$get_tokenizer()["mask_token_id"]),
+        classifier_pooling = "late"
       )
       private$model <- transformers$EuroBertForMaskedLM(configuration)
     },
@@ -101,13 +101,13 @@ BaseModelEuroBert <- R6::R6Class(
 
 # Add the model to the user list
 BaseModelsIndex$eurobert <- list(
-  class_name="BaseModelEuroBert",
-  model_type="eurobert",
-  reference="Boizard, N., Gisserot-Boukhlef, H., Alves, D. M., Martins, A.,
+  class_name = "BaseModelEuroBert",
+  model_type = "eurobert",
+  reference = "Boizard, N., Gisserot-Boukhlef, H., Alves, D. M., Martins, A.,
   Hammal, A., Corro, C., Hudelot, C., Malherbe, E., Malaboeuf, E.,
   Jourdan, F., Hautreux, G., Alves, J., El-Haddad, K., Faysse, M.,
   Peyrard, M., Guerreiro, N. M., Fernandes, P.,
   Rei, R. & Colombo, P. (2025). EuroBERT: Scaling Multilingual Encoders for
   European Languages. doi: [10.48550/arXiv.2503.05500](https://doi.org/10.48550/arXiv.2503.05500)",
-  req_sentencepiece=FALSE
+  req_sentencepiece = FALSE
 )

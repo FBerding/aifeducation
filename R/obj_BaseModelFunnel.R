@@ -24,7 +24,7 @@ BaseModelFunnel <- R6::R6Class(
   inherit = BaseModelCore,
   private = list(
     model_type = "funnel",
-    slow_tokenizer="FunnelTokenizer",
+    slow_tokenizer = "FunnelTokenizer",
     adjust_max_sequence_length = 1,
     sequence_mode = "vary",
     create_model = function(args) {
@@ -118,9 +118,9 @@ BaseModelFunnel <- R6::R6Class(
 
 # Add the model to the user list
 BaseModelsIndex$Funnel <- list(
-  class_name="BaseModelFunnel",
-  model_type="funnel",
-  reference="Dai, Z., Lai, G., Yang, Y. & Le, Q. V. (2020). Funnel-Transformer:
+  class_name = "BaseModelFunnel",
+  model_type = "funnel",
+  reference = "Dai, Z., Lai, G., Yang, Y. & Le, Q. V. (2020). Funnel-Transformer:
   Filtering out Sequential Redundancy for Efficient Language Processing. doi: [10.48550/arXiv.2006.03236](https://doi.org/10.48550/arXiv.2006.03236)",
-  req_sentencepiece=FALSE
+  req_sentencepiece = FALSE
 )

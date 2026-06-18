@@ -87,8 +87,8 @@ get_depr_obj_names <- function() {
 create_object <- function(class) {
   # Create list of all objects on user level
 
-  base_model=get_entry_from_BaseModelsIndex("class_name")
-  names(base_model)=get_entry_from_BaseModelsIndex("model_type")
+  base_model <- get_entry_from_BaseModelsIndex("class_name")
+  names(base_model) <- get_entry_from_BaseModelsIndex("model_type")
 
   object_list <- c(
     DataSetsIndex,
@@ -123,10 +123,10 @@ create_object <- function(class) {
 #' @family Utils Developers
 #' @keywords internal
 #' @noRd
-get_entry_from_BaseModelsIndex=function(entry="class_name"){
-  results=vector(length = length(BaseModelsIndex))
-  for(i in seq_along(BaseModelsIndex)){
-    results[i]=BaseModelsIndex[[i]][[entry]]
+get_entry_from_BaseModelsIndex <- function(entry = "class_name") {
+  results <- vector(length = length(BaseModelsIndex))
+  for (i in seq_along(BaseModelsIndex)) {
+    results[i] <- BaseModelsIndex[[i]][[entry]]
   }
   return(results)
 }

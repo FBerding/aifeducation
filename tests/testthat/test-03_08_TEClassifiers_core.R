@@ -10,7 +10,7 @@ test_time_start <- Sys.time()
 # config------------------------------------------------------------------------
 load_all_py_scripts()
 object_class_names <- get_TEClassifiers_class_names(super_class = "ClassifiersBasedOnTextEmbeddings")
-object_class_names=setdiff(x=object_class_names,y=c("TEClassifierProtoNet","TEClassifierRegular"))
+object_class_names <- setdiff(x = object_class_names, y = c("TEClassifierProtoNet", "TEClassifierRegular"))
 
 max_samples <- 20
 max_samples_CI <- 2
@@ -573,48 +573,48 @@ for (object_class_name in object_class_names) {
         get_current_args_for_print(test_combination),
         get_current_args_for_print(train_args_combinations)
       ), {
-      # Predictions before saving and loading
-      suppressMessages(
-        predictions <- classifier$predict(
-          newdata = test_embeddings_reduced,
-          batch_size = 2,
-          ml_trace = 0
+        # Predictions before saving and loading
+        suppressMessages(
+          predictions <- classifier$predict(
+            newdata = test_embeddings_reduced,
+            batch_size = 2,
+            ml_trace = 0
+          )
         )
-      )
 
-      # Save and load
-      folder_name <- paste0("function_save_load_", generate_id())
-      dir_path <- paste0(root_path_results, "/", folder_name)
-      save_to_disk(
-        object = classifier,
-        dir_path = root_path_results,
-        folder_name = folder_name
-      )
-      classifier2 <- NULL
-      classifier2 <- load_from_disk(dir_path = dir_path)
-
-      # Is config equal after loading
-      expect_equal(
-        classifier$get_model_config(),
-        classifier2$get_model_config()
-      )
-
-      # Predict after loading
-      suppressMessages(
-        predictions_2 <- classifier2$predict(
-          newdata = test_embeddings_reduced,
-          batch_size = 2,
-          ml_trace = 0
+        # Save and load
+        folder_name <- paste0("function_save_load_", generate_id())
+        dir_path <- paste0(root_path_results, "/", folder_name)
+        save_to_disk(
+          object = classifier,
+          dir_path = root_path_results,
+          folder_name = folder_name
         )
-      )
+        classifier2 <- NULL
+        classifier2 <- load_from_disk(dir_path = dir_path)
 
-      # Compare predictions
-      columns_to_compate=setdiff(colnames(predictions),"expected_category")
-      i <- sample(x = seq.int(from = 1, to = nrow(predictions)), size = 1)
-      expect_equal(predictions[i, columns_to_compate, drop = FALSE],
-        predictions_2[i, columns_to_compate, drop = FALSE],
-        tolerance = 1e-5
-      )
+        # Is config equal after loading
+        expect_equal(
+          classifier$get_model_config(),
+          classifier2$get_model_config()
+        )
+
+        # Predict after loading
+        suppressMessages(
+          predictions_2 <- classifier2$predict(
+            newdata = test_embeddings_reduced,
+            batch_size = 2,
+            ml_trace = 0
+          )
+        )
+
+        # Compare predictions
+        columns_to_compate <- setdiff(colnames(predictions), "expected_category")
+        i <- sample(x = seq.int(from = 1, to = nrow(predictions)), size = 1)
+        expect_equal(predictions[i, columns_to_compate, drop = FALSE],
+          predictions_2[i, columns_to_compate, drop = FALSE],
+          tolerance = 1e-5
+        )
       })
 
       # Plot training history------------------------------------------------
@@ -661,7 +661,7 @@ for (object_class_name in object_class_names) {
         expect_s3_class(object = classifier$plot_coding_stream(), class = "ggplot")
       })
 
-      if (classifier$last_training$config$lr_rate==0.0 ||classifier$last_training$config$lr_rate==0.0){
+      if (classifier$last_training$config$lr_rate == 0.0 || classifier$last_training$config$lr_rate == 0.0) {
         test_that(paste(
           "plot_learning_rate", object_class_name,
           get_current_args_for_print(test_combination),

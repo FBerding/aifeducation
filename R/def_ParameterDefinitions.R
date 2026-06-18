@@ -149,7 +149,7 @@ get_param_dict <- function() {
   param$chunks <- param$n_chunks
   param$chunks$min <- 2L
 
-  param$emb_insert_mask_tokens<- list(
+  param$emb_insert_mask_tokens <- list(
     type = "double",
     min = 0.0,
     max = 0.5,
@@ -160,7 +160,7 @@ get_param_dict <- function() {
     gui_label = NULL,
     default_value = 0.15,
     default_historic = 0.0,
-    test_values = c(0.0,0.15)
+    test_values = c(0.0, 0.15)
   )
 
   param$emb_layer_min <- list(
@@ -601,7 +601,7 @@ get_param_dict <- function() {
     test_values = c(12L, 20L)
   )
   param$d_model <- param$hidden_size
-  param$dim<- param$hidden_size
+  param$dim <- param$hidden_size
 
   param$hidden_act <- list(
     type = "string",
@@ -616,7 +616,7 @@ get_param_dict <- function() {
     test_values = NULL
   )
   param$hidden_activation <- param$hidden_act
-  param$activation<- param$hidden_act
+  param$activation <- param$hidden_act
 
   param$num_hidden_layers <- list(
     type = "int",
@@ -631,7 +631,7 @@ get_param_dict <- function() {
     test_values = c(2L, 4L)
   )
   param$num_hidden_layer <- param$num_hidden_layers
-  param$n_layers<- param$num_hidden_layers
+  param$n_layers <- param$num_hidden_layers
 
   param$num_hidden_groups <- list(
     type = "int",
@@ -668,7 +668,7 @@ get_param_dict <- function() {
     desc = "`vector` of strings representing the Language codes.",
     gui_box = "Transformer Encoder Layers",
     gui_label = "Language Codes",
-    default_value = c("eng","deu"),
+    default_value = c("eng", "deu"),
     test_values = "deu"
   )
   param$default_language <- list(
@@ -1142,7 +1142,7 @@ get_param_dict <- function() {
     test_values = NULL
   )
   param$loss_pt_fct_name <- param$loss_cls_fct_name
-  param$loss_pt_fct_name$allowed_values <- c("MultiWayContrastiveLoss","MultiWayContrastiveLossFC","FocalLoss")
+  param$loss_pt_fct_name$allowed_values <- c("MultiWayContrastiveLoss", "MultiWayContrastiveLossFC", "FocalLoss")
   param$loss_pt_fct_name$values_desc <- list(
     MultiWayContrastiveLoss = "Applies the loss described by [Zhang et al. 2019](https://doi.org/10.1007/978-3-030-16145-3_24).",
     MultiWayContrastiveLossFC = "Applies the sum of the loss described by [Zhang et al. 2019](https://doi.org/10.1007/978-3-030-16145-3_24) and the
@@ -1227,7 +1227,7 @@ get_param_dict <- function() {
     gui_box = "Learning Rate",
     gui_label = "Minimal Learning Rate",
     default_value = 0.0,
-    test_values = c(0.0,1e-4)
+    test_values = c(0.0, 1e-4)
   )
   param$lr_scheduler <- list(
     type = "string",
@@ -1678,7 +1678,7 @@ get_param_dict <- function() {
     min = NULL,
     max = NULL,
     allow_null = FALSE,
-    allowed_values = c("Max", "Min", "MinMax","MaxTimes","MinMaxTimes"),
+    allowed_values = c("Max", "Min", "MinMax", "MaxTimes", "MinMaxTimes"),
     desc = "Type of extracting intermediate features.",
     gui_box = "Classifiction Pooling Layer",
     gui_label = "Feature Extraction Method",
@@ -1965,7 +1965,7 @@ get_param_dict <- function() {
   )
   param$tf_dense_dim <- param$intermediate_size
   param$d_inner <- param$intermediate_size
-  param$hidden_dim<- param$intermediate_size
+  param$hidden_dim <- param$intermediate_size
 
   param$attention_type <- list(
     type = "string",

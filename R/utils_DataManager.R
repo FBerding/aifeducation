@@ -32,14 +32,13 @@
 #' @family Utils Developers
 #' @keywords internal
 #' @noRd
-create_sc_tasks_and_config=function(sequence_length,target,max_k,min_k){
-  input=list()
+create_sc_tasks_and_config <- function(sequence_length, target, max_k, min_k) {
+  input <- list()
   # get possible seq lengths in order to group the cases by sequence length
   seq_length_categories <- as.numeric(names(table(sequence_length)))
 
   # Create tasks for every group of sequence lengths
   for (current_seq_length in seq_length_categories) {
-
     condition <- (sequence_length == current_seq_length)
     idx <- which(condition)
     cat_freq <- table(target[idx])
@@ -47,7 +46,7 @@ create_sc_tasks_and_config=function(sequence_length,target,max_k,min_k){
     max_freq <- max(cat_freq)
 
     for (cat in categories) {
-      if(cat_freq[cat]>4L && cat_freq[cat]<max_freq){
+      if (cat_freq[cat] > 4L && cat_freq[cat] < max_freq) {
         # Check k and adjust if necessary
         n_neighbors <- cat_freq[cat] - 2L
 
@@ -67,56 +66,56 @@ create_sc_tasks_and_config=function(sequence_length,target,max_k,min_k){
         min_k_final <- as.numeric(min_k_final)
 
         # calculate required cases
-        n_k <- max_k_final-min_k_final+1L
-        required_cases_vector=vector(length = n_k)
-        required_cases_vector[]=0L
-        required_cases_total=max_freq - cat_freq[cat]
-        required_cases_per_n_k<-floor(required_cases_total/n_k)
-        residual=required_cases_total-required_cases_per_n_k*n_k
+        n_k <- max_k_final - min_k_final + 1L
+        required_cases_vector <- vector(length = n_k)
+        required_cases_vector[] <- 0L
+        required_cases_total <- max_freq - cat_freq[cat]
+        required_cases_per_n_k <- floor(required_cases_total / n_k)
+        residual <- required_cases_total - required_cases_per_n_k * n_k
         for (i in seq_len(n_k)) {
-          if(residual>0L){
-            required_cases_vector[i]=required_cases_per_n_k+1L
-            residual=residual-1L
+          if (residual > 0L) {
+            required_cases_vector[i] <- required_cases_per_n_k + 1L
+            residual <- residual - 1L
           } else {
-            required_cases_vector[i]=required_cases_per_n_k
+            required_cases_vector[i] <- required_cases_per_n_k
           }
         }
-        if(sum(required_cases_vector)!=required_cases_total){
+        if (sum(required_cases_vector) != required_cases_total) {
           stop("Error in required_cases_vector.")
         }
 
-        ids_to_small=which(required_cases_vector<=1L)
-        sum_to_small=sum(required_cases_vector[ids_to_small])
-        if(sum(required_cases_vector>1L)==0L){
-          valid_ids=seq.int(from = 1L,to=max(1L,floor(sum_to_small/2L)))
-        } else{
-          valid_ids=which(required_cases_vector>1L)
+        ids_to_small <- which(required_cases_vector <= 1L)
+        sum_to_small <- sum(required_cases_vector[ids_to_small])
+        if (sum(required_cases_vector > 1L) == 0L) {
+          valid_ids <- seq.int(from = 1L, to = max(1L, floor(sum_to_small / 2L)))
+        } else {
+          valid_ids <- which(required_cases_vector > 1L)
         }
-        ids_to_small=setdiff(x=ids_to_small,y=valid_ids)
-        sum_to_small=sum(required_cases_vector[ids_to_small])
+        ids_to_small <- setdiff(x = ids_to_small, y = valid_ids)
+        sum_to_small <- sum(required_cases_vector[ids_to_small])
 
-        cases_per_valid=floor(sum_to_small/length(valid_ids))
-        residual=sum_to_small-cases_per_valid*length(valid_ids)
-        for(vid in valid_ids){
-          if(residual>0L){
-            required_cases_vector[vid]=required_cases_vector[vid]+cases_per_valid+1L
-            residual=residual-1L
+        cases_per_valid <- floor(sum_to_small / length(valid_ids))
+        residual <- sum_to_small - cases_per_valid * length(valid_ids)
+        for (vid in valid_ids) {
+          if (residual > 0L) {
+            required_cases_vector[vid] <- required_cases_vector[vid] + cases_per_valid + 1L
+            residual <- residual - 1L
           } else {
-            required_cases_vector[vid]=required_cases_vector[vid]+cases_per_valid
+            required_cases_vector[vid] <- required_cases_vector[vid] + cases_per_valid
           }
         }
-        required_cases_vector[ids_to_small]=0L
+        required_cases_vector[ids_to_small] <- 0L
 
-        if(sum(required_cases_vector)!=required_cases_total){
+        if (sum(required_cases_vector) != required_cases_total) {
           stop("Error in required_cases_vector.")
         }
 
-        ids=which(required_cases_vector>1L)
-        for(id in ids){
-          input[[length(input)+1L]] <- list(
+        ids <- which(required_cases_vector > 1L)
+        for (id in ids) {
+          input[[length(input) + 1L]] <- list(
             cat = as.character(cat),
             required_cases = required_cases_vector[id],
-            k = min_k_final+id-1L,
+            k = min_k_final + id - 1L,
             selected_cases = idx,
             chunks = current_seq_length
           )
@@ -159,14 +158,13 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
                                             method = "knnor",
                                             min_k = 1L,
                                             max_k = 6L,
-                                            pad_value=-100L) {
-
-  input=create_sc_tasks_and_config(
-    sequence_length=sequence_length,
-    target=target,
-    min_k=min_k,
-    max_k=max_k
-    )
+                                            pad_value = -100L) {
+  input <- create_sc_tasks_and_config(
+    sequence_length = sequence_length,
+    target = target,
+    min_k = min_k,
+    max_k = max_k
+  )
 
   index <- 1
   result_list <- foreach::foreach(
@@ -174,7 +172,7 @@ get_synthetic_cases_from_matrix <- function(matrix_form,
     .export = "create_synthetic_units_from_matrix",
     .errorhandling = "pass"
   ) %dopar% {
-    tmp_results=create_synthetic_units_from_matrix(
+    tmp_results <- create_synthetic_units_from_matrix(
       matrix_form = matrix_form[
         input[[index]]$selected_cases,
         c(1L:(input[[index]]$chunks * features))
@@ -265,22 +263,21 @@ create_synthetic_units_from_matrix <- function(matrix_form,
                                                k,
                                                method,
                                                cat) {
-
   # Transform to a binary problem
   tmp_target <- as.numeric((target == cat))
-  if(length(tmp_target)!=nrow(matrix_form)){
+  if (length(tmp_target) != nrow(matrix_form)) {
     stop("Number of labels and number of embeddings do not match.")
   }
-  if(anyNA(tmp_target)){
+  if (anyNA(tmp_target)) {
     stop("Labels contain NA.")
   }
-  if(anyNA(matrix_form)){
+  if (anyNA(matrix_form)) {
     stop("Labels contain NA.")
   }
-  if(!is.numeric(matrix_form)){
+  if (!is.numeric(matrix_form)) {
     stop("matrix_form must be numeric")
   }
-  if(!is.character(cat)){
+  if (!is.character(cat)) {
     stop("cat must be of type character")
   }
 
@@ -295,7 +292,7 @@ create_synthetic_units_from_matrix <- function(matrix_form,
         ),
         k = as.integer(k),
         aug_num = as.integer(required_cases),
-        cycles_number_limit=5000L
+        cycles_number_limit = 5000L
       ),
       silent = TRUE
     )
@@ -305,8 +302,7 @@ create_synthetic_units_from_matrix <- function(matrix_form,
     !inherits(x = syn_data, what = "try-error") &&
       (!is.null(syn_data) || nrow(syn_data$syn_data) > 0L)
   ) {
-
-    if(nrow(syn_data)!=required_cases){
+    if (nrow(syn_data) != required_cases) {
       stop("Number or requestes cases could not be generated.")
     }
 

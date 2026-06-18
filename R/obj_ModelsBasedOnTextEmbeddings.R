@@ -157,7 +157,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       plot_data_all <- data_prepared$aggregated
       # Select the performance measure to display
       plot_data <- plot_data_all[[measure]]
-      checkpoints=data_prepared[["checkpoints"]]
+      checkpoints <- data_prepared[["checkpoints"]]
 
       # Create Plot
       if (measure == "loss") {
@@ -284,7 +284,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
           selected_state_point <- get_used_state_point(
             plot_data = plot_data_all,
             measure = measure,
-            checkpoints=checkpoints
+            checkpoints = checkpoints
           )
           tmp_plot <- add_point(
             plot_object = tmp_plot,
@@ -329,7 +329,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
           selected_states <- get_selected_states_from_folds(
             data_folds = data_prepared$folds,
             measure = measure,
-            checkpoints=checkpoints
+            checkpoints = checkpoints
           )
           tmp_plot <- add_point(
             plot_object = tmp_plot,
@@ -374,44 +374,45 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     #' @description Method for requesting a plot that shows the analysis for selecting
     #' a good learning rate.
     #' @return Returns a plot of class `ggplot` visualizing the training process.
-    plot_learning_rate=function(){
-      plot_data=private$lr_statistics
-      if(is.null_or_na(plot_data)){
+    plot_learning_rate = function() {
+      plot_data <- private$lr_statistics
+      if (is.null_or_na(plot_data)) {
         stop("Calculation of learning rates was not requested during training.")
       } else {
-        if(nrow(plot_data)<=0L){
+        if (nrow(plot_data) <= 0L) {
           stop("Calculation of learning rates was not requested during training.")
         } else {
-          plot_data$lr_rate=as.factor(plot_data$lr_rate)
-          #plot_data$rel_improvment=(plot_data$delta)/plot_data$start_loss
-          relevant_range=subset(
-            x=plot_data,
-            subset=plot_data$best_range
+          plot_data$lr_rate <- as.factor(plot_data$lr_rate)
+          # plot_data$rel_improvment=(plot_data$delta)/plot_data$start_loss
+          relevant_range <- subset(
+            x = plot_data,
+            subset = plot_data$best_range
           )
-          selected=which(plot_data$selected)
-          if(length(selected)<=1L){
-            selected=c(selected,selected)
+          selected <- which(plot_data$selected)
+          if (length(selected) <= 1L) {
+            selected <- c(selected, selected)
           }
 
-          #Create plot
-          tmp_plot=ggplot2::ggplot(data=plot_data)+
+          # Create plot
+          tmp_plot <- ggplot2::ggplot(data = plot_data) +
             ggplot2::geom_bar(
               stat = "identity",
               ggplot2::aes(
-              x=lr_rate,
-              y=delta
-            ))+
+                x = lr_rate,
+                y = delta
+              )
+            ) +
             ggplot2::geom_point(
               ggplot2::aes(
-                x=lr_rate,
-                y=smoothed_delta
+                x = lr_rate,
+                y = smoothed_delta
               )
-            )+
-            ggplot2::xlab("Learning Rate")+
-            ggplot2::ylab("Change in %")+
-            ggplot2::geom_vline(xintercept=plot_data$lr_rate[selected[1L]])+
-            ggplot2::geom_vline(xintercept=plot_data$lr_rate[selected[2L]])+
-            ggplot2::coord_flip()+
+            ) +
+            ggplot2::xlab("Learning Rate") +
+            ggplot2::ylab("Change in %") +
+            ggplot2::geom_vline(xintercept = plot_data$lr_rate[selected[1L]]) +
+            ggplot2::geom_vline(xintercept = plot_data$lr_rate[selected[2L]]) +
+            ggplot2::coord_flip() +
             ggplot2::theme_classic()
           return(tmp_plot)
         }
@@ -429,7 +430,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     #' * best_range: `bool` indicating if the learning rate is part of the best range.
     #' * selected: `bool` indicating if the learning rate is selected for further training.
     #'
-    get_lr_statistics=function(){
+    get_lr_statistics = function() {
       return(private$lr_statistics)
     }
   ),
@@ -693,9 +694,9 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
                                         pl_step = NULL) {
       plot_data <- self$last_training$history
 
-      #if (length(plot_data) <= 1L) {
+      # if (length(plot_data) <= 1L) {
       #  plot_data[[1L]] <- list(loss = plot_data[[1L]])
-      #}
+      # }
 
       if (is.null_or_na(final)) {
         final <- FALSE
@@ -726,18 +727,18 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         if (!use_pl) {
           measures <- names(plot_data[[1L]])
           n_sample_type <- nrow(plot_data[[1L]][[measures[1L]]])
-          checkpoints=list()
-          for(i in seq.int(n_folds)){
-            checkpoints[i]=list(
+          checkpoints <- list()
+          for (i in seq.int(n_folds)) {
+            checkpoints[i] <- list(
               plot_data[[i]][["checkpoints"]]
             )
           }
         } else {
           measures <- names(plot_data[[1L]][[1L]])
           n_sample_type <- nrow(plot_data[[1L]][[as.numeric(pl_step)]][[measures[1L]]])
-          checkpoints=list()
-          for(i in seq.int(n_folds)){
-            checkpoints[i]=list(
+          checkpoints <- list()
+          for (i in seq.int(n_folds)) {
+            checkpoints[i] <- list(
               plot_data[[i]][[as.numeric(pl_step)]][["checkpoints"]]
             )
           }
@@ -747,11 +748,11 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         if (!use_pl) {
           measures <- names(plot_data[[index_final]])
           n_sample_type <- nrow(plot_data[[index_final]][[measures[1L]]])
-          checkpoints=plot_data[[index_final]][["checkpoints"]]
+          checkpoints <- plot_data[[index_final]][["checkpoints"]]
         } else {
           measures <- names(plot_data[[index_final]][[1L]])
           n_sample_type <- nrow(plot_data[[index_final]][[as.numeric(pl_step)]][[measures[1L]]])
-          checkpoints=plot_data[[index_final]][[as.numeric(pl_step)]][["checkpoints"]]
+          checkpoints <- plot_data[[index_final]][[as.numeric(pl_step)]][["checkpoints"]]
         }
       }
 
@@ -868,7 +869,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         list(
           aggregated = result_list,
           folds = results_folds,
-          checkpoints=checkpoints
+          checkpoints = checkpoints
         )
       )
     },
@@ -922,122 +923,121 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       }
     },
     #-------------------------------------------------------------------------
-    calculate_learning_rate=function(data_manager){
-      if(self$last_training$config$lr_rate==0.0 || self$last_training$config$lr_min==0.0){
+    calculate_learning_rate = function(data_manager) {
+      if (self$last_training$config$lr_rate == 0.0 || self$last_training$config$lr_min == 0.0) {
         print_message(
           msg = "Estimating Learning Rates",
           trace = self$last_training$config$trace
         )
-        if(is_on_CI()){
-          total_epochs=2L
+        if (is_on_CI()) {
+          total_epochs <- 2L
         } else {
-          total_epochs=20L
+          total_epochs <- 20L
         }
-        estimates=private$estimate_learning_rates(
+        estimates <- private$estimate_learning_rates(
           data_manager,
-          total_epochs=total_epochs
-          )
-        private$lr_statistics=private$select_learning_rates(
+          total_epochs = total_epochs
+        )
+        private$lr_statistics <- private$select_learning_rates(
           estimates,
           total_epochs = total_epochs
-          )
+        )
       }
     },
     #--------------------------------------------------------------------------
-    select_learning_rates=function(lr_estimation_results,total_epochs){
-
-      lr_estimation_results=t(lr_estimation_results)
-      lr_estimation_results=lr_estimation_results[order(lr_estimation_results[,1],decreasing=TRUE),]
-      colnames(lr_estimation_results)=c("lr_rate","n_improvments","start_loss","final_loss")
-      lr_estimation_results=as.data.frame(lr_estimation_results)
-      lr_estimation_results=subset(
-        x=lr_estimation_results,
-        subset=lr_estimation_results$lr_rate!=0.0
+    select_learning_rates = function(lr_estimation_results, total_epochs) {
+      lr_estimation_results <- t(lr_estimation_results)
+      lr_estimation_results <- lr_estimation_results[order(lr_estimation_results[, 1], decreasing = TRUE), ]
+      colnames(lr_estimation_results) <- c("lr_rate", "n_improvments", "start_loss", "final_loss")
+      lr_estimation_results <- as.data.frame(lr_estimation_results)
+      lr_estimation_results <- subset(
+        x = lr_estimation_results,
+        subset = lr_estimation_results$lr_rate != 0.0
       )
-      lr_estimation_results$index=seq.int(from=1L,to=nrow(lr_estimation_results))
-      lr_estimation_results$selected=FALSE
-      #Smooth data distribution
-      lr_estimation_results$delta=(lr_estimation_results$final_loss-lr_estimation_results$start_loss)/lr_estimation_results$start_loss*100
-      smoothed_fct=loess(delta~index,data=lr_estimation_results)
-      lr_estimation_results$smoothed_delta=predict(smoothed_fct)
-      lr_estimation_results$smoothed_delta_imp=lr_estimation_results$smoothed_delta<0.0
-      #Calculate gradient and calculate turning point
-      gradient=vector(length = nrow(lr_estimation_results))
-      gradient[]=NA
-      for(i in nrow(lr_estimation_results):2L){
-        gradient[i-1L]=lr_estimation_results$smoothed_delta[i-1L]-lr_estimation_results$smoothed_delta[i]
+      lr_estimation_results$index <- seq.int(from = 1L, to = nrow(lr_estimation_results))
+      lr_estimation_results$selected <- FALSE
+      # Smooth data distribution
+      lr_estimation_results$delta <- (lr_estimation_results$final_loss - lr_estimation_results$start_loss) / lr_estimation_results$start_loss * 100
+      smoothed_fct <- loess(delta ~ index, data = lr_estimation_results)
+      lr_estimation_results$smoothed_delta <- predict(smoothed_fct)
+      lr_estimation_results$smoothed_delta_imp <- lr_estimation_results$smoothed_delta < 0.0
+      # Calculate gradient and calculate turning point
+      gradient <- vector(length = nrow(lr_estimation_results))
+      gradient[] <- NA
+      for (i in nrow(lr_estimation_results):2L) {
+        gradient[i - 1L] <- lr_estimation_results$smoothed_delta[i - 1L] - lr_estimation_results$smoothed_delta[i]
       }
-      lr_estimation_results$gradient=gradient
+      lr_estimation_results$gradient <- gradient
 
-      turning_points=vector(length = nrow(lr_estimation_results))
-      for(i in (nrow(lr_estimation_results)-1L):2L){
-        condition_one=lr_estimation_results$gradient[i-1L]<=lr_estimation_results$gradient[i]
-        if(condition_one){
-          turning_points[i]=TRUE
+      turning_points <- vector(length = nrow(lr_estimation_results))
+      for (i in (nrow(lr_estimation_results) - 1L):2L) {
+        condition_one <- lr_estimation_results$gradient[i - 1L] <= lr_estimation_results$gradient[i]
+        if (condition_one) {
+          turning_points[i] <- TRUE
         } else {
-          turning_points[i]=FALSE
+          turning_points[i] <- FALSE
         }
       }
-      lr_estimation_results$turning_points=turning_points
+      lr_estimation_results$turning_points <- turning_points
       # identify stable range
-      range_length=vector(length = nrow(lr_estimation_results))
+      range_length <- vector(length = nrow(lr_estimation_results))
       for (i in 1:nrow(lr_estimation_results)) {
-        continious=TRUE
-        counter=0
-        for(j in i:nrow(lr_estimation_results)){
-          if(lr_estimation_results$smoothed_delta_imp[j]&&continious){
-            counter=counter+1
+        continious <- TRUE
+        counter <- 0
+        for (j in i:nrow(lr_estimation_results)) {
+          if (lr_estimation_results$smoothed_delta_imp[j] && continious) {
+            counter <- counter + 1
           } else {
-            continious=FALSE
+            continious <- FALSE
           }
         }
-        range_length[i]=counter
+        range_length[i] <- counter
       }
-      best_range=vector(length = length(range_length))
-      best_range[]=FALSE
-      start_idx=which(range_length==max(range_length))
-      range=range_length[start_idx]
-      best_range[start_idx:(start_idx+range-1)]=TRUE
-      lr_estimation_results$best_range=best_range
-      relevant_range=subset(
-        x=lr_estimation_results,
-        subset= (lr_estimation_results$best_range & lr_estimation_results$smoothed_delta_imp)
+      best_range <- vector(length = length(range_length))
+      best_range[] <- FALSE
+      start_idx <- which(range_length == max(range_length))
+      range <- range_length[start_idx]
+      best_range[start_idx:(start_idx + range - 1)] <- TRUE
+      lr_estimation_results$best_range <- best_range
+      relevant_range <- subset(
+        x = lr_estimation_results,
+        subset = (lr_estimation_results$best_range & lr_estimation_results$smoothed_delta_imp)
       )
-      #Selecht the best values from the increasing side of the graph
-      if(nrow(relevant_range)>0L){
-        best_idx=min(which(relevant_range$delta==min(relevant_range$delta)))
-        relevant_range=relevant_range[best_idx:nrow(relevant_range),]
+      # Selecht the best values from the increasing side of the graph
+      if (nrow(relevant_range) > 0L) {
+        best_idx <- min(which(relevant_range$delta == min(relevant_range$delta)))
+        relevant_range <- relevant_range[best_idx:nrow(relevant_range), ]
 
-        relevant_range=relevant_range[order(relevant_range$lr_rate,decreasing=TRUE),]
+        relevant_range <- relevant_range[order(relevant_range$lr_rate, decreasing = TRUE), ]
 
-        if(any(relevant_range$turning_points)){
-          best_idx=min(which(relevant_range$turning_points))
+        if (any(relevant_range$turning_points)) {
+          best_idx <- min(which(relevant_range$turning_points))
         } else {
-          best_idx=min(which(relevant_range$delta==min(relevant_range$delta)))
+          best_idx <- min(which(relevant_range$delta == min(relevant_range$delta)))
         }
 
-        best=relevant_range$lr_rate[best_idx]
+        best <- relevant_range$lr_rate[best_idx]
 
-        lr_idx=max(which(relevant_range$delta==max(relevant_range$delta)))
-        lr=relevant_range$lr_rate[lr_idx]
+        lr_idx <- max(which(relevant_range$delta == max(relevant_range$delta)))
+        lr <- relevant_range$lr_rate[lr_idx]
 
-        if(best>lr){
-          self$last_training$config$lr_rate=best
-          self$last_training$config$lr_min=lr
+        if (best > lr) {
+          self$last_training$config$lr_rate <- best
+          self$last_training$config$lr_min <- lr
         } else {
-          self$last_training$config$lr_rate=lr
-          self$last_training$config$lr_min=best
+          self$last_training$config$lr_rate <- lr
+          self$last_training$config$lr_min <- best
         }
 
-        lr_estimation_results$selected[which(lr_estimation_results$lr_rate==self$last_training$config$lr_rate)]=TRUE
-        lr_estimation_results$selected[which(lr_estimation_results$lr_rate==self$last_training$config$lr_min)]=TRUE
+        lr_estimation_results$selected[which(lr_estimation_results$lr_rate == self$last_training$config$lr_rate)] <- TRUE
+        lr_estimation_results$selected[which(lr_estimation_results$lr_rate == self$last_training$config$lr_min)] <- TRUE
 
         print_message(
           msg = paste0(
             "Set lr_rate to ",
-            format(self$last_training$config$lr_rate,scientific=TRUE),
+            format(self$last_training$config$lr_rate, scientific = TRUE),
             " and lr_min to ",
-            format(self$last_training$config$lr_min,scientific=TRUE),
+            format(self$last_training$config$lr_min, scientific = TRUE),
             "."
           ),
           trace = self$last_training$config$trace
@@ -1047,18 +1047,18 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
           msg = paste0(
             "No good learning rates could be identified. ",
             "Set lr_rate to ",
-            format(self$last_training$config$lr_rate,scientific=TRUE),
+            format(self$last_training$config$lr_rate, scientific = TRUE),
             " and lr_min to ",
-            format(self$last_training$config$lr_min,scientific=TRUE),
+            format(self$last_training$config$lr_min, scientific = TRUE),
             "."
           ),
           trace = self$last_training$config$trace
         )
-        self$last_training$config$lr_rate=1e-3
-        self$last_training$config$lr_min=1e-4
+        self$last_training$config$lr_rate <- 1e-3
+        self$last_training$config$lr_min <- 1e-4
       }
-      #Reduce to relevant columns
-      lr_estimation_results=lr_estimation_results[c(
+      # Reduce to relevant columns
+      lr_estimation_results <- lr_estimation_results[c(
         "index",
         "lr_rate",
         "start_loss",
@@ -1071,20 +1071,20 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       return(lr_estimation_results)
     },
     #--------------------------------------------------------------------------
-    save_init_weights=function(){
+    save_init_weights = function() {
       torch$save(
-        obj=private$model$state_dict(),
-        f=file.path(private$dir_checkpoint, "init_weights.pt")
-        )
+        obj = private$model$state_dict(),
+        f = file.path(private$dir_checkpoint, "init_weights.pt")
+      )
     },
     #--------------------------------------------------------------------------
-    load_init_weights=function(){
+    load_init_weights = function() {
       private$model$load_state_dict(
         torch$load(
           file.path(private$dir_checkpoint, "init_weights.pt"),
-          weights_only=TRUE
-          )
+          weights_only = TRUE
         )
+      )
     }
   )
 )

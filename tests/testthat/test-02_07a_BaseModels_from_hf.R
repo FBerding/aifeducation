@@ -30,8 +30,8 @@ create_dir(test_tmp_data_base_model_path, FALSE)
 
 # Test Configuration
 object_class_names <- get_entry_from_BaseModelsIndex("class_name")
-if (check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "5.0.0")){
-  object_class_names=setdiff(object_class_names,"BaseModelMPNet")
+if (check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "5.0.0")) {
+  object_class_names <- setdiff(object_class_names, "BaseModelMPNet")
 }
 
 for (object_class_name in object_class_names) {
@@ -98,7 +98,7 @@ for (object_class_name in object_class_names) {
     object_class_name,
     get_current_args_for_print(train_args)
   ), {
-    expect_gte(base_model$get_max_seq_len(),1L)
+    expect_gte(base_model$get_max_seq_len(), 1L)
   })
 
 
@@ -227,7 +227,7 @@ for (object_class_name in object_class_names) {
   # Re-Load Base Model and compare with the initial model
   base_model_reloaded <- suppressMessages(
     load_from_disk(
-    dir_path = tmp_dir
+      dir_path = tmp_dir
     )
   )
 
@@ -254,8 +254,8 @@ for (object_class_name in object_class_names) {
     # )
 
     expect_equal(
-      base_model$Tokenizer$encode("This is a test.",token_encodings_only =TRUE),
-      base_model_reloaded$Tokenizer$encode("This is a test.",token_encodings_only =TRUE)
+      base_model$Tokenizer$encode("This is a test.", token_encodings_only = TRUE),
+      base_model_reloaded$Tokenizer$encode("This is a test.", token_encodings_only = TRUE)
     )
 
     expect_equal(
@@ -263,7 +263,6 @@ for (object_class_name in object_class_names) {
       base_model_reloaded$Tokenizer$get_sustainability_data()
     )
   })
-
 
 
   # Clear directory for next test
