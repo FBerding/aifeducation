@@ -958,7 +958,11 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       lr_estimation_results$selected <- FALSE
       # Smooth data distribution
       lr_estimation_results$delta <- (lr_estimation_results$final_loss - lr_estimation_results$start_loss) / lr_estimation_results$start_loss * 100
-      smoothed_fct <- loess(delta ~ index, data = lr_estimation_results)
+      smoothed_fct <- loess(
+        formula= delta ~ index,
+        data = lr_estimation_results,
+        span = 0.85
+        )
       lr_estimation_results$smoothed_delta <- predict(smoothed_fct)
       lr_estimation_results$smoothed_delta_imp <- lr_estimation_results$smoothed_delta < 0.0
       # Calculate gradient and calculate turning point
