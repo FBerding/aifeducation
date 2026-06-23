@@ -1554,7 +1554,10 @@ of parameters for all subsequent layers and decreases training and usage time, i
 You can experiment with this value to strike a balance between speed and performance. 
 A study by Takeshita et al. (2025) shows that randomly dropping 50% of the dimensions
 leads only to a minor drop in performance in classification tasks. Thus, this value can serve as
-a rule of thumb for determining this parameter.
+a rule of thumb for determining this parameter. 
+
+In our example we have only a
+very limited number of samples. Thus, we decrease the number of features further.
 
 In addition, the parameter `cls_pooling_features` should be equal or less the number you used
 for `feat_size`. With `cls_pooling_features` you determine how many of the resulting features should be used
@@ -1614,7 +1617,7 @@ classifier$train(
   loss_balance_class_weights = TRUE,
   loss_balance_sequence_length = TRUE,
   loss_cls_fct_name = "FocalLoss",
-  use_sc = FALSE,
+  use_sc = TRUE,
   sc_method = "knnor",
   sc_min_k = 1,
   sc_max_k = 10,
@@ -2088,7 +2091,7 @@ classifier_prototype$configure(
   target_levels = c("neg", "pos"),
   skip_connection_type = "ResidualGate",
   cls_pooling_features = 20,
-  cls_pooling_type = "Max",
+  cls_pooling_type = "MaxTimes",
   projection_type = "Regular",
   metric_type = "Euclidean",
   feat_act_fct = "ELU",
@@ -2106,12 +2109,12 @@ classifier_prototype$configure(
   ng_conv_parametrizations = "None",
   ng_conv_normalization_type = "PowerNorm",
   ng_conv_residual_type = "ResidualGate",
-  dense_act_fct = "Tanh",
+  dense_act_fct = "ELU",
   dense_n_layers = 2,
   dense_dropout = 0.10,
   dense_bias = FALSE,
   dense_parametrizations = "None",
-  dense_normalization_type = "None",
+  dense_normalization_type = "RMSNorm",
   dense_residual_type = "ResidualGate",
   rec_act_fct = "Tanh",
   rec_n_layers = 0,
@@ -2172,7 +2175,7 @@ classifier_prototype$train(
   data_folds = 10,
   data_val_size = 0.25,
   loss_pt_fct_name = "MultiWayContrastiveLossFC",
-  use_sc = FALSE,
+  use_sc = TRUE,
   sc_method = "knnor",
   sc_min_k = 1,
   sc_max_k = 10,
@@ -2188,7 +2191,7 @@ classifier_prototype$train(
   sustain_log_level = "error",
   epochs = 2000,
   batch_size = 32,
-  Ns = 9,
+  Ns = 18,
   Nq = 3,
   loss_alpha = 0.75,
   loss_margin = 0.10,
@@ -2772,7 +2775,7 @@ classifier_with_fe$train(
   loss_balance_class_weights = TRUE,
   loss_balance_sequence_length = TRUE,
   loss_cls_fct_name = "FocalLoss",
-  use_sc = FALSE,
+  use_sc = TRUE,
   sc_method = "knnor",
   sc_min_k = 1,
   sc_max_k = 10,
