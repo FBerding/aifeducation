@@ -124,7 +124,7 @@ for (object_class_name in object_class_names) {
         token_overlap = 256L,
         trace = FALSE
       )
-      expect_equal(object = length(quantiles), expected = 15L)
+      expect_equal(object = length(quantiles), expected = 17L)
       for (i in seq_along(quantiles)) {
         expect_gte(quantiles[i], 1L)
       }
