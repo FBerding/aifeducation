@@ -49,7 +49,8 @@ load_all_py_scripts <- function() {
   )
   python_files <- list.files(
     path = python_dir,
-    full.names = TRUE
+    full.names = TRUE,
+    pattern="$.py"
   )
 
   for (file in python_files) {
