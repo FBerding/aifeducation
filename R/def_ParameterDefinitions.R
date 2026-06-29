@@ -1757,11 +1757,11 @@ get_param_dict <- function() {
     min = NULL,
     max = NULL,
     allow_null = FALSE,
-    allowed_values = c("ELU", "LeakyReLU", "ReLU", "GELU", "Sigmoid", "Tanh", "PReLU"),
+    allowed_values = c("ELU", "LeakyReLU", "ReLU", "GELU", "Sigmoid", "Tanh", "PReLU","SwiGLU"),
     desc = "Activation function for all layers.",
     gui_box = "General Settings",
     gui_label = "Activation Function",
-    default_value = "ELU",
+    default_value = "SwiGLU",
     default_historic = "GELU",
     test_values = NULL
   )
