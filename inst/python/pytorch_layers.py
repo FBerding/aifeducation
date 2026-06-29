@@ -250,7 +250,7 @@ class dense_layer_with_mask(torch.nn.Module):
     elif self.parametrizations=="SpectralNorm":
       torch.nn.utils.spectral_norm(module=self.dense, name='weight', n_power_iterations=1, eps=1e-12, dim=None)
     
-    self.act_fct=get_act_fct(self.act_fct_name)
+    self.act_fct=get_act_fct(self.act_fct_name,hidden_size=self.output_size)
     
     if self.dropout >0:
       self.dropout=layer_dropout_with_mask(p=self.dropout,pad_value=self.pad_value)
@@ -398,7 +398,7 @@ class layer_n_gram_convolution(torch.nn.Module):
       padding_mode='zeros',
       device=self.device, 
       dtype=self.dtype)
-    self.act_fct=get_act_fct(self.act_fct_name)
+    self.act_fct=get_act_fct(self.act_fct_name,hidden_size=self.kernel_size_features)
     
     if self.parametrizations=="OrthogonalWeights":
       torch.nn.utils.parametrizations.orthogonal(module=self.conv_layer, name='weight',orthogonal_map="matrix_exp")
@@ -488,7 +488,7 @@ class layer_mutiple_n_gram_convolution(torch.nn.Module):
       )
     
     self.act_fct_name=act_fct_name
-    self.act_fct=get_act_fct(self.act_fct_name)
+    self.act_fct=get_act_fct(self.act_fct_name,hidden_size=self.features)
     self.normalization_layer=get_layer_normalization(
       name=normalization_type,
       times=self.times,

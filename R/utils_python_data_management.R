@@ -239,6 +239,9 @@ extract_column_from_py_dataset <- function(py_dataset, column_name, format = "R"
       }
       rm(data_column)
       gc()
+      if (is.list(r_column)){
+        r_column=unlist(r_column)
+      }
       return(r_column)
     } else {
       data_column$set_format(format)

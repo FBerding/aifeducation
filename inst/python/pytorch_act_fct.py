@@ -17,7 +17,18 @@ import numpy as np
 import math
 import safetensors
 
-def get_act_fct(name):
+class SwiGLU(torch.nn.Module):
+  def __init__(self,hidden_size):
+    super().__init__()
+    self.sigmoid=torch.nn.Sigmoid()
+    self.weights=torch.nn.Linear(in_features=hidden_size, out_features=hidden_size, bias=False, device=None, dtype=None)
+  def forward(self,x):
+    swish_value=x*self.sigmoid(x)
+    xp=self.weights(x)
+    y=swish_value*xp
+    return y
+
+def get_act_fct(name,hidden_size=None):
   if name=="ELU":
     return torch.nn.ELU()
   elif name=="LeakyReLU":
@@ -32,6 +43,8 @@ def get_act_fct(name):
     return torch.nn.Tanh()
   elif name=="PReLU":
     return torch.nn.PReLU()
+  elif name=="SwiGLU":
+    return SwiGLU(hidden_size)
   elif name=="None":
     return  torch.nn.Identity()
 

@@ -1471,6 +1471,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       if (self$last_training$config$loss_balance_sequence_length) {
         sequence_length <- extract_column_from_py_dataset(data_set, "length")
         abs_freq_length <- table(sequence_length)
+        print(which(is.na(sequence_length)))
 
         sample_weight_per_sequence_length <- as.vector(
           sum(abs_freq_length) / (length(abs_freq_length) * abs_freq_length)
