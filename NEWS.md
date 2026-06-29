@@ -29,6 +29,7 @@ editor_options:
 - Add support for Xmod.
 - Add method get_max_seq_len to BaseModels allowing to request the maximum number
   of tokens a model supports.
+- MPNet is now available.
 
 **Tokenizer**
 
