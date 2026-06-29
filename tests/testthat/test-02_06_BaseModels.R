@@ -37,13 +37,13 @@ raw_texts <- LargeDataSetForText$new(example_data)
 object_class_names <- BaseModelsIndex
 if (check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "5.0.0")){
   object_class_names <- c(
-      "BaseModelDebertaV2",
-      "BaseModelBert",
-     "BaseModelFunnel",
-     #"BaseModelLongformer",
-      "BaseModelModernBert",
-      "BaseModelRoberta"#,
-    #  "BaseModelMPNet"
+    "BaseModelDebertaV2",
+    "BaseModelBert",
+    "BaseModelFunnel",
+    #"BaseModelLongformer",
+    "BaseModelModernBert",
+    "BaseModelRoberta",
+    "BaseModelMPNet"
   )
 }
 
