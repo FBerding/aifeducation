@@ -1,3 +1,6 @@
+.vscode
+pyrightconfig.json
+__pycache__/
 Trial
 .Rproj.user
 inst/doc
