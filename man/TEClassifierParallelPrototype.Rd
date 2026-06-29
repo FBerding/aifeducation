@@ -259,13 +259,13 @@ indicating a higher category/class. For nominal data the order does not matter.}
       \item{\code{metric_type}}{\code{string} Type of metric used for calculating the distance. Allowed values: 'Euclidean', 'CosineDistance'}
       \item{\code{shared_feat_layer}}{\code{bool} If \code{TRUE} all streams use the same feature layer. If \code{FALSE} all streams use their own feature layer.}
       \item{\code{projection_type}}{\code{string} Type of projection. Allowed values: 'Regular', 'PairwiseOrthogonal', 'PairwiseOrthogonalDense'}
-      \item{\code{feat_act_fct}}{\code{string} Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
+      \item{\code{feat_act_fct}}{\code{string} Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU', 'SwiGLU'}
       \item{\code{feat_size}}{\code{int} Number of neurons for each dense layer. Allowed values: \ifelse{latex}{$2 <= x $}{\ifelse{html}{\eqn{2 <= x }}{`2 <= x `}}}
       \item{\code{feat_bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
       \item{\code{feat_dropout}}{\code{double} determining the dropout for the dense projection of the feature layer. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{\eqn{0 <= x <= 0.6}}{`0 <= x <= 0.6`}}}
       \item{\code{feat_parametrizations}}{\code{string} Re-Parametrizations of the weights of layers. Allowed values: 'None', 'OrthogonalWeights', 'WeightNorm', 'SpectralNorm'}
       \item{\code{feat_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values: 'LayerNorm', 'BatchNorm', 'PowerNorm', 'RMSNorm', 'None'}
-      \item{\code{ng_conv_act_fct}}{\code{string} Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
+      \item{\code{ng_conv_act_fct}}{\code{string} Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU', 'SwiGLU'}
       \item{\code{ng_conv_n_layers}}{\code{int} determining how many times the n-gram layers should be added to the network. Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
       \item{\code{ng_conv_ks_min}}{\code{int} determining the minimal window size for n-grams. Allowed values: \ifelse{latex}{$2 <= x $}{\ifelse{html}{\eqn{2 <= x }}{`2 <= x `}}}
       \item{\code{ng_conv_ks_max}}{\code{int} determining the maximal window size for n-grams. Allowed values: \ifelse{latex}{$2 <= x $}{\ifelse{html}{\eqn{2 <= x }}{`2 <= x `}}}
@@ -274,7 +274,7 @@ indicating a higher category/class. For nominal data the order does not matter.}
       \item{\code{ng_conv_parametrizations}}{\code{string} Re-Parametrizations of the weights of layers. Allowed values: 'None', 'OrthogonalWeights', 'WeightNorm', 'SpectralNorm'}
       \item{\code{ng_conv_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values: 'LayerNorm', 'BatchNorm', 'PowerNorm', 'RMSNorm', 'None'}
       \item{\code{ng_conv_residual_type}}{\code{string} Type of residual connenction for all layers and stack of layers. Allowed values: 'ResidualGate', 'Addition', 'None'}
-      \item{\code{dense_act_fct}}{\code{string} Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
+      \item{\code{dense_act_fct}}{\code{string} Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU', 'SwiGLU'}
       \item{\code{dense_n_layers}}{\code{int} Number of dense layers. Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
       \item{\code{dense_dropout}}{\code{double} determining the dropout between dense layers. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{\eqn{0 <= x <= 0.6}}{`0 <= x <= 0.6`}}}
       \item{\code{dense_bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
@@ -290,7 +290,7 @@ indicating a higher category/class. For nominal data the order does not matter.}
       \item{\code{rec_parametrizations}}{\code{string} Re-Parametrizations of the weights of layers. Allowed values: 'None'}
       \item{\code{rec_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values: 'LayerNorm', 'BatchNorm', 'PowerNorm', 'RMSNorm', 'None'}
       \item{\code{rec_residual_type}}{\code{string} Type of residual connenction for all layers and stack of layers. Allowed values: 'ResidualGate', 'Addition', 'None'}
-      \item{\code{tf_act_fct}}{\code{string} Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
+      \item{\code{tf_act_fct}}{\code{string} Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU', 'SwiGLU'}
       \item{\code{tf_dense_dim}}{\code{int} determining the size of the projection layer within a each transformer encoder. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
       \item{\code{tf_n_layers}}{\code{int} determining how many times the encoder should be added to the network. Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
       \item{\code{tf_dropout_rate_1}}{\code{double} determining the dropout after the attention mechanism within the transformer encoder layers. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{\eqn{0 <= x <= 0.6}}{`0 <= x <= 0.6`}}}

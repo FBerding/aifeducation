@@ -46,6 +46,7 @@ editor_options:
 - Pooling over features is now optional.
 - Improve progress indicator for training. It now displays the remaining time and the epoch of
   the last checkpoint.
+- Add [SwiGLU (Shazeer, 2020)](https://doi.org/10.48550/arXiv.2002.05202).
 - Add FocalLoss to classifiers based on prototypes.
 - Add automatic detection of learning rates and a method for plotting the corresponding analysis.
 - Replaced average_iota with a smoothed version of average_iota for an improved detection of

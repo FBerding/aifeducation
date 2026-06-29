@@ -170,7 +170,7 @@ indicating a higher category/class. For nominal data the order does not matter.}
       \item{\code{intermediate_size}}{\code{int} determining the size of the projection layer within a each transformer encoder. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
       \item{\code{attention_type}}{\code{string} Choose the attention type. Allowed values: 'Fourier', 'MultiHead'}
       \item{\code{add_pos_embedding}}{\code{bool} \code{TRUE} if positional embedding should be used.}
-      \item{\code{act_fct}}{\code{string} Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
+      \item{\code{act_fct}}{\code{string} Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU', 'SwiGLU'}
       \item{\code{parametrizations}}{\code{string} Re-Parametrizations of the weights of layers. Allowed values: 'None', 'OrthogonalWeights', 'WeightNorm', 'SpectralNorm'}
       \item{\code{rec_dropout}}{\code{double} determining the dropout between recurrent layers. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{\eqn{0 <= x <= 0.6}}{`0 <= x <= 0.6`}}}
       \item{\code{repeat_encoder}}{\code{int} determining how many times the encoder should be added to the network. Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
