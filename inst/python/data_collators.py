@@ -149,7 +149,9 @@ class WordMixin:
         current_word_id = -1
         current_group: list[int] = []
 
-        for idx, word_id in enumerate(word_ids.tolist()):
+        ids = cast(list[int], word_ids.tolist())
+
+        for idx, word_id in enumerate(ids):
             if word_id == -1:
                 if current_group:
                     groups.append(current_group)
@@ -332,7 +334,7 @@ class PermutationCollatorMixin:
         if self.return_explicit_mlm_labels:
             batch["mlm_labels"] = batch.pop("labels")
 
-        return batch
+        return batch  # pyright: ignore[reportUnknownVariableType]
 
 
 # DataCollatorForLanguageModeling
@@ -387,7 +389,9 @@ class DataCollatorForTokenMLM(TokenMLMMixin):
         examples: Sequence[Example],
     ) -> dict[str, torch.Tensor]:
         if isinstance(examples[0], Mapping):
-            word_ids_list = []
+            examples = cast(Sequence[dict[str, Any]], examples)
+
+            word_ids_list: list[list[int]] = []
 
             if "word_ids" in examples[0]:
                 for example in examples:

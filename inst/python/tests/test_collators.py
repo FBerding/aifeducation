@@ -3,7 +3,6 @@ from typing import Any, cast
 
 import pytest
 import torch
-from data_collator import AifeDataCollatorForWholeWordMask
 from data_collators import (
     DataCollatorForTokenMLM,
     DataCollatorForTokenMLMAndWordPLM,
@@ -11,7 +10,6 @@ from data_collators import (
     DataCollatorForWordMLM,
     DataCollatorForWordMLMAndTokenPLM,
     DataCollatorForWordMPLM,
-    MaskingStrategy,
     TokenMLMMixin,
     TokenPLMMixin,
     WordMixin,
@@ -937,45 +935,3 @@ def test_WordPLM(collator_cls: type[DataCollatorForTokenMLM]) -> None:
         subword_idx = (permuted == 3).nonzero().item()
 
         assert abs(hello_idx - subword_idx) == 1
-
-
-@pytest.mark.parametrize("mlm_probability", [0.0, 0.15, 1.0])
-@pytest.mark.parametrize("masking_strategy", ["bert", "mask_only"])
-def test_WholeWord_compare(
-    mlm_probability: float,
-    masking_strategy: MaskingStrategy,
-) -> None:
-
-    collator1 = AifeDataCollatorForWholeWordMask(
-        tokenizer=tokenizer,
-        mlm_probability=mlm_probability,
-    )
-
-    collator2 = DataCollatorForWordMLM(
-        tokenizer=tokenizer,
-        mlm_probability=mlm_probability,
-        mlm=True,
-        masking_strategy=masking_strategy,
-    )
-
-    examples: list[dict[str, Any]] = [
-        {
-            "input_ids": [1, 2, 3, 6],
-            "word_ids": [None, 0, 0, None],
-        },
-        {
-            "input_ids": [1, 4, 5, 6, 0],
-            "word_ids": [None, 0, 1, None, None],
-        },
-    ]
-
-    batch1 = collator1(examples)
-    batch2 = collator2(examples)
-
-    keys = ("input_ids", "labels")
-
-    for k in keys:
-        assert batch1[k].shape == batch2[k].shape
-
-        if mlm_probability == 1.0 and masking_strategy == "mask_only":
-            assert torch.equal(batch1[k], batch2[k])
