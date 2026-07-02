@@ -1752,30 +1752,40 @@ get_param_dict <- function() {
   param$feat_bias$gui_box <- "Feature Layer"
 
   # Activation functions---------------------------------------------------------
+  act_fct_allowed_values=c("ELU", "LeakyReLU", "ReLU", "GELU", "Sigmoid", "Tanh", "PReLU","SwiGLU")
   param$act_fct <- list(
     type = "string",
     min = NULL,
     max = NULL,
     allow_null = FALSE,
-    allowed_values = c("ELU", "LeakyReLU", "ReLU", "GELU", "Sigmoid", "Tanh", "PReLU","SwiGLU"),
-    desc = "Activation function for all layers.",
+    allowed_values = setdiff(x=act_fct_allowed_values,y="SwiGLU"),
+    desc = "Activation function for the specified layers.",
     gui_box = "General Settings",
     gui_label = "Activation Function",
     default_value = "SwiGLU",
     default_historic = "GELU",
     test_values = NULL
   )
-  param$feat_act_fct <- param$act_fct
+
+  param$feat_act_fct=param$act_fct
+  param$feat_act_fct$allowed_values <- setdiff(x=act_fct_allowed_values,y="SwiGLU")
   param$feat_act_fct$gui_box <- "Feature Layer"
-  param$ng_conv_act_fct <- param$act_fct
+
+  param$ng_conv_act_fct=param$act_fct
+  param$ng_conv_act_fct$allowed_values <- setdiff(x=act_fct_allowed_values,y="SwiGLU")
   param$ng_conv_act_fct$gui_box <- "Multiple N-Gram Layers"
+
   param$dense_act_fct <- param$act_fct
+  param$dense_act_fct$allowed_values <- setdiff(x=act_fct_allowed_values,y="SwiGLU")
   param$dense_act_fct$gui_box <- "Dense Layers"
-  param$rec_act_fct <- param$act_fct
+
+  param$rec_act_fct=param$act_fct
   param$rec_act_fct$allowed_values <- "Tanh"
   param$rec_act_fct$gui_box <- "Recurrent Layers"
+
   param$tf_act_fct <- param$act_fct
   param$tf_act_fct$gui_box <- "Transformer Encoder Layers"
+  param$rec_act_fct$allowed_values <- act_fct_allowed_values
 
   # Recurrent Layer--------------------------------------------------------------
   param$rec_dropout <- list(
