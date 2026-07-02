@@ -30,9 +30,9 @@ create_dir(test_tmp_data_base_model_path, FALSE)
 
 # Test Configuration
 object_class_names <- get_entry_from_BaseModelsIndex("class_name")
-if (check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "5.0.0")) {
-  object_class_names <- setdiff(object_class_names, "BaseModelMPNet")
-}
+#if (check_versions(a = get_py_package_version("transformers"), operator = ">=", b = "5.0.0")) {
+#  object_class_names <- setdiff(object_class_names, "BaseModelMPNet")
+#}
 
 for (object_class_name in object_class_names) {
   # Data Management
