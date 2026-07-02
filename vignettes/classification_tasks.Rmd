@@ -791,7 +791,7 @@ base_model_bert$configure(
   num_hidden_layers = 4,
   num_attention_heads = 4,
   intermediate_size = 2 * 64,
-  hidden_act = "GGELU",
+  hidden_act = "GELU",
   hidden_dropout_prob = 0.1,
   attention_probs_dropout_prob = 0.1
 )
