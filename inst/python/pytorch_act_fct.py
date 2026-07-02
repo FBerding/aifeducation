@@ -20,11 +20,12 @@ import safetensors
 class SwiGLU(torch.nn.Module):
   def __init__(self,hidden_size):
     super().__init__()
-    self.sigmoid=torch.nn.Sigmoid()
     self.weights=torch.nn.Linear(in_features=hidden_size, out_features=hidden_size, bias=False, device=None, dtype=None)
-  def forward(self,x):
-    swish_value=x*self.sigmoid(x)
-    xp=self.weights(x)
+  #x1 projected values of x
+  #x2 not projected values of x, x2=x
+  def forward(self,x1,x2):
+    swish_value=torch.nn.SiLU(x1)
+    xp=self.weights(x2)
     y=swish_value*xp
     return y
 

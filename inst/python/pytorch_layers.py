@@ -252,7 +252,7 @@ class dense_layer_with_mask(torch.nn.Module):
     
     self.act_fct=get_act_fct(self.act_fct_name,hidden_size=self.output_size)
     
-    if self.dropout >0:
+    if self.dropout>0:
       self.dropout=layer_dropout_with_mask(p=self.dropout,pad_value=self.pad_value)
     else:
       self.dropout=identity_layer(pad_value=self.pad_value,apply_masking=True)
@@ -262,7 +262,10 @@ class dense_layer_with_mask(torch.nn.Module):
   def forward(self,x,mask_times):
     y=self.dense(x)
     y,mask_times=self.normalization_layer(y,mask_times)
-    y=self.act_fct(y)
+    if self.act_fct_name=="SwiGLU":
+      y=self.act_fct(y,x)
+    else:  
+      y=self.act_fct(y)
     y,mask_times=self.dropout(x=y,mask_times=mask_times)
     y,mask_times=self.residual_connection(x=x,y=y,mask_times=mask_times)
     return y,mask_times
@@ -702,7 +705,7 @@ class layer_tf_encoder(torch.nn.Module):
   
       #Sub Layer 2    
       proj_output,proj_mask=self.dense_1(y,mask_times)
-      #Actvation function is part of dense_1. This it does not need a layer
+      #Actvation function is part of dense_1. Thus it does not need a layer
       proj_output,proj_mask=self.dense_2(proj_output,proj_mask)
       proj_dropout=self.dropout_2(proj_output)
       proj_dropout=proj_dropout.masked_fill(mask=mask_features,value=self.pad_value)
