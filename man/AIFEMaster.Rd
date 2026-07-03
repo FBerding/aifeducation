@@ -276,7 +276,11 @@ resulting CO2 equivalents in kg.
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{track_mode}}{\code{string} Determines the stept to which the data refer. Allowed values: 'training', 'inference'}
+      \item{\code{track_mode}}{\code{string} Determines the stept to which the data refer. Allowed values:
+\itemize{
+\item 'training'
+\item 'inference'
+}}
     }
     \if{html}{\out{</div>}}
   }

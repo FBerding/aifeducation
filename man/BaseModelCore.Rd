@@ -92,7 +92,9 @@ Objects of class \code{TokenizerBase}.}
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{model_dir}}{Path where the model is stored.}
-      \item{\code{tokenizer_dir}}{\code{string} Path to the directory where the tokenizer is saved. Allowed values: any}
+      \item{\code{tokenizer_dir}}{\code{string} Path to the directory where the tokenizer is saved. Allowed values:
+
+any}
     }
     \if{html}{\out{</div>}}
   }
@@ -135,36 +137,69 @@ Objects of class \code{TokenizerBase}.}
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{text_dataset}}{\code{LargeDataSetForText} \link{LargeDataSetForText} Object storing textual data.}
-      \item{\code{p_mask}}{\code{double} Ratio that determines the number of tokens used for masking. Allowed values: \ifelse{latex}{$0.05 <= x <= 0.6$}{\ifelse{html}{\eqn{0.05 <= x <= 0.6}}{`0.05 <= x <= 0.6`}}}
+      \item{\code{p_mask}}{\code{double} Ratio that determines the number of tokens used for masking. Allowed values:
+
+\ifelse{latex}{$0.05 <= x <= 0.6$}{\ifelse{html}{\eqn{0.05 <= x <= 0.6}}{`0.05 <= x <= 0.6`}}}
       \item{\code{whole_word}}{\code{bool} * \code{TRUE}: whole word masking should be applied. Only relevant if a \code{WordPieceTokenizer} is used.
 \itemize{
 \item \code{FALSE}: token masking is used.
 }}
       \item{\code{val_size}}{\code{double} between 0 and 1, indicating the proportion of cases which should be
 used for the validation sample during the estimation of the model.
-The remaining cases are part of the training data. Allowed values: \ifelse{latex}{$0 < x < 1$}{\ifelse{html}{\eqn{0 < x < 1}}{`0 < x < 1`}}}
-      \item{\code{n_epoch}}{\code{int} Number of training epochs. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{max_sequence_length}}{\code{int} Maximal number of tokens for every sequence. Allowed values: \ifelse{latex}{$20 <= x $}{\ifelse{html}{\eqn{20 <= x }}{`20 <= x `}}}
+The remaining cases are part of the training data. Allowed values:
+
+\ifelse{latex}{$0 < x < 1$}{\ifelse{html}{\eqn{0 < x < 1}}{`0 < x < 1`}}}
+      \item{\code{n_epoch}}{\code{int} Number of training epochs. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{max_sequence_length}}{\code{int} Maximal number of tokens for every sequence. Allowed values:
+
+\ifelse{latex}{$20 <= x $}{\ifelse{html}{\eqn{20 <= x }}{`20 <= x `}}}
       \item{\code{full_sequences_only}}{\code{bool} \code{TRUE} for using only chunks with a sequence length equal to \code{chunk_size}.}
       \item{\code{min_seq_len}}{\code{int} Only relevant if \code{full_sequences_only = FALSE}. Value determines the minimal sequence length included in
-training process.  Allowed values: \ifelse{latex}{$10 <= x $}{\ifelse{html}{\eqn{10 <= x }}{`10 <= x `}}}
+training process.  Allowed values:
+
+\ifelse{latex}{$10 <= x $}{\ifelse{html}{\eqn{10 <= x }}{`10 <= x `}}}
       \item{\code{learning_rate}}{\code{double} Initial learning rate for the training. Sets the maximal learning rate.
-Set this value to \code{0.0} requests an automatic search for a good learning rate. Allowed values: \ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
+Set this value to \code{0.0} requests an automatic search for a good learning rate. Allowed values:
+
+\ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
       \item{\code{sustain_track}}{\code{bool} If \code{TRUE} energy consumption is tracked during training via the python library 'codecarbon'.}
       \item{\code{sustain_iso_code}}{\code{string} ISO code (Alpha-3-Code) for the country. This variable must be set if
 sustainability should be tracked. A list can be found on Wikipedia:
-\url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}. Allowed values: any}
+\url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}. Allowed values:
+
+any}
       \item{\code{sustain_region}}{\code{string} Region within a country. Only available for USA and Canada See the documentation of
-codecarbon for more information. \url{https://docs.codecarbon.io/latest/} Allowed values: any}
-      \item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{sustain_log_level}}{\code{string} Level for printing information to the console. Allowed values: 'debug', 'info', 'warning', 'error', 'critical'}
+codecarbon for more information. \url{https://docs.codecarbon.io/latest/} Allowed values:
+
+any}
+      \item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{sustain_log_level}}{\code{string} Level for printing information to the console. Allowed values:
+\itemize{
+\item 'debug'
+\item 'info'
+\item 'warning'
+\item 'error'
+\item 'critical'
+}}
       \item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
-      \item{\code{pytorch_trace}}{\code{int} \code{ml_trace=0} does not print any information about the training process from pytorch on the console. Allowed values: \ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
+      \item{\code{pytorch_trace}}{\code{int} \code{ml_trace=0} does not print any information about the training process from pytorch on the console. Allowed values:
+
+\ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
       \item{\code{log_dir}}{\code{string} Path to the directory where the log files should be saved.
-If no logging is desired set this argument to \code{NULL}. Allowed values: any}
+If no logging is desired set this argument to \code{NULL}. Allowed values:
+
+any}
       \item{\code{log_write_interval}}{\code{int} Time in seconds determining the interval in which the logger should try to update
-the log files. Only relevant if \code{log_dir} is not \code{NULL}. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+the log files. Only relevant if \code{log_dir} is not \code{NULL}. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
     }
     \if{html}{\out{</div>}}
   }
@@ -209,12 +244,22 @@ This method requires the \emph{R} package 'ggplot2' to work.
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{x_min}}{\code{int} Minimal value for x-axis. Set to \code{NULL} for an automatic adjustment. Allowed values: \ifelse{latex}{$ x $}{\ifelse{html}{\eqn{ x }}{` x `}}}
-      \item{\code{x_max}}{\code{int} Maximal value for x-axis. Set to \code{NULL} for an automatic adjustment. Allowed values: \ifelse{latex}{$ x $}{\ifelse{html}{\eqn{ x }}{` x `}}}
-      \item{\code{y_min}}{\code{int} Minimal value for y-axis. Set to \code{NULL} for an automatic adjustment. Allowed values: \ifelse{latex}{$ x $}{\ifelse{html}{\eqn{ x }}{` x `}}}
-      \item{\code{y_max}}{\code{int} Maximal value for y-axis. Set to \code{NULL} for an automatic adjustment. Allowed values: \ifelse{latex}{$ x $}{\ifelse{html}{\eqn{ x }}{` x `}}}
+      \item{\code{x_min}}{\code{int} Minimal value for x-axis. Set to \code{NULL} for an automatic adjustment. Allowed values:
+
+\ifelse{latex}{$ x $}{\ifelse{html}{\eqn{ x }}{` x `}}}
+      \item{\code{x_max}}{\code{int} Maximal value for x-axis. Set to \code{NULL} for an automatic adjustment. Allowed values:
+
+\ifelse{latex}{$ x $}{\ifelse{html}{\eqn{ x }}{` x `}}}
+      \item{\code{y_min}}{\code{int} Minimal value for y-axis. Set to \code{NULL} for an automatic adjustment. Allowed values:
+
+\ifelse{latex}{$ x $}{\ifelse{html}{\eqn{ x }}{` x `}}}
+      \item{\code{y_max}}{\code{int} Maximal value for y-axis. Set to \code{NULL} for an automatic adjustment. Allowed values:
+
+\ifelse{latex}{$ x $}{\ifelse{html}{\eqn{ x }}{` x `}}}
       \item{\code{ind_best_model}}{\code{bool} If \code{TRUE} the plot indicates the best states of the model according to the chosen measure.}
-      \item{\code{text_size}}{\code{int} Size of text elements. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{text_size}}{\code{int} Size of text elements. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
     }
     \if{html}{\out{</div>}}
   }
@@ -267,8 +312,12 @@ and their type, token, and id in the columns.
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{masked_text}}{\code{string} Text with mask tokens. Allowed values: any}
-      \item{\code{n_solutions}}{\code{int} Number of solutions the model should predict. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{masked_text}}{\code{string} Text with mask tokens. Allowed values:
+
+any}
+      \item{\code{n_solutions}}{\code{int} Number of solutions the model should predict. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
     }
     \if{html}{\out{</div>}}
   }
@@ -293,7 +342,9 @@ the score, token id, and token string in the columns.
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{dir_path}}{Path to the directory where to save the object.}
-      \item{\code{folder_name}}{\code{string} Name of the folder where the model should be saved. Allowed values: any}
+      \item{\code{folder_name}}{\code{string} Name of the folder where the model should be saved. Allowed values:
+
+any}
     }
     \if{html}{\out{</div>}}
   }
@@ -466,14 +517,29 @@ members for publication information of the model.
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{text_dataset}}{\code{LargeDataSetForText} \link{LargeDataSetForText} Object storing textual data.}
-      \item{\code{n_samples}}{\code{int} Number of samples. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{n_samples}}{\code{int} Number of samples. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
       \item{\code{sustain_iso_code}}{\code{string} ISO code (Alpha-3-Code) for the country. This variable must be set if
 sustainability should be tracked. A list can be found on Wikipedia:
-\url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}. Allowed values: any}
+\url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}. Allowed values:
+
+any}
       \item{\code{sustain_region}}{\code{string} Region within a country. Only available for USA and Canada See the documentation of
-codecarbon for more information. \url{https://docs.codecarbon.io/latest/} Allowed values: any}
-      \item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{sustain_log_level}}{\code{string} Level for printing information to the console. Allowed values: 'debug', 'info', 'warning', 'error', 'critical'}
+codecarbon for more information. \url{https://docs.codecarbon.io/latest/} Allowed values:
+
+any}
+      \item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{sustain_log_level}}{\code{string} Level for printing information to the console. Allowed values:
+\itemize{
+\item 'debug'
+\item 'info'
+\item 'warning'
+\item 'error'
+\item 'critical'
+}}
       \item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
     }
     \if{html}{\out{</div>}}
@@ -497,9 +563,15 @@ The statistics can be accessed with the method \code{get_sustainability_data("in
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{n_batches}}{\code{int} Number of batches. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{n_epoch}}{\code{int} Number of training epochs. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{n_batches}}{\code{int} Number of batches. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{n_epoch}}{\code{int} Number of training epochs. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
     }
     \if{html}{\out{</div>}}
   }

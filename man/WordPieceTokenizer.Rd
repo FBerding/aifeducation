@@ -79,7 +79,9 @@ Other Tokenizer:
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{vocab_size}}{\code{int} Size of the vocabulary. Allowed values: \ifelse{latex}{$1000 <= x <= 500000$}{\ifelse{html}{\eqn{1000 <= x <= 500000}}{`1000 <= x <= 500000`}}}
+      \item{\code{vocab_size}}{\code{int} Size of the vocabulary. Allowed values:
+
+\ifelse{latex}{$1000 <= x <= 500000$}{\ifelse{html}{\eqn{1000 <= x <= 500000}}{`1000 <= x <= 500000`}}}
       \item{\code{vocab_do_lower_case}}{\code{bool} \code{TRUE} if all tokens should be lower case.}
     }
     \if{html}{\out{</div>}}
@@ -112,15 +114,30 @@ Other Tokenizer:
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{text_dataset}}{\code{LargeDataSetForText} \link{LargeDataSetForText} Object storing textual data.}
-      \item{\code{statistics_max_tokens_length}}{\code{int} Maximum sequence length for calculating the statistics. Allowed values: \ifelse{latex}{$20 <= x <= 8192$}{\ifelse{html}{\eqn{20 <= x <= 8192}}{`20 <= x <= 8192`}}}
+      \item{\code{statistics_max_tokens_length}}{\code{int} Maximum sequence length for calculating the statistics. Allowed values:
+
+\ifelse{latex}{$20 <= x <= 8192$}{\ifelse{html}{\eqn{20 <= x <= 8192}}{`20 <= x <= 8192`}}}
       \item{\code{sustain_track}}{\code{bool} If \code{TRUE} energy consumption is tracked during training via the python library 'codecarbon'.}
       \item{\code{sustain_iso_code}}{\code{string} ISO code (Alpha-3-Code) for the country. This variable must be set if
 sustainability should be tracked. A list can be found on Wikipedia:
-\url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}. Allowed values: any}
+\url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}. Allowed values:
+
+any}
       \item{\code{sustain_region}}{\code{string} Region within a country. Only available for USA and Canada See the documentation of
-codecarbon for more information. \url{https://docs.codecarbon.io/latest/} Allowed values: any}
-      \item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{sustain_log_level}}{\code{string} Level for printing information to the console. Allowed values: 'debug', 'info', 'warning', 'error', 'critical'}
+codecarbon for more information. \url{https://docs.codecarbon.io/latest/} Allowed values:
+
+any}
+      \item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{sustain_log_level}}{\code{string} Level for printing information to the console. Allowed values:
+\itemize{
+\item 'debug'
+\item 'info'
+\item 'warning'
+\item 'error'
+\item 'critical'
+}}
       \item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
     }
     \if{html}{\out{</div>}}

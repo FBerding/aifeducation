@@ -1622,7 +1622,7 @@ get_param_dict <- function() {
     max = Inf,
     allowed_values = NULL,
     desc = "Number of features to be extracted at the end of the model.
-      Only relevant if pooling type ist 'Max', 'Min' or 'MinMax'.",
+      Only relevant if pooling type is 'Max', 'Min' or 'MinMax'.",
     gui_box = "Classifiction Pooling Layer",
     gui_label = "Size",
     default_value = 32L,
@@ -1785,7 +1785,7 @@ get_param_dict <- function() {
 
   param$tf_act_fct <- param$act_fct
   param$tf_act_fct$gui_box <- "Transformer Encoder Layers"
-  param$rec_act_fct$allowed_values <- act_fct_allowed_values
+  param$tf_act_fct$allowed_values <- act_fct_allowed_values
 
   # Recurrent Layer--------------------------------------------------------------
   param$rec_dropout <- list(
@@ -2338,7 +2338,7 @@ get_param_doc_desc <- function(param_name) {
       if (is.null(param_def$allowed_values)) {
         allowed_values <- "any"
       } else {
-        allowed_values <- toString(paste0("'", param_def$allowed_values, "'"))
+        allowed_values <- paste("\n",paste0("* '", param_def$allowed_values, "'\n"),collapse = " ")
       }
     } else if (param_def$type %in% c("double", "(double", "double)", "(double)")) {
       if (param_def$min != -Inf) {
@@ -2381,7 +2381,11 @@ get_param_doc_desc <- function(param_name) {
   }
 
   if (!is.null(allowed_values)) {
-    allowed_values <- paste("Allowed values:", allowed_values)
+    allowed_values <- paste(
+      "Allowed values:\n\n",
+      allowed_values,
+      "\n\n"
+    )
   } else {
     allowed_values <- ""
   }

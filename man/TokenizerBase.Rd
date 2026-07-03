@@ -78,7 +78,9 @@ Other R6 Classes for Developers:
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{dir_path}}{Path to the directory where to save the object.}
-      \item{\code{folder_name}}{\code{string} Name of the folder where the model should be saved. Allowed values: any}
+      \item{\code{folder_name}}{\code{string} Name of the folder where the model should be saved. Allowed values:
+
+any}
     }
     \if{html}{\out{</div>}}
   }
@@ -178,9 +180,15 @@ and updates the object to the current version of the package.
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{raw_text}}{\code{vector} Raw text.}
-      \item{\code{token_overlap}}{\code{int} Number of tokens from the previous chunk that should be added at the beginng of the next chunk. Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
-      \item{\code{max_token_sequence_length}}{\code{int} Maximal number of tokens per chunk. Allowed values: \ifelse{latex}{$20 <= x $}{\ifelse{html}{\eqn{20 <= x }}{`20 <= x `}}}
-      \item{\code{n_chunks}}{\code{int} Maximal number chunks. Allowed values: \ifelse{latex}{$2 <= x $}{\ifelse{html}{\eqn{2 <= x }}{`2 <= x `}}}
+      \item{\code{token_overlap}}{\code{int} Number of tokens from the previous chunk that should be added at the beginng of the next chunk. Allowed values:
+
+\ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
+      \item{\code{max_token_sequence_length}}{\code{int} Maximal number of tokens per chunk. Allowed values:
+
+\ifelse{latex}{$20 <= x $}{\ifelse{html}{\eqn{20 <= x }}{`20 <= x `}}}
+      \item{\code{n_chunks}}{\code{int} Maximal number chunks. Allowed values:
+
+\ifelse{latex}{$2 <= x $}{\ifelse{html}{\eqn{2 <= x }}{`2 <= x `}}}
       \item{\code{token_encodings_only}}{\code{bool}
 \itemize{
 \item \code{TRUE}: Returns a \code{list} containg only the tokens.
@@ -285,7 +293,9 @@ Applications, 21, 200335.
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{text_dataset}}{\code{LargeDataSetForText} \link{LargeDataSetForText} Object storing textual data.}
-      \item{\code{statistics_max_tokens_length}}{\code{int} Maximum sequence length for calculating the statistics. Allowed values: \ifelse{latex}{$20 <= x <= 8192$}{\ifelse{html}{\eqn{20 <= x <= 8192}}{`20 <= x <= 8192`}}}
+      \item{\code{statistics_max_tokens_length}}{\code{int} Maximum sequence length for calculating the statistics. Allowed values:
+
+\ifelse{latex}{$20 <= x <= 8192$}{\ifelse{html}{\eqn{20 <= x <= 8192}}{`20 <= x <= 8192`}}}
       \item{\code{step}}{\code{string} describing the context of the estimation.}
     }
     \if{html}{\out{</div>}}
@@ -325,9 +335,15 @@ how many sequences are necessary. The number of sequences of sequences is called
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{text_dataset}}{\code{LargeDataSetForText} \link{LargeDataSetForText} Object storing textual data.}
-      \item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{seq_len_tokens}}{\code{int} Length of a sequence in tokens Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{token_overlap}}{\code{int} Number of tokens from the previous chunk that should be added at the beginng of the next chunk. Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
+      \item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{seq_len_tokens}}{\code{int} Length of a sequence in tokens Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{token_overlap}}{\code{int} Number of tokens from the previous chunk that should be added at the beginng of the next chunk. Allowed values:
+
+\ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
       \item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
     }
     \if{html}{\out{</div>}}

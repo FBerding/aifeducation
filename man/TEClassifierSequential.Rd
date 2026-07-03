@@ -226,63 +226,254 @@ Other Classification:
     \describe{
       \item{\code{name}}{\code{string} Name of the new model. Please refer to common name conventions.
 Free text can be used with parameter \code{label}. If set to \code{NULL} a unique ID
-is generated automatically. Allowed values: any}
-      \item{\code{label}}{\code{string} Label for the new model. Here you can use free text. Allowed values: any}
+is generated automatically. Allowed values:
+
+any}
+      \item{\code{label}}{\code{string} Label for the new model. Here you can use free text. Allowed values:
+
+any}
       \item{\code{text_embeddings}}{\verb{EmbeddedText, LargeDataSetForTextEmbeddings} Object of class \link{EmbeddedText} or \link{LargeDataSetForTextEmbeddings}.}
       \item{\code{feature_extractor}}{\code{TEFeatureExtractor} Object of class \link{TEFeatureExtractor} which should be used in order to reduce
 the number of dimensions of the text embeddings. If no feature extractor should be applied set \code{NULL}.}
       \item{\code{target_levels}}{\code{vector} containing the levels (categories or classes) within the target data. Please
 note that order matters. For ordinal data please ensure that the levels are sorted correctly with later levels
 indicating a higher category/class. For nominal data the order does not matter.}
-      \item{\code{skip_connection_type}}{\code{string} Type of residual connenction for all layers and stack of layers. Allowed values: 'ResidualGate', 'Addition', 'None'}
+      \item{\code{skip_connection_type}}{\code{string} Type of residual connenction for all layers and stack of layers. Allowed values:
+\itemize{
+\item 'ResidualGate'
+\item 'Addition'
+\item 'None'
+}}
       \item{\code{cls_pooling_features}}{\code{int} Number of features to be extracted at the end of the model.
-Only relevant if pooling type ist 'Max', 'Min' or 'MinMax'. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{cls_pooling_type}}{\code{string} Type of extracting intermediate features. Allowed values: 'Max', 'Min', 'MinMax', 'MaxTimes', 'MinMaxTimes'}
-      \item{\code{cls_head_type}}{\code{string} Type of classification head. Allowed values: 'Regular', 'PairwiseOrthogonal', 'PairwiseOrthogonalDense'}
-      \item{\code{feat_act_fct}}{\code{string} Activation function for the specified layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
-      \item{\code{feat_size}}{\code{int} Number of neurons for each dense layer. Allowed values: \ifelse{latex}{$2 <= x $}{\ifelse{html}{\eqn{2 <= x }}{`2 <= x `}}}
+Only relevant if pooling type is 'Max', 'Min' or 'MinMax'. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{cls_pooling_type}}{\code{string} Type of extracting intermediate features. Allowed values:
+\itemize{
+\item 'Max'
+\item 'Min'
+\item 'MinMax'
+\item 'MaxTimes'
+\item 'MinMaxTimes'
+}}
+      \item{\code{cls_head_type}}{\code{string} Type of classification head. Allowed values:
+\itemize{
+\item 'Regular'
+\item 'PairwiseOrthogonal'
+\item 'PairwiseOrthogonalDense'
+}}
+      \item{\code{feat_act_fct}}{\code{string} Activation function for the specified layers. Allowed values:
+\itemize{
+\item 'ELU'
+\item 'LeakyReLU'
+\item 'ReLU'
+\item 'GELU'
+\item 'Sigmoid'
+\item 'Tanh'
+\item 'PReLU'
+}}
+      \item{\code{feat_size}}{\code{int} Number of neurons for each dense layer. Allowed values:
+
+\ifelse{latex}{$2 <= x $}{\ifelse{html}{\eqn{2 <= x }}{`2 <= x `}}}
       \item{\code{feat_bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
-      \item{\code{feat_dropout}}{\code{double} determining the dropout for the dense projection of the feature layer. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{\eqn{0 <= x <= 0.6}}{`0 <= x <= 0.6`}}}
-      \item{\code{feat_parametrizations}}{\code{string} Re-Parametrizations of the weights of layers. Allowed values: 'None', 'OrthogonalWeights', 'WeightNorm', 'SpectralNorm'}
-      \item{\code{feat_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values: 'LayerNorm', 'BatchNorm', 'PowerNorm', 'RMSNorm', 'None'}
-      \item{\code{ng_conv_act_fct}}{\code{string} Activation function for the specified layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
-      \item{\code{ng_conv_n_layers}}{\code{int} determining how many times the n-gram layers should be added to the network. Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
-      \item{\code{ng_conv_ks_min}}{\code{int} determining the minimal window size for n-grams. Allowed values: \ifelse{latex}{$2 <= x $}{\ifelse{html}{\eqn{2 <= x }}{`2 <= x `}}}
-      \item{\code{ng_conv_ks_max}}{\code{int} determining the maximal window size for n-grams. Allowed values: \ifelse{latex}{$2 <= x $}{\ifelse{html}{\eqn{2 <= x }}{`2 <= x `}}}
+      \item{\code{feat_dropout}}{\code{double} determining the dropout for the dense projection of the feature layer. Allowed values:
+
+\ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{\eqn{0 <= x <= 0.6}}{`0 <= x <= 0.6`}}}
+      \item{\code{feat_parametrizations}}{\code{string} Re-Parametrizations of the weights of layers. Allowed values:
+\itemize{
+\item 'None'
+\item 'OrthogonalWeights'
+\item 'WeightNorm'
+\item 'SpectralNorm'
+}}
+      \item{\code{feat_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values:
+\itemize{
+\item 'LayerNorm'
+\item 'BatchNorm'
+\item 'PowerNorm'
+\item 'RMSNorm'
+\item 'None'
+}}
+      \item{\code{ng_conv_act_fct}}{\code{string} Activation function for the specified layers. Allowed values:
+\itemize{
+\item 'ELU'
+\item 'LeakyReLU'
+\item 'ReLU'
+\item 'GELU'
+\item 'Sigmoid'
+\item 'Tanh'
+\item 'PReLU'
+}}
+      \item{\code{ng_conv_n_layers}}{\code{int} determining how many times the n-gram layers should be added to the network. Allowed values:
+
+\ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
+      \item{\code{ng_conv_ks_min}}{\code{int} determining the minimal window size for n-grams. Allowed values:
+
+\ifelse{latex}{$2 <= x $}{\ifelse{html}{\eqn{2 <= x }}{`2 <= x `}}}
+      \item{\code{ng_conv_ks_max}}{\code{int} determining the maximal window size for n-grams. Allowed values:
+
+\ifelse{latex}{$2 <= x $}{\ifelse{html}{\eqn{2 <= x }}{`2 <= x `}}}
       \item{\code{ng_conv_bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
-      \item{\code{ng_conv_dropout}}{\code{double} determining the dropout for n-gram convolution layers. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{\eqn{0 <= x <= 0.6}}{`0 <= x <= 0.6`}}}
-      \item{\code{ng_conv_parametrizations}}{\code{string} Re-Parametrizations of the weights of layers. Allowed values: 'None', 'OrthogonalWeights', 'WeightNorm', 'SpectralNorm'}
-      \item{\code{ng_conv_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values: 'LayerNorm', 'BatchNorm', 'PowerNorm', 'RMSNorm', 'None'}
-      \item{\code{ng_conv_residual_type}}{\code{string} Type of residual connenction for all layers and stack of layers. Allowed values: 'ResidualGate', 'Addition', 'None'}
-      \item{\code{dense_act_fct}}{\code{string} Activation function for the specified layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
-      \item{\code{dense_n_layers}}{\code{int} Number of dense layers. Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
-      \item{\code{dense_dropout}}{\code{double} determining the dropout between dense layers. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{\eqn{0 <= x <= 0.6}}{`0 <= x <= 0.6`}}}
+      \item{\code{ng_conv_dropout}}{\code{double} determining the dropout for n-gram convolution layers. Allowed values:
+
+\ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{\eqn{0 <= x <= 0.6}}{`0 <= x <= 0.6`}}}
+      \item{\code{ng_conv_parametrizations}}{\code{string} Re-Parametrizations of the weights of layers. Allowed values:
+\itemize{
+\item 'None'
+\item 'OrthogonalWeights'
+\item 'WeightNorm'
+\item 'SpectralNorm'
+}}
+      \item{\code{ng_conv_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values:
+\itemize{
+\item 'LayerNorm'
+\item 'BatchNorm'
+\item 'PowerNorm'
+\item 'RMSNorm'
+\item 'None'
+}}
+      \item{\code{ng_conv_residual_type}}{\code{string} Type of residual connenction for all layers and stack of layers. Allowed values:
+\itemize{
+\item 'ResidualGate'
+\item 'Addition'
+\item 'None'
+}}
+      \item{\code{dense_act_fct}}{\code{string} Activation function for the specified layers. Allowed values:
+\itemize{
+\item 'ELU'
+\item 'LeakyReLU'
+\item 'ReLU'
+\item 'GELU'
+\item 'Sigmoid'
+\item 'Tanh'
+\item 'PReLU'
+}}
+      \item{\code{dense_n_layers}}{\code{int} Number of dense layers. Allowed values:
+
+\ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
+      \item{\code{dense_dropout}}{\code{double} determining the dropout between dense layers. Allowed values:
+
+\ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{\eqn{0 <= x <= 0.6}}{`0 <= x <= 0.6`}}}
       \item{\code{dense_bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
-      \item{\code{dense_parametrizations}}{\code{string} Re-Parametrizations of the weights of layers. Allowed values: 'None', 'OrthogonalWeights', 'WeightNorm', 'SpectralNorm'}
-      \item{\code{dense_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values: 'LayerNorm', 'BatchNorm', 'PowerNorm', 'RMSNorm', 'None'}
-      \item{\code{dense_residual_type}}{\code{string} Type of residual connenction for all layers and stack of layers. Allowed values: 'ResidualGate', 'Addition', 'None'}
-      \item{\code{rec_act_fct}}{\code{string} Activation function for the specified layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU', 'SwiGLU'}
-      \item{\code{rec_n_layers}}{\code{int} Number of recurrent layers. Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
-      \item{\code{rec_type}}{\code{string} Type of the recurrent layers. \code{rec_type='GRU'} for Gated Recurrent Unit and \code{rec_type='LSTM'} for Long Short-Term Memory. Allowed values: 'GRU', 'LSTM'}
+      \item{\code{dense_parametrizations}}{\code{string} Re-Parametrizations of the weights of layers. Allowed values:
+\itemize{
+\item 'None'
+\item 'OrthogonalWeights'
+\item 'WeightNorm'
+\item 'SpectralNorm'
+}}
+      \item{\code{dense_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values:
+\itemize{
+\item 'LayerNorm'
+\item 'BatchNorm'
+\item 'PowerNorm'
+\item 'RMSNorm'
+\item 'None'
+}}
+      \item{\code{dense_residual_type}}{\code{string} Type of residual connenction for all layers and stack of layers. Allowed values:
+\itemize{
+\item 'ResidualGate'
+\item 'Addition'
+\item 'None'
+}}
+      \item{\code{rec_act_fct}}{\code{string} Activation function for the specified layers. Allowed values:
+\itemize{
+\item 'Tanh'
+}}
+      \item{\code{rec_n_layers}}{\code{int} Number of recurrent layers. Allowed values:
+
+\ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
+      \item{\code{rec_type}}{\code{string} Type of the recurrent layers. \code{rec_type='GRU'} for Gated Recurrent Unit and \code{rec_type='LSTM'} for Long Short-Term Memory. Allowed values:
+\itemize{
+\item 'GRU'
+\item 'LSTM'
+}}
       \item{\code{rec_bidirectional}}{\code{bool} If \code{TRUE} a bidirectional version of the recurrent layers is used.}
-      \item{\code{rec_dropout}}{\code{double} determining the dropout between recurrent layers. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{\eqn{0 <= x <= 0.6}}{`0 <= x <= 0.6`}}}
+      \item{\code{rec_dropout}}{\code{double} determining the dropout between recurrent layers. Allowed values:
+
+\ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{\eqn{0 <= x <= 0.6}}{`0 <= x <= 0.6`}}}
       \item{\code{rec_bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
-      \item{\code{rec_parametrizations}}{\code{string} Re-Parametrizations of the weights of layers. Allowed values: 'None'}
-      \item{\code{rec_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values: 'LayerNorm', 'BatchNorm', 'PowerNorm', 'RMSNorm', 'None'}
-      \item{\code{rec_residual_type}}{\code{string} Type of residual connenction for all layers and stack of layers. Allowed values: 'ResidualGate', 'Addition', 'None'}
-      \item{\code{tf_act_fct}}{\code{string} Activation function for the specified layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'}
-      \item{\code{tf_dense_dim}}{\code{int} determining the size of the projection layer within a each transformer encoder. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{tf_n_layers}}{\code{int} determining how many times the encoder should be added to the network. Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
-      \item{\code{tf_dropout_rate_1}}{\code{double} determining the dropout after the attention mechanism within the transformer encoder layers. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{\eqn{0 <= x <= 0.6}}{`0 <= x <= 0.6`}}}
-      \item{\code{tf_dropout_rate_2}}{\code{double} determining the dropout for the dense projection within the transformer encoder layers. Allowed values: \ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{\eqn{0 <= x <= 0.6}}{`0 <= x <= 0.6`}}}
-      \item{\code{tf_attention_type}}{\code{string} Choose the attention type. Allowed values: 'Fourier', 'MultiHead'}
-      \item{\code{tf_positional_type}}{\code{string} Type of processing positional information. Allowed values: 'None', 'absolute'}
-      \item{\code{tf_num_heads}}{\code{int} determining the number of attention heads for a self-attention layer. Only relevant if \code{attention_type='MultiHead'} Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
+      \item{\code{rec_parametrizations}}{\code{string} Re-Parametrizations of the weights of layers. Allowed values:
+\itemize{
+\item 'None'
+}}
+      \item{\code{rec_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values:
+\itemize{
+\item 'LayerNorm'
+\item 'BatchNorm'
+\item 'PowerNorm'
+\item 'RMSNorm'
+\item 'None'
+}}
+      \item{\code{rec_residual_type}}{\code{string} Type of residual connenction for all layers and stack of layers. Allowed values:
+\itemize{
+\item 'ResidualGate'
+\item 'Addition'
+\item 'None'
+}}
+      \item{\code{tf_act_fct}}{\code{string} Activation function for the specified layers. Allowed values:
+\itemize{
+\item 'ELU'
+\item 'LeakyReLU'
+\item 'ReLU'
+\item 'GELU'
+\item 'Sigmoid'
+\item 'Tanh'
+\item 'PReLU'
+\item 'SwiGLU'
+}}
+      \item{\code{tf_dense_dim}}{\code{int} determining the size of the projection layer within a each transformer encoder. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{tf_n_layers}}{\code{int} determining how many times the encoder should be added to the network. Allowed values:
+
+\ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
+      \item{\code{tf_dropout_rate_1}}{\code{double} determining the dropout after the attention mechanism within the transformer encoder layers. Allowed values:
+
+\ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{\eqn{0 <= x <= 0.6}}{`0 <= x <= 0.6`}}}
+      \item{\code{tf_dropout_rate_2}}{\code{double} determining the dropout for the dense projection within the transformer encoder layers. Allowed values:
+
+\ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{\eqn{0 <= x <= 0.6}}{`0 <= x <= 0.6`}}}
+      \item{\code{tf_attention_type}}{\code{string} Choose the attention type. Allowed values:
+\itemize{
+\item 'Fourier'
+\item 'MultiHead'
+}}
+      \item{\code{tf_positional_type}}{\code{string} Type of processing positional information. Allowed values:
+\itemize{
+\item 'None'
+\item 'absolute'
+}}
+      \item{\code{tf_num_heads}}{\code{int} determining the number of attention heads for a self-attention layer. Only relevant if \code{attention_type='MultiHead'} Allowed values:
+
+\ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
       \item{\code{tf_bias}}{\code{bool} If \code{TRUE} a bias term is added to all layers. If \code{FALSE} no bias term is added to the layers.}
-      \item{\code{tf_parametrizations}}{\code{string} Re-Parametrizations of the weights of layers. Allowed values: 'None', 'OrthogonalWeights', 'WeightNorm', 'SpectralNorm'}
-      \item{\code{tf_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values: 'LayerNorm', 'BatchNorm', 'PowerNorm', 'RMSNorm', 'None'}
-      \item{\code{tf_normalization_position}}{\code{string} Position where the normalization should be applied. Allowed values: 'Pre', 'Post'}
-      \item{\code{tf_residual_type}}{\code{string} Type of residual connenction for all layers and stack of layers. Allowed values: 'ResidualGate', 'Addition', 'None'}
+      \item{\code{tf_parametrizations}}{\code{string} Re-Parametrizations of the weights of layers. Allowed values:
+\itemize{
+\item 'None'
+\item 'OrthogonalWeights'
+\item 'WeightNorm'
+\item 'SpectralNorm'
+}}
+      \item{\code{tf_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values:
+\itemize{
+\item 'LayerNorm'
+\item 'BatchNorm'
+\item 'PowerNorm'
+\item 'RMSNorm'
+\item 'None'
+}}
+      \item{\code{tf_normalization_position}}{\code{string} Position where the normalization should be applied. Allowed values:
+\itemize{
+\item 'Pre'
+\item 'Post'
+}}
+      \item{\code{tf_residual_type}}{\code{string} Type of residual connenction for all layers and stack of layers. Allowed values:
+\itemize{
+\item 'ResidualGate'
+\item 'Addition'
+\item 'None'
+}}
     }
     \if{html}{\out{</div>}}
   }

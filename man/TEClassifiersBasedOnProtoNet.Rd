@@ -139,38 +139,87 @@ on the validation data set is used as the final model.
       \item{\code{data_embeddings}}{\verb{EmbeddedText, LargeDataSetForTextEmbeddings} Object of class \link{EmbeddedText} or \link{LargeDataSetForTextEmbeddings}.}
       \item{\code{data_targets}}{\code{factor} containing the labels for cases stored in embeddings. Factor must be
 named and has to use the same names as used in in the embeddings. .}
-      \item{\code{data_folds}}{\code{int} determining the number of cross-fold samples. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{data_folds}}{\code{int} determining the number of cross-fold samples. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
       \item{\code{data_val_size}}{\code{double} between 0 and 1, indicating the proportion of cases which should be
 used for the validation sample during the estimation of the model.
-The remaining cases are part of the training data. Allowed values: \ifelse{latex}{$0 < x < 1$}{\ifelse{html}{\eqn{0 < x < 1}}{`0 < x < 1`}}}
-      \item{\code{loss_pt_fct_name}}{\code{string} Name of the loss function to use during training. Allowed values: 'MultiWayContrastiveLoss', 'MultiWayContrastiveLossFC', 'FocalLoss'}
+The remaining cases are part of the training data. Allowed values:
+
+\ifelse{latex}{$0 < x < 1$}{\ifelse{html}{\eqn{0 < x < 1}}{`0 < x < 1`}}}
+      \item{\code{loss_pt_fct_name}}{\code{string} Name of the loss function to use during training. Allowed values:
+\itemize{
+\item 'MultiWayContrastiveLoss'
+\item 'MultiWayContrastiveLossFC'
+\item 'FocalLoss'
+}}
       \item{\code{use_sc}}{\code{bool} \code{TRUE} if the estimation should integrate synthetic cases. \code{FALSE} if not.}
-      \item{\code{sc_method}}{\code{string} containing the method for generating synthetic cases. Allowed values: 'knnor'}
-      \item{\code{sc_min_k}}{\code{int} determining the minimal number of k which is used for creating synthetic units. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{sc_max_k}}{\code{int} determining the maximal number of k which is used for creating synthetic units. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{sc_method}}{\code{string} containing the method for generating synthetic cases. Allowed values:
+\itemize{
+\item 'knnor'
+}}
+      \item{\code{sc_min_k}}{\code{int} determining the minimal number of k which is used for creating synthetic units. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{sc_max_k}}{\code{int} determining the maximal number of k which is used for creating synthetic units. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
       \item{\code{use_pl}}{\code{bool} \code{TRUE} if the estimation should integrate pseudo-labeling. \code{FALSE} if not.}
-      \item{\code{pl_max_steps}}{\code{int} determining the maximum number of steps during pseudo-labeling. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{pl_max}}{\code{double} setting the maximal level of confidence for considering a case for pseudo-labeling. Allowed values: \ifelse{latex}{$0 < x <= 1$}{\ifelse{html}{\eqn{0 < x <= 1}}{`0 < x <= 1`}}}
-      \item{\code{pl_anchor}}{\code{double} indicating the reference point for sorting the new cases of every label. Allowed values: \ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
-      \item{\code{pl_min}}{\code{double} setting the mnimal level of confidence for considering a case for pseudo-labeling. Allowed values: \ifelse{latex}{$0 <= x < 1$}{\ifelse{html}{\eqn{0 <= x < 1}}{`0 <= x < 1`}}}
+      \item{\code{pl_max_steps}}{\code{int} determining the maximum number of steps during pseudo-labeling. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{pl_max}}{\code{double} setting the maximal level of confidence for considering a case for pseudo-labeling. Allowed values:
+
+\ifelse{latex}{$0 < x <= 1$}{\ifelse{html}{\eqn{0 < x <= 1}}{`0 < x <= 1`}}}
+      \item{\code{pl_anchor}}{\code{double} indicating the reference point for sorting the new cases of every label. Allowed values:
+
+\ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
+      \item{\code{pl_min}}{\code{double} setting the mnimal level of confidence for considering a case for pseudo-labeling. Allowed values:
+
+\ifelse{latex}{$0 <= x < 1$}{\ifelse{html}{\eqn{0 <= x < 1}}{`0 <= x < 1`}}}
       \item{\code{sustain_track}}{\code{bool} If \code{TRUE} energy consumption is tracked during training via the python library 'codecarbon'.}
       \item{\code{sustain_iso_code}}{\code{string} ISO code (Alpha-3-Code) for the country. This variable must be set if
 sustainability should be tracked. A list can be found on Wikipedia:
-\url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}. Allowed values: any}
+\url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}. Allowed values:
+
+any}
       \item{\code{sustain_region}}{\code{string} Region within a country. Only available for USA and Canada See the documentation of
-codecarbon for more information. \url{https://docs.codecarbon.io/latest/} Allowed values: any}
-      \item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{sustain_log_level}}{\code{string} Level for printing information to the console. Allowed values: 'debug', 'info', 'warning', 'error', 'critical'}
-      \item{\code{epochs}}{\code{int} Number of training epochs. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{Ns}}{\code{int} Number of cases for every class in the sample. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{Nq}}{\code{int} Number of cases for every class in the query. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+codecarbon for more information. \url{https://docs.codecarbon.io/latest/} Allowed values:
+
+any}
+      \item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{sustain_log_level}}{\code{string} Level for printing information to the console. Allowed values:
+\itemize{
+\item 'debug'
+\item 'info'
+\item 'warning'
+\item 'error'
+\item 'critical'
+}}
+      \item{\code{epochs}}{\code{int} Number of training epochs. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{Ns}}{\code{int} Number of cases for every class in the sample. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{Nq}}{\code{int} Number of cases for every class in the query. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
       \item{\code{loss_alpha}}{\code{double} Value between 0 and 1 indicating how strong the loss should focus on pulling cases to
 its corresponding prototypes or pushing cases away from other prototypes. The higher the value the more the
-loss concentrates on pulling cases to its corresponding prototypes. Allowed values: \ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
+loss concentrates on pulling cases to its corresponding prototypes. Allowed values:
+
+\ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
       \item{\code{loss_margin}}{\code{double} Value greater 0 indicating the minimal distance of every case from prototypes of other classes. Please note that
 in contrast to the orginal work by Zhang et al. (2019) this implementation
-reaches better performance if the margin is a magnitude lower (e.g. 0.05 instead of 0.5). Allowed values: \ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
+reaches better performance if the margin is a magnitude lower (e.g. 0.05 instead of 0.5). Allowed values:
+
+\ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
       \item{\code{sampling_separate}}{\code{bool} If \code{TRUE} the cases for every class are divided into a data set for sample and
 for query. These are never mixed. If \code{TRUE} sample and query cases are drawn from the same data pool. That is,
 a case can be part of sample in one epoch and in another epoch it can be part of query. It is ensured that a
@@ -179,19 +228,44 @@ only once during a training step.}
       \item{\code{sampling_shuffle}}{\code{bool} if \code{TRUE} cases a randomly drawn from the data during every step. If \code{FALSE} the
 cases are not shuffled.}
       \item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
-      \item{\code{ml_trace}}{\code{int} \code{ml_trace=0} does not print any information about the training process from pytorch on the console. Allowed values: \ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
+      \item{\code{ml_trace}}{\code{int} \code{ml_trace=0} does not print any information about the training process from pytorch on the console. Allowed values:
+
+\ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
       \item{\code{log_dir}}{\code{string} Path to the directory where the log files should be saved.
-If no logging is desired set this argument to \code{NULL}. Allowed values: any}
+If no logging is desired set this argument to \code{NULL}. Allowed values:
+
+any}
       \item{\code{log_write_interval}}{\code{int} Time in seconds determining the interval in which the logger should try to update
-the log files. Only relevant if \code{log_dir} is not \code{NULL}. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{n_cores}}{\code{int} Number of cores which should be used during the calculation of synthetic cases. Only relevant if \code{use_sc=TRUE}. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+the log files. Only relevant if \code{log_dir} is not \code{NULL}. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{n_cores}}{\code{int} Number of cores which should be used during the calculation of synthetic cases. Only relevant if \code{use_sc=TRUE}. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
       \item{\code{lr_rate}}{\code{double} Initial learning rate for the training. Sets the maximal learning rate.
-Set this value to \code{0.0} requests an automatic search for a good learning rate. Allowed values: \ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
+Set this value to \code{0.0} requests an automatic search for a good learning rate. Allowed values:
+
+\ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
       \item{\code{lr_min}}{\code{double} Minimal learning rate during training.
-Set this value to \code{0.0} requests an automatic search for a good learning rate. Allowed values: \ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
-      \item{\code{lr_scheduler}}{\code{string} Learning rate scheduler. To use a constant learning rate for the whole training set this parameter to 'None'. Allowed values: 'None', 'Linear', 'Cyclic'}
-      \item{\code{lr_warm_up_ratio}}{\code{double} Number of epochs used for warm up. To disable warm up set this value to 0.0. Allowed values: \ifelse{latex}{$0 < x < 0.5$}{\ifelse{html}{\eqn{0 < x < 0.5}}{`0 < x < 0.5`}}}
-      \item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values: 'Adam', 'RMSprop', 'AdamW', 'SGD'}
+Set this value to \code{0.0} requests an automatic search for a good learning rate. Allowed values:
+
+\ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
+      \item{\code{lr_scheduler}}{\code{string} Learning rate scheduler. To use a constant learning rate for the whole training set this parameter to 'None'. Allowed values:
+\itemize{
+\item 'None'
+\item 'Linear'
+\item 'Cyclic'
+}}
+      \item{\code{lr_warm_up_ratio}}{\code{double} Number of epochs used for warm up. To disable warm up set this value to 0.0. Allowed values:
+
+\ifelse{latex}{$0 < x < 0.5$}{\ifelse{html}{\eqn{0 < x < 0.5}}{`0 < x < 0.5`}}}
+      \item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values:
+\itemize{
+\item 'Adam'
+\item 'RMSprop'
+\item 'AdamW'
+\item 'SGD'
+}}
       \item{\code{amp}}{\code{bool} Apply automatic mixed precision to spped up computations. It is generally
 recommended to set this parameter to \code{TRUE}. If you encounter problems set to \code{FALSE}.
 * \code{FALSE}: Use full precision.
@@ -240,7 +314,9 @@ this aim, the distance from the anchor is calculated and all cases are arranged 
       \item{\code{newdata}}{Object of class \link{EmbeddedText} or \link{LargeDataSetForTextEmbeddings} containing the text
 embeddings for all cases which should be predicted. They form the query set.}
       \item{\code{batch_size}}{\code{int} batch size.}
-      \item{\code{ml_trace}}{\code{int} \code{ml_trace=0} does not print any information about the training process from pytorch on the console. Allowed values: \ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
+      \item{\code{ml_trace}}{\code{int} \code{ml_trace=0} does not print any information about the training process from pytorch on the console. Allowed values:
+
+\ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
       \item{\code{embeddings_s}}{Object of class \link{EmbeddedText} or \link{LargeDataSetForTextEmbeddings} containing the text
 embeddings for all reference examples. They form the sample set.}
       \item{\code{classes_s}}{Named \code{factor} containing the classes for every case within \code{embeddings_s}.}
@@ -281,7 +357,9 @@ embeddings for all reference examples. They form the sample set. If set to \code
       \item{\code{classes_s}}{Named \code{factor} containing the classes for every case within \code{embeddings_s}.
 If set to \code{NULL} the trained prototypes are used.}
       \item{\code{batch_size}}{\code{int} batch size.}
-      \item{\code{ml_trace}}{\code{int} \code{ml_trace=0} does not print any information about the training process from pytorch on the console. Allowed values: \ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
+      \item{\code{ml_trace}}{\code{int} \code{ml_trace=0} does not print any information about the training process from pytorch on the console. Allowed values:
+
+\ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
     }
     \if{html}{\out{</div>}}
   }

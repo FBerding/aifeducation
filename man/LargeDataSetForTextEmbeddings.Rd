@@ -118,7 +118,9 @@ embeddings.}
       \item{\code{param_emb_pool_type}}{\code{string} determining the method for pooling the token embeddings within each layer.}
       \item{\code{param_pad_value}}{\code{int} Value indicating padding. This value should no be in the range of
 regluar values for computations. Thus it is not recommended to chance this value.
-Default is \code{-100}. Allowed values: \ifelse{latex}{$ x <= -1$}{\ifelse{html}{\eqn{ x <= -1}}{` x <= -1`}}}
+Default is \code{-100}. Allowed values:
+
+\ifelse{latex}{$ x <= -1$}{\ifelse{html}{\eqn{ x <= -1}}{` x <= -1`}}}
       \item{\code{param_aggregation}}{\code{string} Aggregation method of the hidden states. Deprecated. Only included for backward
 compatibility.}
     }

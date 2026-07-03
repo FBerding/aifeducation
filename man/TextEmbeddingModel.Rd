@@ -95,23 +95,47 @@ Object of class \code{BaseModelCore}.}
     \describe{
       \item{\code{model_name}}{\code{string} Name of the new model. Please refer to common name conventions.
 Free text can be used with parameter \code{label}. If set to \code{NULL} a unique ID
-is generated automatically. Allowed values: any}
-      \item{\code{model_label}}{\code{string} Label for the new model. Here you can use free text. Allowed values: any}
-      \item{\code{model_language}}{\code{string} Languages that the models can work with. Allowed values: any}
+is generated automatically. Allowed values:
+
+any}
+      \item{\code{model_label}}{\code{string} Label for the new model. Here you can use free text. Allowed values:
+
+any}
+      \item{\code{model_language}}{\code{string} Languages that the models can work with. Allowed values:
+
+any}
       \item{\code{max_length}}{\code{int} Maximal number of token per chunks. Must be equal or lower
-as the maximal postional embeddings for the model. Allowed values: \ifelse{latex}{$20 <= x $}{\ifelse{html}{\eqn{20 <= x }}{`20 <= x `}}}
-      \item{\code{chunks}}{\code{int} Maximal number chunks. Allowed values: \ifelse{latex}{$2 <= x $}{\ifelse{html}{\eqn{2 <= x }}{`2 <= x `}}}
-      \item{\code{overlap}}{\code{int} Number of tokens from the previous chunk that should be added at the beginng of the next chunk. Allowed values: \ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
-      \item{\code{emb_layer_min}}{\code{int} Minimal layer from which the embeddings should be calculated. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{emb_layer_max}}{\code{int} Maximal layer from which the embeddings should be calculated. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{emb_insert_mask_tokens}}{\code{double} Percentage of mask tokens that should replace tokens in the sequence. Replaces every 1/emb_insert_mask_tokens token. Allowed values: \ifelse{latex}{$0 <= x <= 0.5$}{\ifelse{html}{\eqn{0 <= x <= 0.5}}{`0 <= x <= 0.5`}}}
+as the maximal postional embeddings for the model. Allowed values:
+
+\ifelse{latex}{$20 <= x $}{\ifelse{html}{\eqn{20 <= x }}{`20 <= x `}}}
+      \item{\code{chunks}}{\code{int} Maximal number chunks. Allowed values:
+
+\ifelse{latex}{$2 <= x $}{\ifelse{html}{\eqn{2 <= x }}{`2 <= x `}}}
+      \item{\code{overlap}}{\code{int} Number of tokens from the previous chunk that should be added at the beginng of the next chunk. Allowed values:
+
+\ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
+      \item{\code{emb_layer_min}}{\code{int} Minimal layer from which the embeddings should be calculated. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{emb_layer_max}}{\code{int} Maximal layer from which the embeddings should be calculated. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{emb_insert_mask_tokens}}{\code{double} Percentage of mask tokens that should replace tokens in the sequence. Replaces every 1/emb_insert_mask_tokens token. Allowed values:
+
+\ifelse{latex}{$0 <= x <= 0.5$}{\ifelse{html}{\eqn{0 <= x <= 0.5}}{`0 <= x <= 0.5`}}}
       \item{\code{emb_pool_type}}{\code{string} Method to summarize the embedding of single tokens into a text embedding.
 In the case of \code{'CLS'} all cls-tokens between \code{emb_layer_min} and \code{emb_layer_max} are averaged.
 In the case of \code{'Average'} the embeddings of all tokens are averaged.
-Please note that BaseModelFunnel allows only 'CLS'. Allowed values: 'CLS', 'Average'}
+Please note that BaseModelFunnel allows only 'CLS'. Allowed values:
+\itemize{
+\item 'CLS'
+\item 'Average'
+}}
       \item{\code{pad_value}}{\code{int} Value indicating padding. This value should no be in the range of
 regluar values for computations. Thus it is not recommended to chance this value.
-Default is \code{-100}. Allowed values: \ifelse{latex}{$ x <= -1$}{\ifelse{html}{\eqn{ x <= -1}}{` x <= -1`}}}
+Default is \code{-100}. Allowed values:
+
+\ifelse{latex}{$ x <= -1$}{\ifelse{html}{\eqn{ x <= -1}}{` x <= -1`}}}
       \item{\code{base_model}}{\code{BaseModelCore} BaseModels for processing raw texts.}
       \item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
     }
@@ -159,7 +183,9 @@ and updates the object to the current version of the package.
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{dir_path}}{Path to the directory where to save the object.}
-      \item{\code{folder_name}}{\code{string} Name of the folder where the model should be saved. Allowed values: any}
+      \item{\code{folder_name}}{\code{string} Name of the folder where the model should be saved. Allowed values:
+
+any}
     }
     \if{html}{\out{</div>}}
   }
@@ -258,7 +284,9 @@ into text embeddings. For a large number of texts please use the method \code{em
     \describe{
       \item{\code{raw_text}}{\code{vector} Raw text.}
       \item{\code{doc_id}}{\code{vector} Id for every text.}
-      \item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
       \item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
       \item{\code{return_large_dataset}}{\code{bool} If \code{TRUE} a \link{LargeDataSetForTextEmbeddings} is returned. If \code{FALSE} an object if class \link{EmbeddedText} is returned.}
     }
@@ -291,12 +319,18 @@ model creating the embeddings.
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{text_dataset}}{\code{LargeDataSetForText} \link{LargeDataSetForText} Object storing textual data.}
-      \item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
       \item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
       \item{\code{log_file}}{\code{string} Path to the file where the log files should be saved.
-If no logging is desired set this argument to \code{NULL}. Allowed values: any}
+If no logging is desired set this argument to \code{NULL}. Allowed values:
+
+any}
       \item{\code{log_write_interval}}{\code{int} Time in seconds determining the interval in which the logger should try to update
-the log files. Only relevant if \code{log_dir} is not \code{NULL}. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+the log files. Only relevant if \code{log_dir} is not \code{NULL}. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
     }
     \if{html}{\out{</div>}}
   }
@@ -377,7 +411,11 @@ resulting CO2 equivalents in kg.
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{track_mode}}{\code{string} Determines the stept to which the data refer. Allowed values: 'training', 'inference'}
+      \item{\code{track_mode}}{\code{string} Determines the stept to which the data refer. Allowed values:
+\itemize{
+\item 'training'
+\item 'inference'
+}}
     }
     \if{html}{\out{</div>}}
   }
@@ -409,14 +447,29 @@ tracker used, and technical information on the training infrastructure.
     \if{html}{\out{<div class="arguments">}}
     \describe{
       \item{\code{text_dataset}}{\code{LargeDataSetForText} \link{LargeDataSetForText} Object storing textual data.}
-      \item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{batch_size}}{\code{int} Size of the batches for training. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
       \item{\code{sustain_iso_code}}{\code{string} ISO code (Alpha-3-Code) for the country. This variable must be set if
 sustainability should be tracked. A list can be found on Wikipedia:
-\url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}. Allowed values: any}
+\url{https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes}. Allowed values:
+
+any}
       \item{\code{sustain_region}}{\code{string} Region within a country. Only available for USA and Canada See the documentation of
-codecarbon for more information. \url{https://docs.codecarbon.io/latest/} Allowed values: any}
-      \item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage. Allowed values: \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{sustain_log_level}}{\code{string} Level for printing information to the console. Allowed values: 'debug', 'info', 'warning', 'error', 'critical'}
+codecarbon for more information. \url{https://docs.codecarbon.io/latest/} Allowed values:
+
+any}
+      \item{\code{sustain_interval}}{\code{int} Interval in seconds for measuring power usage. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{sustain_log_level}}{\code{string} Level for printing information to the console. Allowed values:
+\itemize{
+\item 'debug'
+\item 'info'
+\item 'warning'
+\item 'error'
+\item 'critical'
+}}
       \item{\code{trace}}{\code{bool} \code{TRUE} if information about the estimation phase should be printed to the console.}
     }
     \if{html}{\out{</div>}}
