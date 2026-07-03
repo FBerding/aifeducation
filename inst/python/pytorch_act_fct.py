@@ -18,18 +18,19 @@ import math
 import safetensors
 
 class SwiGLU(torch.nn.Module):
-  def __init__(self,hidden_size):
+  def __init__(self,input_dim,output_dim):
     super().__init__()
-    self.weights=torch.nn.Linear(in_features=hidden_size, out_features=hidden_size, bias=False, device=None, dtype=None)
+    self.swish=torch.nn.SiLU()
+    self.weights=torch.nn.Linear(in_features=input_dim, out_features=output_dim, bias=False, device=None, dtype=None)
   #x1 projected values of x
   #x2 not projected values of x, x2=x
   def forward(self,x1,x2):
-    swish_value=torch.nn.SiLU(x1)
+    swish_value=self.swish(x1)
     xp=self.weights(x2)
     y=swish_value*xp
     return y
 
-def get_act_fct(name,hidden_size=None):
+def get_act_fct(name,input_dim=None,output_dim=None):
   if name=="ELU":
     return torch.nn.ELU()
   elif name=="LeakyReLU":
@@ -45,7 +46,7 @@ def get_act_fct(name,hidden_size=None):
   elif name=="PReLU":
     return torch.nn.PReLU()
   elif name=="SwiGLU":
-    return SwiGLU(hidden_size)
+    return SwiGLU(input_dim=input_dim,output_dim=output_dim)
   elif name=="None":
     return  torch.nn.Identity()
 
