@@ -132,7 +132,8 @@ Objects of class <code>TokenizerBase</code>.</p></dd>
 <dd><p>Path where the model is stored.</p></dd>
 
       <dt><code>tokenizer_dir</code></dt>
-<dd><p><code>string</code> Path to the directory where the tokenizer is saved. Allowed values: any</p></dd>
+<dd><p><code>string</code> Path to the directory where the tokenizer is saved. Allowed values:</p>
+<p>any</p></dd>
 
 
 </dl><p></p></div>
@@ -174,7 +175,8 @@ Objects of class <code>TokenizerBase</code>.</p></dd>
 <dd><p><code>LargeDataSetForText</code> <a href="LargeDataSetForText.html">LargeDataSetForText</a> Object storing textual data.</p></dd>
 
       <dt><code>p_mask</code></dt>
-<dd><p><code>double</code> Ratio that determines the number of tokens used for masking. Allowed values: \(0.05 &lt;= x &lt;= 0.6\)</p></dd>
+<dd><p><code>double</code> Ratio that determines the number of tokens used for masking. Allowed values:</p>
+<p>\(0.05 &lt;= x &lt;= 0.6\)</p></dd>
 
       <dt><code>whole_word</code></dt>
 <dd><p><code>bool</code> * <code>TRUE</code>: whole word masking should be applied. Only relevant if a <code>WordPieceTokenizer</code> is used.</p><ul><li><p><code>FALSE</code>: token masking is used.</p></li>
@@ -183,27 +185,33 @@ Objects of class <code>TokenizerBase</code>.</p></dd>
       <dt><code>val_size</code></dt>
 <dd><p><code>double</code> between 0 and 1, indicating the proportion of cases which should be
 used for the validation sample during the estimation of the model.
-The remaining cases are part of the training data. Allowed values: \(0 &lt; x &lt; 1\)</p></dd>
+The remaining cases are part of the training data. Allowed values:</p>
+<p>\(0 &lt; x &lt; 1\)</p></dd>
 
       <dt><code>n_epoch</code></dt>
-<dd><p><code>int</code> Number of training epochs. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Number of training epochs. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>batch_size</code></dt>
-<dd><p><code>int</code> Size of the batches for training. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Size of the batches for training. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>max_sequence_length</code></dt>
-<dd><p><code>int</code> Maximal number of tokens for every sequence. Allowed values: \(20 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Maximal number of tokens for every sequence. Allowed values:</p>
+<p>\(20 &lt;= x \)</p></dd>
 
       <dt><code>full_sequences_only</code></dt>
 <dd><p><code>bool</code> <code>TRUE</code> for using only chunks with a sequence length equal to <code>chunk_size</code>.</p></dd>
 
       <dt><code>min_seq_len</code></dt>
 <dd><p><code>int</code> Only relevant if <code>full_sequences_only = FALSE</code>. Value determines the minimal sequence length included in
-training process.  Allowed values: \(10 &lt;= x \)</p></dd>
+training process.  Allowed values:</p>
+<p>\(10 &lt;= x \)</p></dd>
 
       <dt><code>learning_rate</code></dt>
 <dd><p><code>double</code> Initial learning rate for the training. Sets the maximal learning rate.
-Set this value to <code>0.0</code> requests an automatic search for a good learning rate. Allowed values: \(0 &lt;= x &lt;= 1\)</p></dd>
+Set this value to <code>0.0</code> requests an automatic search for a good learning rate. Allowed values:</p>
+<p>\(0 &lt;= x &lt;= 1\)</p></dd>
 
       <dt><code>sustain_track</code></dt>
 <dd><p><code>bool</code> If <code>TRUE</code> energy consumption is tracked during training via the python library 'codecarbon'.</p></dd>
@@ -211,31 +219,42 @@ Set this value to <code>0.0</code> requests an automatic search for a good learn
       <dt><code>sustain_iso_code</code></dt>
 <dd><p><code>string</code> ISO code (Alpha-3-Code) for the country. This variable must be set if
 sustainability should be tracked. A list can be found on Wikipedia:
-<a href="https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes" class="external-link">https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes</a>. Allowed values: any</p></dd>
+<a href="https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes" class="external-link">https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes</a>. Allowed values:</p>
+<p>any</p></dd>
 
       <dt><code>sustain_region</code></dt>
 <dd><p><code>string</code> Region within a country. Only available for USA and Canada See the documentation of
-codecarbon for more information. <a href="https://docs.codecarbon.io/latest/" class="external-link">https://docs.codecarbon.io/latest/</a> Allowed values: any</p></dd>
+codecarbon for more information. <a href="https://docs.codecarbon.io/latest/" class="external-link">https://docs.codecarbon.io/latest/</a> Allowed values:</p>
+<p>any</p></dd>
 
       <dt><code>sustain_interval</code></dt>
-<dd><p><code>int</code> Interval in seconds for measuring power usage. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Interval in seconds for measuring power usage. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>sustain_log_level</code></dt>
-<dd><p><code>string</code> Level for printing information to the console. Allowed values: 'debug', 'info', 'warning', 'error', 'critical'</p></dd>
+<dd><p><code>string</code> Level for printing information to the console. Allowed values:</p><ul><li><p>'debug'</p></li>
+<li><p>'info'</p></li>
+<li><p>'warning'</p></li>
+<li><p>'error'</p></li>
+<li><p>'critical'</p></li>
+</ul></dd>
 
       <dt><code>trace</code></dt>
 <dd><p><code>bool</code> <code>TRUE</code> if information about the estimation phase should be printed to the console.</p></dd>
 
       <dt><code>pytorch_trace</code></dt>
-<dd><p><code>int</code> <code>ml_trace=0</code> does not print any information about the training process from pytorch on the console. Allowed values: \(0 &lt;= x &lt;= 1\)</p></dd>
+<dd><p><code>int</code> <code>ml_trace=0</code> does not print any information about the training process from pytorch on the console. Allowed values:</p>
+<p>\(0 &lt;= x &lt;= 1\)</p></dd>
 
       <dt><code>log_dir</code></dt>
 <dd><p><code>string</code> Path to the directory where the log files should be saved.
-If no logging is desired set this argument to <code>NULL</code>. Allowed values: any</p></dd>
+If no logging is desired set this argument to <code>NULL</code>. Allowed values:</p>
+<p>any</p></dd>
 
       <dt><code>log_write_interval</code></dt>
 <dd><p><code>int</code> Time in seconds determining the interval in which the logger should try to update
-the log files. Only relevant if <code>log_dir</code> is not <code>NULL</code>. Allowed values: \(1 &lt;= x \)</p></dd>
+the log files. Only relevant if <code>log_dir</code> is not <code>NULL</code>. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
 
 </dl><p></p></div>
@@ -274,22 +293,27 @@ This method requires the <em>R</em> package 'ggplot2' to work.</p><div class="se
 </div><p></p><div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>x_min</code></dt>
-<dd><p><code>int</code> Minimal value for x-axis. Set to <code>NULL</code> for an automatic adjustment. Allowed values: \( x \)</p></dd>
+<dd><p><code>int</code> Minimal value for x-axis. Set to <code>NULL</code> for an automatic adjustment. Allowed values:</p>
+<p>\( x \)</p></dd>
 
       <dt><code>x_max</code></dt>
-<dd><p><code>int</code> Maximal value for x-axis. Set to <code>NULL</code> for an automatic adjustment. Allowed values: \( x \)</p></dd>
+<dd><p><code>int</code> Maximal value for x-axis. Set to <code>NULL</code> for an automatic adjustment. Allowed values:</p>
+<p>\( x \)</p></dd>
 
       <dt><code>y_min</code></dt>
-<dd><p><code>int</code> Minimal value for y-axis. Set to <code>NULL</code> for an automatic adjustment. Allowed values: \( x \)</p></dd>
+<dd><p><code>int</code> Minimal value for y-axis. Set to <code>NULL</code> for an automatic adjustment. Allowed values:</p>
+<p>\( x \)</p></dd>
 
       <dt><code>y_max</code></dt>
-<dd><p><code>int</code> Maximal value for y-axis. Set to <code>NULL</code> for an automatic adjustment. Allowed values: \( x \)</p></dd>
+<dd><p><code>int</code> Maximal value for y-axis. Set to <code>NULL</code> for an automatic adjustment. Allowed values:</p>
+<p>\( x \)</p></dd>
 
       <dt><code>ind_best_model</code></dt>
 <dd><p><code>bool</code> If <code>TRUE</code> the plot indicates the best states of the model according to the chosen measure.</p></dd>
 
       <dt><code>text_size</code></dt>
-<dd><p><code>int</code> Size of text elements. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Size of text elements. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
 
 </dl><p></p></div>
@@ -333,10 +357,12 @@ and their type, token, and id in the columns.</p>
 </div><p></p><div class="section">
 <h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>masked_text</code></dt>
-<dd><p><code>string</code> Text with mask tokens. Allowed values: any</p></dd>
+<dd><p><code>string</code> Text with mask tokens. Allowed values:</p>
+<p>any</p></dd>
 
       <dt><code>n_solutions</code></dt>
-<dd><p><code>int</code> Number of solutions the model should predict. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Number of solutions the model should predict. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
 
 </dl><p></p></div>
@@ -360,7 +386,8 @@ the score, token id, and token string in the columns.</p>
 <dd><p>Path to the directory where to save the object.</p></dd>
 
       <dt><code>folder_name</code></dt>
-<dd><p><code>string</code> Name of the folder where the model should be saved. Allowed values: any</p></dd>
+<dd><p><code>string</code> Name of the folder where the model should be saved. Allowed values:</p>
+<p>any</p></dd>
 
 
 </dl><p></p></div>
@@ -514,22 +541,31 @@ members for publication information of the model.</p>
 <dd><p><code>LargeDataSetForText</code> <a href="LargeDataSetForText.html">LargeDataSetForText</a> Object storing textual data.</p></dd>
 
       <dt><code>n_samples</code></dt>
-<dd><p><code>int</code> Number of samples. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Number of samples. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>sustain_iso_code</code></dt>
 <dd><p><code>string</code> ISO code (Alpha-3-Code) for the country. This variable must be set if
 sustainability should be tracked. A list can be found on Wikipedia:
-<a href="https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes" class="external-link">https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes</a>. Allowed values: any</p></dd>
+<a href="https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes" class="external-link">https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes</a>. Allowed values:</p>
+<p>any</p></dd>
 
       <dt><code>sustain_region</code></dt>
 <dd><p><code>string</code> Region within a country. Only available for USA and Canada See the documentation of
-codecarbon for more information. <a href="https://docs.codecarbon.io/latest/" class="external-link">https://docs.codecarbon.io/latest/</a> Allowed values: any</p></dd>
+codecarbon for more information. <a href="https://docs.codecarbon.io/latest/" class="external-link">https://docs.codecarbon.io/latest/</a> Allowed values:</p>
+<p>any</p></dd>
 
       <dt><code>sustain_interval</code></dt>
-<dd><p><code>int</code> Interval in seconds for measuring power usage. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Interval in seconds for measuring power usage. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>sustain_log_level</code></dt>
-<dd><p><code>string</code> Level for printing information to the console. Allowed values: 'debug', 'info', 'warning', 'error', 'critical'</p></dd>
+<dd><p><code>string</code> Level for printing information to the console. Allowed values:</p><ul><li><p>'debug'</p></li>
+<li><p>'info'</p></li>
+<li><p>'warning'</p></li>
+<li><p>'error'</p></li>
+<li><p>'critical'</p></li>
+</ul></dd>
 
       <dt><code>trace</code></dt>
 <dd><p><code>bool</code> <code>TRUE</code> if information about the estimation phase should be printed to the console.</p></dd>
@@ -552,13 +588,16 @@ The statistics can be accessed with the method <code>get_sustainability_data("in
 </div><p></p><div class="section">
 <h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>batch_size</code></dt>
-<dd><p><code>int</code> Size of the batches for training. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Size of the batches for training. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>n_batches</code></dt>
-<dd><p><code>int</code> Number of batches. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Number of batches. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>n_epoch</code></dt>
-<dd><p><code>int</code> Number of training epochs. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Number of training epochs. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
 
 </dl><p></p></div>

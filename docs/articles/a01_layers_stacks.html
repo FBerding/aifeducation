@@ -178,7 +178,8 @@ et al. 2018</a>.</li>
 <li><p><em>tf_bias</em>: If <code>TRUE</code> a bias term is added to
 all layers. If <code>FALSE</code> no bias term is added to the
 layers.</p></li>
-<li><p><em>tf_act_fct</em>: Activation function for all layers.</p></li>
+<li><p><em>tf_act_fct</em>: Activation function for the specified
+layers.</p></li>
 <li><p><em>tf_dropout_rate_1</em>: determining the dropout after the
 attention mechanism within the transformer encoder layers.</p></li>
 <li><p><em>tf_dropout_rate_2</em>: determining the dropout for the dense
@@ -285,7 +286,7 @@ et al. 2018</a>.</li>
 <li><p><em>feat_bias</em>: If <code>TRUE</code> a bias term is added to
 all layers. If <code>FALSE</code> no bias term is added to the
 layers.</p></li>
-<li><p><em>feat_act_fct</em>: Activation function for all
+<li><p><em>feat_act_fct</em>: Activation function for the specified
 layers.</p></li>
 <li><p><em>feat_dropout</em>: determining the dropout for the dense
 projection of the feature layer.</p></li>
@@ -367,7 +368,7 @@ et al. 2018</a>.</li>
 <li><p><em>dense_bias</em>: If <code>TRUE</code> a bias term is added to
 all layers. If <code>FALSE</code> no bias term is added to the
 layers.</p></li>
-<li><p><em>dense_act_fct</em>: Activation function for all
+<li><p><em>dense_act_fct</em>: Activation function for the specified
 layers.</p></li>
 <li><p><em>dense_dropout</em>: determining the dropout between dense
 layers.</p></li>
@@ -467,7 +468,7 @@ et al. 2018</a>.</li>
 <li><p><em>ng_conv_bias</em>: If <code>TRUE</code> a bias term is added
 to all layers. If <code>FALSE</code> no bias term is added to the
 layers.</p></li>
-<li><p><em>ng_conv_act_fct</em>: Activation function for all
+<li><p><em>ng_conv_act_fct</em>: Activation function for the specified
 layers.</p></li>
 <li><p><em>ng_conv_dropout</em>: determining the dropout for n-gram
 convolution layers.</p></li>
@@ -554,7 +555,7 @@ et al. 2018</a>.</li>
 <li><p><em>rec_bias</em>: If <code>TRUE</code> a bias term is added to
 all layers. If <code>FALSE</code> no bias term is added to the
 layers.</p></li>
-<li><p><em>rec_act_fct</em>: Activation function for all
+<li><p><em>rec_act_fct</em>: Activation function for the specified
 layers.</p></li>
 <li><p><em>rec_dropout</em>: determining the dropout between recurrent
 layers.</p></li>
@@ -594,7 +595,7 @@ for the minimal features. All parameters with the prefix
 <p><strong>Parameters</strong></p>
 <ul>
 <li><p><em>cls_pooling_features</em>: Number of features to be extracted
-at the end of the model. Only relevant if pooling type ist ‘Max’, ‘Min’
+at the end of the model. Only relevant if pooling type is ‘Max’, ‘Min’
 or ‘MinMax’.</p></li>
 <li><p><em>cls_pooling_type</em>: Type of extracting intermediate
 features.</p></li>
@@ -642,7 +643,7 @@ Implementation supports masking of sequences.</li>
 </ul>
 </li>
 <li><p><em>merge_pooling_features</em>: Number of features to be
-extracted at the end of the model. Only relevant if pooling type ist
+extracted at the end of the model. Only relevant if pooling type is
 ‘Max’, ‘Min’ or ‘MinMax’.</p></li>
 <li><p><em>merge_pooling_type</em>: Type of extracting intermediate
 features.</p></li>

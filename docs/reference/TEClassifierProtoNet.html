@@ -191,10 +191,12 @@ https://doi.org/10.1007/978-3-030-16145-3_24</p>
 <p></p><div class="arguments"><dl><dt><code>name</code></dt>
 <dd><p><code>string</code> Name of the new model. Please refer to common name conventions.
 Free text can be used with parameter <code>label</code>. If set to <code>NULL</code> a unique ID
-is generated automatically. Allowed values: any</p></dd>
+is generated automatically. Allowed values:</p>
+<p>any</p></dd>
 
       <dt><code>label</code></dt>
-<dd><p><code>string</code> Label for the new model. Here you can use free text. Allowed values: any</p></dd>
+<dd><p><code>string</code> Label for the new model. Here you can use free text. Allowed values:</p>
+<p>any</p></dd>
 
       <dt><code>text_embeddings</code></dt>
 <dd><p><code>EmbeddedText, LargeDataSetForTextEmbeddings</code> Object of class <a href="EmbeddedText.html">EmbeddedText</a> or <a href="LargeDataSetForTextEmbeddings.html">LargeDataSetForTextEmbeddings</a>.</p></dd>
@@ -209,55 +211,81 @@ note that order matters. For ordinal data please ensure that the levels are sort
 indicating a higher category/class. For nominal data the order does not matter.</p></dd>
 
       <dt><code>dense_size</code></dt>
-<dd><p><code>int</code> Number of neurons for each dense layer. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Number of neurons for each dense layer. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>dense_layers</code></dt>
-<dd><p><code>int</code> Number of dense layers. Allowed values: \(0 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Number of dense layers. Allowed values:</p>
+<p>\(0 &lt;= x \)</p></dd>
 
       <dt><code>rec_size</code></dt>
-<dd><p><code>int</code> Number of neurons for each recurrent layer. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Number of neurons for each recurrent layer. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>rec_layers</code></dt>
-<dd><p><code>int</code> Number of recurrent layers. Allowed values: \(0 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Number of recurrent layers. Allowed values:</p>
+<p>\(0 &lt;= x \)</p></dd>
 
       <dt><code>rec_type</code></dt>
-<dd><p><code>string</code> Type of the recurrent layers. <code>rec_type='GRU'</code> for Gated Recurrent Unit and <code>rec_type='LSTM'</code> for Long Short-Term Memory. Allowed values: 'GRU', 'LSTM'</p></dd>
+<dd><p><code>string</code> Type of the recurrent layers. <code>rec_type='GRU'</code> for Gated Recurrent Unit and <code>rec_type='LSTM'</code> for Long Short-Term Memory. Allowed values:</p><ul><li><p>'GRU'</p></li>
+<li><p>'LSTM'</p></li>
+</ul></dd>
 
       <dt><code>rec_bidirectional</code></dt>
 <dd><p><code>bool</code> If <code>TRUE</code> a bidirectional version of the recurrent layers is used.</p></dd>
 
       <dt><code>embedding_dim</code></dt>
-<dd><p><code>int</code>  determining the number of dimensions for the embedding. Allowed values: \(2 &lt;= x \)</p></dd>
+<dd><p><code>int</code>  determining the number of dimensions for the embedding. Allowed values:</p>
+<p>\(2 &lt;= x \)</p></dd>
 
       <dt><code>self_attention_heads</code></dt>
-<dd><p><code>int</code> determining the number of attention heads for a self-attention layer. Only relevant if <code>attention_type='MultiHead'</code> Allowed values: \(0 &lt;= x \)</p></dd>
+<dd><p><code>int</code> determining the number of attention heads for a self-attention layer. Only relevant if <code>attention_type='MultiHead'</code> Allowed values:</p>
+<p>\(0 &lt;= x \)</p></dd>
 
       <dt><code>intermediate_size</code></dt>
-<dd><p><code>int</code> determining the size of the projection layer within a each transformer encoder. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> determining the size of the projection layer within a each transformer encoder. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>attention_type</code></dt>
-<dd><p><code>string</code> Choose the attention type. Allowed values: 'Fourier', 'MultiHead'</p></dd>
+<dd><p><code>string</code> Choose the attention type. Allowed values:</p><ul><li><p>'Fourier'</p></li>
+<li><p>'MultiHead'</p></li>
+</ul></dd>
 
       <dt><code>add_pos_embedding</code></dt>
 <dd><p><code>bool</code> <code>TRUE</code> if positional embedding should be used.</p></dd>
 
       <dt><code>act_fct</code></dt>
-<dd><p><code>string</code> Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'</p></dd>
+<dd><p><code>string</code> Activation function for the specified layers. Allowed values:</p><ul><li><p>'ELU'</p></li>
+<li><p>'LeakyReLU'</p></li>
+<li><p>'ReLU'</p></li>
+<li><p>'GELU'</p></li>
+<li><p>'Sigmoid'</p></li>
+<li><p>'Tanh'</p></li>
+<li><p>'PReLU'</p></li>
+</ul></dd>
 
       <dt><code>parametrizations</code></dt>
-<dd><p><code>string</code> Re-Parametrizations of the weights of layers. Allowed values: 'None', 'OrthogonalWeights', 'WeightNorm', 'SpectralNorm'</p></dd>
+<dd><p><code>string</code> Re-Parametrizations of the weights of layers. Allowed values:</p><ul><li><p>'None'</p></li>
+<li><p>'OrthogonalWeights'</p></li>
+<li><p>'WeightNorm'</p></li>
+<li><p>'SpectralNorm'</p></li>
+</ul></dd>
 
       <dt><code>rec_dropout</code></dt>
-<dd><p><code>double</code> determining the dropout between recurrent layers. Allowed values: \(0 &lt;= x &lt;= 0.6\)</p></dd>
+<dd><p><code>double</code> determining the dropout between recurrent layers. Allowed values:</p>
+<p>\(0 &lt;= x &lt;= 0.6\)</p></dd>
 
       <dt><code>repeat_encoder</code></dt>
-<dd><p><code>int</code> determining how many times the encoder should be added to the network. Allowed values: \(0 &lt;= x \)</p></dd>
+<dd><p><code>int</code> determining how many times the encoder should be added to the network. Allowed values:</p>
+<p>\(0 &lt;= x \)</p></dd>
 
       <dt><code>dense_dropout</code></dt>
-<dd><p><code>double</code> determining the dropout between dense layers. Allowed values: \(0 &lt;= x &lt;= 0.6\)</p></dd>
+<dd><p><code>double</code> determining the dropout between dense layers. Allowed values:</p>
+<p>\(0 &lt;= x &lt;= 0.6\)</p></dd>
 
       <dt><code>encoder_dropout</code></dt>
-<dd><p><code>double</code> determining the dropout for the dense projection within the transformer encoder layers. Allowed values: \(0 &lt;= x &lt;= 0.6\)</p></dd>
+<dd><p><code>double</code> determining the dropout for the dense projection within the transformer encoder layers. Allowed values:</p>
+<p>\(0 &lt;= x &lt;= 0.6\)</p></dd>
 
       <dt><code>bias</code></dt>
 <dd><p><code>bool</code> If <code>TRUE</code> a bias term is added to all layers. If <code>FALSE</code> no bias term is added to the layers.</p></dd>

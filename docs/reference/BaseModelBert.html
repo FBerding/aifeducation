@@ -145,29 +145,40 @@ guidelines:</p><ul><li><p>hidden_size is a multiple of num_attention_heads.</p><
 
       <dt><code>max_position_embeddings</code></dt>
 <dd><p><code>int</code> Number of maximum position embeddings. This parameter also determines the maximum length of a sequence which
-can be processed with the model. Allowed values: \(10 &lt;= x &lt;= 4048\)</p></dd>
+can be processed with the model. Allowed values:</p>
+<p>\(10 &lt;= x &lt;= 4048\)</p></dd>
 
       <dt><code>hidden_size</code></dt>
 <dd><p><code>int</code> Number of neurons in each layer. This parameter determines the dimensionality of the resulting text
-embedding. Allowed values: \(1 &lt;= x &lt;= 2048\)</p></dd>
+embedding. Allowed values:</p>
+<p>\(1 &lt;= x &lt;= 2048\)</p></dd>
 
       <dt><code>num_hidden_layers</code></dt>
-<dd><p><code>int</code> Number of hidden layers. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Number of hidden layers. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>num_attention_heads</code></dt>
-<dd><p><code>int</code> determining the number of attention heads for a self-attention layer. Only relevant if <code>attention_type='MultiHead'</code> Allowed values: \(0 &lt;= x \)</p></dd>
+<dd><p><code>int</code> determining the number of attention heads for a self-attention layer. Only relevant if <code>attention_type='MultiHead'</code> Allowed values:</p>
+<p>\(0 &lt;= x \)</p></dd>
 
       <dt><code>intermediate_size</code></dt>
-<dd><p><code>int</code> determining the size of the projection layer within a each transformer encoder. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> determining the size of the projection layer within a each transformer encoder. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>hidden_act</code></dt>
-<dd><p><code>string</code> Name of the activation function. Allowed values: 'GELU', 'relu', 'silu', 'gelu_new'</p></dd>
+<dd><p><code>string</code> Name of the activation function. Allowed values:</p><ul><li><p>'GELU'</p></li>
+<li><p>'relu'</p></li>
+<li><p>'silu'</p></li>
+<li><p>'gelu_new'</p></li>
+</ul></dd>
 
       <dt><code>hidden_dropout_prob</code></dt>
-<dd><p><code>double</code> Ratio of dropout. Allowed values: \(0 &lt;= x &lt;= 0.6\)</p></dd>
+<dd><p><code>double</code> Ratio of dropout. Allowed values:</p>
+<p>\(0 &lt;= x &lt;= 0.6\)</p></dd>
 
       <dt><code>attention_probs_dropout_prob</code></dt>
-<dd><p><code>double</code> Ratio of dropout for attention probabilities. Allowed values: \(0 &lt;= x &lt;= 0.6\)</p></dd>
+<dd><p><code>double</code> Ratio of dropout for attention probabilities. Allowed values:</p>
+<p>\(0 &lt;= x &lt;= 0.6\)</p></dd>
 
 
 </dl><p></p></div>

@@ -117,7 +117,8 @@ Bridging the Gap between Human and Machine Translation.
 </div><p></p><div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>vocab_size</code></dt>
-<dd><p><code>int</code> Size of the vocabulary. Allowed values: \(1000 &lt;= x &lt;= 500000\)</p></dd>
+<dd><p><code>int</code> Size of the vocabulary. Allowed values:</p>
+<p>\(1000 &lt;= x &lt;= 500000\)</p></dd>
 
       <dt><code>vocab_do_lower_case</code></dt>
 <dd><p><code>bool</code> <code>TRUE</code> if all tokens should be lower case.</p></dd>
@@ -151,7 +152,8 @@ Bridging the Gap between Human and Machine Translation.
 <dd><p><code>LargeDataSetForText</code> <a href="LargeDataSetForText.html">LargeDataSetForText</a> Object storing textual data.</p></dd>
 
       <dt><code>statistics_max_tokens_length</code></dt>
-<dd><p><code>int</code> Maximum sequence length for calculating the statistics. Allowed values: \(20 &lt;= x &lt;= 8192\)</p></dd>
+<dd><p><code>int</code> Maximum sequence length for calculating the statistics. Allowed values:</p>
+<p>\(20 &lt;= x &lt;= 8192\)</p></dd>
 
       <dt><code>sustain_track</code></dt>
 <dd><p><code>bool</code> If <code>TRUE</code> energy consumption is tracked during training via the python library 'codecarbon'.</p></dd>
@@ -159,17 +161,25 @@ Bridging the Gap between Human and Machine Translation.
       <dt><code>sustain_iso_code</code></dt>
 <dd><p><code>string</code> ISO code (Alpha-3-Code) for the country. This variable must be set if
 sustainability should be tracked. A list can be found on Wikipedia:
-<a href="https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes" class="external-link">https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes</a>. Allowed values: any</p></dd>
+<a href="https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes" class="external-link">https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes</a>. Allowed values:</p>
+<p>any</p></dd>
 
       <dt><code>sustain_region</code></dt>
 <dd><p><code>string</code> Region within a country. Only available for USA and Canada See the documentation of
-codecarbon for more information. <a href="https://docs.codecarbon.io/latest/" class="external-link">https://docs.codecarbon.io/latest/</a> Allowed values: any</p></dd>
+codecarbon for more information. <a href="https://docs.codecarbon.io/latest/" class="external-link">https://docs.codecarbon.io/latest/</a> Allowed values:</p>
+<p>any</p></dd>
 
       <dt><code>sustain_interval</code></dt>
-<dd><p><code>int</code> Interval in seconds for measuring power usage. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Interval in seconds for measuring power usage. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>sustain_log_level</code></dt>
-<dd><p><code>string</code> Level for printing information to the console. Allowed values: 'debug', 'info', 'warning', 'error', 'critical'</p></dd>
+<dd><p><code>string</code> Level for printing information to the console. Allowed values:</p><ul><li><p>'debug'</p></li>
+<li><p>'info'</p></li>
+<li><p>'warning'</p></li>
+<li><p>'error'</p></li>
+<li><p>'critical'</p></li>
+</ul></dd>
 
       <dt><code>trace</code></dt>
 <dd><p><code>bool</code> <code>TRUE</code> if information about the estimation phase should be printed to the console.</p></dd>

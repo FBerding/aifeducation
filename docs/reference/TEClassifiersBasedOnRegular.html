@@ -170,12 +170,14 @@ on the validation data set is used as the final model.</p><div class="section">
 named and has to use the same names as used in in the embeddings. .</p></dd>
 
       <dt><code>data_folds</code></dt>
-<dd><p><code>int</code> determining the number of cross-fold samples. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> determining the number of cross-fold samples. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>data_val_size</code></dt>
 <dd><p><code>double</code> between 0 and 1, indicating the proportion of cases which should be
 used for the validation sample during the estimation of the model.
-The remaining cases are part of the training data. Allowed values: \(0 &lt; x &lt; 1\)</p></dd>
+The remaining cases are part of the training data. Allowed values:</p>
+<p>\(0 &lt; x &lt; 1\)</p></dd>
 
       <dt><code>loss_balance_class_weights</code></dt>
 <dd><p><code>bool</code> If <code>TRUE</code> class weights are generated based on the frequencies of the
@@ -187,34 +189,43 @@ the frequencies of the training data with the method Inverse Class Frequency.
 If <code>FALSE</code> each sequences length has the weight 1.</p></dd>
 
       <dt><code>loss_cls_fct_name</code></dt>
-<dd><p><code>string</code> Name of the loss function to use during training. Allowed values: 'FocalLoss', 'CrossEntropyLoss'</p></dd>
+<dd><p><code>string</code> Name of the loss function to use during training. Allowed values:</p><ul><li><p>'FocalLoss'</p></li>
+<li><p>'CrossEntropyLoss'</p></li>
+</ul></dd>
 
       <dt><code>use_sc</code></dt>
 <dd><p><code>bool</code> <code>TRUE</code> if the estimation should integrate synthetic cases. <code>FALSE</code> if not.</p></dd>
 
       <dt><code>sc_method</code></dt>
-<dd><p><code>string</code> containing the method for generating synthetic cases. Allowed values: 'knnor'</p></dd>
+<dd><p><code>string</code> containing the method for generating synthetic cases. Allowed values:</p><ul><li><p>'knnor'</p></li>
+</ul></dd>
 
       <dt><code>sc_min_k</code></dt>
-<dd><p><code>int</code> determining the minimal number of k which is used for creating synthetic units. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> determining the minimal number of k which is used for creating synthetic units. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>sc_max_k</code></dt>
-<dd><p><code>int</code> determining the maximal number of k which is used for creating synthetic units. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> determining the maximal number of k which is used for creating synthetic units. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>use_pl</code></dt>
 <dd><p><code>bool</code> <code>TRUE</code> if the estimation should integrate pseudo-labeling. <code>FALSE</code> if not.</p></dd>
 
       <dt><code>pl_max_steps</code></dt>
-<dd><p><code>int</code> determining the maximum number of steps during pseudo-labeling. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> determining the maximum number of steps during pseudo-labeling. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>pl_max</code></dt>
-<dd><p><code>double</code> setting the maximal level of confidence for considering a case for pseudo-labeling. Allowed values: \(0 &lt; x &lt;= 1\)</p></dd>
+<dd><p><code>double</code> setting the maximal level of confidence for considering a case for pseudo-labeling. Allowed values:</p>
+<p>\(0 &lt; x &lt;= 1\)</p></dd>
 
       <dt><code>pl_anchor</code></dt>
-<dd><p><code>double</code> indicating the reference point for sorting the new cases of every label. Allowed values: \(0 &lt;= x &lt;= 1\)</p></dd>
+<dd><p><code>double</code> indicating the reference point for sorting the new cases of every label. Allowed values:</p>
+<p>\(0 &lt;= x &lt;= 1\)</p></dd>
 
       <dt><code>pl_min</code></dt>
-<dd><p><code>double</code> setting the mnimal level of confidence for considering a case for pseudo-labeling. Allowed values: \(0 &lt;= x &lt; 1\)</p></dd>
+<dd><p><code>double</code> setting the mnimal level of confidence for considering a case for pseudo-labeling. Allowed values:</p>
+<p>\(0 &lt;= x &lt; 1\)</p></dd>
 
       <dt><code>sustain_track</code></dt>
 <dd><p><code>bool</code> If <code>TRUE</code> energy consumption is tracked during training via the python library 'codecarbon'.</p></dd>
@@ -222,57 +233,81 @@ If <code>FALSE</code> each sequences length has the weight 1.</p></dd>
       <dt><code>sustain_iso_code</code></dt>
 <dd><p><code>string</code> ISO code (Alpha-3-Code) for the country. This variable must be set if
 sustainability should be tracked. A list can be found on Wikipedia:
-<a href="https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes" class="external-link">https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes</a>. Allowed values: any</p></dd>
+<a href="https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes" class="external-link">https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes</a>. Allowed values:</p>
+<p>any</p></dd>
 
       <dt><code>sustain_region</code></dt>
 <dd><p><code>string</code> Region within a country. Only available for USA and Canada See the documentation of
-codecarbon for more information. <a href="https://docs.codecarbon.io/latest/" class="external-link">https://docs.codecarbon.io/latest/</a> Allowed values: any</p></dd>
+codecarbon for more information. <a href="https://docs.codecarbon.io/latest/" class="external-link">https://docs.codecarbon.io/latest/</a> Allowed values:</p>
+<p>any</p></dd>
 
       <dt><code>sustain_interval</code></dt>
-<dd><p><code>int</code> Interval in seconds for measuring power usage. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Interval in seconds for measuring power usage. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>sustain_log_level</code></dt>
-<dd><p><code>string</code> Level for printing information to the console. Allowed values: 'debug', 'info', 'warning', 'error', 'critical'</p></dd>
+<dd><p><code>string</code> Level for printing information to the console. Allowed values:</p><ul><li><p>'debug'</p></li>
+<li><p>'info'</p></li>
+<li><p>'warning'</p></li>
+<li><p>'error'</p></li>
+<li><p>'critical'</p></li>
+</ul></dd>
 
       <dt><code>epochs</code></dt>
-<dd><p><code>int</code> Number of training epochs. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Number of training epochs. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>batch_size</code></dt>
-<dd><p><code>int</code> Size of the batches for training. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Size of the batches for training. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>trace</code></dt>
 <dd><p><code>bool</code> <code>TRUE</code> if information about the estimation phase should be printed to the console.</p></dd>
 
       <dt><code>ml_trace</code></dt>
-<dd><p><code>int</code> <code>ml_trace=0</code> does not print any information about the training process from pytorch on the console. Allowed values: \(0 &lt;= x &lt;= 1\)</p></dd>
+<dd><p><code>int</code> <code>ml_trace=0</code> does not print any information about the training process from pytorch on the console. Allowed values:</p>
+<p>\(0 &lt;= x &lt;= 1\)</p></dd>
 
       <dt><code>log_dir</code></dt>
 <dd><p><code>string</code> Path to the directory where the log files should be saved.
-If no logging is desired set this argument to <code>NULL</code>. Allowed values: any</p></dd>
+If no logging is desired set this argument to <code>NULL</code>. Allowed values:</p>
+<p>any</p></dd>
 
       <dt><code>log_write_interval</code></dt>
 <dd><p><code>int</code> Time in seconds determining the interval in which the logger should try to update
-the log files. Only relevant if <code>log_dir</code> is not <code>NULL</code>. Allowed values: \(1 &lt;= x \)</p></dd>
+the log files. Only relevant if <code>log_dir</code> is not <code>NULL</code>. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>n_cores</code></dt>
-<dd><p><code>int</code> Number of cores which should be used during the calculation of synthetic cases. Only relevant if <code>use_sc=TRUE</code>. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Number of cores which should be used during the calculation of synthetic cases. Only relevant if <code>use_sc=TRUE</code>. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>lr_rate</code></dt>
 <dd><p><code>double</code> Initial learning rate for the training. Sets the maximal learning rate.
-Set this value to <code>0.0</code> requests an automatic search for a good learning rate. Allowed values: \(0 &lt;= x &lt;= 1\)</p></dd>
+Set this value to <code>0.0</code> requests an automatic search for a good learning rate. Allowed values:</p>
+<p>\(0 &lt;= x &lt;= 1\)</p></dd>
 
       <dt><code>lr_min</code></dt>
 <dd><p><code>double</code> Minimal learning rate during training.
-Set this value to <code>0.0</code> requests an automatic search for a good learning rate. Allowed values: \(0 &lt;= x &lt;= 1\)</p></dd>
+Set this value to <code>0.0</code> requests an automatic search for a good learning rate. Allowed values:</p>
+<p>\(0 &lt;= x &lt;= 1\)</p></dd>
 
       <dt><code>lr_warm_up_ratio</code></dt>
-<dd><p><code>double</code> Number of epochs used for warm up. To disable warm up set this value to 0.0. Allowed values: \(0 &lt; x &lt; 0.5\)</p></dd>
+<dd><p><code>double</code> Number of epochs used for warm up. To disable warm up set this value to 0.0. Allowed values:</p>
+<p>\(0 &lt; x &lt; 0.5\)</p></dd>
 
       <dt><code>lr_scheduler</code></dt>
-<dd><p><code>string</code> Learning rate scheduler. To use a constant learning rate for the whole training set this parameter to 'None'. Allowed values: 'None', 'Linear', 'Cyclic'</p></dd>
+<dd><p><code>string</code> Learning rate scheduler. To use a constant learning rate for the whole training set this parameter to 'None'. Allowed values:</p><ul><li><p>'None'</p></li>
+<li><p>'Linear'</p></li>
+<li><p>'Cyclic'</p></li>
+</ul></dd>
 
       <dt><code>optimizer</code></dt>
-<dd><p><code>string</code> determining the optimizer used for training. Allowed values: 'Adam', 'RMSprop', 'AdamW', 'SGD'</p></dd>
+<dd><p><code>string</code> determining the optimizer used for training. Allowed values:</p><ul><li><p>'Adam'</p></li>
+<li><p>'RMSprop'</p></li>
+<li><p>'AdamW'</p></li>
+<li><p>'SGD'</p></li>
+</ul></dd>
 
       <dt><code>amp</code></dt>
 <dd><p><code>bool</code> Apply automatic mixed precision to spped up computations. It is generally

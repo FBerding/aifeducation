@@ -355,10 +355,12 @@ a saved classifier.</p>
 <p></p><div class="arguments"><dl><dt><code>name</code></dt>
 <dd><p><code>string</code> Name of the new model. Please refer to common name conventions.
 Free text can be used with parameter <code>label</code>. If set to <code>NULL</code> a unique ID
-is generated automatically. Allowed values: any</p></dd>
+is generated automatically. Allowed values:</p>
+<p>any</p></dd>
 
       <dt><code>label</code></dt>
-<dd><p><code>string</code> Label for the new model. Here you can use free text. Allowed values: any</p></dd>
+<dd><p><code>string</code> Label for the new model. Here you can use free text. Allowed values:</p>
+<p>any</p></dd>
 
       <dt><code>text_embeddings</code></dt>
 <dd><p><code>EmbeddedText, LargeDataSetForTextEmbeddings</code> Object of class <a href="EmbeddedText.html">EmbeddedText</a> or <a href="LargeDataSetForTextEmbeddings.html">LargeDataSetForTextEmbeddings</a>.</p></dd>
@@ -373,149 +375,268 @@ note that order matters. For ordinal data please ensure that the levels are sort
 indicating a higher category/class. For nominal data the order does not matter.</p></dd>
 
       <dt><code>skip_connection_type</code></dt>
-<dd><p><code>string</code> Type of residual connenction for all layers and stack of layers. Allowed values: 'ResidualGate', 'Addition', 'None'</p></dd>
+<dd><p><code>string</code> Type of residual connenction for all layers and stack of layers. Allowed values:</p><ul><li><p>'ResidualGate'</p></li>
+<li><p>'Addition'</p></li>
+<li><p>'None'</p></li>
+</ul></dd>
 
       <dt><code>cls_pooling_features</code></dt>
 <dd><p><code>int</code> Number of features to be extracted at the end of the model.
-Only relevant if pooling type ist 'Max', 'Min' or 'MinMax'. Allowed values: \(1 &lt;= x \)</p></dd>
+Only relevant if pooling type is 'Max', 'Min' or 'MinMax'. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>cls_pooling_type</code></dt>
-<dd><p><code>string</code> Type of extracting intermediate features. Allowed values: 'Max', 'Min', 'MinMax', 'MaxTimes', 'MinMaxTimes'</p></dd>
+<dd><p><code>string</code> Type of extracting intermediate features. Allowed values:</p><ul><li><p>'Max'</p></li>
+<li><p>'Min'</p></li>
+<li><p>'MinMax'</p></li>
+<li><p>'MaxTimes'</p></li>
+<li><p>'MinMaxTimes'</p></li>
+</ul></dd>
 
       <dt><code>cls_head_type</code></dt>
-<dd><p><code>string</code> Type of classification head. Allowed values: 'Regular', 'PairwiseOrthogonal', 'PairwiseOrthogonalDense'</p></dd>
+<dd><p><code>string</code> Type of classification head. Allowed values:</p><ul><li><p>'Regular'</p></li>
+<li><p>'PairwiseOrthogonal'</p></li>
+<li><p>'PairwiseOrthogonalDense'</p></li>
+</ul></dd>
 
       <dt><code>feat_act_fct</code></dt>
-<dd><p><code>string</code> Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'</p></dd>
+<dd><p><code>string</code> Activation function for the specified layers. Allowed values:</p><ul><li><p>'ELU'</p></li>
+<li><p>'LeakyReLU'</p></li>
+<li><p>'ReLU'</p></li>
+<li><p>'GELU'</p></li>
+<li><p>'Sigmoid'</p></li>
+<li><p>'Tanh'</p></li>
+<li><p>'PReLU'</p></li>
+</ul></dd>
 
       <dt><code>feat_size</code></dt>
-<dd><p><code>int</code> Number of neurons for each dense layer. Allowed values: \(2 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Number of neurons for each dense layer. Allowed values:</p>
+<p>\(2 &lt;= x \)</p></dd>
 
       <dt><code>feat_bias</code></dt>
 <dd><p><code>bool</code> If <code>TRUE</code> a bias term is added to all layers. If <code>FALSE</code> no bias term is added to the layers.</p></dd>
 
       <dt><code>feat_dropout</code></dt>
-<dd><p><code>double</code> determining the dropout for the dense projection of the feature layer. Allowed values: \(0 &lt;= x &lt;= 0.6\)</p></dd>
+<dd><p><code>double</code> determining the dropout for the dense projection of the feature layer. Allowed values:</p>
+<p>\(0 &lt;= x &lt;= 0.6\)</p></dd>
 
       <dt><code>feat_parametrizations</code></dt>
-<dd><p><code>string</code> Re-Parametrizations of the weights of layers. Allowed values: 'None', 'OrthogonalWeights', 'WeightNorm', 'SpectralNorm'</p></dd>
+<dd><p><code>string</code> Re-Parametrizations of the weights of layers. Allowed values:</p><ul><li><p>'None'</p></li>
+<li><p>'OrthogonalWeights'</p></li>
+<li><p>'WeightNorm'</p></li>
+<li><p>'SpectralNorm'</p></li>
+</ul></dd>
 
       <dt><code>feat_normalization_type</code></dt>
-<dd><p><code>string</code> Type of normalization applied to all layers and stack layers. Allowed values: 'LayerNorm', 'BatchNorm', 'PowerNorm', 'RMSNorm', 'None'</p></dd>
+<dd><p><code>string</code> Type of normalization applied to all layers and stack layers. Allowed values:</p><ul><li><p>'LayerNorm'</p></li>
+<li><p>'BatchNorm'</p></li>
+<li><p>'PowerNorm'</p></li>
+<li><p>'RMSNorm'</p></li>
+<li><p>'None'</p></li>
+</ul></dd>
 
       <dt><code>ng_conv_act_fct</code></dt>
-<dd><p><code>string</code> Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'</p></dd>
+<dd><p><code>string</code> Activation function for the specified layers. Allowed values:</p><ul><li><p>'ELU'</p></li>
+<li><p>'LeakyReLU'</p></li>
+<li><p>'ReLU'</p></li>
+<li><p>'GELU'</p></li>
+<li><p>'Sigmoid'</p></li>
+<li><p>'Tanh'</p></li>
+<li><p>'PReLU'</p></li>
+</ul></dd>
 
       <dt><code>ng_conv_n_layers</code></dt>
-<dd><p><code>int</code> determining how many times the n-gram layers should be added to the network. Allowed values: \(0 &lt;= x \)</p></dd>
+<dd><p><code>int</code> determining how many times the n-gram layers should be added to the network. Allowed values:</p>
+<p>\(0 &lt;= x \)</p></dd>
 
       <dt><code>ng_conv_ks_min</code></dt>
-<dd><p><code>int</code> determining the minimal window size for n-grams. Allowed values: \(2 &lt;= x \)</p></dd>
+<dd><p><code>int</code> determining the minimal window size for n-grams. Allowed values:</p>
+<p>\(2 &lt;= x \)</p></dd>
 
       <dt><code>ng_conv_ks_max</code></dt>
-<dd><p><code>int</code> determining the maximal window size for n-grams. Allowed values: \(2 &lt;= x \)</p></dd>
+<dd><p><code>int</code> determining the maximal window size for n-grams. Allowed values:</p>
+<p>\(2 &lt;= x \)</p></dd>
 
       <dt><code>ng_conv_bias</code></dt>
 <dd><p><code>bool</code> If <code>TRUE</code> a bias term is added to all layers. If <code>FALSE</code> no bias term is added to the layers.</p></dd>
 
       <dt><code>ng_conv_dropout</code></dt>
-<dd><p><code>double</code> determining the dropout for n-gram convolution layers. Allowed values: \(0 &lt;= x &lt;= 0.6\)</p></dd>
+<dd><p><code>double</code> determining the dropout for n-gram convolution layers. Allowed values:</p>
+<p>\(0 &lt;= x &lt;= 0.6\)</p></dd>
 
       <dt><code>ng_conv_parametrizations</code></dt>
-<dd><p><code>string</code> Re-Parametrizations of the weights of layers. Allowed values: 'None', 'OrthogonalWeights', 'WeightNorm', 'SpectralNorm'</p></dd>
+<dd><p><code>string</code> Re-Parametrizations of the weights of layers. Allowed values:</p><ul><li><p>'None'</p></li>
+<li><p>'OrthogonalWeights'</p></li>
+<li><p>'WeightNorm'</p></li>
+<li><p>'SpectralNorm'</p></li>
+</ul></dd>
 
       <dt><code>ng_conv_normalization_type</code></dt>
-<dd><p><code>string</code> Type of normalization applied to all layers and stack layers. Allowed values: 'LayerNorm', 'BatchNorm', 'PowerNorm', 'RMSNorm', 'None'</p></dd>
+<dd><p><code>string</code> Type of normalization applied to all layers and stack layers. Allowed values:</p><ul><li><p>'LayerNorm'</p></li>
+<li><p>'BatchNorm'</p></li>
+<li><p>'PowerNorm'</p></li>
+<li><p>'RMSNorm'</p></li>
+<li><p>'None'</p></li>
+</ul></dd>
 
       <dt><code>ng_conv_residual_type</code></dt>
-<dd><p><code>string</code> Type of residual connenction for all layers and stack of layers. Allowed values: 'ResidualGate', 'Addition', 'None'</p></dd>
+<dd><p><code>string</code> Type of residual connenction for all layers and stack of layers. Allowed values:</p><ul><li><p>'ResidualGate'</p></li>
+<li><p>'Addition'</p></li>
+<li><p>'None'</p></li>
+</ul></dd>
 
       <dt><code>dense_act_fct</code></dt>
-<dd><p><code>string</code> Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'</p></dd>
+<dd><p><code>string</code> Activation function for the specified layers. Allowed values:</p><ul><li><p>'ELU'</p></li>
+<li><p>'LeakyReLU'</p></li>
+<li><p>'ReLU'</p></li>
+<li><p>'GELU'</p></li>
+<li><p>'Sigmoid'</p></li>
+<li><p>'Tanh'</p></li>
+<li><p>'PReLU'</p></li>
+</ul></dd>
 
       <dt><code>dense_n_layers</code></dt>
-<dd><p><code>int</code> Number of dense layers. Allowed values: \(0 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Number of dense layers. Allowed values:</p>
+<p>\(0 &lt;= x \)</p></dd>
 
       <dt><code>dense_dropout</code></dt>
-<dd><p><code>double</code> determining the dropout between dense layers. Allowed values: \(0 &lt;= x &lt;= 0.6\)</p></dd>
+<dd><p><code>double</code> determining the dropout between dense layers. Allowed values:</p>
+<p>\(0 &lt;= x &lt;= 0.6\)</p></dd>
 
       <dt><code>dense_bias</code></dt>
 <dd><p><code>bool</code> If <code>TRUE</code> a bias term is added to all layers. If <code>FALSE</code> no bias term is added to the layers.</p></dd>
 
       <dt><code>dense_parametrizations</code></dt>
-<dd><p><code>string</code> Re-Parametrizations of the weights of layers. Allowed values: 'None', 'OrthogonalWeights', 'WeightNorm', 'SpectralNorm'</p></dd>
+<dd><p><code>string</code> Re-Parametrizations of the weights of layers. Allowed values:</p><ul><li><p>'None'</p></li>
+<li><p>'OrthogonalWeights'</p></li>
+<li><p>'WeightNorm'</p></li>
+<li><p>'SpectralNorm'</p></li>
+</ul></dd>
 
       <dt><code>dense_normalization_type</code></dt>
-<dd><p><code>string</code> Type of normalization applied to all layers and stack layers. Allowed values: 'LayerNorm', 'BatchNorm', 'PowerNorm', 'RMSNorm', 'None'</p></dd>
+<dd><p><code>string</code> Type of normalization applied to all layers and stack layers. Allowed values:</p><ul><li><p>'LayerNorm'</p></li>
+<li><p>'BatchNorm'</p></li>
+<li><p>'PowerNorm'</p></li>
+<li><p>'RMSNorm'</p></li>
+<li><p>'None'</p></li>
+</ul></dd>
 
       <dt><code>dense_residual_type</code></dt>
-<dd><p><code>string</code> Type of residual connenction for all layers and stack of layers. Allowed values: 'ResidualGate', 'Addition', 'None'</p></dd>
+<dd><p><code>string</code> Type of residual connenction for all layers and stack of layers. Allowed values:</p><ul><li><p>'ResidualGate'</p></li>
+<li><p>'Addition'</p></li>
+<li><p>'None'</p></li>
+</ul></dd>
 
       <dt><code>rec_act_fct</code></dt>
-<dd><p><code>string</code> Activation function for all layers. Allowed values: 'Tanh'</p></dd>
+<dd><p><code>string</code> Activation function for the specified layers. Allowed values:</p><ul><li><p>'Tanh'</p></li>
+</ul></dd>
 
       <dt><code>rec_n_layers</code></dt>
-<dd><p><code>int</code> Number of recurrent layers. Allowed values: \(0 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Number of recurrent layers. Allowed values:</p>
+<p>\(0 &lt;= x \)</p></dd>
 
       <dt><code>rec_type</code></dt>
-<dd><p><code>string</code> Type of the recurrent layers. <code>rec_type='GRU'</code> for Gated Recurrent Unit and <code>rec_type='LSTM'</code> for Long Short-Term Memory. Allowed values: 'GRU', 'LSTM'</p></dd>
+<dd><p><code>string</code> Type of the recurrent layers. <code>rec_type='GRU'</code> for Gated Recurrent Unit and <code>rec_type='LSTM'</code> for Long Short-Term Memory. Allowed values:</p><ul><li><p>'GRU'</p></li>
+<li><p>'LSTM'</p></li>
+</ul></dd>
 
       <dt><code>rec_bidirectional</code></dt>
 <dd><p><code>bool</code> If <code>TRUE</code> a bidirectional version of the recurrent layers is used.</p></dd>
 
       <dt><code>rec_dropout</code></dt>
-<dd><p><code>double</code> determining the dropout between recurrent layers. Allowed values: \(0 &lt;= x &lt;= 0.6\)</p></dd>
+<dd><p><code>double</code> determining the dropout between recurrent layers. Allowed values:</p>
+<p>\(0 &lt;= x &lt;= 0.6\)</p></dd>
 
       <dt><code>rec_bias</code></dt>
 <dd><p><code>bool</code> If <code>TRUE</code> a bias term is added to all layers. If <code>FALSE</code> no bias term is added to the layers.</p></dd>
 
       <dt><code>rec_parametrizations</code></dt>
-<dd><p><code>string</code> Re-Parametrizations of the weights of layers. Allowed values: 'None'</p></dd>
+<dd><p><code>string</code> Re-Parametrizations of the weights of layers. Allowed values:</p><ul><li><p>'None'</p></li>
+</ul></dd>
 
       <dt><code>rec_normalization_type</code></dt>
-<dd><p><code>string</code> Type of normalization applied to all layers and stack layers. Allowed values: 'LayerNorm', 'BatchNorm', 'PowerNorm', 'RMSNorm', 'None'</p></dd>
+<dd><p><code>string</code> Type of normalization applied to all layers and stack layers. Allowed values:</p><ul><li><p>'LayerNorm'</p></li>
+<li><p>'BatchNorm'</p></li>
+<li><p>'PowerNorm'</p></li>
+<li><p>'RMSNorm'</p></li>
+<li><p>'None'</p></li>
+</ul></dd>
 
       <dt><code>rec_residual_type</code></dt>
-<dd><p><code>string</code> Type of residual connenction for all layers and stack of layers. Allowed values: 'ResidualGate', 'Addition', 'None'</p></dd>
+<dd><p><code>string</code> Type of residual connenction for all layers and stack of layers. Allowed values:</p><ul><li><p>'ResidualGate'</p></li>
+<li><p>'Addition'</p></li>
+<li><p>'None'</p></li>
+</ul></dd>
 
       <dt><code>tf_act_fct</code></dt>
-<dd><p><code>string</code> Activation function for all layers. Allowed values: 'ELU', 'LeakyReLU', 'ReLU', 'GELU', 'Sigmoid', 'Tanh', 'PReLU'</p></dd>
+<dd><p><code>string</code> Activation function for the specified layers. Allowed values:</p><ul><li><p>'ELU'</p></li>
+<li><p>'LeakyReLU'</p></li>
+<li><p>'ReLU'</p></li>
+<li><p>'GELU'</p></li>
+<li><p>'Sigmoid'</p></li>
+<li><p>'Tanh'</p></li>
+<li><p>'PReLU'</p></li>
+<li><p>'SwiGLU'</p></li>
+</ul></dd>
 
       <dt><code>tf_dense_dim</code></dt>
-<dd><p><code>int</code> determining the size of the projection layer within a each transformer encoder. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> determining the size of the projection layer within a each transformer encoder. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>tf_n_layers</code></dt>
-<dd><p><code>int</code> determining how many times the encoder should be added to the network. Allowed values: \(0 &lt;= x \)</p></dd>
+<dd><p><code>int</code> determining how many times the encoder should be added to the network. Allowed values:</p>
+<p>\(0 &lt;= x \)</p></dd>
 
       <dt><code>tf_dropout_rate_1</code></dt>
-<dd><p><code>double</code> determining the dropout after the attention mechanism within the transformer encoder layers. Allowed values: \(0 &lt;= x &lt;= 0.6\)</p></dd>
+<dd><p><code>double</code> determining the dropout after the attention mechanism within the transformer encoder layers. Allowed values:</p>
+<p>\(0 &lt;= x &lt;= 0.6\)</p></dd>
 
       <dt><code>tf_dropout_rate_2</code></dt>
-<dd><p><code>double</code> determining the dropout for the dense projection within the transformer encoder layers. Allowed values: \(0 &lt;= x &lt;= 0.6\)</p></dd>
+<dd><p><code>double</code> determining the dropout for the dense projection within the transformer encoder layers. Allowed values:</p>
+<p>\(0 &lt;= x &lt;= 0.6\)</p></dd>
 
       <dt><code>tf_attention_type</code></dt>
-<dd><p><code>string</code> Choose the attention type. Allowed values: 'Fourier', 'MultiHead'</p></dd>
+<dd><p><code>string</code> Choose the attention type. Allowed values:</p><ul><li><p>'Fourier'</p></li>
+<li><p>'MultiHead'</p></li>
+</ul></dd>
 
       <dt><code>tf_positional_type</code></dt>
-<dd><p><code>string</code> Type of processing positional information. Allowed values: 'None', 'absolute'</p></dd>
+<dd><p><code>string</code> Type of processing positional information. Allowed values:</p><ul><li><p>'None'</p></li>
+<li><p>'absolute'</p></li>
+</ul></dd>
 
       <dt><code>tf_num_heads</code></dt>
-<dd><p><code>int</code> determining the number of attention heads for a self-attention layer. Only relevant if <code>attention_type='MultiHead'</code> Allowed values: \(0 &lt;= x \)</p></dd>
+<dd><p><code>int</code> determining the number of attention heads for a self-attention layer. Only relevant if <code>attention_type='MultiHead'</code> Allowed values:</p>
+<p>\(0 &lt;= x \)</p></dd>
 
       <dt><code>tf_bias</code></dt>
 <dd><p><code>bool</code> If <code>TRUE</code> a bias term is added to all layers. If <code>FALSE</code> no bias term is added to the layers.</p></dd>
 
       <dt><code>tf_parametrizations</code></dt>
-<dd><p><code>string</code> Re-Parametrizations of the weights of layers. Allowed values: 'None', 'OrthogonalWeights', 'WeightNorm', 'SpectralNorm'</p></dd>
+<dd><p><code>string</code> Re-Parametrizations of the weights of layers. Allowed values:</p><ul><li><p>'None'</p></li>
+<li><p>'OrthogonalWeights'</p></li>
+<li><p>'WeightNorm'</p></li>
+<li><p>'SpectralNorm'</p></li>
+</ul></dd>
 
       <dt><code>tf_normalization_type</code></dt>
-<dd><p><code>string</code> Type of normalization applied to all layers and stack layers. Allowed values: 'LayerNorm', 'BatchNorm', 'PowerNorm', 'RMSNorm', 'None'</p></dd>
+<dd><p><code>string</code> Type of normalization applied to all layers and stack layers. Allowed values:</p><ul><li><p>'LayerNorm'</p></li>
+<li><p>'BatchNorm'</p></li>
+<li><p>'PowerNorm'</p></li>
+<li><p>'RMSNorm'</p></li>
+<li><p>'None'</p></li>
+</ul></dd>
 
       <dt><code>tf_normalization_position</code></dt>
-<dd><p><code>string</code> Position where the normalization should be applied. Allowed values: 'Pre', 'Post'</p></dd>
+<dd><p><code>string</code> Position where the normalization should be applied. Allowed values:</p><ul><li><p>'Pre'</p></li>
+<li><p>'Post'</p></li>
+</ul></dd>
 
       <dt><code>tf_residual_type</code></dt>
-<dd><p><code>string</code> Type of residual connenction for all layers and stack of layers. Allowed values: 'ResidualGate', 'Addition', 'None'</p></dd>
+<dd><p><code>string</code> Type of residual connenction for all layers and stack of layers. Allowed values:</p><ul><li><p>'ResidualGate'</p></li>
+<li><p>'Addition'</p></li>
+<li><p>'None'</p></li>
+</ul></dd>
 
 
 </dl><p></p></div>

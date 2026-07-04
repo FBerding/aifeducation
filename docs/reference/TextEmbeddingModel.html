@@ -135,43 +135,55 @@ Object of class <code>BaseModelCore</code>.</p></dd>
 <p></p><div class="arguments"><dl><dt><code>model_name</code></dt>
 <dd><p><code>string</code> Name of the new model. Please refer to common name conventions.
 Free text can be used with parameter <code>label</code>. If set to <code>NULL</code> a unique ID
-is generated automatically. Allowed values: any</p></dd>
+is generated automatically. Allowed values:</p>
+<p>any</p></dd>
 
       <dt><code>model_label</code></dt>
-<dd><p><code>string</code> Label for the new model. Here you can use free text. Allowed values: any</p></dd>
+<dd><p><code>string</code> Label for the new model. Here you can use free text. Allowed values:</p>
+<p>any</p></dd>
 
       <dt><code>model_language</code></dt>
-<dd><p><code>string</code> Languages that the models can work with. Allowed values: any</p></dd>
+<dd><p><code>string</code> Languages that the models can work with. Allowed values:</p>
+<p>any</p></dd>
 
       <dt><code>max_length</code></dt>
 <dd><p><code>int</code> Maximal number of token per chunks. Must be equal or lower
-as the maximal postional embeddings for the model. Allowed values: \(20 &lt;= x \)</p></dd>
+as the maximal postional embeddings for the model. Allowed values:</p>
+<p>\(20 &lt;= x \)</p></dd>
 
       <dt><code>chunks</code></dt>
-<dd><p><code>int</code> Maximal number chunks. Allowed values: \(2 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Maximal number chunks. Allowed values:</p>
+<p>\(2 &lt;= x \)</p></dd>
 
       <dt><code>overlap</code></dt>
-<dd><p><code>int</code> Number of tokens from the previous chunk that should be added at the beginng of the next chunk. Allowed values: \(0 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Number of tokens from the previous chunk that should be added at the beginng of the next chunk. Allowed values:</p>
+<p>\(0 &lt;= x \)</p></dd>
 
       <dt><code>emb_layer_min</code></dt>
-<dd><p><code>int</code> Minimal layer from which the embeddings should be calculated. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Minimal layer from which the embeddings should be calculated. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>emb_layer_max</code></dt>
-<dd><p><code>int</code> Maximal layer from which the embeddings should be calculated. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Maximal layer from which the embeddings should be calculated. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>emb_insert_mask_tokens</code></dt>
-<dd><p><code>double</code> Percentage of mask tokens that should replace tokens in the sequence. Replaces every 1/emb_insert_mask_tokens token. Allowed values: \(0 &lt;= x &lt;= 0.5\)</p></dd>
+<dd><p><code>double</code> Percentage of mask tokens that should replace tokens in the sequence. Replaces every 1/emb_insert_mask_tokens token. Allowed values:</p>
+<p>\(0 &lt;= x &lt;= 0.5\)</p></dd>
 
       <dt><code>emb_pool_type</code></dt>
 <dd><p><code>string</code> Method to summarize the embedding of single tokens into a text embedding.
 In the case of <code>'CLS'</code> all cls-tokens between <code>emb_layer_min</code> and <code>emb_layer_max</code> are averaged.
 In the case of <code>'Average'</code> the embeddings of all tokens are averaged.
-Please note that BaseModelFunnel allows only 'CLS'. Allowed values: 'CLS', 'Average'</p></dd>
+Please note that BaseModelFunnel allows only 'CLS'. Allowed values:</p><ul><li><p>'CLS'</p></li>
+<li><p>'Average'</p></li>
+</ul></dd>
 
       <dt><code>pad_value</code></dt>
 <dd><p><code>int</code> Value indicating padding. This value should no be in the range of
 regluar values for computations. Thus it is not recommended to chance this value.
-Default is <code>-100</code>. Allowed values: \( x &lt;= -1\)</p></dd>
+Default is <code>-100</code>. Allowed values:</p>
+<p>\( x &lt;= -1\)</p></dd>
 
       <dt><code>base_model</code></dt>
 <dd><p><code>BaseModelCore</code> BaseModels for processing raw texts.</p></dd>
@@ -219,7 +231,8 @@ and updates the object to the current version of the package.</p><div class="sec
 <dd><p>Path to the directory where to save the object.</p></dd>
 
       <dt><code>folder_name</code></dt>
-<dd><p><code>string</code> Name of the folder where the model should be saved. Allowed values: any</p></dd>
+<dd><p><code>string</code> Name of the folder where the model should be saved. Allowed values:</p>
+<p>any</p></dd>
 
 
 </dl><p></p></div>
@@ -315,7 +328,8 @@ into text embeddings. For a large number of texts please use the method <code>em
 <dd><p><code>vector</code> Id for every text.</p></dd>
 
       <dt><code>batch_size</code></dt>
-<dd><p><code>int</code> Size of the batches for training. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Size of the batches for training. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>trace</code></dt>
 <dd><p><code>bool</code> <code>TRUE</code> if information about the estimation phase should be printed to the console.</p></dd>
@@ -351,18 +365,21 @@ model creating the embeddings.</p>
 <dd><p><code>LargeDataSetForText</code> <a href="LargeDataSetForText.html">LargeDataSetForText</a> Object storing textual data.</p></dd>
 
       <dt><code>batch_size</code></dt>
-<dd><p><code>int</code> Size of the batches for training. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Size of the batches for training. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>trace</code></dt>
 <dd><p><code>bool</code> <code>TRUE</code> if information about the estimation phase should be printed to the console.</p></dd>
 
       <dt><code>log_file</code></dt>
 <dd><p><code>string</code> Path to the file where the log files should be saved.
-If no logging is desired set this argument to <code>NULL</code>. Allowed values: any</p></dd>
+If no logging is desired set this argument to <code>NULL</code>. Allowed values:</p>
+<p>any</p></dd>
 
       <dt><code>log_write_interval</code></dt>
 <dd><p><code>int</code> Time in seconds determining the interval in which the logger should try to update
-the log files. Only relevant if <code>log_dir</code> is not <code>NULL</code>. Allowed values: \(1 &lt;= x \)</p></dd>
+the log files. Only relevant if <code>log_dir</code> is not <code>NULL</code>. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
 
 </dl><p></p></div>
@@ -437,7 +454,9 @@ resulting CO2 equivalents in kg.</p><div class="section">
 </div><p></p><div class="section">
 <h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>track_mode</code></dt>
-<dd><p><code>string</code> Determines the stept to which the data refer. Allowed values: 'training', 'inference'</p></dd>
+<dd><p><code>string</code> Determines the stept to which the data refer. Allowed values:</p><ul><li><p>'training'</p></li>
+<li><p>'inference'</p></li>
+</ul></dd>
 
 
 </dl><p></p></div>
@@ -468,22 +487,31 @@ tracker used, and technical information on the training infrastructure.</p>
 <dd><p><code>LargeDataSetForText</code> <a href="LargeDataSetForText.html">LargeDataSetForText</a> Object storing textual data.</p></dd>
 
       <dt><code>batch_size</code></dt>
-<dd><p><code>int</code> Size of the batches for training. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Size of the batches for training. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>sustain_iso_code</code></dt>
 <dd><p><code>string</code> ISO code (Alpha-3-Code) for the country. This variable must be set if
 sustainability should be tracked. A list can be found on Wikipedia:
-<a href="https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes" class="external-link">https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes</a>. Allowed values: any</p></dd>
+<a href="https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes" class="external-link">https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes</a>. Allowed values:</p>
+<p>any</p></dd>
 
       <dt><code>sustain_region</code></dt>
 <dd><p><code>string</code> Region within a country. Only available for USA and Canada See the documentation of
-codecarbon for more information. <a href="https://docs.codecarbon.io/latest/" class="external-link">https://docs.codecarbon.io/latest/</a> Allowed values: any</p></dd>
+codecarbon for more information. <a href="https://docs.codecarbon.io/latest/" class="external-link">https://docs.codecarbon.io/latest/</a> Allowed values:</p>
+<p>any</p></dd>
 
       <dt><code>sustain_interval</code></dt>
-<dd><p><code>int</code> Interval in seconds for measuring power usage. Allowed values: \(1 &lt;= x \)</p></dd>
+<dd><p><code>int</code> Interval in seconds for measuring power usage. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>sustain_log_level</code></dt>
-<dd><p><code>string</code> Level for printing information to the console. Allowed values: 'debug', 'info', 'warning', 'error', 'critical'</p></dd>
+<dd><p><code>string</code> Level for printing information to the console. Allowed values:</p><ul><li><p>'debug'</p></li>
+<li><p>'info'</p></li>
+<li><p>'warning'</p></li>
+<li><p>'error'</p></li>
+<li><p>'critical'</p></li>
+</ul></dd>
 
       <dt><code>trace</code></dt>
 <dd><p><code>bool</code> <code>TRUE</code> if information about the estimation phase should be printed to the console.</p></dd>

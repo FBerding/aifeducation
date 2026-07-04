@@ -62,6 +62,7 @@
 <li>Add support for XML-Roberta.</li>
 <li>Add support for Xmod.</li>
 <li>Add method get_max_seq_len to BaseModels allowing to request the maximum number of tokens a model supports.</li>
+<li>MPNet is now available.</li>
 </ul><p><strong>Tokenizer</strong></p>
 <ul><li>Add Method to calculate the necessary number of parts/chunks to cover a given quantile of texts completely.</li>
 </ul><p><strong>Classifiers</strong></p>
@@ -70,6 +71,7 @@
 <li>Classifiers with prototypes: Ns and Nq are now adjusted to the minimal absolute frequencies of the train test data set. This ensures that Ns and Nq are equal for all classes.</li>
 <li>Pooling over features is now optional.</li>
 <li>Improve progress indicator for training. It now displays the remaining time and the epoch of the last checkpoint.</li>
+<li>Add <a href="https://doi.org/10.48550/arXiv.2002.05202" class="external-link">SwiGLU (Shazeer, 2020)</a> for transformer encoder layers.</li>
 <li>Add FocalLoss to classifiers based on prototypes.</li>
 <li>Add automatic detection of learning rates and a method for plotting the corresponding analysis.</li>
 <li>Replaced average_iota with a smoothed version of average_iota for an improved detection of good checkpoints.</li>
