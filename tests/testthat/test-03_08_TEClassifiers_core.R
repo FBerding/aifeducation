@@ -466,12 +466,14 @@ for (object_class_name in object_class_names) {
         ng_conv_n_layers <- 0L
         rec_n_layers <- 0L
         dense_n_layers <- 1L
+        lr_min=0.0
       } else {
         use_pl <- FALSE
         tf_n_layers <- NULL
         ng_conv_n_layers <- NULL
         rec_n_layers <- NULL
         dense_n_layers <- NULL
+        lr_min=1e-4
       }
 
       if (object_class_name == "TEClassifierParallel" && j <= 1) {
@@ -498,7 +500,8 @@ for (object_class_name in object_class_names) {
           tf_n_layers = tf_n_layers,
           ng_conv_n_layers = ng_conv_n_layers,
           rec_n_layers = rec_n_layers,
-          dense_n_layers = dense_n_layers
+          dense_n_layers = dense_n_layers,
+          lr_min=lr_min
         )
       )
 
@@ -514,6 +517,8 @@ for (object_class_name in object_class_names) {
         var_override = list(
           name = NULL,
           label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+          use_pl=use_pl,
+          use_sc=use_sc,
           trace = random_bool_on_CI(),
           log_dir = log_dir
         )

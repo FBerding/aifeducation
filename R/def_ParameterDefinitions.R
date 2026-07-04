@@ -1187,7 +1187,7 @@ get_param_dict <- function() {
     gui_box = "General Settings",
     gui_label = "Batch Size",
     default_value = 32L,
-    test_values = 2L
+    test_values = 32L
   )
 
   param$n_batches <- list(
@@ -1227,7 +1227,7 @@ get_param_dict <- function() {
     gui_box = "Learning Rate",
     gui_label = "Minimal Learning Rate",
     default_value = 0.0,
-    test_values = c(0.0, 1e-4)
+    test_values = 1e-4
   )
   param$lr_scheduler <- list(
     type = "string",
