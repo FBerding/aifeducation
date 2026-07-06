@@ -177,6 +177,6 @@ BaseModelsIndex$Xmod <- list(
   model_type = "xmod",
   reference = "Pfeiffer, J., Goyal, N., Lin, X. V., Li, X., Cross, J.,
   Riedel, S., & Artetxe, M. (2022). Lifting the Curse of Multilinguality
-  by Pre-training Modular Transformers. arXiv. doi: [0.48550/ARXIV.2205.06266](https://doi.org/0.48550/ARXIV.2205.06266)",
+  by Pre-training Modular Transformers. arXiv. doi: [10.48550/arXiv.2205.06266](https://doi.org/10.48550/arXiv.2205.06266)",
   req_sentencepiece = TRUE
 )
