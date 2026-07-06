@@ -91,6 +91,13 @@ jobs:
 
 
           reticulate::conda_install(
+            packages = c("pip"),
+            envname = envname,
+            conda = "auto",
+            pip = FALSE
+          )
+
+          reticulate::conda_install(
             packages = c(
               "pytorch",
               "nomkl"

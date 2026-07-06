@@ -1,5 +1,8 @@
 url: https://fberding.github.io/aifeducation/
 template:
+  math-rendering: katex
+  light-switch: true
+  theme-dark: breeze-dark
   bootstrap: 5
 
 navbar:
@@ -23,6 +26,8 @@ navbar:
         href: "articles/sharing_and_publishing.html"
       - text: "Appendix 01 Layers and Stacks"
         href: "articles/a01_layers_stacks.html"
+      - text: "Appendix 02 Supported Base Models"
+        href: "articles/a02_base_model_types.html"
 
 
 reference:

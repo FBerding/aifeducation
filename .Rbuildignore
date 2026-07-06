@@ -10,6 +10,8 @@ examples
 
 trainer_output
 
+pytest.ini
+
 ^.*\.Rproj$
 ^\.Rproj\.user$
 Trial
@@ -20,6 +22,7 @@ test_model
 tests/testthat/test_artefacts
 tests/testthat/test_data_tmp
 tests/testthat/test_data/OldModels
+tests/testthat/test_data/OpenSourceBaseModels
 
 .h5
 .git

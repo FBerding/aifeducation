@@ -1,3 +1,6 @@
+.vscode
+pyrightconfig.json
+__pycache__/
 Trial
 .Rproj.user
 inst/doc
@@ -10,6 +13,7 @@ language_models
 *.h5
 tests/testthat/test_artefacts
 tests/testthat/test_data_tmp
+tests/testthat/test_data/OpenSourceBaseModels
 tests/testthat/test_data/language_models/
 tests/testthat/test_data/tmp/
 tests/testthat/tmp/

@@ -283,18 +283,40 @@ They use about 5% of the epochs for the warm-up.
 Marek et al. (2025, p. 6) demonstrate that small batch sizes are more robust to all of
 Adam's hyperparameters. 
 
-Based on these results we recommend to start with `batch_size=32`. For calculating
-the corresponding learning rate you first have to choose a base learning rate $\eta_{Base}$. Based 
-on the work by Masters and Luschi (2018) we recommend to set $\eta_{Base}=2^{-10}$.
-The learning rate to apply can now be calculated as $\eta=\eta_{Base}*batchsize$.
-For a batch size of 32 this is $\eta=2^{-10}*32=0.03125$. We set `lr_rate=3e-2`.
-Based on the work of Goyal et al. (2017), we recommend using the first 
-5% (`lr_warm_up_ratio = 0.05`) to 10 % (`lr_warm_up_ratio = 0.1`)
-of epochs for warum-up. 
-
 Please note that there are exceptions to this rule. In the context of contrastive
 learning, higher batch sizes tend to generate better generalisation performance 
 (Chen et al., 2020).
+
+Another approach to find a good learning rate is to use a learning rate finder which is suggested by
+Smith (2015). The learning rater finder trains a model for some steps and increases the learning rate
+after each step. The minimum learning rate is the learning rate where the performance
+measure increases and the maximum learning rate is the last learning rate before the
+performance measure becomes unstable.
+
+In *aifeducation* you can use a learning rater finder by setting the argument `lr_rate = 0.0` or
+`lr_min = 0.0`. Please note, that the packages is based on Smith's (2015) idea but uses
+a different implementation:
+
+- For every learning rate the model is trained for a specific number of
+  epochs without changing the learning rate during training.
+- For every learning rate the model uses the same initial weights and parameters. 
+- The resulting statistics is smoothed.
+- All calculations are done with the smoothed data.
+- Learning rates are chosen from the largest range of stable values.
+- The maximum learning rate is the learning rate at the turning point of the 
+  smoothed loss distribution. The minimum learning rate is the smallest learning
+  rate within the selection range.
+  
+
+Based on these results we **recommend to use the learning rate finder**. If you want to
+set the learning rate manually start with `batch_size = 32`. For calculating
+the corresponding learning rate you first have to choose a base learning rate $\eta_{Base}$. Based 
+on the work by Masters and Luschi (2018) we recommend to set $\eta_{Base}=2^{-10}$.
+The learning rate to apply can now be calculated as $\eta=\eta_{Base}*batchsize$.
+For a batch size of 32 this is $\eta = 2^{-10}*32 = 0.03125$. We set `lr_rate = 3e-2`.
+Based on the work of Goyal et al. (2017), we recommend using the first 
+5% (`lr_warm_up_ratio = 0.05`) to 10 % (`lr_warm_up_ratio = 0.1`)
+of epochs for warum-up. 
 
 *Epochs*
 
@@ -394,6 +416,9 @@ Rogers, A., Kovaleva, O., & Rumshisky, A. (2020). A Primer in BERTology:
 What We Know About How BERT Works. Transactions of the Association for
 Computational Linguistics, 8, 842–866.
 <https://doi.org/10.1162/tacl_a_00349>
+
+Smith, L. N. (2015). Cyclical Learning Rates for Training Neural Networks.
+<https://doi.org/10.48550/arXiv.1506.01186>
 
 Takeshita, S., Takeshita, Y., Ruffinelli, D. & Ponzetto, S. P. (2025). Randomly 
 Removing 50% of Dimensions in Text Embeddings has Minimal Impact on Retrieval and 
