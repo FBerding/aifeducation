@@ -27,8 +27,6 @@ them computationally demanding. With specialized libraries such as
 *PyTorch*, graphical processing units (gpu)
 can help to speed up computations significantly. However, many of these
 specialized libraries for machine learning are written in python.
-Fortunately, an interface to python is provided via the *R* package
-[reticulate](https://cran.r-project.org/package=reticulate).
 
 The R package *Artificial Intelligence for Education (aifeducation)*
 aims to provide educators, educational researchers, and social
@@ -67,6 +65,9 @@ Since natural language processing with neural nets is based on models
 which are computationally intensive, *PyTorch* is used within this
 package together with some other specialized python libraries.
 
+> Before you start installing python or updating python packages, please
+> ensure that you have the newest version of the *R* package 'reticulate' installed.
+
 The most straightforward method for getting started is to call the
 function `install_aifeducation` as follows:
 
@@ -74,7 +75,9 @@ function `install_aifeducation` as follows:
 aifeducation::install_aifeducation(
   install_aifeducation_studio = TRUE,
   python_version = "3.12",
-  use_conda = FALSE)
+  cuda_version = "12.4",
+  use_conda = FALSE
+)
 ```
 
 This function will install python, and all relevant python
@@ -83,9 +86,9 @@ libraries into a virtual environment called "aifeducation".
 In addition, we recommend to set `install_aifeducation_studio=TRUE`
 since this will install the optional *R* packages necessary to use *AI
 for Education - Studio*. *AI for Education - Studio* is a graphical user
-interface for applying these packages. We recommend to use it for
+interface for using this package. We recommend to use it for
 everyone who is unfamiliar with *R* or machine learning. If you do not
-want use the studio, you can set the argument to `FALSE`. In this case
+want use studio, you can set the argument to `FALSE`. In this case
 you have to use the package with *R* syntax.
 
 If you have a suitable machine and would like to use a graphic card for
@@ -108,6 +111,33 @@ aifeducation::check_aif_py_modules()
 
 Now everything is ready to use the package.
 
+
+
+## Step 3 - Install Protocol Buffer Compiler (Optional)
+
+Next you *can* install Protocol Buffer Compiler if it is not already on your system.
+This compiler is a prerequisite for two python packages ('protbuf' and 'sentencepiece') 
+and some open source models to work. These packages are also necessary to update
+some older open source models to newer version of the library 'transformers'. 
+You can find installation instructions on [https://protobuf.dev/installation/].
+
+As an alternative you can call `aifeducation::install_protocol_buffer_compiler()`
+for an automatic installation. 
+
+After a successful installation of Protocol Buffer Compiler you can install
+the two python packages by calling `reticulate::py_install(c("protobuf","sentencepiece"))`.
+Please restart the session.
+
+> Please note that this installation step is only necessary if you plan to
+> work with base models that use a tokenizer based on 'sentencepiece'. You can found
+> a table with all transformers models and their prerequisites in 
+> [A02 Supported Base Models](https://fberding.github.io/aifeducation/articles/a02_base_model_types.html)
+
+> Please note that all base models created with this package do **not** need
+> these packages.
+
+In order to be fully flexible we recommend  to install these packages and the compiler.
+
 # 2) Starting a new session
 
 The most convenient way to work with the package is to use *AI for
@@ -124,11 +154,11 @@ directly after starting a *R* session.
 
 ```{r, include = TRUE, eval=FALSE}
 library(aifeducation)
-aifeducation::prepare_python()
+aifeducation::prepare_session()
 ```
 
 > **Note:** Please remember: Every time you start a new session in *R,*
-> you have to call the funcion `aifeducation::prepare_python`. This is not
+> you have to call the funcion `aifeducation::prepare_session`. This is not
 > necessary if you use *AI for Education - Studio*.
 
 # 3) Tutorials and Guides
@@ -150,6 +180,33 @@ version of this package, it is recommended to update the used python
 libraries as well. The easiest way is to call the following function:
 
 ```{r, include = TRUE, eval=FALSE}
-aifeducation::update_aifeducation()
+aifeducation::update_aifeducation(
+  update_aifeducation_studio = TRUE,
+  env_type = "auto",
+  cuda_version = "12.4",
+  envname = "aifeducation"
+)
 ```
 
+> Starting with version 1.1.2 the python package 'calflops' is necessary. If you
+> used aifeducation with version 1.1.1 or lower please 
+> install this package manually with `reticulate::py_install("calflops")` or call
+> `aifeducation::update_aifeducation`.
+
+> Starting with version 1.1.6 the python packages 'protobuf' and 'sentencepiece ' are optional packages. If you
+> used aifeducation with version 1.1.5 or lower please 
+> install first Protocol Buffer Compiler via `install_protocol_buffer_compiler` or
+> (https://protobuf.dev/installation/)[https://protobuf.dev/installation/].
+> After that install the packages manually with `reticulate::py_install(c("protobuf","sentencepiece"))`.
+
+# 5) Recommended Version of Python Packages
+
+Using the function above will install the newest and recommended version of the 
+core python packages in order to use this package. In the case you would like to
+install the packages manually we recommend the following versions.
+
+```{r, include = TRUE, eval=TRUE}
+t(aifeducation::get_recommended_py_versions())
+```
+
+We have tested the package with these versions ensuring that *aifeducation* works correctly.
