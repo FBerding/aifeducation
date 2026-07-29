@@ -319,36 +319,6 @@ generate_embeddings <- function(times,
   return(tensor_data)
 }
 
-#' @title Generate static test tensor
-#' @description Function generates a static test tensor which is always the same.
-#' @param pad_value `int` Value used to indicate padding.
-#' @returns Returns an object of class `Tensor` which is always the same except padding.
-#' Shape (5,3,7).
-#' @family Utils TestThat Developers
-#' @export
-get_fixed_test_tensor <- function(pad_value) {
-  times <- 3L
-  features <- 7L
-  batch <- 5L
-  seq_len <- c(1L, 2L, 1L, 3L, 2L)
-  tensor_data <- array(
-    data = pad_value,
-    dim = c(batch, times, features)
-  )
-
-  for (i in seq_along(seq_len)) {
-    for (j in seq(from = 1L, to = seq_len[i])) {
-      tensor_data[i, j, ] <- seq(from = -seq_len[i], to = j * batch, length.out = features)
-    }
-  }
-  tensor_np <- reticulate::np_array(tensor_data)
-  if (!numpy_writeable(tensor_np)) {
-    warning("Numpy array is not writable")
-  }
-  tensor <- torch$from_numpy(tensor_np)
-  return(tensor)
-}
-
 #' @title Test if running on Continuous Integration (CI)
 #' @description Function checks if it is called on CI.
 #' @returns Returns `TRUE` if one of the following variables are set to "true"
@@ -360,7 +330,6 @@ get_fixed_test_tensor <- function(pad_value) {
 is_on_CI <- function() {
   if (
     Sys.getenv("CI") == "true" ||
-      # Sys.getenv("NOT_CRAN") == "true" ||
       Sys.getenv("_R_CHECK_LIMIT_CORES_") == "true"
   ) {
     return(TRUE)
