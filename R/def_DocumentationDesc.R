@@ -572,7 +572,7 @@ build_aife_site <- function(clear_docs = FALSE) {
 build_layer_overview_base_models <- function() {
   requireNamespace("knitr")
   ov_clm_names <- c("class_name", "reference", "req_sentencepiece")
-  final_clm_names <- c("BaseModel", "Reference", "Require Sentencepiece")
+  final_clm_names <- c("BaseModel", "Reference", "Requires Sentencepiece")
   overview_table <- matrix(
     nrow = length(BaseModelsIndex),
     ncol = length(ov_clm_names),
