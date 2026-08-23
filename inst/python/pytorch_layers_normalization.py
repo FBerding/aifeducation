@@ -37,9 +37,11 @@ class LayerNorm_with_Mask(torch.nn.Module):
       self.times=times
       self.features = features
       if isinstance(pad_value, torch.Tensor):
-        self.pad_value=pad_value.detach()
+          #self.pad_value = pad_value.detach().float()
+          self.register_buffer("pad_value",pad_value.clone().float())
       else:
-        self.pad_value=torch.tensor(pad_value)
+          #self.pad_value = torch.tensor(pad_value,dtype=torch.float)
+          self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
       self.gamma = torch.nn.Parameter(torch.ones(1, 1, self.features))
 
     def forward(self, x,mask_times):
@@ -93,10 +95,15 @@ class BatchNorm_with_Mask(torch.nn.Module):
         self.eps = eps
         self.alpha = alpha
         self.features = features
+        
         if isinstance(pad_value, torch.Tensor):
-            self.pad_value = pad_value.detach()
+            #self.pad_value = pad_value.detach().float()
+            self.register_buffer("pad_value",pad_value.detach().clone().float())
+            print(pad_value)
         else:
-            self.pad_value = torch.tensor(pad_value)
+            #self.pad_value = torch.tensor(pad_value,dtype=torch.float)
+            self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
+
         self.gamma = torch.nn.Parameter(torch.ones(1, 1, self.features))
         self.beta = torch.nn.Parameter(torch.zeros(1, 1, self.features))
         self.register_buffer("running_mean",torch.zeros((1, 1, self.features)))
@@ -132,20 +139,23 @@ class BatchNorm_with_Mask(torch.nn.Module):
             batch_mean, batch_variance, n_elements = self.calc_batch_statistics(
                 x_reshaped, mask_times
             )
-            if batch_mean is not None:
+            if (batch_variance < 0).any:
                 # Update running mean and variance
-                self.running_mean = (
+                tmp_running_mean = (
                     1 - self.alpha
                 ) * self.running_mean + self.alpha * torch.unsqueeze(
                     torch.unsqueeze(batch_mean.detach(), dim=0), dim=0
                 )  # (1, 1, F_out)
-                self.running_variance =  (
+                self.running_mean.copy_(tmp_running_mean)
+                
+                tmp_running_variance =  (
                     1 - self.alpha
                 ) * self.running_variance + self.alpha * (
                     n_elements / (n_elements - 1)
                 ) * torch.unsqueeze(
                     torch.unsqueeze(batch_variance.detach(), dim=0), dim=0
                 )  # (1, 1, F_out)
+                self.running_variance.copy_(tmp_running_variance)
                 # Normalize Scale and shift
                 # self.eps in torch.sqrt is necessary for numeric stability
                 y = (
@@ -194,26 +204,33 @@ class BatchNorm_with_Mask(torch.nn.Module):
         else:
             x_stacked = x
             mask_stacked = mask_times
+        
         # Select only the rows that are not masked
-        x_sub = torch.index_select(
-            input=x_stacked,  # (B * T, F)
-            dim=0,
-            index=torch.masked_select(
-                input=torch.arange(start=0, end=x_stacked.size(0)).to(
-                    mask_stacked.device
-                ),
-                mask=~mask_stacked,  # (B * T)
-            ),
-        )  # (B * T, F_out)
+        n_elements=torch.sum(~mask_stacked).detach()
         # Calc meand and variance only if at least two rows exist
-        if x_sub.size(0) >= 2:
-            batch_mean = torch.mean(input=x_sub, dim=0)  # (F_out)
-            batch_variance = torch.var(input=x_sub, dim=0)  # (F_out)
-            batch_variance = torch.clamp(batch_variance, min=0.0, max=None)  # (F_out)
-        else:
-            batch_mean = None
-            batch_variance = None
-        n_elements = x_sub.size(0)  # B * T
+        #Work around to avoid if else statment depending on data flow
+        elements_sufficent=(n_elements > 2)
+        tmp_elements=n_elements*elements_sufficent+2*(~elements_sufficent)
+        
+        #Create Feature mask
+        mask_features_stacked=torch.unsqueeze(mask_stacked,dim=1)
+        mask_features_stacked=mask_features_stacked.expand((x_stacked.size(0),x_stacked.size(1)))
+        mask_features_stacked=mask_features_stacked.detach()
+        #Set masked item to 0
+        x_prepared=(~mask_features_stacked)*x_stacked
+        #Mean
+        batch_mean = torch.sum(x_prepared,dim=0)/tmp_elements # (F_out)
+        #Variance
+        tmp_batch_mean=torch.unsqueeze(batch_mean,dim=0)
+        tmp_batch_mean=tmp_batch_mean.expand((x_stacked.size(0),x_stacked.size(1)))
+        batch_variance = torch.pow(x_stacked-tmp_batch_mean,exponent=2)*(~mask_features_stacked)
+        batch_variance = torch.sum(batch_variance,dim=0)/tmp_elements
+        batch_variance = torch.clamp(batch_variance, min=0.0, max=None) # (F_out)
+        
+        batch_mean=batch_mean*elements_sufficent-torch.ones((batch_mean.size()),device=batch_mean.device)*(~elements_sufficent)
+        batch_variance = batch_variance*elements_sufficent-torch.ones((batch_variance.size()),device=batch_variance.device)*(~elements_sufficent)
+        
+        #n_elements = x_sub.size(0)  # B * T
         return batch_mean, batch_variance, n_elements  # (F_out), (F_out), B * T
 
 
@@ -230,9 +247,11 @@ class RMSNorm_with_Mask(nn.Module):
         self.gamma = nn.Parameter(torch.ones(features))  # Multiplied
         self.features = features
         if isinstance(pad_value, torch.Tensor):
-            self.pad_value = pad_value.detach()
+            #self.pad_value = pad_value.detach().float()
+            self.register_buffer("pad_value",pad_value.clone().float())
         else:
-            self.pad_value = torch.tensor(pad_value)
+            #self.pad_value = torch.tensor(pad_value,dtype=torch.float)
+            self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
 
     def forward(
         self,
@@ -324,9 +343,11 @@ class PowerNorm_with_Mask(nn.Module):
         self.eps = eps
 
         if isinstance(pad_value, torch.Tensor):
-            self.pad_value = pad_value.detach()
+            #self.pad_value = pad_value.detach().float()
+            self.register_buffer("pad_value",pad_value.clone().float())
         else:
-            self.pad_value = torch.tensor(pad_value)
+            #self.pad_value = torch.tensor(pad_value,dtype=torch.float)
+            self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
 
     def forward(
         self,
