@@ -128,10 +128,18 @@ class LogWriter:
 class ProgressLogger:
   def set_start_time(self):
     self.start_time=datetime.datetime.now()
+    self.last_point=0.0
   def print_progress(self,trace,epoch,epochs):
       if trace:
-        running_time=(datetime.datetime.now()-self.start_time)
-        rt=(epochs-epoch)*running_time/(epoch+1)
+        if epochs<=0:
+          last_point=self.start_time
+        else:
+          last_point=self.last_point
+        current_point=datetime.datetime.now()
+        running_time=(current_point-last_point)/intervalls
+        self.last_point=current_point
+        
+        rt=(epochs-epoch)*running_time
         rt=rt.seconds
         hours = rt // 3600
         minutes = (rt - (hours * 3600)) // 60

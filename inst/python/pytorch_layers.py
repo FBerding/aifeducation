@@ -36,18 +36,17 @@ class masking_layer(torch.nn.Module):
   def __init__(self,pad_value):
     super().__init__()
     if isinstance(pad_value, torch.Tensor):
-      self.pad_value=pad_value.detach()
+        self.register_buffer("pad_value",pad_value.clone().float())
     else:
-      self.pad_value=pad_value
+        self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
   def forward(self,x):
-    features=x.size()[-1]
-    with torch.no_grad():
-      time_sums=torch.sum(x,dim=2)
-      #Get mask on the level of sequences/times
-      mask_times=(time_sums==features*self.pad_value)
-      #Bring values to device
-      mask_times=mask_times.to(x.device)
-    return x, mask_times
+    features=torch.tensor(x.size()[-1], device=x.device, dtype=torch.float)
+    time_sums=torch.sum(x,dim=2)
+    #Get mask on the level of sequences/times
+    condition=(time_sums==features*self.pad_value)
+    mask_times=torch.zeros(time_sums.size(),device=time_sums.device,dtype=torch.bool)
+    mask_times=torch.where(condition,True,False)
+    return x, mask_times.detach()
 
 #Dropout layer with mask
 class layer_dropout_with_mask(torch.nn.Module):
@@ -57,12 +56,15 @@ class layer_dropout_with_mask(torch.nn.Module):
       self.dropout_layer=torch.nn.Dropout(p=self.p)
       
       if isinstance(pad_value, torch.Tensor):
-        self.pad_value=pad_value.detach()
+          #self.pad_value = pad_value.detach().float()
+          self.register_buffer("pad_value",pad_value.clone().float())
       else:
-        self.pad_value=torch.tensor(pad_value)
+          #self.pad_value = torch.tensor(pad_value,dtype=torch.float)
+          self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
+        
   def forward(self,x,mask_times):
     y=self.dropout_layer(x)
-    y_padded=y.masked_fill(mask=get_FeatureMask_from_mask(mask_times,y.size(2)),value=self.pad_value)
+    y_padded=torch.where(get_FeatureMask_from_mask(mask_times,y.size(2)),self.pad_value,y)
     return y_padded,mask_times
 
 
@@ -73,9 +75,11 @@ class layer_residual_connection(torch.nn.Module):
       self.type=type
       
       if isinstance(pad_value, torch.Tensor):
-        self.pad_value=pad_value.detach()
+          #self.pad_value = pad_value.detach().float()
+          self.register_buffer("pad_value",pad_value.clone().float())
       else:
-        self.pad_value=torch.tensor(pad_value)
+          #self.pad_value = torch.tensor(pad_value,dtype=torch.float)
+          self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
       
       if self.type=="ResidualGate":
         self.gate_param=torch.nn.Parameter(torch.ones(1))
@@ -85,12 +89,12 @@ class layer_residual_connection(torch.nn.Module):
         return y, mask_times
       elif self.type=="Addition":
         z=x+y
-        z=z.masked_fill(mask=get_FeatureMask_from_mask(mask_times,z.size(2)),value=self.pad_value)
+        z=torch.where(get_FeatureMask_from_mask(mask_times,z.size(2)),self.pad_value,z)
         return z, mask_times
       elif self.type=="ResidualGate":
         weight=torch.nn.functional.sigmoid(self.gate_param)
         z=(1-weight)*x+weight*y
-        z=z.masked_fill(mask=get_FeatureMask_from_mask(mask_times,z.size(2)),value=self.pad_value)
+        z=torch.where(get_FeatureMask_from_mask(mask_times,z.size(2)),self.pad_value,z)
         return z, mask_times
 
 class identity_layer(torch.nn.Module):
@@ -98,13 +102,13 @@ class identity_layer(torch.nn.Module):
     super().__init__()
     if not pad_value==None:
       if isinstance(pad_value, torch.Tensor):
-        self.pad_value=pad_value.detach()
+          self.register_buffer("pad_value",pad_value.clone().float())
       else:
-        self.pad_value=torch.tensor(pad_value)
+          self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
     self.apply_masking=apply_masking
   def forward(self,x,mask_times):
-    if self.apply_masking==True:
-      y=x.masked_fill(mask=get_FeatureMask_from_mask(mask_times,x.size(2)),value=self.pad_value)
+    if self.apply_masking:
+      y=torch.where(get_FeatureMask_from_mask(mask_times,x.size(2)),self.pad_value,x)
     else:
       y=x
     return y,mask_times
@@ -112,7 +116,7 @@ class identity_layer(torch.nn.Module):
 #Blockwise orthogonal dense layer----------------------------------------------
 #Function required for block_orth_dense to speed up comutations via vmap
 def apply_weights_pair_orth_dense(x, weights):
-  return torch.matmul(x,weights.to(x.device,x.dtype))
+  return torch.matmul(x,weights)
 
 # Input size must be equal or greater as output_size
 # Forward pass takes rensors of shape (any, input_size) and returns (any, output_size)
@@ -133,9 +137,9 @@ class pairwise_orthogonal_dense(torch.nn.Module):
     self.n_params_residual=self.input_size-self.n_params
     self.n_params=self.n_params+self.n_params_residual
 
-    self.weight=torch.nn.parameter.Parameter(torch.rand(1,self.n_params)).to(device)
+    self.weight=torch.nn.parameter.Parameter(torch.rand(1,self.n_params),device=device)
     if self.bias:
-      self.beta=torch.nn.parameter.Parameter(torch.zeros(1,self.output_size)).to(device)
+      self.beta=torch.nn.parameter.Parameter(torch.zeros(1,self.output_size),device=device)
     
     if self.pre_dense==True:
       self.dense_layer=torch.nn.Linear(
@@ -145,9 +149,11 @@ class pairwise_orthogonal_dense(torch.nn.Module):
         device=device, dtype=dtype
       )
 
-    self.design_matrix=torch.zeros((self.input_size,self.output_size)).to(device)
-    self.unit_matrix=torch.zeros((self.input_size,self.input_size)).fill_diagonal_(1).to(device)
     
+    unit_matrix=torch.zeros((self.input_size,self.input_size),device=device).fill_diagonal_(1)
+    self.register_buffer("unit_matrix",unit_matrix)
+    
+    design_matrix=torch.zeros((self.input_size,self.output_size),device=device)
     range_start=0
     residual_counter=1
     for j in range(0,self.output_size):
@@ -157,15 +163,16 @@ class pairwise_orthogonal_dense(torch.nn.Module):
       else:
         range_end=range_start+self.n_params_ratio
       for i in range(range_start,range_end):
-        self.design_matrix[i,j]=1
+        design_matrix[i,j]=1
       range_start=range_end
+    self.register_buffer("design_matrix",design_matrix)
     self.apply_weights_vmap=torch.vmap(func=apply_weights_pair_orth_dense, in_dims=(-2,None), out_dims=-2, randomness='error', chunk_size=None)
     
   def forward(self,x):
     if self.pre_dense:
       x=self.dense_layer(x)
-    weights_design=self.weight.expand(self.n_params,self.n_params)*self.unit_matrix.to(self.weight.device)
-    weights_design=torch.matmul(weights_design,self.design_matrix.to(dtype=weights_design.dtype,device=weights_design.device))
+    weights_design=self.weight.expand(self.n_params,self.n_params)*self.unit_matrix
+    weights_design=torch.matmul(weights_design,self.design_matrix)
     if x.dim()>2:
       y=self.apply_weights_vmap(x,weights_design)
     else:
@@ -179,9 +186,11 @@ class flatten_layer_with_mask(torch.nn.Module):
   def __init__(self,pad_value):
     super().__init__()
     if isinstance(pad_value, torch.Tensor):
-      self.pad_value=pad_value.detach()
+        #self.pad_value = pad_value.detach().float()
+        self.register_buffer("pad_value",pad_value.clone().float())
     else:
-      self.pad_value=torch.tensor(pad_value)
+        #self.pad_value = torch.tensor(pad_value,dtype=torch.float)
+        self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
     self.flatten=torch.nn.modules.flatten.Flatten(start_dim=1, end_dim=-1)
   def get_mask(self,mask_times,features):
     with torch.no_grad():
@@ -191,7 +200,7 @@ class flatten_layer_with_mask(torch.nn.Module):
   def forward(self,x,mask_times):
     y=self.flatten(x)
     mask_flatten=self.get_mask(mask_times,x.size(2))
-    y=y.masked_fill(mask=mask_flatten,value=self.pad_value)
+    y=torch.where(mask_flatten,self.pad_value,y)
     return y, mask_flatten
     
 
@@ -212,9 +221,9 @@ class dense_layer_with_mask(torch.nn.Module):
     self.output_size=output_size
     self.connection_type=connection_type
     if isinstance(pad_value, torch.Tensor):
-      self.pad_value=pad_value.detach()
+        self.register_buffer("pad_value",pad_value.clone().float())
     else:
-      self.pad_value=torch.tensor(pad_value)
+        self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
     self.times=times
     self.dropout=dropout
     self.bias=bias
@@ -258,6 +267,19 @@ class dense_layer_with_mask(torch.nn.Module):
       self.dropout=identity_layer(pad_value=self.pad_value,apply_masking=True)
     
     self.residual_connection=layer_residual_connection(residual_type,self.pad_value)  
+
+    #self.turning_layer=turning_layer(
+    #  features=self.output_size,
+    #  times=self.times,
+    #  pad_value=self.pad_value,
+    #  act_fct="GELU",
+    #  normalization_type="tf_normalization_position",
+    #  dropout=dropout,
+    #  parametrizations=self.parametrizations,
+    #  device=None, 
+    #  dtype=None,
+    #  residual_type=residual_type
+    #)
       
   def forward(self,x,mask_times):
     y=self.dense(x)
@@ -268,6 +290,7 @@ class dense_layer_with_mask(torch.nn.Module):
       y=self.act_fct(y)
     y,mask_times=self.dropout(x=y,mask_times=mask_times)
     y,mask_times=self.residual_connection(x=x,y=y,mask_times=mask_times)
+    #y,mask_times=self.turning_layer(y,mask_times)
     return y,mask_times
 
 # Pooling Layer================================================================
@@ -288,22 +311,30 @@ class exreme_pooling_over_time(torch.nn.Module):
     self.features=features
     self.kernel_size_times=times
     self.kernel_size_features=1
+
     if isinstance(pad_value, torch.Tensor):
-      self.pad_value=pad_value.detach()
+        #self.pad_value = pad_value.detach().float()
+        self.register_buffer("pad_value",pad_value.clone().float())
     else:
-      self.pad_value=torch.tensor(pad_value)
+        #self.pad_value = torch.tensor(pad_value,dtype=torch.float)
+        self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
+        
     self.pooling_type=pooling_type
     
     self.n_filter_max=math.ceil(self.features/2)
     self.n_filter_min=self.features-self.n_filter_max
-    
-    self.pool_layer=torch.nn.MaxPool2d(
-      kernel_size=(self.kernel_size_times, self.kernel_size_features), 
-      stride=None, 
-      padding=0, 
-      dilation=1, 
-      return_indices=False, 
-      ceil_mode=False)
+
+    if self.pooling_type=="Max" or self.pooling_type=="Min" or self.pooling_type=="MinMax":
+      self.pool_layer=torch.nn.MaxPool2d(
+        kernel_size=(self.kernel_size_times, self.kernel_size_features), 
+        stride=None, 
+        padding=0, 
+        dilation=1, 
+        return_indices=False, 
+        ceil_mode=False)
+    if self.pooling_type=="WeightedAverage":
+      self.weights=torch.nn.parameter.Parameter(torch.rand((1,times,1)))
+      self.softmax=torch.nn.Softmax(dim=1)
 
   def forward(self,x,mask_features):
     if self.pooling_type=="Max" or self.pooling_type=="MinMax":
@@ -312,14 +343,31 @@ class exreme_pooling_over_time(torch.nn.Module):
       tmp=(-1)*x
       tmp=torch.where(condition=mask_features,input=self.pad_value,other=tmp)
       result_min=torch.squeeze((-1)*self.pool_layer(tmp),dim=1)
-    
+
     if self.pooling_type=="Max":
       return result_max
     elif self.pooling_type=="Min":
       return result_min
     elif self.pooling_type=="MinMax":
       return torch.cat((result_max,result_min),dim=1)
-
+    
+    if self.pooling_type=="Average":
+      active=(~mask_features)
+      seq_len=torch.sum(active,dim=1).detach()
+      result_avg=torch.sum(active*x,dim=1)
+      result_avg=result_avg/seq_len
+      return result_avg
+    elif self.pooling_type=="WeightedAverage":
+      active=(~mask_features)
+      seq_len=torch.sum(active,dim=1).detach()
+      
+      w=self.weights.expand(x.size())
+      w=torch.where(mask_features,float("-Inf"),w)
+      w=self.softmax(w)
+      
+      result_avg=torch.sum(w*active*x,dim=1)
+      result_avg=result_avg/seq_len
+      return result_avg
 
 # Pooling over features
 #Expects tensor of shape (Batch, Features)
@@ -334,21 +382,25 @@ class layer_adaptive_extreme_pooling_1d(torch.nn.Module):
     self.n_out_max=math.ceil(self.output_size/2)
     self.n_out_min=self.output_size-self.n_out_max
     
-  def get_max_n_values(self,x,n):
+    self.register_buffer("index_output_size",torch.arange(start=0,end=self.output_size,step=1),dtype=torch.int)
+    self.register_buffer("index_n_out_max",torch.arange(start=0,end=self.n_out_max,step=1),dtype=torch.int)
+    self.register_buffer("index_n_out_min",torch.arange(start=0,end=self.n_out_min,step=1),dtype=torch.int)
+    
+  def get_max_n_values(self,x,select_index):
     y=x.sort(dim=1,descending=True)[0]
-    y=torch.index_select(input=y,dim=1,index=torch.arange(start=0,end=n,step=1).to(device=y.device))
+    y=torch.index_select(input=y,dim=1,index=select_index)
     return y
   def forward(self,x):
     y=x
     if self.pooling_type=="Max":
-      z=self.get_max_n_values(y,self.output_size)
+      z=self.get_max_n_values(y,self.index_output_size)
       return z
     elif self.pooling_type=="Min":
-      z=(-1)*self.get_max_n_values((-1)*y,self.output_size)
+      z=(-1)*self.get_max_n_values((-1)*y,self.index_output_size)
       return z
     else:
-      tmp_max=self.get_max_n_values(y,self.n_out_max)
-      tmp_min=(-1)*self.get_max_n_values((-1)*y,self.n_out_min)
+      tmp_max=self.get_max_n_values(y,self.index_n_out_max)
+      tmp_min=(-1)*self.get_max_n_values((-1)*y,self.index_n_out_min)
       return torch.cat((tmp_max,tmp_min),dim=1)
 
 #n-Gram-Convolution
@@ -374,9 +426,11 @@ class layer_n_gram_convolution(torch.nn.Module):
     self.parametrizations=parametrizations
     self.n_filters=n_filter
     if isinstance(pad_value, torch.Tensor):
-      self.pad_value=pad_value.detach()
+        #self.pad_value = pad_value.detach().float()
+        self.register_buffer("pad_value",pad_value.clone().float())
     else:
-      self.pad_value=torch.tensor(pad_value)
+        #self.pad_value = torch.tensor(pad_value,dtype=torch.float)
+        self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
     self.act_fct_name=act_fct
 
     self.kernel_size_times=kernel_size_times
@@ -425,7 +479,7 @@ class layer_n_gram_convolution(torch.nn.Module):
     y=torch.permute(input=y,dims=(0,2,1))
     y=self.act_fct(y)
     #Insert padding
-    y_padded=y.masked_fill(mask=get_FeatureMask_from_mask(mask_times,self.n_filters),value=self.pad_value)
+    y_padded=torch.where(get_FeatureMask_from_mask(mask_times,self.n_filters),self.pad_value,y)
     return y_padded,mask_times
     
   def calc_padding(self):
@@ -459,9 +513,11 @@ class layer_mutiple_n_gram_convolution(torch.nn.Module):
     self.features=features
     self.times=times
     if isinstance(pad_value, torch.Tensor):
-      self.pad_value=pad_value.detach()
+        #self.pad_value = pad_value.detach().float()
+        self.register_buffer("pad_value",pad_value.clone().float())
     else:
-      self.pad_value=torch.tensor(pad_value)
+        #self.pad_value = torch.tensor(pad_value,dtype=torch.float)
+        self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
 
     self.filters_per_ks = math.floor(self.features / self.num_n_grams)
     assert self.filters_per_ks >= 1, "filters per n-gram must be at least 1"
@@ -553,9 +609,11 @@ class layer_unpack_and_masking(torch.nn.Module):
     super().__init__()
     self.sequence_length=sequence_length
     if isinstance(pad_value, torch.Tensor):
-      self.pad_value=pad_value.detach()
+        #self.pad_value = pad_value.detach().float()
+        self.register_buffer("pad_value",pad_value.clone().float())
     else:
-      self.pad_value=torch.tensor(pad_value)
+        #self.pad_value = torch.tensor(pad_value,dtype=torch.float)
+        self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
     
   def forward(self,x,mask_times):
     x=torch.nn.utils.rnn.pad_packed_sequence(
@@ -587,26 +645,29 @@ class layer_abs_positional_embedding(torch.nn.Module):
       embedding_dim=self.embedding_dim,
       padding_idx=0
     )
+    self.register_buffer("indices",torch.arange(start=1, end=(self.sequence_length+1), step=1,dtype=torch.long))
     
   def forward(self, x):
+    B=x.size(0)
     mask=self.get_mask(x)
-
-    input_seq=torch.arange(start=1, end=(self.sequence_length+1), step=1)
-    input_seq=input_seq.to(x.device)
-    
-    input_seq=input_seq.repeat(x.shape[0], 1)
-    input_seq.masked_fill(mask,value=0)
+    input_seq=torch.unsqueeze(self.indices,dim=0)
+    input_seq=input_seq.expand((B,self.sequence_length))
+    input_seq=torch.where(
+      mask,
+      torch.tensor(0,dtype=torch.long,device=input_seq.device),
+      input_seq
+    )
     embedded_positions_masked=self.embedding(input_seq)
-   
-    return x+embedded_positions_masked
+    y=x+embedded_positions_masked
+    return y
   
   def get_mask(self,x):
-    device=('cuda' if torch.cuda.is_available() else 'cpu')
-    time_sum=torch.sum(x,dim=2)
-    time_sum=(time_sum!=0)
-    masks=~time_sum
-    masks=masks.to(device)
-    return masks
+    with torch.no_grad():
+      time_sum=torch.sum(x,dim=2)
+      condition=(time_sum==0.0)
+      mask_final=torch.zeros(condition.size(),dtype=torch.bool,device=x.device)
+      mask_final=torch.where(condition,True,mask_final)
+    return mask_final.detach()
 
 #layer tf_encoder
 class layer_tf_encoder(torch.nn.Module):
@@ -620,9 +681,11 @@ class layer_tf_encoder(torch.nn.Module):
     
     self.features=features
     if isinstance(pad_value, torch.Tensor):
-      self.pad_value=pad_value.detach()
+        #self.pad_value = pad_value.detach().float()
+        self.register_buffer("pad_value",pad_value.clone().float())
     else:
-      self.pad_value=torch.tensor(pad_value)
+        #self.pad_value = torch.tensor(pad_value,dtype=torch.float)
+        self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
     self.times=times
     self.bias=bias
     self.parametrizations=parametrizations
@@ -708,7 +771,7 @@ class layer_tf_encoder(torch.nn.Module):
           value=x,
           key_padding_mask=mask_times)[0]
       y=self.dropout_1(y)
-      y=y.masked_fill(mask=mask_features,value=self.pad_value)
+      y=torch.where(mask_features,self.pad_value,y)
       y,mask_times=self.residual_connection_1(x=x,y=y,mask_times=mask_times)
       y,mask_times=self.normalization_1(y,mask_times)
   
@@ -717,7 +780,7 @@ class layer_tf_encoder(torch.nn.Module):
       #Actvation function is part of dense_1. Thus it does not need a layer
       proj_output,proj_mask=self.dense_2(proj_output,proj_mask)
       proj_dropout=self.dropout_2(proj_output)
-      proj_dropout=proj_dropout.masked_fill(mask=mask_features,value=self.pad_value)
+      proj_dropout=torch.where(mask_features,self.pad_value,proj_dropout)
       
       output,mask_times=self.residual_connection_2(x=y,y=proj_dropout,mask_times=mask_times)
       output,mask_times=self.normalization_2(output,mask_times)
@@ -735,7 +798,7 @@ class layer_tf_encoder(torch.nn.Module):
           value=xn,
           key_padding_mask=mask_times)[0]
       y=self.dropout_1(y)
-      y=y.masked_fill(mask=mask_features,value=self.pad_value)
+      y=torch.where(mask_features,self.pad_value,y)
       y,mask_times=self.residual_connection_1(x=x,y=y,mask_times=mask_times)
   
       #Sub Layer 2
@@ -744,7 +807,7 @@ class layer_tf_encoder(torch.nn.Module):
       #Actvation function is part of dense_1. This it does not need a layer
       proj_output,proj_mask=self.dense_2(proj_output,proj_mask)
       proj_dropout=self.dropout_2(proj_output)
-      proj_dropout=proj_dropout.masked_fill(mask=mask_features,value=self.pad_value)
+      proj_dropout=torch.where(mask_features,self.pad_value,proj_dropout)
       
       output, mask_times =self.residual_connection_2(x=y,y=proj_dropout,mask_times=mask_times)
            
@@ -759,9 +822,11 @@ class merge_layer(torch.nn.Module):
     self.features=features
     
     if isinstance(pad_value, torch.Tensor):
-      self.pad_value=pad_value.detach()
+        #self.pad_value = pad_value.detach().float()
+        self.register_buffer("pad_value",pad_value.clone().float())
     else:
-      self.pad_value=torch.tensor(pad_value)
+        #self.pad_value = torch.tensor(pad_value,dtype=torch.float)
+        self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
     
     self.pooling_type=pooling_type
     if self.pooling_type=="Max" or self.pooling_type=="MaxTimes":
@@ -770,7 +835,11 @@ class merge_layer(torch.nn.Module):
       self.merge_pooling_type_times="MinMax"
     elif self.pooling_type=="Min":
       self.merge_pooling_type_times="Min"
-    
+    elif self.pooling_type=="AverageTimes":
+      self.merge_pooling_type_times="Average"
+    elif self.pooling_type=="WeightedAverageTimes":
+      self.merge_pooling_type_times="WeightedAverage"   
+
     self.n_extracted_features=n_extracted_features
     self.n_input_streams=n_input_streams
     self.pooling_type=pooling_type
@@ -879,6 +948,7 @@ class layer_class_mean(torch.nn.Module):
     index_matrix=torch.nn.functional.one_hot(torch.Tensor.to(classes,dtype=torch.int64),num_classes=total_classes)
     index_matrix=torch.transpose(index_matrix,dim0=0,dim1=1)
     index_matrix=torch.Tensor.to(index_matrix,dtype=x.dtype)
+    
     cases_per_class=torch.sum(index_matrix,dim=1)
     class_mean=torch.matmul(torch.diag(1/cases_per_class),torch.matmul(index_matrix,x))
     return class_mean
@@ -935,3 +1005,85 @@ class layer_global_average_pooling_1d(torch.nn.Module):
     length=torch.sum(length,dim=1).repeat(x.size(2),1)
     length=torch.transpose(length,dim0=0,dim1=1)
     return length
+
+#Turning Layer
+class turning_layer(torch.nn.Module):
+  def __init__(self,features,times,pad_value,act_fct="ELU",normalization_type="LayerNorm",dropout=0.0,parametrizations="None",device=None, dtype=None,residual_type="None"):
+    super().__init__()
+    self.features=features
+    if isinstance(pad_value, torch.Tensor):
+        self.pad_value = pad_value.detach().float()
+        #self.register_buffer("pad_value",pad_value.clone().float())
+    else:
+        self.pad_value = torch.tensor(pad_value,dtype=torch.float)
+        #self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
+    self.times=times
+    self.dropout=dropout
+    self.parametrizations=parametrizations
+    self.act_fct_name=act_fct
+    #Act Fct
+    self.act_fct=get_act_fct(self.act_fct_name,input_dim=self.features,output_dim=self.features)
+    #Normalization Layer
+    self.normalization_layer=get_layer_normalization(
+      name=normalization_type,
+      times=self.times,
+      features=self.features,
+      pad_value= self.pad_value,
+      eps=1e-5)
+    #weights
+    self.weights_cosinus=torch.nn.parameter.Parameter(data=torch.rand((self.features,self.features)))
+    self.weights_sinus=torch.nn.parameter.Parameter(data=torch.rand((self.features,self.features)))
+    self.weights_alpha=torch.nn.parameter.Parameter(data=torch.rand((self.features)))
+    #Weight Parametrizations  
+    if self.parametrizations=="OrthogonalWeights":
+      torch.nn.utils.parametrizations.orthogonal(module=self, name='weights_cosinus',orthogonal_map="matrix_exp")
+      torch.nn.utils.parametrizations.orthogonal(module=self, name='weights_sinus',orthogonal_map="matrix_exp")
+      torch.nn.utils.parametrizations.orthogonal(module=self, name='weights_alpha',orthogonal_map="matrix_exp")
+    elif self.parametrizations=="WeightNorm":
+      torch.nn.utils.parametrizations.weight_norm(module=self, name='weights_cosinus', dim=0)
+      torch.nn.utils.parametrizations.weight_norm(module=self, name='weights_sinus', dim=0)
+      torch.nn.utils.parametrizations.weight_norm(module=self, name='weights_alpha', dim=0)
+    elif self.parametrizations=="SpectralNorm":
+      torch.nn.utils.spectral_norm(module=self, name='weights_cosinus', n_power_iterations=1, eps=1e-12, dim=None)
+      torch.nn.utils.spectral_norm(module=self, name='weights_sinus', n_power_iterations=1, eps=1e-12, dim=None)
+      torch.nn.utils.spectral_norm(module=self, name='weights_alpha', n_power_iterations=1, eps=1e-12, dim=None)
+    #Dropout
+    if self.dropout>0:
+      self.dropout=layer_dropout_with_mask(p=self.dropout,pad_value=self.pad_value)
+    else:
+      self.dropout=identity_layer(pad_value=self.pad_value,apply_masking=True)
+    #Residual connection
+    self.residual_connection=layer_residual_connection(residual_type,self.pad_value)    
+  
+  def forward(self,x,mask_times):
+    #calc alpha
+    #x: (B,T,F)
+    alpha=torch.matmul(x,self.weights_alpha) # B, T
+    alpha=360*torch.nn.functional.sigmoid(torch.clamp(alpha, min=-10, max=10)) #B
+    alpha=torch.unsqueeze(alpha,dim=2)
+    alpha=torch.unsqueeze(alpha,dim=3) # (B,T,1,1)
+    alpha=alpha.expand((x.size(0),x.size(1),self.features,self.features)) #(B,T,F,F)
+    #Calc Cosinus
+    cosinus_value=torch.cos(alpha) #(B,F,F)
+    cos_weights= self.act_fct(self.weights_cosinus)
+    cos_weights=torch.unsqueeze(cos_weights,dim=0)
+    cos_weights=cos_weights.expand(x.size(0),self.features,self.features)
+    cosinus_value=cos_factor*cosinus_value #(B, F, F)
+    #Calc Sinus
+    sinus_value=torch.sin(alpha) #(B,F,F)
+    sin_weights= self.act_fct(self.sin_weights)
+    sin_weights=torch.unsqueeze(sin_weights,dim=0)
+    sin_weights=sin_weights.expand(x.size(0),self.features,self.features)
+    sinus_value=sin_weights*sinus_value #(B,F,F)
+    #Final calculation
+    turning_matrix=cosinus_value+sinus_value #(B, F, F)
+    xe=torch.unsqueeze(x,dim=2)
+    y=torch.matmul(turining_matrix, xe) #(B,F,1)
+    y=torch.squeeze(y,dim=2)
+
+    y,mask_times=self.normalization_layer(y,mask_times)
+    y,mask_times=self.dropout(x=y,mask_times=mask_times)
+    y,mask_times=self.residual_connection(x=x,y=y,mask_times=mask_times)
+    return y,mask_times    
+   
+     

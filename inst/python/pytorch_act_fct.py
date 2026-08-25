@@ -25,7 +25,7 @@ class SwiGLU(torch.nn.Module):
   #x1 projected values of x
   #x2 not projected values of x, x2=x
   def forward(self,x1,x2):
-    swish_value=self.swish(x1)
+    swish_value=self.swish(torch.clamp(x1, min=-30.0, max=30.0))
     xp=self.weights(x2)
     y=swish_value*xp
     return y

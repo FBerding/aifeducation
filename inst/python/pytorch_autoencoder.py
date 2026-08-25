@@ -307,6 +307,8 @@ def run_epoch_autoencoder(model,dataloader,loss_fct,optimizer,scaler,scheduler,a
       with torch.autocast(device_type=device, dtype=amp_dtype, enabled=amp):  
         outputs=model(inputs,encoder_mode=False)
         loss=loss_fct(outputs,labels)
+        if torch.any(torch.isnan(loss)):
+          ValueError("NANs detected in loss")
       if cblock=="train":
         scaler.scale(loss).backward()
         scaler.step(optimizer)

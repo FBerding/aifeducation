@@ -70,7 +70,7 @@ class LayerNorm_with_Mask(torch.nn.Module):
       normalized=gamma_long*(x_zeros-mean_long)/var_long
       
       #Insert padding values
-      normalized=normalized.masked_fill(mask=mask_features,value=self.pad_value)
+      normalized=torch.where(mask_features,self.pad_value,normalized)
 
       return normalized, mask_times
 
@@ -97,11 +97,8 @@ class BatchNorm_with_Mask(torch.nn.Module):
         self.features = features
         
         if isinstance(pad_value, torch.Tensor):
-            #self.pad_value = pad_value.detach().float()
             self.register_buffer("pad_value",pad_value.detach().clone().float())
-            print(pad_value)
         else:
-            #self.pad_value = torch.tensor(pad_value,dtype=torch.float)
             self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
 
         self.gamma = torch.nn.Parameter(torch.ones(1, 1, self.features))
@@ -139,39 +136,30 @@ class BatchNorm_with_Mask(torch.nn.Module):
             batch_mean, batch_variance, n_elements = self.calc_batch_statistics(
                 x_reshaped, mask_times
             )
-            if (batch_variance < 0).any:
-                # Update running mean and variance
-                tmp_running_mean = (
-                    1 - self.alpha
-                ) * self.running_mean + self.alpha * torch.unsqueeze(
-                    torch.unsqueeze(batch_mean.detach(), dim=0), dim=0
-                )  # (1, 1, F_out)
-                self.running_mean.copy_(tmp_running_mean)
-                
-                tmp_running_variance =  (
-                    1 - self.alpha
-                ) * self.running_variance + self.alpha * (
-                    n_elements / (n_elements - 1)
-                ) * torch.unsqueeze(
-                    torch.unsqueeze(batch_variance.detach(), dim=0), dim=0
-                )  # (1, 1, F_out)
-                self.running_variance.copy_(tmp_running_variance)
-                # Normalize Scale and shift
-                # self.eps in torch.sqrt is necessary for numeric stability
-                y = (
-                    gamma_expanded
-                    * (x_reshaped - batch_mean)
-                    / (torch.sqrt(batch_variance + self.eps) + self.eps)
-                    + beta_expanded
-                )  # (B, T, F)
-            else:
-                # Normalize Scale and shift
-                y = (
-                    gamma_expanded
-                    * (x_reshaped - self.running_mean)
-                    / (torch.sqrt(self.running_variance) + self.eps)
-                    + beta_expanded
-                )
+            # Update running mean and variance
+            tmp_running_mean = (
+                1 - self.alpha
+            ) * self.running_mean + self.alpha * torch.unsqueeze(
+                torch.unsqueeze(batch_mean.detach(), dim=0), dim=0
+            )  # (1, 1, F_out)
+            self.running_mean.copy_(tmp_running_mean)
+            
+            tmp_running_variance =  (
+                1 - self.alpha
+            ) * self.running_variance + self.alpha * (
+                n_elements / (n_elements - 1)
+            ) * torch.unsqueeze(
+                torch.unsqueeze(batch_variance.detach(), dim=0), dim=0
+            )  # (1, 1, F_out)
+            self.running_variance.copy_(tmp_running_variance)
+            # Normalize Scale and shift
+            # self.eps in torch.sqrt is necessary for numeric stability
+            y = (
+                gamma_expanded
+                * (x_reshaped - batch_mean)
+                / (torch.sqrt(batch_variance + self.eps) + self.eps)
+                + beta_expanded
+            )  # (B, T, F)
         else:
             # Normalize Scale and shift
             y = (
@@ -182,7 +170,7 @@ class BatchNorm_with_Mask(torch.nn.Module):
             )
         # Insert padding values
         # (B, T, F)
-        normalized = y.masked_fill(mask=mask_features, value=self.pad_value)
+        normalized = torch.where(mask_features, self.pad_value,y)
         if x.dim() == 2:
             normalized = torch.squeeze(normalized, dim=1)  # (B, F)
         # Return results
@@ -225,7 +213,7 @@ class BatchNorm_with_Mask(torch.nn.Module):
         tmp_batch_mean=tmp_batch_mean.expand((x_stacked.size(0),x_stacked.size(1)))
         batch_variance = torch.pow(x_stacked-tmp_batch_mean,exponent=2)*(~mask_features_stacked)
         batch_variance = torch.sum(batch_variance,dim=0)/tmp_elements
-        batch_variance = torch.clamp(batch_variance, min=0.0, max=None) # (F_out)
+        batch_variance = torch.clamp(batch_variance, min=self.eps, max=None) # (F_out)
         
         batch_mean=batch_mean*elements_sufficent-torch.ones((batch_mean.size()),device=batch_mean.device)*(~elements_sufficent)
         batch_variance = batch_variance*elements_sufficent-torch.ones((batch_variance.size()),device=batch_variance.device)*(~elements_sufficent)
@@ -268,7 +256,7 @@ class RMSNorm_with_Mask(nn.Module):
         rms = torch.sqrt(rms + self.eps)  # eps for numeric stability
         x_norm = x / (rms + self.eps)
         x_norm = x_norm * self.gamma
-        x_norm = x_norm.masked_fill(mask=mask_features, value=self.pad_value)
+        x_norm = torch.where(mask_features, self.pad_value,x_norm)
         return x_norm, mask_times
 
 # PowerNorm with mask-----------------------------------------------------------
@@ -367,7 +355,7 @@ class PowerNorm_with_Mask(nn.Module):
 
         if mask_features is not None:
             # Set padding value to zero
-            x = x.masked_fill(mask_features, 1e-6)
+            x = torch.where(mask_features, 1e-6,x)
 
         orig_shape = x.shape
         if x.dim() == 3:

@@ -18,6 +18,8 @@ import numpy as np
 import math
 import safetensors
 
+#torch._dynamo.config.log_level = logging.INFO
+torch._inductor.config.trace.enabled = True
 
 #Functions that are part of the training loop
 def get_device():
@@ -37,8 +39,19 @@ def get_loss_cls_fct(name,class_weights):
   elif name =="FocalLoss":
     loss_fct=focal_loss(
       gamma=2,
-      class_weights = class_weights
+      class_weights = class_weights,
+      scale_level = "nominal"
     )
+  elif name =="FocalLossOrdinal":
+    loss_fct=focal_loss(
+      gamma=2,
+      class_weights = class_weights,
+      scale_level = "ordinal"
+    ) 
+  elif name =="AEMLoss":
+    loss_fct=aem_loss(
+      eps=1e-6
+    )    
   return loss_fct
 
 def get_loss_cls_pt_fct(name,margin,alpha):
@@ -49,31 +62,54 @@ def get_loss_cls_pt_fct(name,margin,alpha):
   elif name=="MultiWayContrastiveLossFC":
     fct=multi_way_contrastive_loss_fc(
       alpha=alpha,
-      margin=margin)
+      margin=margin,
+      scale_level="nominal")
+  elif name=="MultiWayContrastiveLossFCOrdinal":
+    fct=multi_way_contrastive_loss_fc(
+      alpha=alpha,
+      margin=margin,
+      scale_level="ordinal")    
   elif name=="FocalLoss":
     fct=focal_loss_pt(
       class_weights=None,
-      gamma=2
+      gamma=2,
+      scale_level="nominal"
     )
+  elif name=="FocalLossOrdinal":
+    fct=focal_loss_pt(
+      class_weights=None,
+      gamma=2,
+      scale_level="ordinal"
+    )
+  elif name =="AEMLoss":
+    fct=aem_loss_pt(
+      eps=1e-6
+    )      
   return fct
 
-def build_data_loaders(train_data, val_data, batch_size, test_data=None, pin_memory=False):
+def build_data_loaders(train_data, val_data, batch_size, test_data=None, pin_memory=False,comp_use=False):
   trainloader=torch.utils.data.DataLoader(
     train_data,
     batch_size=batch_size,
     pin_memory=pin_memory,
+    drop_last =True,
+    num_workers=0,
     shuffle=True)
   valloader=torch.utils.data.DataLoader(
     val_data,
     batch_size=batch_size,
     pin_memory=pin_memory,
-    shuffle=False)
+    drop_last =True,
+    num_workers=0,
+    shuffle=True)
   if not (test_data is None):
     testloader=torch.utils.data.DataLoader(
       test_data,
       batch_size=batch_size,
       pin_memory=pin_memory,
-      shuffle=False)
+      drop_last =True,
+      num_workers=0,
+      shuffle=True)
   else:
     testloader=None
   return trainloader, valloader, testloader
@@ -140,7 +176,7 @@ def calc_lr_rate_loss(model,device,current_dtype,optimizer,loss_fct,dataloader,n
     loss_complete=0
     model.train()
 
-    if isinstance(model,TEClassifierSequential) or isinstance(model,TEClassifierParallel):
+    if isinstance(model,TEClassifierSequential) or isinstance(model,TEClassifierParallel) or isinstance(model,TEClassifierReferencePoint):
       for batch in dataloader:
         inputs=batch["input"]
         labels=batch["labels"]
@@ -221,7 +257,7 @@ def calc_lr_rate(trace,model,epochs,filepath,optimizer_method,loss_fct_name,data
       alpha=alpha,
       margin=margin
     )
-  elif isinstance(model,TEClassifierSequential) or isinstance(model,TEClassifierParallel):
+  elif isinstance(model,TEClassifierSequential) or isinstance(model,TEClassifierParallel) or isinstance(model,TEClassifierReferencePoint):
     loss_fct=get_loss_cls_fct(name=loss_fct_name,class_weights=class_weights)
   elif isinstance(model,LSTMAutoencoder_with_Mask_PT) or isinstance(model,DenseAutoencoder_with_Mask_PT):
     loss_fct=torch.nn.MSELoss()
@@ -326,7 +362,11 @@ def calc_lr_rate(trace,model,epochs,filepath,optimizer_method,loss_fct_name,data
 def check_and_set_checkpoints_cls(use_callback,model,filepath,epoch,metric_storage,best_val_avg_iota,best_val_loss,best_acc,best_bacc,acc_val,bacc_val,avg_iota_val,val_loss,elc):
   if use_callback==True:
       if (avg_iota_val>best_val_avg_iota) or (avg_iota_val==best_val_avg_iota and acc_val>best_acc) or (avg_iota_val==best_val_avg_iota and acc_val==best_acc and val_loss<best_val_loss):
-        torch.save(model.state_dict(),filepath)
+        if isinstance(model, torch._dynamo.eval_frame.OptimizedModule):
+          print("model is compiled")
+          torch.save(model._orig_mod.state_dict(),filepath)
+        else:
+          torch.save(model.state_dict(),filepath)
         best_bacc=bacc_val
         best_val_avg_iota=avg_iota_val
         best_acc=acc_val
@@ -335,52 +375,81 @@ def check_and_set_checkpoints_cls(use_callback,model,filepath,epoch,metric_stora
         elc=epoch+1
   return best_val_loss, best_acc,best_bacc,best_val_avg_iota,elc  
 
+class epoch_trainer(torch.nn.Module):
+  def __init__(self,model,loss_fct,optimizer,scaler,scheduler,amp,device,model_typ):
+      super().__init__()
+      self.model=model.to(device=device)
+      self.loss_fct=loss_fct.to(device=device)
+      self.optimizer=optimizer
+      self.scaler=scaler
+      self.scheduler=scheduler
+      self.amp=amp
+      self.device=device
+      self.model_type=model_typ
 
-def run_epoch_cls(model,dataloader,loss_fct,optimizer,scaler,scheduler,amp,epoch,n_classes,device,current_dtype,cblock,metric_storage,logger):
+  def traininig_step(self,static_input,static_target,static_sample_weights):
+    with torch.autocast(device_type=self.device, dtype=None, enabled=self.amp):  
+      output=self.model(static_input,prediction_mode=False)
+      loss=(self.loss_fct(output,static_target)*static_sample_weights.detach()).mean()
+    return loss, output
+
+
+  def train_and_eval(self,static_input,static_target,static_sample_weights):
+     if self.training:
+      self.optimizer.zero_grad(set_to_none=True)
+      loss, output = self.traininig_step(static_input=static_input,static_target=static_target,static_sample_weights=static_sample_weights)
+      self.scaler.scale(loss).backward()
+      self.scaler.unscale_(self.optimizer)
+      torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0,foreach=True)
+      self.scaler.step(self.optimizer)
+      self.scaler.update()
+      if self.scheduler is not None:
+        self.scheduler.step()
+      return loss, output
+     else:
+      with torch.no_grad():
+        with torch.amp.autocast(device_type=self.device, dtype=torch.bfloat16, enabled=self.amp):
+          output = self.model(static_input, prediction_mode=False)
+          loss = (self.loss_fct(output, static_target) * static_sample_weights.detach()).mean()
+        return loss, output
+
+
+  
+    
+    
+
+def run_epoch_cls(trainer,dataloader,static_input,static_label,static_sample_weights,epoch,n_classes,device,current_dtype,cblock,metric_storage,logger):
   total_loss=0.0
   confusion_matrix=torch.zeros(size=(n_classes,n_classes),device=device,dtype=current_dtype)
   prob_confusion_matrix=torch.zeros(size=(n_classes,n_classes),device=device,dtype=current_dtype)
 
   if cblock=="train":
-    optimizer.zero_grad()
-    model.train()
-    ctx=torch.enable_grad()
+    trainer.train()
   else:
-    model.eval()
-    ctx=torch.no_grad()
-
+    trainer.eval()
   for batch in dataloader:
-    with ctx: 
-      inputs=batch["input"]
-      labels=batch["labels"]
-      inputs = inputs.to(device,dtype=current_dtype)
-      labels=labels.to(device,dtype=current_dtype)
-      if "sample_weights" in batch.keys():
-        sample_weights=batch["sample_weights"]
-        sample_weights=torch.reshape(input=sample_weights,shape=(sample_weights.size(dim=0),1))
-        sample_weights=sample_weights.to(device,dtype=current_dtype)
-      else:
-         sample_weights=torch.ones((inputs.size(0)),device=device,dtype=current_dtype)/inputs.size(0)
-      
-      if cblock=="train":
-        optimizer.zero_grad()
-      with torch.autocast(device_type=device, dtype=None, enabled=amp):  
-        outputs=model(inputs,prediction_mode=False)
-        loss=loss_fct(outputs,labels)*sample_weights.detach()
-        loss=loss.mean()
-      if cblock=="train":
-        scaler.scale(loss).backward()
-        scaler.step(optimizer)
-        scaler.update()  
-        #loss.backward()
-        #optimizer.step()
-        if scheduler!=None:
-          scheduler.step()
-      #Metrics
-      total_loss +=loss.item()
-      label_idx=labels.max(dim=1).indices
-    confusion_matrix+=multiclass_confusion_matrix(input=outputs,target=label_idx,num_classes=n_classes,normalize = None)
-    prob_confusion_matrix+=create_p_confusion_matrix(torch.nn.Softmax(dim=1)(outputs),label_idx=label_idx,num_classes=n_classes)
+    inputs=batch["input"]
+    labels=batch["labels"]
+    inputs = inputs.to(device=device,dtype=current_dtype,non_blocking=True)
+    labels = labels.to(device=device,dtype=current_dtype,non_blocking=True)
+    static_input.copy_(inputs)
+    static_label.copy_(labels)
+    if "sample_weights" in batch.keys():
+      sample_weights=batch["sample_weights"]
+      sample_weights=torch.reshape(input=sample_weights,shape=(sample_weights.size(dim=0),1))
+      sample_weights=sample_weights.to(device=device,dtype=current_dtype)
+    else:
+       sample_weights=torch.ones((inputs.size(0),1),device=device,dtype=current_dtype)/inputs.size(0)
+    sample_weights=sample_weights.to(device=device,dtype=current_dtype,non_blocking=True)
+    static_sample_weights.copy_(sample_weights)   
+    
+    loss,output=trainer.train_and_eval(static_input,static_label,static_sample_weights)
+    loss=loss.detach()
+    output=output.detach()
+    total_loss +=loss
+    label_idx=labels.max(dim=1).indices
+    confusion_matrix+=multiclass_confusion_matrix(input=output,target=label_idx,num_classes=n_classes,normalize = None)
+    prob_confusion_matrix+=create_p_confusion_matrix(torch.nn.Softmax(dim=1)(output),label_idx=label_idx,num_classes=n_classes)
     
     #Update log file
     logger.inc_value("bottom")
@@ -448,7 +517,13 @@ def run_epoch_cls_pt(model,dataloader,loss_fct,optimizer,scaler, scheduler,amp,e
             metric_scale_factor=model.get_metric_scale_factor().detach(),
             logits=outputs[0]
           )
+          if torch.any(torch.isnan(loss)):
+            ValueError("NANs detected in loss")
         scaler.scale(loss).backward()
+        
+        scaler.unscale_(optimizer)
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0,foreach=True)
+        
         scaler.step(optimizer)
         scaler.update()  
         #loss.backward()
@@ -515,25 +590,35 @@ def run_epoch_cls_pt(model,dataloader,loss_fct,optimizer,scaler, scheduler,amp,e
   )
   return results
 
-def TeClassifierTrain(model,loss_cls_fct_name , optimizer_method,scheduler_type,amp, lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,batch_size,
-train_data,val_data,filepath,use_callback,n_classes,class_weights,test_data=None,
-log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
-  #Prepare model
+
+def prepare_model(model):
   device=get_device()
   current_dtype=get_dtype(device)
   model.to(device=device,dtype=current_dtype)
-  #Prepare loss function
+  return model, device, current_dtype
+
+def prepare_loss_function(loss_cls_fct_name,class_weights,device,current_dtype):
   class_weights=class_weights.clone()
   class_weights=class_weights.to(device)
   loss_fct=get_loss_cls_fct(name=loss_cls_fct_name,class_weights=class_weights)
   loss_fct.to(device=device,dtype=current_dtype)
+  return loss_fct
+  
+def TeClassifierTrain(model,features,times,final_dim,loss_cls_fct_name , optimizer_method,scheduler_type,amp, lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,batch_size,
+train_data,val_data,filepath,use_callback,n_classes,class_weights,comp_use,comp_backend,test_data=None,
+log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
+  #Prepare model
+  model,device, current_dtype=prepare_model(model)
+  #Prepare loss function
+  loss_fct=prepare_loss_function(loss_cls_fct_name,class_weights,device,current_dtype)
   #create data loader
   trainloader, valloader, testloader = build_data_loaders(
     train_data=train_data,
     val_data=val_data,
     test_data=test_data,
     batch_size=batch_size,
-    pin_memory = True if device=="cuda" else False
+    pin_memory = True if device=="cuda" else False,
+    comp_use=comp_use
   )
   #Create optimizer and scheduler
   optimizer=get_Optimizer(
@@ -541,6 +626,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     params=model.parameters(),
     lr_rate=lr_rate
   )
+  #Create scheduler
   scheduler=get_lr_scheduler(
     optimizer=optimizer,
     scheduler_type=scheduler_type,
@@ -550,7 +636,12 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     max_lr=lr_rate,
     min_lr=lr_min
   )
+  #Amp_Scaler
   amp_scaler=torch.amp.GradScaler(device ,enabled=amp)
+  #Create static addresses for compilation
+  static_input=torch.randn((batch_size,times,features),device=device,dtype=current_dtype)
+  static_label=torch.randn((batch_size,n_classes),device=device,dtype=current_dtype)
+  static_sample_weights=torch.randn((batch_size,1),device=device,dtype=current_dtype)
   #Numpys for Saving Training History
   metric_storage=create_metric_storage(
     metric_names=["loss","accuracy","balanced_accuracy","avg_iota","s_avg_iota"],
@@ -584,16 +675,31 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     last_log = None, 
     write_interval = log_write_interval
   )
-  # Start loop    
+  #Create Trainer model
+  trainer=epoch_trainer(
+    model=model,
+    loss_fct=loss_fct,
+    optimizer=optimizer,
+    scaler=amp_scaler,
+    scheduler=scheduler,
+    amp=amp,
+    device=device,
+    model_typ="standard_classification"
+  )
+  trainer=trainer.to(dtype=current_dtype,device=device)
+  #Compile
+  if comp_use:
+    if trace: 
+      print("Compile model with "+comp_backend+".")
+    trainer=torch.compile(trainer,backend=comp_backend,fullgraph=False,dynamic=False,mode=None)
+  # Start loop
   for epoch in range(epochs):
     train_results=run_epoch_cls(
-      model=model,
+      trainer=trainer,
+      static_input=static_input,
+      static_label=static_label,
+      static_sample_weights=static_sample_weights,
       dataloader=trainloader,
-      optimizer=optimizer,
-      scaler=amp_scaler,
-      scheduler=scheduler,
-      amp=amp,
-      loss_fct=loss_fct,
       epoch=epoch,
       n_classes=n_classes,
       device=device,
@@ -603,13 +709,11 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       logger=logger
     )
     val_results=run_epoch_cls(
-      model=model,
+      trainer=trainer,
+      static_input=static_input,
+      static_label=static_label,
+      static_sample_weights=static_sample_weights,
       dataloader=valloader,
-      loss_fct=loss_fct,
-      optimizer=optimizer,
-      scaler=amp_scaler,
-      scheduler=scheduler,
-      amp=amp,
       epoch=epoch,
       n_classes=n_classes,
       device=device,
@@ -620,13 +724,11 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     )
     if testloader is not None:
       test_results=run_epoch_cls(
-        model=model,
+       trainer=trainer,
+        static_input=static_input,
+        static_label=static_label,
+        static_sample_weights=static_sample_weights,
         dataloader=testloader,
-        optimizer=optimizer,
-        scaler=amp_scaler,
-        scheduler=scheduler,
-        amp=amp,
-        loss_fct=loss_fct,
         epoch=epoch,
         n_classes=n_classes,
         device=device,
@@ -641,7 +743,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     #Callback-------------------------------------------------------------------
     best_val_loss, best_acc, best_bacc, best_val_avg_iota,elc = check_and_set_checkpoints_cls(
       use_callback=use_callback,
-      model=model,
+      model=trainer.model,
       filepath=filepath,
       epoch=epoch,
       metric_storage=metric_storage,

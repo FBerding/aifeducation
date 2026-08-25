@@ -39,9 +39,11 @@ class stack_dense_layer(torch.nn.Module):
     self.normalization_type=normalization_type
     self.times=times
     if isinstance(pad_value, torch.Tensor):
-      self.pad_value=pad_value.detach()
+      #self.pad_value = pad_value.detach().float()
+      self.register_buffer("pad_value",pad_value.clone().float())
     else:
-      self.pad_value=torch.tensor(pad_value)
+      #self.pad_value = torch.tensor(pad_value,dtype=torch.float)
+      self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
     
     self.residual_type=residual_type
     self.residual_connection=layer_residual_connection(self.residual_type,self.pad_value)  
@@ -165,9 +167,12 @@ class stack_tf_encoder_layer(torch.nn.Module):
     self.dropout_rate_2=dropout_rate_2
     
     if isinstance(pad_value, torch.Tensor):
-      self.pad_value=pad_value.detach()
+      #self.pad_value = pad_value.detach().float()
+      self.register_buffer("pad_value",pad_value.clone().float())
     else:
-      self.pad_value=torch.tensor(pad_value)
+      #self.pad_value = torch.tensor(pad_value,dtype=torch.float)
+      self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
+      
     self.bias=bias
     self.parametrizations=parametrizations
     self.positional_embedding=positional_embedding
@@ -209,7 +214,7 @@ class stack_tf_encoder_layer(torch.nn.Module):
 
   def forward(self,x,mask_times):
     y=self.positional_embedding_layer(x)
-    y=y.masked_fill(mask=get_FeatureMask_from_mask(mask_times,self.features),value=self.pad_value)
+    y=torch.where(get_FeatureMask_from_mask(mask_times,self.features),self.pad_value,y)
     for r in range(self.n_layers):
       current_layer=self.layer_list[r]
       y,mask_times=current_layer(y,mask_times)
@@ -230,10 +235,13 @@ class stack_n_gram_convolution(torch.nn.Module):
     self.residual_type=residual_type
     self.ks_min=ks_min
     self.ks_max=ks_max
+    
     if isinstance(pad_value, torch.Tensor):
-      self.pad_value=pad_value.detach()
+      #self.pad_value = pad_value.detach().float()
+      self.register_buffer("pad_value",pad_value.clone().float())
     else:
-      self.pad_value=torch.tensor(pad_value)
+      #self.pad_value = torch.tensor(pad_value,dtype=torch.float)
+      self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
     
     self.layer_list=torch.nn.ModuleList()
     
