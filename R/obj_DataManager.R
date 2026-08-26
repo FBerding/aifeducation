@@ -561,7 +561,6 @@ DataManagerClassifier <- R6::R6Class(
         message(
           get_time_stamp(),
           " Total Cases: ", n_init_cases,
-          " Unique Cases: ", n_final_cases,
           " Labeled Cases: ", length(indices_labeled)
         )
       }

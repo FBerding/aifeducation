@@ -1090,12 +1090,17 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
 
       tmp_history <- py$TeClassifierTrain(
         model = private$model,
+        features=as.integer(private$model_config$features),
+        times=as.integer(private$model_config$times),
+        final_dim=as.integer(private$model_config$feat_size),
         loss_cls_fct_name = self$last_training$config$loss_cls_fct_name,
         optimizer_method = self$last_training$config$optimizer,
         lr_rate = self$last_training$config$lr_rate,
         lr_min = self$last_training$config$lr_min,
         scheduler_type = self$last_training$config$lr_scheduler,
         amp = self$last_training$config$amp,
+        comp_use=self$last_training$config$comp_use,
+        comp_backend=get_compiler_backend(),
         lr_warm_up_ratio = self$last_training$config$lr_warm_up_ratio,
         epochs = as.integer(self$last_training$config$epochs),
         trace = as.integer(self$last_training$config$ml_trace),
@@ -1362,17 +1367,14 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
 
       # Init Training------------------------------------------------------------
       private$init_train()
-
       # config datasets
       datasets$disable_progress_bars()
       # datasets$disable_caching()
 
       # Start Sustainability Tracking-------------------------------------------
       private$init_and_start_sustainability_tracking()
-
       # Calculate learning rate if requested
       private$calculate_learning_rate(data_manager)
-
       # Start Training----------------------------------------------------------
       # Start Loop inclusive final training
       for (iter in 1L:(self$last_training$config$n_folds + 1L)) {
@@ -1471,7 +1473,6 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       if (self$last_training$config$loss_balance_sequence_length) {
         sequence_length <- extract_column_from_py_dataset(data_set, "length")
         abs_freq_length <- table(sequence_length)
-        print(which(is.na(sequence_length)))
 
         sample_weight_per_sequence_length <- as.vector(
           sum(abs_freq_length) / (length(abs_freq_length) * abs_freq_length)

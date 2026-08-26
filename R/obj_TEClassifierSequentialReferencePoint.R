@@ -12,27 +12,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-#' @title Text embedding classifier with a ProtoNet
-#' @description
-#' `r build_documentation_for_model(model_name="TEClassifierParallelPrototype",cls_type="prototype",core_type="parallel",input_type="text_embeddings")`
+#' @title Text embedding classifier with a neural net
+#' @description `r build_documentation_for_model(model_name="TEClassifierSequentialReferencePoint",cls_type="prob",core_type="sequential",input_type="text_embeddings")`
 #'
 #' @return Returns a new object of this class ready for configuration or for loading
 #' a saved classifier.
 #'
-#'
-#' @references Oreshkin, B. N., Rodriguez, P. & Lacoste, A. (2018). TADAM: Task dependent adaptive metric for improved
-#'   few-shot learning. https://doi.org/10.48550/arXiv.1805.10123
-#' @references Snell, J., Swersky, K. & Zemel, R. S. (2017). Prototypical Networks for Few-shot Learning.
-#'   https://doi.org/10.48550/arXiv.1703.05175
-#' @references Zhang, X., Nie, J., Zong, L., Yu, H. & Liang, W. (2019). One Shot Learning with Margin. In Q. Yang, Z.-H.
-#'   Zhou, Z. Gong, M.-L. Zhang & S.-J. Huang (Eds.), Lecture Notes in Computer Science. Advances in Knowledge Discovery
-#'   and Data Mining (Vol. 11440, pp. 305–317). Springer International Publishing.
-#'   https://doi.org/10.1007/978-3-030-16145-3_24
 #' @family Classification
 #' @export
-TEClassifierParallelPrototype <- R6::R6Class(
-  classname = "TEClassifierParallelPrototype",
-  inherit = TEClassifiersBasedOnProtoNet,
+TEClassifierSequentialReferencePoint <- R6::R6Class(
+  classname = "TEClassifierSequentialReferencePoint",
+  inherit = TEClassifiersBasedOnRegular,
   public = list(
     # New-----------------------------------------------------------------------
     #' @description Creating a new instance of this class.
@@ -41,9 +31,8 @@ TEClassifierParallelPrototype <- R6::R6Class(
     #' @param text_embeddings `r get_param_doc_desc("text_embeddings")`
     #' @param feature_extractor `r get_param_doc_desc("feature_extractor")`
     #' @param target_levels `r get_param_doc_desc("target_levels")`
-    #' @param shared_feat_layer `r get_param_doc_desc("shared_feat_layer")`
-    #' @param merge_pooling_features `r get_param_doc_desc("merge_pooling_features")`
-    #' @param merge_pooling_type `r get_param_doc_desc("merge_pooling_type")`
+    #' @param skip_connection_type `r get_param_doc_desc("skip_connection_type")`
+    #' @param cls_times_pooling_type `r get_param_doc_desc("cls_times_pooling_type")`
     #' @param feat_act_fct `r get_param_doc_desc("feat_act_fct")`
     #' @param feat_size `r get_param_doc_desc("feat_size")`
     #' @param feat_bias `r get_param_doc_desc("feat_bias")`
@@ -88,22 +77,17 @@ TEClassifierParallelPrototype <- R6::R6Class(
     #' @param tf_normalization_type `r get_param_doc_desc("tf_normalization_type")`
     #' @param tf_normalization_position `r get_param_doc_desc("tf_normalization_position")`
     #' @param tf_residual_type `r get_param_doc_desc("tf_residual_type")`
-    #' @param merge_attention_type `r get_param_doc_desc("merge_attention_type")`
-    #' @param merge_num_heads `r get_param_doc_desc("merge_num_heads")`
-    #' @param merge_normalization_type `r get_param_doc_desc("merge_normalization_type")`
     #' @param metric_type `r get_param_doc_desc("metric_type")`
-    #' @param embedding_dim `r get_param_doc_desc("embedding_dim")`
-    #' @param projection_type `r get_param_doc_desc("projection_type")`
     #' @return Function does nothing return. It modifies the current object.
     configure = function(name = NULL,
                          label = NULL,
                          text_embeddings = NULL,
                          feature_extractor = NULL,
                          target_levels = NULL,
-                         metric_type = "Euclidean",
-                         shared_feat_layer = TRUE,
-                         projection_type = "Regular",
+                         skip_connection_type = "ResidualGate",
+                         cls_times_pooling_type = "MinMaxTimes",
                          cls_input_normalize="BatchNorm",
+                         metric_type = "Euclidean",
                          feat_act_fct = "ELU",
                          feat_size = 50L,
                          feat_bias = TRUE,
@@ -120,7 +104,7 @@ TEClassifierParallelPrototype <- R6::R6Class(
                          ng_conv_normalization_type = "LayerNorm",
                          ng_conv_residual_type = "ResidualGate",
                          dense_act_fct = "ELU",
-                         dense_n_layers = 1L,
+                         dense_n_layers = 1,
                          dense_dropout = 0.5,
                          dense_bias = FALSE,
                          dense_parametrizations = "None",
@@ -142,36 +126,31 @@ TEClassifierParallelPrototype <- R6::R6Class(
                          tf_dropout_rate_2 = 0.5,
                          tf_attention_type = "MultiHead",
                          tf_positional_type = "absolute",
-                         tf_num_heads = 1L,
+                         tf_num_heads = 1,
                          tf_bias = FALSE,
                          tf_parametrizations = "None",
                          tf_normalization_type = "LayerNorm",
                          tf_normalization_position = "Pre",
-                         tf_residual_type = "ResidualGate",
-                         merge_attention_type = "MultiHead",
-                         merge_num_heads = 1L,
-                         merge_normalization_type = "LayerNorm",
-                         merge_pooling_features = 50L,
-                         merge_pooling_type = "MinMaxTimes",
-                         embedding_dim = 2L) {
+                         tf_residual_type = "ResidualGate") {
       arguments <- get_called_args(n = 1L)
-      arguments$core_net_type <- "parallel"
-      private$do_configuration(args = arguments, one_hot_encoding = FALSE)
+      arguments$core_net_type <- "sequential"
+      private$do_configuration(args = arguments)
     }
   ),
+  # Private---------------------------------------------------------------------
   private = list(
-    # Private--------------------------------------------------------------------------
+    #--------------------------------------------------------------------------
     init_model = function() {
       private$check_config_for_TRUE()
-      private$model <- py$TEClassifierPrototype(
+
+      private$model <- py$TEClassifierReferencePoint(
         features = as.integer(private$model_config$features),
         times = as.integer(private$model_config$times),
-        target_levels = reticulate::np_array(seq(from = 0L, to = (length(private$model_config$target_levels) - 1L))),
+        target_levels = private$model_config$target_levels,
         pad_value = as.integer(private$text_embedding_model$pad_value),
-        skip_connection_type = "None",
-        metric_type = private$model_config$metric_type,
-        shared_feat_layer = private$model_config$shared_feat_layer,
-        projection_type = private$model_config$projection_type,
+        skip_connection_type = private$model_config$skip_connection_type,
+        metric_type=private$model_config$metric_type,
+        cls_times_pooling_type = private$model_config$cls_times_pooling_type,
         cls_input_normalize=private$model_config$cls_input_normalize,
         feat_act_fct = private$model_config$feat_act_fct,
         feat_size = as.integer(private$model_config$feat_size),
@@ -217,22 +196,11 @@ TEClassifierParallelPrototype <- R6::R6Class(
         tf_normalization_type = private$model_config$tf_normalization_type,
         tf_normalization_position = private$model_config$tf_normalization_position,
         tf_residual_type = private$model_config$tf_residual_type,
-        merge_attention_type = private$model_config$merge_attention_type,
-        merge_normalization_type = private$model_config$merge_normalization_type,
-        merge_pooling_features = as.integer(private$model_config$merge_pooling_features),
-        merge_pooling_type = private$model_config$merge_pooling_type,
-        embedding_dim = as.integer(private$model_config$embedding_dim),
         core_net_type = private$model_config$core_net_type
       )
-      private$set_random_prototypes()
     },
     #--------------------------------------------------------------------------
     check_param_combinations_configuration = function() {
-      if (private$model_config$feat_size < private$model_config$merge_pooling_features) {
-        warning("merge_pooling_features must be equal or lower as feat_size. Set merge_pooling_features=feat_size.")
-        private$model_config$merge_pooling_features <- private$model_config$feat_size
-      }
-
       if (private$model_config$rec_n_layers == 1L && private$model_config$rec_dropout > 0.0) {
         print_message(
           msg = "Dropout for recurrent layers requires at least two layers. Setting rec_dropout to 0.0.",
@@ -247,4 +215,4 @@ TEClassifierParallelPrototype <- R6::R6Class(
 )
 
 # Add Classifier to central index
-TEClassifiers_class_names <- append(x = TEClassifiers_class_names, values = "TEClassifierParallelPrototype")
+TEClassifiers_class_names <- append(x = TEClassifiers_class_names, values = "TEClassifierSequentialReferencePoint")

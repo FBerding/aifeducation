@@ -69,6 +69,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
     #' @param lr_min `r get_param_doc_desc("lr_min")`
     #' @param lr_warm_up_ratio `r get_param_doc_desc("lr_warm_up_ratio")`
     #' @param lr_scheduler `r get_param_doc_desc("lr_scheduler")`
+    #' @param lr_epochs `r get_param_doc_desc("lr_epochs")`
     #' @param optimizer `r get_param_doc_desc("optimizer")`
     #' @param amp `r get_param_doc_desc("amp")`
     #' @param Ns `r get_param_doc_desc("Ns")`
@@ -122,6 +123,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
                      lr_min = 0.0,
                      lr_scheduler = "None",
                      lr_warm_up_ratio = 0.02,
+                     lr_epochs = 50L,
                      optimizer = "AdamW",
                      amp = FALSE) {
       private$do_training(args = get_called_args(n = 1L))

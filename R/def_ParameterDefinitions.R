@@ -1130,11 +1130,13 @@ get_param_dict <- function() {
     allow_null = FALSE,
     min = NULL,
     max = NULL,
-    allowed_values = c("FocalLoss", "CrossEntropyLoss"),
+    allowed_values = c("FocalLoss","FocalLossOrdinal", "CrossEntropyLoss","AEMLoss"),
     desc = "Name of the loss function to use during training.",
     values_desc = list(
       CrossEntropyLoss = "Applies the a cross cross entropy loss.",
-      FocalLoss = "Applies the focal loss described by [Lin et al. 2017](https://doi.org/10.48550/arXiv.1708.02002)."
+      FocalLoss = "Applies the focal loss described by [Lin et al. 2017](https://doi.org/10.48550/arXiv.1708.02002).",
+      FocalLossOrdinal = "Same as 'FocalLoss' but with additional quadratic weights for ordinal scales.",
+      AEMLoss = "Experimental loss based on Berding and Pargmann (2022)."
     ),
     gui_box = "General Settings",
     gui_label = "Loss Function",
@@ -1142,12 +1144,21 @@ get_param_dict <- function() {
     test_values = NULL
   )
   param$loss_pt_fct_name <- param$loss_cls_fct_name
-  param$loss_pt_fct_name$allowed_values <- c("MultiWayContrastiveLoss", "MultiWayContrastiveLossFC", "FocalLoss")
+  param$loss_pt_fct_name$allowed_values <- c(
+    "MultiWayContrastiveLoss",
+    "MultiWayContrastiveLossFC",
+    "MultiWayContrastiveLossFCOrdinal",
+    "FocalLoss","FocalLossOrdinal",
+    "AEMLoss"
+    )
   param$loss_pt_fct_name$values_desc <- list(
     MultiWayContrastiveLoss = "Applies the loss described by [Zhang et al. 2019](https://doi.org/10.1007/978-3-030-16145-3_24).",
     MultiWayContrastiveLossFC = "Applies the sum of the loss described by [Zhang et al. 2019](https://doi.org/10.1007/978-3-030-16145-3_24) and the
     Focal Loss described by [Lin et al. 2017](https://doi.org/10.48550/arXiv.1708.02002).",
-    FocalLoss = "Applies the focal loss described by [Lin et al. 2017](https://doi.org/10.48550/arXiv.1708.02002)."
+    MultiWayContrastiveLossFCOrdinal = "Same as 'MultiWayContrastiveLossFC' but with additional quadratic weights for ordinal scales.",
+    FocalLoss = "Applies the focal loss described by [Lin et al. 2017](https://doi.org/10.48550/arXiv.1708.02002).",
+    FocalLossOrdinal = "Same as 'FocalLoss' but with additional quadratic weights for ordinal scales.",
+    AEMLoss = "Experimental loss based on Berding and Pargmann (2022)."
   )
   param$loss_pt_fct_name$default_value <- "MultiWayContrastiveLoss"
   param$loss_pt_fct_name$gui_box <- "General Settings"
@@ -1258,6 +1269,19 @@ get_param_dict <- function() {
     default_value = 0.01,
     test_values = 0.01
   )
+
+  param$lr_epochs <- list(
+    type = "int",
+    allow_null = FALSE,
+    min = 1L,
+    max = Inf,
+    desc = "Number of epochs used for calculating the learning rate.",
+    gui_box = "Learning Rate",
+    gui_label = "Epochs for Calculating Learning Rate",
+    default_value = 50,
+    test_values = 5
+  )
+
 
   param$amp <- list(
     type = "bool",
@@ -1578,6 +1602,20 @@ get_param_dict <- function() {
     test_values = NULL
   )
 
+  cls_input_normalize=param$normalization_type
+  cls_input_normalize$desc="Type of normalization applied to data before passing to any layers of the net."
+  cls_input_normalize$allowed_values=c(
+    "BatchNorm",
+    "PowerNorm",
+    "None"
+  )
+  cls_input_normalize$values_desc=param$normalization_type$values_desc[c("BatchNorm","PowerNorm","None")]
+  cls_input_normalize$gui_box = "General Settings"
+  cls_input_normalize$gui_label = "Normalization"
+  cls_input_normalize$default_value = "BatchNorm"
+  cls_input_normalize$default_historic = "None"
+  cls_input_normalize$test_values = NULL
+
   param$feat_normalization_type <- param$normalization_type
   param$feat_normalization_type$gui_box <- "Feature Layer"
 
@@ -1631,6 +1669,8 @@ get_param_dict <- function() {
   param$merge_pooling_features <- param$cls_pooling_features
   param$merge_pooling_features$gui_box <- "Merge Layer"
 
+
+
   param$cls_head_type <- list(
     type = "string",
     min = NULL,
@@ -1678,7 +1718,7 @@ get_param_dict <- function() {
     min = NULL,
     max = NULL,
     allow_null = FALSE,
-    allowed_values = c("Max", "Min", "MinMax", "MaxTimes", "MinMaxTimes"),
+    allowed_values = c("Max", "Min", "MinMax", "MaxTimes", "MinMaxTimes","AverageTimes","WeightedAverageTimes"),
     desc = "Type of extracting intermediate features.",
     gui_box = "Classifiction Pooling Layer",
     gui_label = "Feature Extraction Method",
@@ -1688,6 +1728,22 @@ get_param_dict <- function() {
   )
   param$merge_pooling_type <- param$cls_pooling_type
   param$merge_pooling_type$gui_box <- "Merge Layer"
+
+  param$cls_times_pooling_type <- list(
+    type = "string",
+    min = NULL,
+    max = NULL,
+    allow_null = FALSE,
+    allowed_values = c("Max", "MinMax","Average","WeightedAverage"),
+    desc = "Type of extracting intermediate features.",
+    gui_box = "Classifiction Pooling Layer",
+    gui_label = "Feature Extraction Method",
+    default_value = "Max",
+    default_historic = NULL,
+    test_values = NULL
+  )
+  param$merge_times_pooling_type=param$cls_times_pooling_type
+  param$merge_times_pooling_type$gui_box <- "Merge Layer"
 
 
   # Parametrizations------------------------------------------------------------
@@ -1752,7 +1808,7 @@ get_param_dict <- function() {
   param$feat_bias$gui_box <- "Feature Layer"
 
   # Activation functions---------------------------------------------------------
-  act_fct_allowed_values=c("ELU", "LeakyReLU", "ReLU", "GELU", "Sigmoid", "Tanh", "PReLU","SwiGLU")
+  act_fct_allowed_values=c("ELU", "LeakyReLU", "ReLU", "GELU", "Sigmoid", "Tanh", "PReLU","SwiGLU","None")
   param$act_fct <- list(
     type = "string",
     min = NULL,

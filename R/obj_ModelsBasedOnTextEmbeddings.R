@@ -932,7 +932,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         if (is_on_CI()) {
           total_epochs <- 2L
         } else {
-          total_epochs <- 20L
+          total_epochs <- self$last_training$config$lr_epochs
         }
         estimates <- private$estimate_learning_rates(
           data_manager,

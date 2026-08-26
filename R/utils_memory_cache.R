@@ -98,5 +98,28 @@ format_size <- function(size) {
     return(paste(round(size / (10^3), digits = 3), "KB"))
   } else if (size < 10^3 & size >= 0) {
     return(paste(round(size, digits = 3), "Byte"))
+  } else {
+    stop("Size is below zero.")
+  }
+}
+
+get_compiler_backend=function(){
+  running_os=detec_os()
+  if(running_os=="windows"){
+    if (torch$cuda$is_available()){
+      return("cudagraphs")
+    } else {
+      return("inductor")
+    }
+  } else if (running_os=="linux"){
+    return("TorchInductor")
+  } else if(running_os=="mac"){
+    if (torch$cuda$is_available()){
+      return("aot_eager")
+    } else {
+      return("inductor")
+    }
+  } else {
+    stop("Backend for compilation could not be found.")
   }
 }
