@@ -114,6 +114,34 @@ def build_data_loaders(train_data, val_data, batch_size, test_data=None, pin_mem
     testloader=None
   return trainloader, valloader, testloader
 
+def build_data_loaders_pt(train_data, val_data, Ns,Nq, test_data=None, pin_memory=False,comp_use=False):
+  ProtoNetSampler_Train=MetaLernerBatchSampler(
+  targets=train_data["labels"][range(0,len(train_data))],
+  Ns=Ns,
+  Nq=Nq,
+  separate=sampling_separate,
+  shuffle=sampling_shuffle)
+  trainloader=torch.utils.data.DataLoader(
+    train_data,
+    pin_memory = True if device=="cuda" else False,
+    batch_sampler=ProtoNetSampler_Train)
+  valloader=torch.utils.data.DataLoader(
+    val_data,
+    pin_memory = True if device=="cuda" else False,
+    batch_size=Ns+Nq,
+    drop_last=comp_use,
+    shuffle=False)
+  if not (test_data is None):
+    testloader=torch.utils.data.DataLoader(
+      test_data,
+      pin_memory = True if device=="cuda" else False,
+      batch_size=Ns+Nq,
+      drop_last=comp_use,
+      shuffle=False)
+  else:
+    testloader=None
+  return trainloader, valloader, testloader   
+
 def create_metric_storage(metric_names,epochs,inc_test):
   storage={}
   for metric in metric_names:
@@ -387,17 +415,9 @@ class epoch_trainer(torch.nn.Module):
       self.device=device
       self.model_type=model_typ
 
-  def traininig_step(self,static_input,static_target,static_sample_weights):
-    with torch.autocast(device_type=self.device, dtype=None, enabled=self.amp):  
-      output=self.model(static_input,prediction_mode=False)
-      loss=(self.loss_fct(output,static_target)*static_sample_weights.detach()).mean()
-    return loss, output
-
-
-  def train_and_eval(self,static_input,static_target,static_sample_weights):
-     if self.training:
-      self.optimizer.zero_grad(set_to_none=True)
-      loss, output = self.traininig_step(static_input=static_input,static_target=static_target,static_sample_weights=static_sample_weights)
+  def prepare_training_step(self):
+    self.optimizer.zero_grad(set_to_none=True)
+  def finalize_training_step(self,loss):
       self.scaler.scale(loss).backward()
       self.scaler.unscale_(self.optimizer)
       torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0,foreach=True)
@@ -405,6 +425,14 @@ class epoch_trainer(torch.nn.Module):
       self.scaler.update()
       if self.scheduler is not None:
         self.scheduler.step()
+        
+  def train_and_eval_standard(self,static_input,static_target,static_sample_weights=None):
+     if self.training:
+      self.prepare_training_step()
+      with torch.autocast(device_type=self.device, dtype=None, enabled=self.amp):  
+        output=self.model(static_input,prediction_mode=False)
+        loss=(self.loss_fct(output,static_target)*static_sample_weights.detach()).mean()
+      self.finalize_training_step(loss)
       return loss, output
      else:
       with torch.no_grad():
@@ -423,6 +451,7 @@ def run_epoch_cls(trainer,dataloader,static_input,static_label,static_sample_wei
   else:
     trainer.eval()
   for batch in dataloader:
+    #Prepare Data
     inputs=batch["input"]
     labels=batch["labels"]
     inputs = inputs.to(device=device,dtype=current_dtype,non_blocking=True)
@@ -437,8 +466,9 @@ def run_epoch_cls(trainer,dataloader,static_input,static_label,static_sample_wei
        sample_weights=torch.ones((inputs.size(0),1),device=device,dtype=current_dtype)/inputs.size(0)
     sample_weights=sample_weights.to(device=device,dtype=current_dtype,non_blocking=True)
     static_sample_weights.copy_(sample_weights)   
-    
-    loss,output=trainer.train_and_eval(static_input,static_label,static_sample_weights)
+    #Train Step
+    loss,output=trainer.train_and_eval_standard(static_input,static_label,static_sample_weights)
+    #Calculate CLS Statistics
     loss=loss.detach()
     output=output.detach()
     total_loss +=loss
@@ -592,7 +622,7 @@ def prepare_model(model):
   model.to(device=device,dtype=current_dtype)
   return model, device, current_dtype
 
-def prepare_loss_function(loss_cls_fct_name,class_weights,device,current_dtype):
+def prepare_loss_function(loss_cls_fct_name,class_weights,device,current_dtype,type="prob_classification"):
   class_weights=class_weights.clone()
   class_weights=class_weights.to(device)
   loss_fct=get_loss_cls_fct(name=loss_cls_fct_name,class_weights=class_weights)
@@ -605,7 +635,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   #Prepare model
   model,device, current_dtype=prepare_model(model)
   #Prepare loss function
-  loss_fct=prepare_loss_function(loss_cls_fct_name,class_weights,device,current_dtype)
+  loss_fct=prepare_loss_function(loss_cls_fct_name,class_weights,device,current_dtype,type="prob_classification")
   #create data loader
   trainloader, valloader, testloader = build_data_loaders(
     train_data=train_data,
@@ -631,9 +661,23 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     max_lr=lr_rate,
     min_lr=lr_min
   )
-  #Amp_Scaler
+  #Create Amp_Scaler
   amp_scaler=torch.amp.GradScaler(device ,enabled=amp)
   #Create static addresses for compilation
+        sample_inputs=inputs[0:(n_classes*Ns)].clone()
+        query_inputs=inputs[(n_classes*Ns):(n_classes*(Ns+Nq))].clone()
+        sample_classes=labels[0:(n_classes*Ns)].clone()
+        query_classes=labels[(n_classes*Ns):(n_classes*(Ns+Nq))].clone()
+        sample_inputs = sample_inputs.to(device,dtype=current_dtype)
+        query_inputs = query_inputs.to(device,dtype=current_dtype)
+        sample_classes = sample_classes.to(device,dtype=current_dtype)
+        query_classes = query_classes.to(device,dtype=current_dtype)
+        
+        inputs = inputs.to(device,dtype=current_dtype)
+        labels=labels.to(device,dtype=current_dtype)
+  
+  
+  
   static_input=torch.randn((batch_size,times,features),device=device,dtype=current_dtype)
   static_label=torch.randn((batch_size,n_classes),device=device,dtype=current_dtype)
   static_sample_weights=torch.randn((batch_size,1),device=device,dtype=current_dtype)
@@ -781,15 +825,17 @@ def TeClassifierTrainPrototype(model,features,times,final_dim,loss_pt_fct_name ,
 loss_alpha, loss_margin, train_data,val_data,filepath,use_callback,n_classes,sampling_separate,sampling_shuffle,test_data=None,
 log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
   #Prepare model
-  device=get_device()
-  current_dtype=get_dtype(device)
-  model.to(device=device,dtype=current_dtype)
+  model,device, current_dtype=prepare_model(model)
   #Prepare loss function
   loss_fct=get_loss_cls_pt_fct(
     name=loss_pt_fct_name,
     alpha=loss_alpha,
     margin=loss_margin
   )
+  #Create static addresses for compilation
+  #static_input=torch.randn((batch_size,times,features),device=device,dtype=current_dtype)
+  #static_label=torch.randn((batch_size,n_classes),device=device,dtype=current_dtype)
+  #static_sample_weights=torch.randn((batch_size,1),device=device,dtype=current_dtype)
   #Numpys for Saving Training History
   metric_storage=create_metric_storage(
     metric_names=["loss","accuracy","balanced_accuracy","avg_iota","s_avg_iota"],
@@ -803,35 +849,22 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   best_val_avg_iota=float('-inf')
   elc=0
   #Set Up Loaders
-  ProtoNetSampler_Train=MetaLernerBatchSampler(
-  targets=train_data["labels"][range(0,len(train_data))],
-  Ns=Ns,
-  Nq=Nq,
-  separate=sampling_separate,
-  shuffle=sampling_shuffle)
-  trainloader=torch.utils.data.DataLoader(
-    train_data,
-    pin_memory = True if device=="cuda" else False,
-    batch_sampler=ProtoNetSampler_Train)
-  valloader=torch.utils.data.DataLoader(
-    val_data,
-    pin_memory = True if device=="cuda" else False,
-    batch_size=Ns+Nq,
-    shuffle=False)
-  if not (test_data is None):
-    testloader=torch.utils.data.DataLoader(
-      test_data,
-      pin_memory = True if device=="cuda" else False,
-      batch_size=Ns+Nq,
-      shuffle=False)
-  else:
-    testloader=None
-  #Create optimizer and scheduler    
+  trainloader,valloader,testloader=build_data_loaders_pt(
+    train_data=train_data, 
+    val_data=val_data, 
+    Ns=Ns,
+    Nq=Nq, 
+    test_data=test_data, 
+    pin_memory=True if device=="cuda" else False,
+    comp_use=comp_use
+  )
+  #Create optimizer    
   optimizer=get_Optimizer(
     optimizer_method,
     params=model.parameters(),
     lr_rate=lr_rate
   )
+  #Create scheduler
   scheduler=get_lr_scheduler(
     optimizer=optimizer,
     scheduler_type=scheduler_type,
@@ -841,7 +874,25 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     max_lr=lr_rate,
     min_lr=lr_min
   )
+  #Create amp_scaler
   amp_scaler=torch.amp.GradScaler(device ,enabled=amp)
+  #Create Trainer model
+  trainer=epoch_trainer(
+    model=model,
+    loss_fct=loss_fct,
+    optimizer=optimizer,
+    scaler=amp_scaler,
+    scheduler=scheduler,
+    amp=amp,
+    device=device,
+    model_typ="standard_classification"
+  )
+  trainer=trainer.to(dtype=current_dtype,device=device)
+  #Compile
+  if comp_use:
+    if trace: 
+      print("Compile model with "+comp_backend+".")
+    trainer=torch.compile(trainer,backend=comp_backend,fullgraph=False,dynamic=False,mode=None)
   #Logger
   PrgInd=ProgressLogger()
   PrgInd.set_start_time()
@@ -866,13 +917,9 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   #Start loop
   for epoch in range(epochs):
     train_results=run_epoch_cls_pt(
-      model=model,
+      trainer=trainer,
       dataloader=trainloader,
-      optimizer=optimizer,
-      scaler=amp_scaler,
-      scheduler=scheduler,
       amp=amp,
-      loss_fct=loss_fct,
       epoch=epoch,
       Ns=Ns,
       Nq=Nq,
@@ -884,11 +931,8 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       logger=logger
     )
     val_results=run_epoch_cls_pt(
-      model=model,
+     trainer=trainer,
       dataloader=valloader,
-      loss_fct=loss_fct,
-      optimizer=optimizer,
-      scaler=amp_scaler,
       scheduler=scheduler,
       amp=amp,
       epoch=epoch,
@@ -903,13 +947,9 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     )
     if testloader is not None:
       test_results=run_epoch_cls_pt(
-        model=model,
+        trainer=trainer,
         dataloader=testloader,
-        optimizer=optimizer,
-        scaler=amp_scaler,
-        scheduler=scheduler,
         amp=amp,
-        loss_fct=loss_fct,
         epoch=epoch,
         Ns=Ns,
         Nq=Nq,
