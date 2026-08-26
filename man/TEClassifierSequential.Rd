@@ -105,9 +105,11 @@ created with the same \link{TextEmbeddingModel} as for training.
 Other Classification:
 \code{\link{TEClassifierParallel}},
 \code{\link{TEClassifierParallelPrototype}},
+\code{\link{TEClassifierParallelReferencePoint}},
 \code{\link{TEClassifierProtoNet}},
 \code{\link{TEClassifierRegular}},
-\code{\link{TEClassifierSequentialPrototype}}
+\code{\link{TEClassifierSequentialPrototype}},
+\code{\link{TEClassifierSequentialReferencePoint}}
 }
 \concept{Classification}
 \section{Super classes}{
@@ -255,6 +257,8 @@ Only relevant if pooling type is 'Max', 'Min' or 'MinMax'. Allowed values:
 \item 'MinMax'
 \item 'MaxTimes'
 \item 'MinMaxTimes'
+\item 'AverageTimes'
+\item 'WeightedAverageTimes'
 }}
       \item{\code{cls_head_type}}{\code{string} Type of classification head. Allowed values:
 \itemize{
@@ -271,6 +275,7 @@ Only relevant if pooling type is 'Max', 'Min' or 'MinMax'. Allowed values:
 \item 'Sigmoid'
 \item 'Tanh'
 \item 'PReLU'
+\item 'None'
 }}
       \item{\code{feat_size}}{\code{int} Number of neurons for each dense layer. Allowed values:
 
@@ -303,6 +308,7 @@ Only relevant if pooling type is 'Max', 'Min' or 'MinMax'. Allowed values:
 \item 'Sigmoid'
 \item 'Tanh'
 \item 'PReLU'
+\item 'None'
 }}
       \item{\code{ng_conv_n_layers}}{\code{int} determining how many times the n-gram layers should be added to the network. Allowed values:
 
@@ -347,6 +353,7 @@ Only relevant if pooling type is 'Max', 'Min' or 'MinMax'. Allowed values:
 \item 'Sigmoid'
 \item 'Tanh'
 \item 'PReLU'
+\item 'None'
 }}
       \item{\code{dense_n_layers}}{\code{int} Number of dense layers. Allowed values:
 
@@ -421,6 +428,7 @@ Only relevant if pooling type is 'Max', 'Min' or 'MinMax'. Allowed values:
 \item 'Tanh'
 \item 'PReLU'
 \item 'SwiGLU'
+\item 'None'
 }}
       \item{\code{tf_dense_dim}}{\code{int} determining the size of the projection layer within a each transformer encoder. Allowed values:
 

@@ -118,6 +118,7 @@ on the validation data set is used as the final model.
   lr_min = 1e-04,
   lr_warm_up_ratio = 0.02,
   lr_scheduler = "None",
+  lr_epochs = 50L,
   optimizer = "AdamW",
   amp = FALSE
 )}
@@ -145,7 +146,9 @@ If \code{FALSE} each sequences length has the weight 1.}
       \item{\code{loss_cls_fct_name}}{\code{string} Name of the loss function to use during training. Allowed values:
 \itemize{
 \item 'FocalLoss'
+\item 'FocalLossOrdinal'
 \item 'CrossEntropyLoss'
+\item 'AEMLoss'
 }}
       \item{\code{use_sc}}{\code{bool} \code{TRUE} if the estimation should integrate synthetic cases. \code{FALSE} if not.}
       \item{\code{sc_method}}{\code{string} containing the method for generating synthetic cases. Allowed values:
@@ -230,6 +233,9 @@ Set this value to \code{0.0} requests an automatic search for a good learning ra
 \item 'Linear'
 \item 'Cyclic'
 }}
+      \item{\code{lr_epochs}}{\code{int} Number of epochs used for calculating the learning rate. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
       \item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values:
 \itemize{
 \item 'Adam'

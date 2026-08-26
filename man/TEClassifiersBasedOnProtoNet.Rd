@@ -128,6 +128,7 @@ on the validation data set is used as the final model.
   lr_min = 0,
   lr_scheduler = "None",
   lr_warm_up_ratio = 0.02,
+  lr_epochs = 50L,
   optimizer = "AdamW",
   amp = FALSE
 )}
@@ -151,7 +152,10 @@ The remaining cases are part of the training data. Allowed values:
 \itemize{
 \item 'MultiWayContrastiveLoss'
 \item 'MultiWayContrastiveLossFC'
+\item 'MultiWayContrastiveLossFCOrdinal'
 \item 'FocalLoss'
+\item 'FocalLossOrdinal'
+\item 'AEMLoss'
 }}
       \item{\code{use_sc}}{\code{bool} \code{TRUE} if the estimation should integrate synthetic cases. \code{FALSE} if not.}
       \item{\code{sc_method}}{\code{string} containing the method for generating synthetic cases. Allowed values:
@@ -259,6 +263,9 @@ Set this value to \code{0.0} requests an automatic search for a good learning ra
       \item{\code{lr_warm_up_ratio}}{\code{double} Number of epochs used for warm up. To disable warm up set this value to 0.0. Allowed values:
 
 \ifelse{latex}{$0 < x < 0.5$}{\ifelse{html}{\eqn{0 < x < 0.5}}{`0 < x < 0.5`}}}
+      \item{\code{lr_epochs}}{\code{int} Number of epochs used for calculating the learning rate. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
       \item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values:
 \itemize{
 \item 'Adam'

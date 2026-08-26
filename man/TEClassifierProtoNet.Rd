@@ -41,9 +41,11 @@ https://doi.org/10.1007/978-3-030-16145-3_24
 Other Classification:
 \code{\link{TEClassifierParallel}},
 \code{\link{TEClassifierParallelPrototype}},
+\code{\link{TEClassifierParallelReferencePoint}},
 \code{\link{TEClassifierRegular}},
 \code{\link{TEClassifierSequential}},
-\code{\link{TEClassifierSequentialPrototype}}
+\code{\link{TEClassifierSequentialPrototype}},
+\code{\link{TEClassifierSequentialReferencePoint}}
 }
 \concept{Classification}
 \section{Super classes}{
@@ -205,6 +207,7 @@ indicating a higher category/class. For nominal data the order does not matter.}
 \item 'Sigmoid'
 \item 'Tanh'
 \item 'PReLU'
+\item 'None'
 }}
       \item{\code{parametrizations}}{\code{string} Re-Parametrizations of the weights of layers. Allowed values:
 \itemize{

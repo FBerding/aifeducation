@@ -165,6 +165,7 @@ be added to the input during training. Allowed values:
   lr_min = 0,
   lr_warm_up_ratio = 0.02,
   lr_scheduler = "None",
+  lr_epochs = 50L,
   optimizer = "AdamW",
   amp = FALSE
 )}
@@ -235,6 +236,9 @@ Set this value to \code{0.0} requests an automatic search for a good learning ra
 \item 'Linear'
 \item 'Cyclic'
 }}
+      \item{\code{lr_epochs}}{\code{int} Number of epochs used for calculating the learning rate. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
       \item{\code{optimizer}}{\code{string} determining the optimizer used for training. Allowed values:
 \itemize{
 \item 'Adam'

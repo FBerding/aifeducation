@@ -4,6 +4,27 @@ editor_options:
     wrap: 72
 ---
 
+# aifeducation 1.1.7
+
+**Classifiers**
+
+- Add 'FocalLossOrdinal' and 'MultiWayContrastiveLossFCOrdinal' as new losses for ordinal scales.
+- Add a new *experimental* Assignment-Error-Loss (AEMLoss) based on Berding and Pargmann (2022).
+- NANs in loss now raise an error.
+- The number of epochs for learning rate calculation can now be determined by the user.
+- Add gradient clipping to training loops.
+- Add options for data normalization before any data is passed to the net. 
+
+**TEFeatureExtractor**
+
+- NANs in loss now raise an error.
+- The number of epochs for learning rate calculation can now be determined by the user.
+
+**Minor Issues**
+
+- Fixed a unnecessary print during training.
+- Improved stability of SwiGLU.
+
 # aifeducation 1.1.6
 
 **General**

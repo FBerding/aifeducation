@@ -25,7 +25,6 @@ Other Utils TestThat Developers:
 \code{\link[=generate_embeddings]{generate_embeddings()}},
 \code{\link[=generate_tensors]{generate_tensors()}},
 \code{\link[=get_current_args_for_print]{get_current_args_for_print()}},
-\code{\link[=get_fixed_test_tensor]{get_fixed_test_tensor()}},
 \code{\link[=get_test_data_for_classifiers]{get_test_data_for_classifiers()}},
 \code{\link[=random_bool_on_CI]{random_bool_on_CI()}}
 }
