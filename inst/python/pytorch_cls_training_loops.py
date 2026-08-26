@@ -413,11 +413,6 @@ class epoch_trainer(torch.nn.Module):
           loss = (self.loss_fct(output, static_target) * static_sample_weights.detach()).mean()
         return loss, output
 
-
-  
-    
-    
-
 def run_epoch_cls(trainer,dataloader,static_input,static_label,static_sample_weights,epoch,n_classes,device,current_dtype,cblock,metric_storage,logger):
   total_loss=0.0
   confusion_matrix=torch.zeros(size=(n_classes,n_classes),device=device,dtype=current_dtype)
@@ -604,7 +599,7 @@ def prepare_loss_function(loss_cls_fct_name,class_weights,device,current_dtype):
   loss_fct.to(device=device,dtype=current_dtype)
   return loss_fct
   
-def TeClassifierTrain(model,features,times,final_dim,loss_cls_fct_name , optimizer_method,scheduler_type,amp, lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,batch_size,
+def TeClassifierTrain(model,features,times,final_dim,loss_cls_fct_name, optimizer_method,scheduler_type,amp, lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,batch_size,
 train_data,val_data,filepath,use_callback,n_classes,class_weights,comp_use,comp_backend,test_data=None,
 log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
   #Prepare model
@@ -782,7 +777,7 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     model.load_state_dict(torch.load(filepath,weights_only=True))
   return metric_storage
 
-def TeClassifierTrainPrototype(model,loss_pt_fct_name , optimizer_method, scheduler_type, amp,lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,Ns,Nq,
+def TeClassifierTrainPrototype(model,features,times,final_dim,loss_pt_fct_name , optimizer_method, scheduler_type, amp,comp_use,comp_backend,lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,Ns,Nq,
 loss_alpha, loss_margin, train_data,val_data,filepath,use_callback,n_classes,sampling_separate,sampling_shuffle,test_data=None,
 log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
   #Prepare model

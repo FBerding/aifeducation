@@ -382,9 +382,9 @@ class layer_adaptive_extreme_pooling_1d(torch.nn.Module):
     self.n_out_max=math.ceil(self.output_size/2)
     self.n_out_min=self.output_size-self.n_out_max
     
-    self.register_buffer("index_output_size",torch.arange(start=0,end=self.output_size,step=1),dtype=torch.int)
-    self.register_buffer("index_n_out_max",torch.arange(start=0,end=self.n_out_max,step=1),dtype=torch.int)
-    self.register_buffer("index_n_out_min",torch.arange(start=0,end=self.n_out_min,step=1),dtype=torch.int)
+    self.register_buffer("index_output_size",torch.arange(start=0,end=self.output_size,step=1,dtype=torch.int))
+    self.register_buffer("index_n_out_max",torch.arange(start=0,end=self.n_out_max,step=1,dtype=torch.int))
+    self.register_buffer("index_n_out_min",torch.arange(start=0,end=self.n_out_min,step=1,dtype=torch.int))
     
   def get_max_n_values(self,x,select_index):
     y=x.sort(dim=1,descending=True)[0]
