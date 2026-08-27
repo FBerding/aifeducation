@@ -19,7 +19,426 @@ import math
 import safetensors
 
 #torch._dynamo.config.log_level = logging.INFO
-torch._inductor.config.trace.enabled = True
+#torch._inductor.config.trace.enabled = True
+
+
+class ModelTrainer():
+  def __init__(self,model_type):
+    self.model_type=model_type
+  
+  def config_for_StandardClassifier(self,model,features,times,final_dim,loss_cls_fct_name, optimizer_method,scheduler_type,amp, lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,batch_size,
+    train_data,val_data,filepath,use_callback,n_classes,class_weights,comp_use,comp_backend,test_data=None,
+    log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
+    self.model=model
+    self.features=features
+    self.times=times
+    self.final_dim=final_dim
+    self.loss_cls_fct_name=loss_cls_fct_name
+    self.optimizer_method=optimizer_method
+    self.scheduler_type=scheduler_type
+    self.amp=amp
+    self.lr_rate=lr_rate
+    self.lr_min =lr_min
+    self.lr_warm_up_ratio=lr_warm_up_ratio
+    self.epochs=epochs
+    self.trace=trace
+    self.batch_size=batch_size
+    self.train_data=train_data
+    self.val_data=val_data
+    self.filepath=filepath
+    self.use_callback=use_callback
+    self.n_classes=n_classes
+    self.class_weights=class_weights
+    self.comp_use=comp_use
+    self.comp_backend=comp_backend
+    self.test_data=test_data
+    self.log_dir= log_dir
+    self.log_write_interval=log_write_interval
+    self.log_top_value=log_top_value
+    self.log_top_total =log_top_total
+    self.log_top_message=log_top_message
+    #Loss Function
+    self.loss_fct=get_loss_cls_fct(
+      name=self.loss_cls_fct_name,
+      class_weights=self.class_weights
+    )
+  
+  def config_for_cls_pt(self,model,features,times,final_dim,loss_pt_fct_name , optimizer_method, scheduler_type, amp,comp_use,comp_backend,lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,Ns,Nq,
+    loss_alpha, loss_margin, train_data,val_data,filepath,use_callback,n_classes,sampling_separate,sampling_shuffle,test_data=None,
+    log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
+    self.model=model
+    self.features=features
+    self.times=timesfinal_dim
+    self.final_dim=final_dim
+    self.loss_pt_fct_name =loss_pt_fct_name
+    self.optimizer_method =optimizer_method
+    self.scheduler_type=scheduler_type
+    self.amp=amp
+    self.comp_use=comp_use
+    self.comp_backend=comp_backend
+    self.lr_rate=lr_rate
+    self.lr_min =lr_min
+    self.lr_warm_up_ratio=lr_warm_up_ratio
+    self.epochs=epochs
+    self.trace=trace
+    self.Ns=Ns
+    self.Nq=Nq
+    self.loss_alpha=loss_alpha
+    self.loss_margin=loss_margin
+    self.train_data=train_data
+    self.val_data=val_data
+    self.filepath=filepath
+    self.use_callback=use_callback
+    self.n_classes=n_classes
+    self.sampling_separate=sampling_separate
+    self.sampling_shuffle=sampling_shuffle
+    self.test_data=test_data
+    self.log_dir=log_dir
+    self.log_write_interval=log_write_interval
+    self.log_top_value=log_top_value
+    self.log_top_total=log_top_total
+    self.log_top_message=log_top_message
+  #def config_for_fe():
+    
+  def get_device(self):
+    return 'cuda' if torch.cuda.is_available() else 'cpu'
+  
+  def get_dtype(self):
+    if self.device=="cpu":
+      current_dtype=torch.float
+    else:
+      current_dtype=torch.float
+  def prepare_dataloader(self):
+    if self.model_type=="ClassifierStandard":
+      self.trainloader, self.valloader, self.testloader = build_data_loaders(
+        train_data=self.train_data,
+        val_data=self.val_data,
+        test_data=self.test_data,
+        batch_size=self.batch_size,
+        pin_memory = True if self.device=="cuda" else False,
+        comp_use=self.comp_use
+      )
+    elif self.model_type=="ClassifierPrototype":
+      self.trainloader,self.valloader,self.testloader=build_data_loaders_pt(
+        train_data=self.train_data, 
+        val_data=self.val_data, 
+        Ns=self.Ns,
+        Nq=self.Nq, 
+        test_data=self.test_data, 
+        pin_memory=True if self.device=="cuda" else False,
+        comp_use=self.comp_use
+      )
+      
+  def create_optimizer_scaler_scheduler(self):
+    #Create optimizer
+    self.optimizer=get_Optimizer(
+      self.optimizer_method,
+      params=self.model.parameters(),
+      lr_rate=self.lr_rate
+    )
+    #Create scheduler
+    self.scheduler=get_lr_scheduler(
+      optimizer=self.optimizer,
+      scheduler_type=self.scheduler_type,
+      lr_warm_up_ratio=self.lr_warm_up_ratio,
+      total_epochs=self.epochs,
+      batches_per_epoch=len(self.trainloader),
+      max_lr=self.lr_rate,
+      min_lr=self.lr_min
+    )
+    #Create Amp_Scaler
+    self.amp_scaler=torch.amp.GradScaler(self.device ,enabled=self.amp)
+  def create_static_container(self):
+     if self.model_type=="ClassifierStandard":
+        self.static_input=torch.randn((self.batch_size,self.times,self.features),device=self.device,dtype=self.dtype)
+        self.static_label=torch.randn((self.batch_size,self.n_classes),device=self.device,dtype=self.dtype)
+        self.static_sample_weights=torch.randn((self.batch_size,1),device=self.device,dtype=self.dtype)
+  def create_metric_container(self):
+    self.elc=0
+    if self.model_type=="ClassifierStandard" or self.model_type=="ClassifierPrototype":
+        #Numpys for Saving Training History
+        self.metric_storage=create_metric_storage(
+          metric_names=["loss","accuracy","balanced_accuracy","avg_iota","s_avg_iota"],
+          epochs=self.epochs,
+          inc_test=True if not (self.test_data is None) else False
+        )
+        # Init checkpoint values
+        self.best_bacc=float('-inf')
+        self.best_acc=float('-inf')
+        self.best_val_loss=float('inf')
+        self.best_val_avg_iota=float('-inf')
+  def prepare_logger(self):
+    self.PrgInd=ProgressLogger()
+    self.PrgInd.set_start_time()
+    total_steps=len(self.trainloader)+len(self.valloader)
+    if not (self.test_data is None):
+      total_steps=total_steps+len(self.testloader)
+    self.logger=LogWriter(
+      log_file=self.log_dir+"/aifeducation_state.log" if not (self.log_dir is None) else None,
+      log_file_loss =self.log_dir+"/aifeducation_loss.log" if not (self.log_dir is None) else None,
+      value_top = self.log_top_value, 
+      value_middle = 0, 
+      value_bottom = 0,
+      total_top = self.log_top_total, 
+      total_middle = self.epochs, 
+      total_bottom = total_steps, 
+      message_top = self.log_top_message, 
+      message_middle = "Epoch",
+      message_bottom = "Steps",
+      last_log = None, 
+      write_interval = self.log_write_interval
+    )
+  def create_trainer_model(self):
+    self.trainer=epoch_trainer(
+      model=self.model,
+      loss_fct=self.loss_fct,
+      optimizer=self.optimizer,
+      scaler=self.amp_scaler,
+      scheduler=self.scheduler,
+      amp=self.amp,
+      device=self.device
+    )
+    self.trainer=self.trainer.to(dtype=self.dtype,device=self.device)
+    #Compile
+    if self.comp_use:
+      if self.trace: 
+        print("Compile model with "+self.comp_backend+".")
+      self.trainer=torch.compile(self.trainer,backend=self.comp_backend,fullgraph=False,dynamic=False,mode=None) 
+  
+  def run_epoch_cls(self,cblock,epoch,dataloader):
+    # Init Metrics
+    total_loss=0.0
+    confusion_matrix=torch.zeros(size=(self.n_classes,self.n_classes),device=self.device,dtype=self.dtype)
+    prob_confusion_matrix=torch.zeros(size=(self.n_classes,self.n_classes),device=self.device,dtype=self.dtype)
+    #Set state of the model
+    if cblock=="train":
+      self.trainer.train()
+    else:
+      self.trainer.eval()
+    # Run Batches
+    for batch in dataloader:
+      #Prepare Data
+      inputs=batch["input"]
+      labels=batch["labels"]
+      inputs = inputs.to(device=self.device,dtype=self.dtype,non_blocking=True)
+      labels = labels.to(device=self.device,dtype=self.dtype,non_blocking=True)
+      self.static_input.copy_(inputs)
+      self.static_label.copy_(labels)
+      if "sample_weights" in batch.keys():
+        sample_weights=batch["sample_weights"]
+        sample_weights=torch.reshape(input=sample_weights,shape=(sample_weights.size(dim=0),1))
+        sample_weights=sample_weights.to(device=self.device,dtype=self.dtype)
+      else:
+         sample_weights=torch.ones((inputs.size(0),1),device=self.device,dtype=self.dtype)/inputs.size(0)
+      sample_weights=sample_weights.to(device=self.device,dtype=self.dtype,non_blocking=True)
+      self.static_sample_weights.copy_(sample_weights)   
+      #Train Step
+      loss,output=self.trainer.train_and_eval_standard(self.static_input,self.static_label,self.static_sample_weights)
+      #Calculate CLS Statistics
+      loss=loss.detach()
+      output=output.detach()
+      total_loss +=loss
+      label_idx=labels.max(dim=1).indices
+      confusion_matrix+=multiclass_confusion_matrix(input=output,target=label_idx,num_classes=self.n_classes,normalize = None)
+      prob_confusion_matrix+=create_p_confusion_matrix(torch.nn.Softmax(dim=1)(output),label_idx=label_idx,num_classes=self.n_classes)
+      #Update log file
+      self.logger.inc_value("bottom")
+      self.logger.write_log()
+      self.logger.write_history_log(self.metric_storage["loss"])
+    #Calc final metrics for epoch
+    results=calc_cls_performance_measures(
+      confusion_matrix=confusion_matrix,
+      prob_confusion_matrix=prob_confusion_matrix,
+      n_classes=self.n_classes
+    )
+    results.update({"loss":total_loss/len(dataloader)})
+    #Save metrics
+    add_metrics(
+      metrics=results,
+      storage=self.metric_storage,
+      cblock=cblock,
+      epoch=epoch
+    )
+    return results
+  
+  def run_epoch_cls_pt(self,cblock,epoch,dataloader):
+  # Init Metrics
+    total_loss=0.0
+    confusion_matrix=torch.zeros(size=(self.n_classes,self.n_classes),device=device,dtype=current_dtype)
+    prob_confusion_matrix=torch.zeros(size=(self.n_classes,self.n_classes),device=device,dtype=current_dtype)
+    if cblock=="train":
+      self.model.train()
+    else:
+      self.model.eval()
+
+    for batch in dataloader:
+      inputs=batch["input"]
+      labels=batch["labels"]
+      if cblock=="train":
+        sample_inputs=inputs[0:(self.n_classes*Ns)].clone()
+        query_inputs=inputs[(self.n_classes*Ns):(self.n_classes*(Ns+Nq))].clone()
+        sample_classes=labels[0:(self.n_classes*Ns)].clone()
+        query_classes=labels[(self.n_classes*Ns):(self.n_classes*(Ns+Nq))].clone()
+        sample_inputs = sample_inputs.to(device,dtype=current_dtype,non_blocking=True)
+        query_inputs = query_inputs.to(device,dtype=current_dtype,non_blocking=True)
+        sample_classes = sample_classes.to(device,dtype=current_dtype,non_blocking=True)
+        query_classes = query_classes.to(device,dtype=current_dtype,non_blocking=True)
+        
+        self.static_sample_inputs.copy_(sample_inputs)
+        self.static_query_inputs.copy_(query_classes)
+        self.static_sample_classes.copy_(sample_classes)
+        self.static_query_classes.copy_(query_classes)
+        #Train Step
+        loss, outputs=self.trainer.train_prototype(
+            static_query_inputs=self.static_query_inputs,
+            static_query_classes=self.static_query_classes,
+            static_sample_inputs=self.static_sample_inputs,
+            static_sample_classes=self.static_sample_classes)
+        loss=loss.detach()
+        outputs=outputs.detach()
+        #Metrics
+        total_loss +=loss.item()
+        pred_idx=outputs[0].max(dim=1).indices.to(dtype=torch.long,device=device)
+        label_idx=query_classes.to(dtype=torch.long,device=device)  
+      else:
+        inputs = inputs.to(device,dtype=current_dtype,non_blocking=True)
+        labels = labels.to(device,dtype=current_dtype,non_blocking=True)
+        self.static_input.copy_(inputs)
+        self.static_label.copy_(labels)
+        #Validation stept
+        loss,outputs=trainer.validate_prototype(
+          static_input=self.static_input,
+          static_label=self.static_label
+          )
+      #Metrics
+      total_loss +=loss.item()
+      pred_idx=outputs[0].max(dim=1).indices.to(dtype=torch.long,device=device)
+      label_idx=outputs[2].to(dtype=torch.long,device=device)
+      
+      confusion_matrix+=multiclass_confusion_matrix(input=pred_idx,target=label_idx,num_classes=self.n_classes,normalize = None)
+      prob_confusion_matrix+=create_p_confusion_matrix(torch.nn.Softmax(dim=1)(outputs[0]),label_idx=label_idx,num_classes=self.n_classes)
+      
+      #Update log file
+      self.logger.inc_value("bottom")
+      self.logger.write_log()
+      self.logger.write_history_log(metric_storage["loss"])
+    
+    #Calculate prototypes
+    if cblock=="train":
+      self.trainer.model.eval()
+      class_mean_prototypes,class_label=calc_trained_prototypes_batch(
+        n_classes=self.n_classes,
+        model=self.trainer.model,
+        data_loader=self.dataloader,
+        device=self.device,
+        dtype=self.dtype
+        )
+      self.trainer.model.set_trained_prototypes(
+        prototypes=class_mean_prototypes,
+        class_lables=class_label
+        )
+    #Calc final metrics for epoch
+    results=calc_cls_performance_measures(
+      confusion_matrix=confusion_matrix,
+      prob_confusion_matrix=prob_confusion_matrix,
+      n_classes=self.n_classes
+    )
+    results.update({"loss":total_loss/len(self.dataloader)})
+    #Save metrics
+    add_metrics(
+      metrics=results,
+      storage=self.metric_storage,
+      cblock=cblock,
+      epoch=epoch
+    )
+    return results
+
+  def check_and_set_checkpoints_cls(self,epoch,acc_val,bacc_val,avg_iota_val,val_loss):
+    if self.use_callback==True:
+        if (avg_iota_val>self.best_val_avg_iota) or (avg_iota_val==self.best_val_avg_iota and acc_val>self.best_acc) or (avg_iota_val==self.best_val_avg_iota and acc_val==self.best_acc and val_loss<self.best_val_loss):
+          if isinstance(self.trainer.model, torch._dynamo.eval_frame.OptimizedModule):
+            print("model is compiled")
+            torch.save(self.trainer.model._orig_mod.state_dict(),self.filepath)
+          else:
+            torch.save(self.trainer.model.state_dict(),self.filepath)
+          self.best_bacc=bacc_val
+          self.best_val_avg_iota=avg_iota_val
+          self.best_acc=acc_val
+          self.best_val_loss=val_loss
+          self.metric_storage["checkpoints"][epoch]=1
+          self.elc=epoch+1
+          
+  def check_convergence(self,train_results):
+    if self.model_type=="ClassifierStandards":
+      if train_results["loss"]<1e-3 and train_results["s_avg_iota"]>=.98:
+        if trace:
+          print("\n")
+      return True
+    
+  def run_epochs(self):
+    if self.model_type=="ClassifierStandard":
+      for epoch in range(self.epochs):
+        train_results=self.run_epoch_cls(cblock="train",epoch=epoch,dataloader=self.trainloader)
+        val_results=self.run_epoch_cls(cblock="val",epoch=epoch,dataloader=self.valloader)
+        if self.testloader is not None:
+          test_results=self.run_epoch_cls("test",epoch=epoch,dataloader=self.testloader)
+        #Update logger   
+        self.logger.reset_value(level="bottom")
+        self.logger.inc_value(level="middle")
+        #Callback-------------------------------------------------------------------
+        self.check_and_set_checkpoints_cls(
+          epoch=epoch,
+          acc_val=val_results["accuracy"],
+          bacc_val=val_results["balanced_accuracy"],
+          avg_iota_val=val_results["s_avg_iota"],
+          val_loss=val_results["loss"]
+        )
+        #Trace---------------------------------------------------------------------
+        self.PrgInd.print_epoch_results(
+          trace=self.trace,
+          loss_only=False,
+          metric_storage=self.metric_storage,
+          epoch=epoch,
+          epochs=self.epochs,
+          metric_criterion="s_avg_iota",
+          best_metric=self.best_val_avg_iota,
+          best_loss=self.best_val_loss,
+          elc=self.elc
+        )
+        #Check if there are furhter information for training-----------------------
+        # If there are no addtiononal information. Stop training and continue
+        if self.check_convergence(train_results):
+          break
+    elif self.model_type=="ClassifierPrototype":
+      print("test")
+      
+  def do_training(self):
+    # 1. Create Objects
+    self.device_type = self.get_device()
+    self.device = self.get_device()
+    self.dtype = self.get_dtype()
+    # 2. Prepare Datasloader
+    self.prepare_dataloader()
+    # 3. Create Optimizer, Scheduler, and Scaler for AMP
+    self.create_optimizer_scaler_scheduler()
+    # 4. Create static objects for faster compilation
+    self.create_static_container()
+    # 5. Create objects for storing learning history
+    self.create_metric_container()
+    # 6. Prepare Logger
+    self.prepare_logger()
+    # 7. Create Trainer Model
+    self.create_trainer_model()
+    # 8. Run Epochs
+    self.run_epochs()
+    # 9. Finalize
+    self.PrgInd.print_final_performance(trace=self.trace,metric_storage=self.metric_storage,elc=self.elc)
+    if self.use_callback==True:
+      self.model.load_state_dict(torch.load(self.filepath,weights_only=True))
+    return self.metric_storage
+    
+#------------------------------------------------------------------------------
+
 
 #Functions that are part of the training loop
 def get_device():
@@ -404,7 +823,7 @@ def check_and_set_checkpoints_cls(use_callback,model,filepath,epoch,metric_stora
   return best_val_loss, best_acc,best_bacc,best_val_avg_iota,elc  
 
 class epoch_trainer(torch.nn.Module):
-  def __init__(self,model,loss_fct,optimizer,scaler,scheduler,amp,device,model_typ):
+  def __init__(self,model,loss_fct,optimizer,scaler,scheduler,amp,device):
       super().__init__()
       self.model=model.to(device=device)
       self.loss_fct=loss_fct.to(device=device)
@@ -413,10 +832,14 @@ class epoch_trainer(torch.nn.Module):
       self.scheduler=scheduler
       self.amp=amp
       self.device=device
-      self.model_type=model_typ
+      if torch.cuda.is_available() and torch.cuda.is_bf16_supported():
+        self.amp_dtype=torch.bfloat16
+      else:
+        self.amp_dtype=None
 
   def prepare_training_step(self):
     self.optimizer.zero_grad(set_to_none=True)
+    
   def finalize_training_step(self,loss):
       self.scaler.scale(loss).backward()
       self.scaler.unscale_(self.optimizer)
@@ -429,16 +852,70 @@ class epoch_trainer(torch.nn.Module):
   def train_and_eval_standard(self,static_input,static_target,static_sample_weights=None):
      if self.training:
       self.prepare_training_step()
-      with torch.autocast(device_type=self.device, dtype=None, enabled=self.amp):  
-        output=self.model(static_input,prediction_mode=False)
-        loss=(self.loss_fct(output,static_target)*static_sample_weights.detach()).mean()
+      with torch.autocast(device_type=self.device, dtype=self.amp_dtype, enabled=self.amp):
+        if static_sample_weights is None:
+          output=self.model(static_input,prediction_mode=False)
+          loss=self.loss_fct(output,static_target).mean()
+        else:
+          output=self.model(static_input,prediction_mode=False)
+          loss=(self.loss_fct(output,static_target)*static_sample_weights.detach()).mean()
       self.finalize_training_step(loss)
       return loss, output
      else:
       with torch.no_grad():
+        with torch.amp.autocast(device_type=self.device, dtype=self.amp_dtype, enabled=self.amp):
+          if static_sample_weights is None:
+            output=self.model(static_input,prediction_mode=False)
+            loss=self.loss_fct(output,static_target).mean()
+          else:
+            output = self.model(static_input, prediction_mode=False)
+            loss = (self.loss_fct(output, static_target) * static_sample_weights.detach()).mean()
+        return loss, output
+  def train_prototype(self,static_query_inputs,static_query_classes,static_sample_inputs,static_sample_classes):
+     if self.training:
+      self.prepare_training_step()
+      with torch.autocast(device_type=self.device, dtype=self.amp_dtype, enabled=self.amp):
+        output=model(
+            input_q=static_query_inputs,
+            classes_q=static_query_classes,
+            input_s=static_sample_inputs,
+            classes_s=static_sample_classes,
+            prediction_mode=False)
+        loss=lself.loss_fct(
+            classes_q=outputs[2],
+            distance_matrix=outputs[1],
+            metric_scale_factor=model.get_metric_scale_factor().detach(),
+            logits=outputs[0]
+          )    
+      self.finalize_training_step(loss)
+      return loss, output
+  def validate_prototype(self,static_input,static_target):
+    with torch.no_grad():
         with torch.amp.autocast(device_type=self.device, dtype=torch.bfloat16, enabled=self.amp):
-          output = self.model(static_input, prediction_mode=False)
-          loss = (self.loss_fct(output, static_target) * static_sample_weights.detach()).mean()
+          outputs=model(
+            input_q=static_input,
+            classes_q=static_target,
+            prediction_mode=False)
+          loss=loss_fct(
+            classes_q=outputs[2],
+            distance_matrix=outputs[1],
+            metric_scale_factor=model.get_metric_scale_factor().detach(),
+            logits=outputs[0]
+          )
+    return loss, output
+  def train_and_eval_feature_extractor(self,static_input,static_target):
+     if self.training:
+      self.prepare_training_step()
+      with torch.autocast(device_type=self.device, dtype=self.amp_dtype, enabled=self.amp):
+        output=self.model(static_input,encoder_mode=False)
+        loss=self.loss_fct(output,static_target).mean()
+      self.finalize_training_step(loss)
+      return loss, output
+     else:
+      with torch.no_grad():
+        with torch.amp.autocast(device_type=self.device, dtype=self.amp_dtype, enabled=self.amp):
+          output=self.model(static_input,encoder_mode=False)
+          loss=self.loss_fct(output,static_target).mean()
         return loss, output
 
 def run_epoch_cls(trainer,dataloader,static_input,static_label,static_sample_weights,epoch,n_classes,device,current_dtype,cblock,metric_storage,logger):
@@ -496,88 +973,60 @@ def run_epoch_cls(trainer,dataloader,static_input,static_label,static_sample_wei
   )
   return results
 
-def run_epoch_cls_pt(model,dataloader,loss_fct,optimizer,scaler, scheduler,amp,epoch,Ns,Nq,n_classes,device,current_dtype,cblock,metric_storage,logger):
+def run_epoch_cls_pt(model,dataloader,static_input,static_label,static_sample_inputs,static_query_inputs,static_sample_classes,static_query_classes,loss_fct,optimizer,scaler, scheduler,amp,epoch,Ns,Nq,n_classes,device,current_dtype,cblock,metric_storage,logger):
   total_loss=0.0
   confusion_matrix=torch.zeros(size=(n_classes,n_classes),device=device,dtype=current_dtype)
   prob_confusion_matrix=torch.zeros(size=(n_classes,n_classes),device=device,dtype=current_dtype)
 
   if cblock=="train":
-    optimizer.zero_grad()
     model.train()
-    ctx=torch.enable_grad()
   else:
     model.eval()
-    ctx=torch.no_grad()
 
   for batch in dataloader:
-    with ctx:
-      inputs=batch["input"]
-      labels=batch["labels"]
-      if cblock=="train":
-        sample_inputs=inputs[0:(n_classes*Ns)].clone()
-        query_inputs=inputs[(n_classes*Ns):(n_classes*(Ns+Nq))].clone()
-        sample_classes=labels[0:(n_classes*Ns)].clone()
-        query_classes=labels[(n_classes*Ns):(n_classes*(Ns+Nq))].clone()
-        sample_inputs = sample_inputs.to(device,dtype=current_dtype)
-        query_inputs = query_inputs.to(device,dtype=current_dtype)
-        sample_classes = sample_classes.to(device,dtype=current_dtype)
-        query_classes = query_classes.to(device,dtype=current_dtype)
-
-        optimizer.zero_grad()
-        if torch.cuda.is_available() and torch.cuda.is_bf16_supported():
-          amp_dtype=torch.bfloat16
-        else:
-          amp_dtype=None
-        with torch.autocast(device_type=device, dtype=amp_dtype, enabled=amp):
-          outputs=model(
-            input_q=query_inputs,
-            classes_q=query_classes,
-            input_s=sample_inputs,
-            classes_s=sample_classes,
-            prediction_mode=False
-          )
-          loss=loss_fct(
-            classes_q=outputs[2],
-            distance_matrix=outputs[1],
-            metric_scale_factor=model.get_metric_scale_factor().detach(),
-            logits=outputs[0]
-          )
-          if torch.any(torch.isnan(loss)):
-            ValueError("NANs detected in loss")
-        scaler.scale(loss).backward()
-        
-        scaler.unscale_(optimizer)
-        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0,foreach=True)
-        
-        scaler.step(optimizer)
-        scaler.update()  
-        #loss.backward()
-        #optimizer.step()
-        if scheduler!=None:
-          scheduler.step()
-        #Metrics
-        total_loss +=loss.item()
-        pred_idx=outputs[0].max(dim=1).indices.to(dtype=torch.long,device=device)
-        label_idx=query_classes.to(dtype=torch.long,device=device)  
-      else:
-        inputs = inputs.to(device,dtype=current_dtype)
-        labels=labels.to(device,dtype=current_dtype)
-        if torch.cuda.is_available() and torch.cuda.is_bf16_supported():
-          amp_dtype=torch.bfloat16
-        else:
-          amp_dtype=None
-        with torch.autocast(device_type=device, dtype=amp_dtype, enabled=amp):
-          outputs=model(input_q=inputs,classes_q=labels,prediction_mode=False)
-          loss=loss_fct(
-            classes_q=outputs[2],
-            distance_matrix=outputs[1],
-            metric_scale_factor=model.get_metric_scale_factor().detach(),
-            logits=outputs[0]
-          )
-        #Metrics
-        total_loss +=loss.item()
-        pred_idx=outputs[0].max(dim=1).indices.to(dtype=torch.long,device=device)
-        label_idx=outputs[2].to(dtype=torch.long,device=device)
+    inputs=batch["input"]
+    labels=batch["labels"]
+    if cblock=="train":
+      sample_inputs=inputs[0:(n_classes*Ns)].clone()
+      query_inputs=inputs[(n_classes*Ns):(n_classes*(Ns+Nq))].clone()
+      sample_classes=labels[0:(n_classes*Ns)].clone()
+      query_classes=labels[(n_classes*Ns):(n_classes*(Ns+Nq))].clone()
+      sample_inputs = sample_inputs.to(device,dtype=current_dtype,non_blocking=True)
+      query_inputs = query_inputs.to(device,dtype=current_dtype,non_blocking=True)
+      sample_classes = sample_classes.to(device,dtype=current_dtype,non_blocking=True)
+      query_classes = query_classes.to(device,dtype=current_dtype,non_blocking=True)
+      
+      static_sample_inputs.copy_(sample_inputs)
+      static_query_inputs.copy_(query_classes)
+      static_sample_classes.copy_(sample_classes)
+      static_query_classes.copy_(query_classes)
+      #Train Step
+      loss, outputs=trainer.train_prototype(
+          static_query_inputs=static_query_inputs,
+          static_query_classes=static_query_classes,
+          static_sample_inputs=static_sample_inputs,
+          static_sample_classes=static_sample_classes)
+      loss=loss.detach()
+      outputs=outputs.detach()
+      #Metrics
+      total_loss +=loss.item()
+      pred_idx=outputs[0].max(dim=1).indices.to(dtype=torch.long,device=device)
+      label_idx=query_classes.to(dtype=torch.long,device=device)  
+    else:
+      inputs = inputs.to(device,dtype=current_dtype,non_blocking=True)
+      labels = labels.to(device,dtype=current_dtype,non_blocking=True)
+      static_input.copy_(inputs)
+      static_label.copy_(labels)
+      #Validation stept
+      loss,outputs=trainer.validate_prototype(
+        static_input=static_input,
+        static_label=static_label
+        )
+    #Metrics
+    total_loss +=loss.item()
+    pred_idx=outputs[0].max(dim=1).indices.to(dtype=torch.long,device=device)
+    label_idx=outputs[2].to(dtype=torch.long,device=device)
+    
     confusion_matrix+=multiclass_confusion_matrix(input=pred_idx,target=label_idx,num_classes=n_classes,normalize = None)
     prob_confusion_matrix+=create_p_confusion_matrix(torch.nn.Softmax(dim=1)(outputs[0]),label_idx=label_idx,num_classes=n_classes)
     
@@ -585,6 +1034,7 @@ def run_epoch_cls_pt(model,dataloader,loss_fct,optimizer,scaler, scheduler,amp,e
     logger.inc_value("bottom")
     logger.write_log()
     logger.write_history_log(metric_storage["loss"])
+    
   #Calculate prototypes
   if cblock=="train":
     model.eval()
@@ -664,20 +1114,6 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
   #Create Amp_Scaler
   amp_scaler=torch.amp.GradScaler(device ,enabled=amp)
   #Create static addresses for compilation
-        sample_inputs=inputs[0:(n_classes*Ns)].clone()
-        query_inputs=inputs[(n_classes*Ns):(n_classes*(Ns+Nq))].clone()
-        sample_classes=labels[0:(n_classes*Ns)].clone()
-        query_classes=labels[(n_classes*Ns):(n_classes*(Ns+Nq))].clone()
-        sample_inputs = sample_inputs.to(device,dtype=current_dtype)
-        query_inputs = query_inputs.to(device,dtype=current_dtype)
-        sample_classes = sample_classes.to(device,dtype=current_dtype)
-        query_classes = query_classes.to(device,dtype=current_dtype)
-        
-        inputs = inputs.to(device,dtype=current_dtype)
-        labels=labels.to(device,dtype=current_dtype)
-  
-  
-  
   static_input=torch.randn((batch_size,times,features),device=device,dtype=current_dtype)
   static_label=torch.randn((batch_size,n_classes),device=device,dtype=current_dtype)
   static_sample_weights=torch.randn((batch_size,1),device=device,dtype=current_dtype)
@@ -833,9 +1269,13 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     margin=loss_margin
   )
   #Create static addresses for compilation
-  #static_input=torch.randn((batch_size,times,features),device=device,dtype=current_dtype)
-  #static_label=torch.randn((batch_size,n_classes),device=device,dtype=current_dtype)
-  #static_sample_weights=torch.randn((batch_size,1),device=device,dtype=current_dtype)
+  static_sample_inputs=torch.randn((n_classes*Ns,times,features),device=device,dtype=current_dtype)
+  static_query_inputs=torch.randn((n_classes*Nq,times,features),device=device,dtype=current_dtype)
+  static_sample_classes=torch.randn((n_classes*Ns,n_classes),device=device,dtype=current_dtype)
+  static_query_classes=torch.randn((n_classes*Nq,n_classes),device=device,dtype=current_dtype)
+  static_input=torch.randn((Ns+Nq,times,features),device=device,dtype=current_dtype)
+  static_label=torch.randn((Ns+Nq,n_classes),device=device,dtype=current_dtype)
+
   #Numpys for Saving Training History
   metric_storage=create_metric_storage(
     metric_names=["loss","accuracy","balanced_accuracy","avg_iota","s_avg_iota"],
@@ -920,6 +1360,12 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       trainer=trainer,
       dataloader=trainloader,
       amp=amp,
+      static_sample_inputs=static_sample_inputs,
+      static_query_inputs=static_query_inputs,
+      static_sample_classes=static_sample_classes,
+      static_query_classes=static_query_classes,
+      static_input=static_input,
+      static_label=static_label,
       epoch=epoch,
       Ns=Ns,
       Nq=Nq,
@@ -933,6 +1379,12 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     val_results=run_epoch_cls_pt(
      trainer=trainer,
       dataloader=valloader,
+      static_sample_inputs=static_sample_inputs,
+      static_query_inputs=static_query_inputs,
+      static_sample_classes=static_sample_classes,
+      static_query_classes=static_query_classes,
+      static_input=static_input,
+      static_label=static_label,
       scheduler=scheduler,
       amp=amp,
       epoch=epoch,
@@ -949,6 +1401,12 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       test_results=run_epoch_cls_pt(
         trainer=trainer,
         dataloader=testloader,
+        static_sample_inputs=static_sample_inputs,
+        static_query_inputs=static_query_inputs,
+        static_sample_classes=static_sample_classes,
+        static_query_classes=static_query_classes,
+        static_input=static_input,
+        static_label=static_label,
         amp=amp,
         epoch=epoch,
         Ns=Ns,

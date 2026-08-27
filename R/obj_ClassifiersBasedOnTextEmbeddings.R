@@ -1088,7 +1088,9 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         pytorch_test_data <- NULL
       }
 
-      tmp_history <- py$TeClassifierTrain(
+      trainer=py$ModelTrainer("ClassifierStandard")
+
+      trainer$config_for_StandardClassifier(
         model = private$model,
         features=as.integer(private$model_config$features),
         times=as.integer(private$model_config$times),
@@ -1118,6 +1120,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         log_top_total = log_top_total,
         log_top_message = log_top_message
       )
+      tmp_history <-trainer$do_training()
 
 
       # provide rownames and replace -100

@@ -283,42 +283,25 @@ class ConvAutoencoder_with_Mask_PT(torch.nn.Module):
       return(noise)
 
 
-def run_epoch_autoencoder(model,dataloader,loss_fct,optimizer,scaler,scheduler,amp,epoch,device,current_dtype,cblock,metric_storage,logger):
+def run_epoch_autoencoder(model,dataloader,static_input,static_label,loss_fct,optimizer,scaler,scheduler,amp,epoch,device,current_dtype,cblock,metric_storage,logger):
   total_loss=0.0
   if cblock=="train":
-    optimizer.zero_grad()
     model.train()
-    ctx=torch.enable_grad()
   else:
     model.eval()
-    ctx=torch.no_grad()
   for batch in dataloader:
-    with ctx: 
-      inputs=batch["input"]
-      labels=batch["labels"]
-      inputs = inputs.to(device,dtype=current_dtype)
-      labels=labels.to(device,dtype=current_dtype)
-      if cblock=="train":
-        optimizer.zero_grad()
-      if torch.cuda.is_available() and torch.cuda.is_bf16_supported():
-        amp_dtype=torch.bfloat16
-      else:
-        amp_dtype=None  
-      with torch.autocast(device_type=device, dtype=amp_dtype, enabled=amp):  
-        outputs=model(inputs,encoder_mode=False)
-        loss=loss_fct(outputs,labels)
-        if torch.any(torch.isnan(loss)):
-          ValueError("NANs detected in loss")
-      if cblock=="train":
-        scaler.scale(loss).backward()
-        scaler.step(optimizer)
-        scaler.update()  
-        #loss.backward()
-        #optimizer.step()
-        if scheduler!=None:
-          scheduler.step()
-      #Metrics
-      total_loss +=loss.item()
+    inputs=batch["input"]
+    labels=batch["labels"]
+    inputs = inputs.to(device,dtype=current_dtype)
+    labels=labels.to(device,dtype=current_dtype)
+    static_input.copy_(inputs,non_blocking=True)
+    static_label.copy_(labels,non_blocking=True)
+    loss,output=trainer.train_and_eval_feature_extractor(static_input,static_label)
+    #Calculate CLS Statistics
+    loss=loss.detach()
+    output=output.detach()
+    #Metrics
+    total_loss +=loss.item()
     #Update log file
     logger.inc_value("bottom")
     logger.write_log()
@@ -343,7 +326,7 @@ def check_and_set_checkpoints_loss(use_callback,model,filepath,epoch,metric_stor
         elc=epoch+1
   return best_val_loss, elc
     
-def AutoencoderTrain_PT_with_Datasets(model,optimizer_method,scheduler_type,amp, lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,batch_size,
+def AutoencoderTrain_PT_with_Datasets(model,optimizer_method,times,features,scheduler_type,amp, lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,batch_size,
 train_data,val_data,filepath,use_callback,
 log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
   #Set test data to None
@@ -363,12 +346,13 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     batch_size=batch_size,
     pin_memory = True if device=="cuda" else False
   )
-  #Create optimizer and scheduler
+  #Create optimizer
   optimizer=get_Optimizer(
     optimizer_method,
     params=model.parameters(),
     lr_rate=lr_rate
   )
+  #Create Scheduler
   scheduler=get_lr_scheduler(
     optimizer=optimizer,
     scheduler_type=scheduler_type,
@@ -378,9 +362,23 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     max_lr=lr_rate,
     min_lr=lr_min
   )
+  #Create static addresses for compilation
+  static_input=torch.randn((batch_size,times,features),device=device,dtype=current_dtype)
+  static_label=torch.randn((batch_size,times,features),device=device,dtype=current_dtype)
+  #Create Scaler
   amp_scaler=torch.amp.GradScaler(device ,enabled=amp)
-  #Tensor for Saving Training History
-    #Numpys for Saving Training History
+  #Create Trainer model
+  trainer=epoch_trainer(
+    model=model,
+    loss_fct=loss_fct,
+    optimizer=optimizer,
+    scaler=amp_scaler,
+    scheduler=scheduler,
+    amp=amp,
+    device=device
+  )
+  trainer=trainer.to(dtype=current_dtype,device=device)
+  #Numpys for Saving Training History
   metric_storage=create_metric_storage(
     metric_names=["loss"],
     epochs=epochs,
@@ -413,13 +411,12 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
 
   for epoch in range(epochs):
     train_results=run_epoch_autoencoder(
-      model=model,
+      trainer=trainer,
+      static_input=static_input,
+      static_label=static_label,
       dataloader=trainloader,
-      optimizer=optimizer,
-      scaler=amp_scaler,
       amp=amp,
       scheduler=scheduler,
-      loss_fct=loss_fct,
       epoch=epoch,
       device=device,
       current_dtype=current_dtype,
@@ -428,13 +425,11 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
       logger=logger
     )
     val_results=run_epoch_autoencoder(
-      model=model,
+      trainer=trainer,
+      static_input=static_input,
+      static_label=static_label,
       dataloader=valloader,
-      loss_fct=loss_fct,
-      optimizer=optimizer,
-      scaler=amp_scaler,
       amp=amp,
-      scheduler=scheduler,
       epoch=epoch,
       device=device,
       current_dtype=current_dtype,
@@ -444,13 +439,11 @@ log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_m
     )
     if testloader is not None:
       test_results=run_epoch_autoencoder(
-        model=model,
+        trainer=trainer,
+        static_input=static_input,
+        static_label=static_label,
         dataloader=testloader,
-        optimizer=optimizer,
-        scaler=amp_scaler,
         amp=amp,
-        scheduler=scheduler,
-        loss_fct=loss_fct,
         epoch=epoch,
         device=device,
         current_dtype=current_dtype,

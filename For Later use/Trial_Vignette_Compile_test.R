@@ -132,7 +132,7 @@ print(classifier$count_parameter())
 classifier$train(
   data_embeddings = review_embeddings,
   data_targets = review_labels,
-  data_folds = 10,
+  data_folds = 2,
   data_val_size = 0.25,
   loss_cls_fct_name =  "CrossEntropyLoss",
   loss_balance_class_weights = TRUE,
@@ -151,7 +151,7 @@ classifier$train(
   sustain_region = NULL,
   sustain_interval = 15,
   sustain_log_level = "error",
-  epochs = 100,
+  epochs = 25,
   batch_size = 4,
   trace = TRUE,
   ml_trace = 1,
