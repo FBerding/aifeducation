@@ -41,6 +41,38 @@
 #'
 get_param_dict <- function() {
   param <- list()
+  #Compilation------------------------------------------------------------------
+  param$comp_use<- list(
+    type = "bool",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = NULL,
+    desc = "If `TRUE` model and loss are compiled to speed up training.",
+    default_value = TRUE,
+    test_values = TRUE
+  )
+  param$comp_mode<- list(
+    type = "string",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = c("default","reduce-overhead","max-autotune","max-autotune-no-cudagraphs"),
+    desc = "Determines the mode for compilation. Different modes are only available if
+    the compilation backend is 'triton.'.",
+    default_value = TRUE,
+    test_values = "reduce-overhead"
+  )
+  param$ddp_use<- list(
+    type = "bool",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = NULL,
+    desc = "If `TRUE` model uses all available gpus for training.",
+    default_value = FALSE,
+    test_values = FALSE
+  )
   # General---------------------------------------------------------------------
   param$name <- list(
     type = "string",
@@ -1602,19 +1634,19 @@ get_param_dict <- function() {
     test_values = NULL
   )
 
-  cls_input_normalize=param$normalization_type
-  cls_input_normalize$desc="Type of normalization applied to data before passing to any layers of the net."
-  cls_input_normalize$allowed_values=c(
+  param$cls_input_normalize=param$normalization_type
+  param$cls_input_normalize$desc="Type of normalization applied to data before passing to any layers of the net."
+  param$cls_input_normalize$allowed_values=c(
     "BatchNorm",
     "PowerNorm",
     "None"
   )
-  cls_input_normalize$values_desc=param$normalization_type$values_desc[c("BatchNorm","PowerNorm","None")]
-  cls_input_normalize$gui_box = "General Settings"
-  cls_input_normalize$gui_label = "Normalization"
-  cls_input_normalize$default_value = "BatchNorm"
-  cls_input_normalize$default_historic = "None"
-  cls_input_normalize$test_values = NULL
+  param$cls_input_normalize$values_desc=param$normalization_type$values_desc[c("BatchNorm","PowerNorm","None")]
+  param$cls_input_normalize$gui_box = "General Settings"
+  param$cls_input_normalize$gui_label = "Normalization"
+  param$cls_input_normalize$default_value = "BatchNorm"
+  param$cls_input_normalize$default_historic = "None"
+  param$cls_input_normalize$test_values = NULL
 
   param$feat_normalization_type <- param$normalization_type
   param$feat_normalization_type$gui_box <- "Feature Layer"
