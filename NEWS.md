@@ -6,19 +6,33 @@ editor_options:
 
 # aifeducation 1.1.7
 
+**General**
+
+- Refactoring of all python layers to allow compilation without graph breaks. We organized 
+  training loops for classifiers and TEFeatureExtractors new to improve maintenance. 
+
 **Classifiers**
 
-- Add 'FocalLossOrdinal' and 'MultiWayContrastiveLossFCOrdinal' as new losses for ordinal scales.
-- Add a new *experimental* Assignment-Error-Loss (AEMLoss) based on Berding and Pargmann (2022).
+- Added an new type of classifiers which are a combination of classical and prototypical classifiers.
+  ('TEClassifierSequentialReferencePoint' and 'TEClassifierParallelReferencePoint').
+- Added 'FocalLossOrdinal' and 'MultiWayContrastiveLossFCOrdinal' as new losses for ordinal scales.
+- Added a new *experimental* Assignment-Error-Loss (AEMLoss) based on Berding and Pargmann (2022).
 - NANs in loss now raise an error.
 - The number of epochs for learning rate calculation can now be determined by the user.
-- Add gradient clipping to training loops.
-- Add options for data normalization before any data is passed to the net. 
+- Added gradient clipping to training loops.
+- Added options for data normalization before any data is passed to the net.
+- All classifiers now support compilation to speed up training.
 
 **TEFeatureExtractor**
 
 - NANs in loss now raise an error.
 - The number of epochs for learning rate calculation can now be determined by the user.
+- TEFeatureExtractors now support compilation to speed up training.
+
+**DataManager**
+
+- Added a new method for requesting the smallest number of cases over all folds and
+  the different kind of data sets (train, validation, test).
 
 **Minor Issues**
 
