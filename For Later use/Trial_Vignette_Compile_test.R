@@ -1,10 +1,10 @@
 
 devtools::load_all()
-Sys.setenv(CUDA_LAUNCH_BLOCKING = "1")
-Sys.setenv(TORCH_USE_CUDA_DSA = "1")
+#Sys.setenv(CUDA_LAUNCH_BLOCKING = "1")
+#Sys.setenv(TORCH_USE_CUDA_DSA = "1")
 prepare_session()
 os=reticulate::import("os")
-os$environ$setdefault("CUDA_LAUNCH_BLOCKING",1)
+#os$environ$setdefault("CUDA_LAUNCH_BLOCKING","1")
 example_data <- imdb_movie_reviews
 example_data$label <- as.character(example_data$label)
 example_data$label[c(76:100)] <- NA
@@ -69,20 +69,21 @@ review_embeddings <- tem$embed_large(
 
 devtools::load_all()
 load_all_py_scripts()
+gc()
 #prepare_session()
 classifier <- TEClassifierSequentialReferencePoint$new()
-classifier <- TEClassifierSequential$new()
+#classifier <- TEClassifierSequential$new()
 classifier$configure(
   label = "ReferencePoint classifier for Estimating a Postive or Negative Rating of Movie Reviews",
   text_embeddings = review_embeddings,
   feature_extractor = NULL,
   target_levels = c("neg", "pos"),
   skip_connection_type = "ResidualGate",
-  cls_pooling_type = "MinMax",
-  cls_pooling_features = 50,
-  #cls_times_pooling_type = "WeightedAverage",
+  #cls_pooling_type = "WeightedAverageTimes",
+  #cls_pooling_features = 50,
+  cls_times_pooling_type = "WeightedAverage",
   cls_input_normalize="BatchNorm",
- # metric_type = "CosineDistance",
+  metric_type = "CosineDistance",
   feat_act_fct = "Tanh",
   feat_size = 384,
   feat_bias = TRUE,
@@ -128,6 +129,8 @@ classifier$configure(
   tf_normalization_position = "Post",
   tf_residual_type = "ResidualGate"
 )
+
+classifier
 print(classifier$count_parameter())
 classifier$train(
   data_embeddings = review_embeddings,
@@ -164,7 +167,8 @@ classifier$train(
   lr_warm_up_ratio = 0.05,
   optimizer = "AdamW",
   amp = TRUE,
-  comp_use=TRUE
+  comp_use=TRUE,
+  ddp_use=FALSE
 )
 
 classifier$reliability$test_metric_mean
@@ -173,6 +177,8 @@ com_classifier=classifier
 com_classifier$last_training$learning_time
 
 #--------------------------------------------------------------------------------------
+devtools::load_all()
+load_all_py_scripts()
 classifier_prototype <- TEClassifierSequentialPrototype$new()
 classifier_prototype$configure(
   label = "ProtoNet classifier for Estimating a Postive or Negative Rating of Movie Reviews",
@@ -180,8 +186,8 @@ classifier_prototype$configure(
   feature_extractor = NULL,
   target_levels = c("neg", "pos"),
   skip_connection_type = "ResidualGate",
-  cls_pooling_features = 20,
-  cls_pooling_type = "MaxTimes",
+  cls_pooling_features = 25,
+  cls_pooling_type = "WeightedAverageTimes",
   projection_type = "Regular",
   metric_type = "Euclidean",
   feat_act_fct = "Tanh",
@@ -193,7 +199,7 @@ classifier_prototype$configure(
   ng_conv_act_fct = "GELU",
   ng_conv_n_layers = 1,
   ng_conv_ks_min = 2,
-  ng_conv_ks_max = max_chunks,
+  ng_conv_ks_max = 3,
   ng_conv_bias = FALSE,
   ng_conv_dropout = 0.05,
   ng_conv_parametrizations = "None",
@@ -234,10 +240,10 @@ classifier_prototype$configure(
 classifier_prototype$train(
   data_embeddings = review_embeddings,
   data_targets = review_labels,
-  data_folds = 10,
+  data_folds = 2,
   data_val_size = 0.25,
   loss_pt_fct_name = "MultiWayContrastiveLossFC",
-  use_sc = TRUE,
+  use_sc = FALSE,
   sc_method = "knnor",
   sc_min_k = 1,
   sc_max_k = 10,
@@ -251,25 +257,64 @@ classifier_prototype$train(
   sustain_region = NULL,
   sustain_interval = 15,
   sustain_log_level = "error",
-  epochs = 2000,
+  epochs = 300,
   batch_size = 32,
-  Ns = 18,
+  Ns = 3,
   Nq = 3,
   loss_alpha = 0.50,
   loss_margin = 0.05,
   sampling_separate = FALSE,
   sampling_shuffle = TRUE,
   trace = TRUE,
-  ml_trace = 0,
+  ml_trace = 1,
   log_dir = NULL,
   log_write_interval = 10,
   n_cores = auto_n_cores(),
-  lr_rate = 0.0,
-  lr_min = 0.0,
+  lr_rate = 1e-4,
+  lr_min = 1e-4,
   lr_epochs = 75,
   lr_scheduler = "None",
   lr_warm_up_ratio = 0.05,
   optimizer = "AdamW",
   amp = TRUE,
-  comp_use=TRUE
+  comp_use=TRUE,
+  ddp_use=FALSE
+)
+
+
+#-----------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------
+devtools::load_all()
+load_all_py_scripts()
+feature_extractor <- TEFeatureExtractor$new()
+feature_extractor$configure(
+  name = "feature_extractor_bert_movie_reviews",
+  label = "Feature extractor for Text Embeddings",
+  text_embeddings = review_embeddings,
+  features = 384,
+  method = "Dense",
+  orthogonal_method = "matrix_exp",
+  noise_factor = 0.0
+)
+feature_extractor$train(
+  data_embeddings = review_embeddings,
+  data_val_size = 0.25,
+  sustain_track = TRUE,
+  sustain_iso_code = "DEU",
+  sustain_region = NULL,
+  sustain_interval = 15,
+  sustain_log_level = "error",
+  epochs = 20,
+  batch_size = 64,
+  lr_rate = 1e-4,
+  lr_min = 1e-4,
+  lr_epochs = 75,
+  lr_scheduler = "None",
+  trace = TRUE,
+  ml_trace = 1,
+  optimizer = "AdamW",
+  amp = TRUE,
+  comp_use=TRUE,
+  ddp_use=FALSE,
+  lr_warm_up_ratio = 0.10
 )
