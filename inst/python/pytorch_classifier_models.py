@@ -994,48 +994,45 @@ class TEClassifierPrototype(torch.nn.Module):
       n_classes=class_labels.size()[0]
       #Recode class labels in order to start at 0 for sample and query
       sample_classes=self.recode_classes(classes_s,class_labels)
+      query_classes=self.recode_classes(classes_q,class_labels)
       #Calculate Embeddings
       input_all=torch.cat((input_q,input_s),dim=0)
       embeddings_all=self.embed(input_all)
       embeddings_q,embeddings_s=torch.split(embeddings_all,(input_q.size(0),input_s.size(0)),dim=0)
       #Calculate Prototypes      
       prototypes=self.calc_prototypes(input_s=embeddings_s,classes=sample_classes,total_classes=n_classes)
+      #Calc distance from query embeddings to global prototypes
+      distances=self.metric(x=embeddings_q,prototypes=prototypes)
+      logits=torch.exp(-distances)
+      return logits, distances, query_classes, embeddings_q, prototypes
     else:
-    #Sample set
-      if input_s is None or classes_s is None or class_labels is None:
-        prototypes=self.trained_prototypes
-        class_labels=self.class_labels
-        embeddings_q=self.embed(input_q)
-      else:
-        #Get class labels in the samples which are also used for the query set
-        #class_labels=torch.unique(classes_s,sorted=True)
-        n_classes=class_labels.size()[0]
-        #Recode class labels in order to start at 0 for sample and query
-        sample_classes=self.recode_classes(classes_s,class_labels)
-        #Calculate embeddings
-        input_all=torch.cat((input_q,input_s),dim=0)
-        embeddings_all=self.embed(input_all)
-        embeddings_q,embeddings_s=torch.split(embeddings_all,(input_q.size(0),input_s.size(0)),dim=0)
-        #Calc prototypes
-        prototypes=self.calc_prototypes(input_s=embeddings_s,classes=sample_classes,total_classes=n_classes)
-    #Calc distance from query embeddings to global prototypes
-    distances=self.metric(x=embeddings_q,prototypes=prototypes)
-    logits=torch.exp(-distances)
-    if self.training:
+      prototypes=self.trained_prototypes
+      class_labels=self.class_labels
+      embeddings_q=self.embed(input_q)
       query_classes=self.recode_classes(classes_q,class_labels)
-      probabilities=logits 
-      return probabilities, distances, query_classes, embeddings_q, prototypes
-    else:  
+      distances=self.metric(x=embeddings_q,prototypes=prototypes)
+      logits=torch.exp(-distances)
       if prediction_mode==False:
-        #if classes_q==None:
-        #  query_classes=None
-        #else:
-        query_classes=self.recode_classes(classes_q,class_labels)
-        probabilities=logits  
-        return probabilities, distances, query_classes, embeddings_q, prototypes
+        return logits, distances, query_classes, embeddings_q, prototypes
       else:
         probabilities=torch.nn.functional.softmax(logits,dim=1)
         return probabilities
+    
+  def predict_with_samples(self,input_q,input_s,classes_s):
+    class_labels=torch.unique(classes_s,sorted=True)
+    n_classes=class_labels.size()[0]
+    #Recode class labels in order to start at 0 for sample and query
+    sample_classes=self.recode_classes(classes_s,class_labels)
+    #Calculate mebddings
+    input_all=torch.cat((input_q,input_s),dim=0)
+    embeddings_all=self.embed(input_all)
+    embeddings_q,embeddings_s=torch.split(embeddings_all,(input_q.size(0),input_s.size(0)),dim=0)
+    #Calculate Prototypes      
+    prototypes=self.calc_prototypes(input_s=embeddings_s,classes=sample_classes,total_classes=n_classes)    
+    distances=self.metric(x=embeddings_q,prototypes=prototypes)
+    logits=torch.exp(-distances)
+    probabilities=torch.nn.functional.softmax(logits,dim=1)
+    return probabilities
     
   def recode_classes(self,class_vector,class_labels):
     #n_labels=class_labels.size()[0]
@@ -1051,7 +1048,8 @@ class TEClassifierPrototype(torch.nn.Module):
     indices = torch.arange(class_labels.size(0), device=class_vector.device).unsqueeze(1)
     
     # Multipliziert die Maske mit den Indizes und summiert sie auf
-    return (matches * indices).sum(dim=0)    
+    class_ids_new=(matches * indices).sum(dim=0)
+    return class_ids_new.detach()    
   
   def get_distances(self,inputs,prototypes):
     distances=self.metric(x=self.embed(inputs),prototypes=prototypes)
