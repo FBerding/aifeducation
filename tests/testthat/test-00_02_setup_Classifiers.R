@@ -57,12 +57,13 @@ test_that("Setup Classifier Data", {
         sustain_interval = 15,
         sustain_log_level = "error",
         epochs = 75,
-        batch_size = 100,
+        batch_size = 96,
         optimizer = "Adam",
         lr_rate = 1e-3,
         lr_min = 1e-4,
         trace = trace,
-        ml_trace = as.numeric(trace)
+        ml_trace = as.numeric(trace),
+        comp_use=TRUE
       )
       save_to_disk(
         object = extractor,

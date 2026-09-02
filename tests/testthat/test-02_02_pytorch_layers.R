@@ -89,7 +89,7 @@ test_that("Masking Layer", {
     features = features,
     seq_len = sequence_length,
     pad_value = pad_value
-  )
+  )$to(device)
 
   layer <- py$masking_layer(pad_value)$to(device)
   y <- layer(example_tensor)
@@ -428,7 +428,7 @@ test_that("DenseLayer with Mask", {
     features = features,
     seq_len = sequence_length,
     pad_value = pad_value
-  )$to(device)
+  )$to(device,torch$float)
   masking_layer <- py$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 

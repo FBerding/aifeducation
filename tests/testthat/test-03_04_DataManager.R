@@ -87,6 +87,13 @@ for (method in methods) {
       )
     })
 
+      test_that(paste("DataManager - get_n_classes"), {
+        expect_gte(
+          test_datamanager$get_min_n(),
+          1L
+        )
+    })
+
     for (i in 1:(test_datamanager$get_n_folds() + 1)) {
       sample <- test_datamanager$get_samples()[[i]]
       #-----------------------------------------------------------------------------
