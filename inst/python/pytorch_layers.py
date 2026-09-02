@@ -40,13 +40,10 @@ class masking_layer(torch.nn.Module):
     else:
         self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
   def forward(self,x):
-    features=torch.tensor(x.size()[-1], device=x.device, dtype=torch.float)
-    time_sums=torch.sum(x,dim=2)
-    #Get mask on the level of sequences/times
-    condition=(time_sums==features*self.pad_value)
-    mask_times=torch.zeros(time_sums.size(),device=time_sums.device,dtype=torch.bool)
-    mask_times=torch.where(condition,True,False)
-    return x, mask_times.detach()
+    features = x.size(-1)  # Bleibt als Python-Skalar/Symbol für den Compiler intakt
+    time_sums = torch.sum(x, dim=2)
+    condition = (time_sums == (features * self.pad_value))
+    return x, condition.detach()
 
 #Dropout layer with mask
 class layer_dropout_with_mask(torch.nn.Module):
@@ -137,16 +134,17 @@ class pairwise_orthogonal_dense(torch.nn.Module):
     self.n_params_residual=self.input_size-self.n_params
     self.n_params=self.n_params+self.n_params_residual
 
-    self.weight=torch.nn.parameter.Parameter(torch.rand(1,self.n_params),device=device)
+    self.weight=torch.nn.parameter.Parameter(torch.rand(1,self.n_params))
     if self.bias:
-      self.beta=torch.nn.parameter.Parameter(torch.zeros(1,self.output_size),device=device)
+      self.beta=torch.nn.parameter.Parameter(torch.zeros(1,self.output_size))
     
     if self.pre_dense==True:
       self.dense_layer=torch.nn.Linear(
         in_features=self.input_size, 
         out_features=self.input_size, 
         bias=self.bias, 
-        device=device, dtype=dtype
+        device=device, 
+        dtype=dtype
       )
 
     
@@ -627,10 +625,10 @@ class layer_unpack_and_masking(torch.nn.Module):
 class layer_fourier_transformation(torch.nn.Module):
   def __init__(self):
     super().__init__()
-    self.fourier_batch=torch.vmap(func=torch.fft.fft2,in_dims=0,out_dims=0)
     
   def forward(self,x):
-    result=self.fourier_batch(x.to(torch.complex64),norm="backward").real
+    fourier_batch=torch.vmap(func=torch.fft.fft2,in_dims=0,out_dims=0)
+    result=fourier_batch(x.to(torch.complex64),norm="backward").real
     return result.to(x.dtype)
 
 #----------------
@@ -944,14 +942,39 @@ class layer_class_mean(torch.nn.Module):
   def __init__(self):
     super().__init__()
 
-  def forward(self,x,classes,total_classes):
-    index_matrix=torch.nn.functional.one_hot(torch.Tensor.to(classes,dtype=torch.int64),num_classes=total_classes)
-    index_matrix=torch.transpose(index_matrix,dim0=0,dim1=1)
-    index_matrix=torch.Tensor.to(index_matrix,dtype=x.dtype)
-    
-    cases_per_class=torch.sum(index_matrix,dim=1)
-    class_mean=torch.matmul(torch.diag(1/cases_per_class),torch.matmul(index_matrix,x))
-    return class_mean
+  def forward(self, x, classes, total_classes):
+      # total_classes ist hier ein dynamisches Symbol (class_labels.size()[0])
+      # Wir erstellen eine Nullmatrix direkt auf dem richtigen Device
+      index_matrix = torch.zeros(
+          classes.size(0), 
+          total_classes, 
+          dtype=x.dtype, 
+          device=x.device
+      )
+        
+      # Befüllen der Matrix: Setze eine 1.0 an die Positionen der Klassen
+      index_matrix.scatter_(1, classes.long().unsqueeze(1), 1.0)
+      
+      # 1. One-Hot-Matrix erzeugen (Sicherstellen, dass total_classes ein Tensor oder statisch ist)
+      #index_matrix = torch.nn.functional.one_hot(classes.long(), num_classes=total_classes)
+      #index_matrix = index_matrix.to(x.dtype)
+      
+      # 2. Summe pro Klasse berechnen [1, total_classes]
+      cases_per_class = torch.sum(index_matrix, dim=0, keepdim=True)
+      
+      # 3. Graph-Break-freie Division durch Null verhindern mit torch.clamp
+      # Statt where/ones_like nutzen wir ein Minimum von 1. Wenn die Klasse 0-mal vorkommt,
+      # wird die Summe (0) durch 1 geteilt, was mathematisch korrekt 0 ergibt.
+      safe_counts = torch.clamp(cases_per_class, min=1.0)
+      inv_cases = torch.reciprocal(safe_counts)
+      
+      # 4. Matrixmultiplikation und anschließendes Broadcasting
+      class_sum = torch.matmul(index_matrix.t(), x)
+      
+      # .t() erzeugt einen View; .view(-1, 1) sorgt für stabiles Broadcasting beim Multiplizieren
+      class_mean = class_sum * inv_cases.view(-1, 1)
+      
+      return class_mean
 
 # Layer layer_protonet_metric
 # Calculates the distance of sample to prototypes
@@ -964,15 +987,19 @@ class layer_protonet_metric(torch.nn.Module):
     super().__init__()
     self.alpha=torch.nn.Parameter((torch.ones(1)-1e-8))
     self.metric_type=metric_type
-  
+    self.use_euclidean = (metric_type == "Euclidean")
   def forward(self,x,prototypes):
-    if self.metric_type=="Euclidean":
-      distance_matrix=torch.cdist(
-        x1=x,
-        x2=prototypes,
-        p=2.0
-      )
-    elif self.metric_type=="CosineDistance":
+    if self.use_euclidean:
+        x_norm = torch.sum(torch.square(x), dim=-1, keepdim=True)          # [Batch, 1]
+        proto_norm = torch.sum(torch.square(prototypes), dim=-1, keepdim=True).t() # [1, Klassen]
+            
+        # 2. Das Kreuzprodukt (2 * x @ y^T) berechnen
+        cross_term = 2.0 * torch.matmul(x, prototypes.t())                 # [Batch, Klassen]
+            
+        # 3. Zusammenführen und Wurzel ziehen (abgesichert mit clamp/eps gegen negative Werte durch Float-Ungenauigkeiten)
+        sq_distance = x_norm + proto_norm - cross_term
+        distance_matrix = torch.sqrt(torch.clamp(sq_distance, min=1e-8))
+    else:
       distance_matrix=CosineDistance(
         x=x,
         y=prototypes,
@@ -982,29 +1009,6 @@ class layer_protonet_metric(torch.nn.Module):
   def get_scaling_factor(self):
     return torch.sqrt(torch.square(self.alpha+1e-8))
 
-#Global Pooling layer----------------------------------------------------------
-class layer_global_average_pooling_1d(torch.nn.Module):
-  def __init__(self,mask_type="attention"):
-    super().__init__()
-    self.mask_type=mask_type
-
-  def forward(self,x,mask=None):
-    if not mask is None:
-      if not self.mask_type=="attention":
-        applied_mask=~mask
-      else:
-        applied_mask=mask
-      mask_r=applied_mask.reshape(applied_mask.size()[0],applied_mask.size()[1],1)
-      x=torch.mul(x,mask_r.detach())
-    x=torch.sum(x,dim=1)*(1/self.get_length(x))
-    return x
-  
-  def get_length(self,x):
-    length=torch.sum(x,dim=2)
-    length=(length!=0)
-    length=torch.sum(length,dim=1).repeat(x.size(2),1)
-    length=torch.transpose(length,dim0=0,dim1=1)
-    return length
 
 #Turning Layer
 class turning_layer(torch.nn.Module):

@@ -17,21 +17,30 @@ import numpy as np
 import math
 import safetensors
 
-def create_ordinal_weights(targets):
-  with torch.no_grad():
-    n_classes=targets.size(1)
-    class_idx=torch.argmax(targets,dim=1)+1
-    class_idx=torch.unsqueeze(class_idx,dim=1)
-    class_idx=class_idx.expand((class_idx.size(0),n_classes))
+#def create_ordinal_weights(targets):
+#  with torch.no_grad():
+#    n_classes=targets.size(1)
+#    class_idx=torch.argmax(targets,dim=1)+1
+#    class_idx=torch.unsqueeze(class_idx,dim=1)
+#    class_idx=class_idx.expand((class_idx.size(0),n_classes))
+#
+#    index_matrix=torch.arange(start=1,end=n_classes+1,step=1,dtype=class_idx.dtype, device=class_idx.device)
+#    index_matrix=torch.unsqueeze(index_matrix,dim=0)
+#    index_matrix=index_matrix.expand((class_idx.size(0),class_idx.size(1)))
+#    
+#    weights=torch.abs(index_matrix-class_idx)+1
+#    n_factors=torch.sum(weights,dim=1,keepdim=True)
+#    n_factors=n_factors.expand(weights.size())
+#    weights=weights/n_factors
+#    return weights
 
-    index_matrix=torch.arange(start=1,end=n_classes+1,step=1,dtype=class_idx.dtype, device=class_idx.device)
-    index_matrix=torch.unsqueeze(index_matrix,dim=0)
-    index_matrix=index_matrix.expand((class_idx.size(0),class_idx.size(1)))
-    
-    weights=torch.abs(index_matrix-class_idx)+1
-    n_factors=torch.sum(weights,dim=1,keepdim=True)
-    n_factors=n_factors.expand(weights.size())
-    weights=weights/n_factors
+def create_ordinal_weights(targets):
+    n_classes = targets.size(1)
+    class_idx = torch.argmax(targets, dim=1).detach()
+    index_matrix = torch.arange(n_classes, dtype=class_idx.dtype, device=class_idx.device)
+    weights = torch.abs(index_matrix.unsqueeze(0) - class_idx.unsqueeze(1)) + 1
+    n_factors = torch.sum(weights, dim=1, keepdim=True)
+    weights = weights / n_factors
     return weights
     
 

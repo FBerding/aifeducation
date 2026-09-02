@@ -1088,9 +1088,8 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         pytorch_test_data <- NULL
       }
 
-      trainer=py$ModelTrainer("ClassifierStandard")
-
-      trainer$config_for_StandardClassifier(
+      #Model args
+      train_args=list(
         model = private$model,
         features=as.integer(private$model_config$features),
         times=as.integer(private$model_config$times),
@@ -1102,7 +1101,8 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         scheduler_type = self$last_training$config$lr_scheduler,
         amp = self$last_training$config$amp,
         comp_use=self$last_training$config$comp_use,
-        comp_backend=get_compiler_backend(),
+        comp_backend=self$last_training$config$comp_backend,
+        comp_mode=self$last_training$config$comp_mode,
         lr_warm_up_ratio = self$last_training$config$lr_warm_up_ratio,
         epochs = as.integer(self$last_training$config$epochs),
         trace = as.integer(self$last_training$config$ml_trace),
@@ -1120,8 +1120,17 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         log_top_total = log_top_total,
         log_top_message = log_top_message
       )
-      tmp_history <-trainer$do_training()
 
+      trainer_manager=py$ModelTrainerManager(
+        model_type="ClassifierStandard",
+        ddp_use=self$last_training$config$ddp_use,
+        train_args=train_args,
+        tmp_dir=create_and_get_tmp_dir(),
+        aife_dir=system.file("python", package = "aifeducation")
+        #tmp_dir=getwd(),
+        #aife_dir=file.path(getwd(),"inst","python")
+      )
+      tmp_history <-trainer_manager$do_training()
 
       # provide rownames and replace -100
       tmp_history <- private$prepare_history_data(tmp_history)
@@ -1342,6 +1351,9 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         private$check_param_combinations_training()
       }
 
+      #Check config of compilation
+      private$check_and_set_compiler_backend_mode()
+
       # set up logger
       private$set_up_logger(log_dir = args$log_dir, log_write_interval = args$log_write_interval)
 
@@ -1350,6 +1362,9 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         data_targets = args$data_targets,
         data_embeddings = args$data_embeddings
       )
+
+      # Check batch sizes
+      private$check_size_of_data(data_manager)
 
       # Check if data can be used for pseudo labeling
       private$check_data_for_pseudo_labeling(data_manager)

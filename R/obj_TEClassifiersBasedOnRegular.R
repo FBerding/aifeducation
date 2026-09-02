@@ -70,6 +70,8 @@ TEClassifiersBasedOnRegular <- R6::R6Class(
     #' @param lr_epochs `r get_param_doc_desc("lr_epochs")`
     #' @param optimizer `r get_param_doc_desc("optimizer")`
     #' @param amp `r get_param_doc_desc("amp")`
+    #' @param comp_use `r get_param_doc_desc("comp_use")`
+    #' @param comp_mode `r get_param_doc_desc("comp_mode")`
     #' @return Function does not return a value. It changes the object into a trained classifier.
     #' @details
     #'
@@ -114,7 +116,9 @@ TEClassifiersBasedOnRegular <- R6::R6Class(
                      lr_epochs = 50L,
                      optimizer = "AdamW",
                      amp = FALSE,
-                     comp_use=FALSE) {
+                     comp_use=FALSE,
+                     comp_mode="reduce-overhead",
+                     ddp_use=FALSE) {
       private$do_training(args = get_called_args(n = 1L))
     }
   ),

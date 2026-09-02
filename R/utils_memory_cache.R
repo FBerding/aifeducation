@@ -123,3 +123,11 @@ get_compiler_backend=function(){
     stop("Backend for compilation could not be found.")
   }
 }
+
+check_and_set_compiler_mode=function(mode,backend){
+  if (backend=="TorchInductor"){
+    return(mode)
+  } else {
+    return(NULL)
+  }
+}

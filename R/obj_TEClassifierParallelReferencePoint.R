@@ -31,6 +31,7 @@ TEClassifierParallelReferencePoint <- R6::R6Class(
     #' @param text_embeddings `r get_param_doc_desc("text_embeddings")`
     #' @param feature_extractor `r get_param_doc_desc("feature_extractor")`
     #' @param target_levels `r get_param_doc_desc("target_levels")`
+    #' @param cls_input_normalize `r get_param_doc_desc("cls_input_normalize")`
     #' @param skip_connection_type `r get_param_doc_desc("skip_connection_type")`
     #' @param shared_feat_layer `r get_param_doc_desc("shared_feat_layer")`
     #' @param feat_act_fct `r get_param_doc_desc("feat_act_fct")`

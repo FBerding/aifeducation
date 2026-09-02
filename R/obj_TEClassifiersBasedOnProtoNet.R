@@ -72,6 +72,8 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
     #' @param lr_epochs `r get_param_doc_desc("lr_epochs")`
     #' @param optimizer `r get_param_doc_desc("optimizer")`
     #' @param amp `r get_param_doc_desc("amp")`
+    #' @param comp_use `r get_param_doc_desc("comp_use")`
+    #' @param comp_mode `r get_param_doc_desc("comp_mode")`
     #' @param Ns `r get_param_doc_desc("Ns")`
     #' @param Nq `r get_param_doc_desc("Nq")`
     #' @param loss_alpha `r get_param_doc_desc("loss_alpha")`
@@ -125,7 +127,10 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
                      lr_warm_up_ratio = 0.02,
                      lr_epochs = 50L,
                      optimizer = "AdamW",
-                     amp = FALSE) {
+                     amp = FALSE,
+                     comp_use=FALSE,
+                     comp_mode="reduce-overhead",
+                     ddp_use=FALSE) {
       private$do_training(args = get_called_args(n = 1L))
     },
     #---------------------------------------------------------------------------
@@ -638,11 +643,13 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
             )
           )
         ),
-        class_lables = reticulate::np_array(
+        class_lables = torch$from_numpy(
+          reticulate::np_array(
           seq(
             from = 0L,
             to = (length(private$model_config$target_levels) - 1L)
           )
+        )
         )
       )
     },
@@ -781,8 +788,11 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         pytorch_test_data <- NULL
       }
 
-      tmp_history <- py$TeClassifierTrainPrototype(
+      train_args=list(
         model = private$model,
+        features=as.integer(private$model_config$features),
+        times=as.integer(private$model_config$times),
+        final_dim=as.integer(private$model_config$embedding_dim),
         loss_pt_fct_name = self$last_training$config$loss_pt_fct_name,
         optimizer_method = self$last_training$config$optimizer,
         lr_rate = self$last_training$config$lr_rate,
@@ -790,6 +800,9 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         lr_min = self$last_training$config$lr_min,
         scheduler_type = self$last_training$config$lr_scheduler,
         amp = self$last_training$config$amp,
+        comp_use=self$last_training$config$comp_use,
+        comp_backend=self$last_training$config$comp_backend,
+        comp_mode=self$last_training$config$comp_mode,
         Ns = as.integer(tmp_ns),
         Nq = as.integer(tmp_nq),
         loss_alpha = self$last_training$config$loss_alpha,
@@ -810,7 +823,14 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         log_top_total = log_top_total,
         log_top_message = log_top_message
       )
-
+      trainer_manager=py$ModelTrainerManager(
+        model_type="ClassifierPrototype",
+        ddp_use=self$last_training$config$ddp_use,
+        train_args=train_args,
+        tmp_dir=create_and_get_tmp_dir(),
+        aife_dir=system.file("python", package = "aifeducation")
+      )
+      tmp_history <-trainer_manager$do_training()
       # provide rownames and replace -100
       tmp_history <- private$prepare_history_data(tmp_history)
 

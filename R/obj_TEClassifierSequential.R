@@ -32,6 +32,7 @@ TEClassifierSequential <- R6::R6Class(
     #' @param feature_extractor `r get_param_doc_desc("feature_extractor")`
     #' @param target_levels `r get_param_doc_desc("target_levels")`
     #' @param skip_connection_type `r get_param_doc_desc("skip_connection_type")`
+    #' @param cls_input_normalize `r get_param_doc_desc("cls_input_normalize")`
     #' @param cls_pooling_features `r get_param_doc_desc("cls_pooling_features")`
     #' @param cls_pooling_type `r get_param_doc_desc("cls_pooling_type")`
     #' @param cls_head_type `r get_param_doc_desc("cls_head_type")`

@@ -477,6 +477,39 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         }
       }
     },
+    #--------------------------------------------------------------------------
+    check_and_set_compiler_backend_mode=function(){
+      self$last_training$config$comp_backend=get_compiler_backend()
+      self$last_training$config$comp_mode=check_and_set_compiler_mode(
+        mode=self$last_training$config$comp_mode,
+        backend=self$last_training$config$comp_backend
+      )
+    },
+    #-------------------------------------------------------------------------
+    check_size_of_data=function(data_manager){
+      #Check Batch Size
+      #Ensures that at least two batches exist
+      current_batch_size=self$last_training$config$batch_size
+      if(inherits(x=data_manager,what="DataManagerClassifier")){
+        min_n=data_manager$get_min_n()
+      } else if(inherits(x=data_manager,what="datasets.dataset_dict.DatasetDict")) {
+        min_n=min(data_manager$train$num_rows,data_manager$test$num_rows)
+      }
+
+      if(current_batch_size>=min_n){
+        batch_size_new=min_n-1L
+        if (self$last_training$config$trace) {
+          message(
+            "Batch size is to big. Change batch size from ",
+            self$last_training$config$batch_size,
+            " to ",
+            batch_size_new,
+            "."
+          )
+        }
+        self$last_training$config$batch_size=batch_size_new
+      }
+    },
     #-------------------------------------------------------------------------
     check_single_prediction = function(embeddings) {
       if (

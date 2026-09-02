@@ -125,6 +125,8 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param lr_epochs `r get_param_doc_desc("lr_epochs")`
     #' @param optimizer `r get_param_doc_desc("optimizer")`
     #' @param amp `r get_param_doc_desc("amp")`
+    #' @param comp_use `r get_param_doc_desc("comp_use")`
+    #' @param comp_mode `r get_param_doc_desc("comp_mode")`
     #' @note This model requires that the underlying [TextEmbeddingModel] uses `pad_value=0`. If
     #' this condition is not met the pad value is switched before training.
     #' @return Function does not return a value. It changes the object into a trained classifier.
@@ -147,7 +149,10 @@ TEFeatureExtractor <- R6::R6Class(
                      lr_scheduler = "None",
                      lr_epochs = 50L,
                      optimizer = "AdamW",
-                     amp = FALSE) {
+                     amp = FALSE,
+                     comp_use=FALSE,
+                     comp_mode="reduce-overhead",
+                     ddp_use=FALSE) {
       tmp_args <- get_called_args(n = 1L)
       check_all_args(args = tmp_args)
       self$check_embedding_model(data_embeddings)
@@ -160,11 +165,11 @@ TEFeatureExtractor <- R6::R6Class(
         stop("lr_rate must be at least lr_min")
       }
 
+      #Check config of compilation
+      private$check_and_set_compiler_backend_mode()
+
       # set up logger
       private$set_up_logger(log_dir = log_dir, log_write_interval = log_write_interval)
-
-      # Loading PY Scripts
-
 
       # Start-------------------------------------------------------------------
       if (self$last_training$config$trace) {
@@ -190,7 +195,12 @@ TEFeatureExtractor <- R6::R6Class(
         py$map_input_to_labels,
         load_from_cache_file = FALSE,
         keep_in_memory = FALSE,
-        cache_file_name = create_py_dataset_cache_file_path(file.path(create_and_get_tmp_dir(), generate_id(15L)))
+        cache_file_name = create_py_dataset_cache_file_path(
+          file.path(
+            create_and_get_tmp_dir(),
+            generate_id(15L)
+            )
+          )
       )
 
       # Check and create temporary directory for checkpoints
@@ -206,6 +216,8 @@ TEFeatureExtractor <- R6::R6Class(
 
       # Split into train and validation data
       extractor_dataset <- extractor_dataset$train_test_split(self$last_training$config$data_val_size)
+      # Check batch sizes
+      private$check_size_of_data(extractor_dataset)
 
       # Start Sustainability Tracking-------------------------------------------
       private$init_and_start_sustainability_tracking()
@@ -214,10 +226,15 @@ TEFeatureExtractor <- R6::R6Class(
       private$calculate_learning_rate(extractor_dataset$train)
 
       # Start Training----------------------------------------------------------
-      self$last_training$history <- py$AutoencoderTrain_PT_with_Datasets(
+      train_args=list(
         model = private$model,
         optimizer_method = self$last_training$config$optimizer,
+        features=as.integer(private$text_embedding_model["features"]),
+        times=as.integer(private$text_embedding_model["times"]),
         amp = self$last_training$config$amp,
+        comp_use=self$last_training$config$comp_use,
+        comp_backend=self$last_training$config$comp_backend,
+        comp_mode=self$last_training$config$comp_mode,
         lr_rate = self$last_training$config$lr_rate,
         lr_warm_up_ratio = self$last_training$config$lr_warm_up_ratio,
         lr_min = self$last_training$config$lr_min,
@@ -235,6 +252,16 @@ TEFeatureExtractor <- R6::R6Class(
         log_top_total = log_top_total,
         log_top_message = log_top_message
       )
+      trainer_manager=py$ModelTrainerManager(
+        model_type="TEFeatureExtractor",
+        ddp_use=self$last_training$config$ddp_use,
+        train_args=train_args,
+        tmp_dir=create_and_get_tmp_dir(),
+        aife_dir=system.file("python", package = "aifeducation")
+      )
+      tmp_history <-trainer_manager$do_training()
+      self$last_training$history <- private$prepare_history_data(tmp_history)
+
       rownames(self$last_training$history$loss) <- c("train", "val")
       for (i in seq_along(self$last_training$history)) {
         self$last_training$history[[i]] <- replace(

@@ -41,6 +41,7 @@ TEClassifierSequentialPrototype <- R6::R6Class(
     #' @param feature_extractor `r get_param_doc_desc("feature_extractor")`
     #' @param target_levels `r get_param_doc_desc("target_levels")`
     #' @param skip_connection_type `r get_param_doc_desc("skip_connection_type")`
+    #' @param cls_input_normalize `r get_param_doc_desc("cls_input_normalize")`
     #' @param cls_pooling_features `r get_param_doc_desc("cls_pooling_features")`
     #' @param cls_pooling_type `r get_param_doc_desc("cls_pooling_type")`
     #' @param feat_act_fct `r get_param_doc_desc("feat_act_fct")`
@@ -167,7 +168,6 @@ TEClassifierSequentialPrototype <- R6::R6Class(
         cls_input_normalize=private$model_config$cls_input_normalize,
         projection_type = private$model_config$projection_type,
         metric_type = private$model_config$metric_type,
-        points_per_class=as.integer(private$model_config$points_per_class),
         feat_act_fct = private$model_config$feat_act_fct,
         feat_size = as.integer(private$model_config$feat_size),
         feat_bias = private$model_config$feat_bias,

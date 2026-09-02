@@ -34,6 +34,7 @@ TEClassifierParallel <- R6::R6Class(
     #' @param target_levels `r get_param_doc_desc("target_levels")`
     #' @param shared_feat_layer `r get_param_doc_desc("shared_feat_layer")`
     #' @param cls_head_type `r get_param_doc_desc("cls_head_type")`
+    #' @param cls_input_normalize `r get_param_doc_desc("cls_input_normalize")`
     #' @param feat_act_fct `r get_param_doc_desc("feat_act_fct")`
     #' @param feat_size `r get_param_doc_desc("feat_size")`
     #' @param feat_bias `r get_param_doc_desc("feat_bias")`

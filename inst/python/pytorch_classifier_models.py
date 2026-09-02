@@ -16,6 +16,27 @@ import torch
 import numpy as np
 import math
 import safetensors
+import types
+import json
+
+def save_config(args):
+  arguments=args
+  arguments.pop("self")
+  arguments.pop("__class__", None)
+  arguments.pop("device")
+  arguments.pop("dtype")
+  return arguments
+
+def write_config_to_json(self,filepath):
+  tmp_config=self.config
+  tmp_config["class_name"]=self.__class__.__name__
+  try:
+    with open(filepath, "w", encoding="utf-8") as file:
+        # indent=4 formatiert das JSON lesbar mit Einrückungen
+        json.dump(self.config, file, ensure_ascii=False, indent=4)
+  except IOError as e:
+    print(f"Error during saving config: {e}")
+  
 
 def init_weights_orthogonal(m):
     # Check if the layer type has a weight attribute
@@ -33,6 +54,11 @@ class TEClassifierSequential(torch.nn.Module):
               tf_act_fct="ELU",tf_dense_dim=50,tf_n_layers=0,tf_dropout_rate_1=0.0,tf_dropout_rate_2=0.0,tf_attention_type="MultiHead",tf_positional_type ="absolute",tf_num_heads=1,tf_bias=False,tf_parametrizations="None",tf_residual_type="ResidualGate",tf_normalization_type="LayerNorm", tf_normalization_position="pre",
               device=None, dtype=None):
       super().__init__()
+      #Save configuration to dict
+      self.config=save_config(locals())
+      #static mehthod for saving dict
+      self.save_config=types.MethodType(write_config_to_json, self) 
+      
       self.inc_cls_head=inc_cls_head
       
       self.cls_pooling_type=cls_pooling_type
@@ -223,7 +249,6 @@ class TEClassifierSequential(torch.nn.Module):
     else:
       return torch.nn.Softmax(dim=1)(y_c)
 
-
 class TEClassifierParallel(torch.nn.Module):
   def __init__(self,times, features, pad_value,n_target_levels,inc_cls_head=True,cls_input_normalize="None",cls_type="regular", 
               shared_feat_layer=True,feat_act_fct="ELU",feat_size=50,feat_bias=True,feat_dropout=0.0,feat_parametrizations="None",feat_normalization_type="LayerNorm",
@@ -234,13 +259,18 @@ class TEClassifierParallel(torch.nn.Module):
               merge_attention_type="MultiHead",merge_num_heads=1,merge_normalization_type="LayerNorm",merge_pooling_type="MinMax",merge_pooling_features=2,
               device=None, dtype=None):
       super().__init__()
+      #Save configuration to dict
+      self.config=save_config(locals())
+      #static mehthod for saving dict
+      self.save_config=types.MethodType(save_config, self)
+      
       self.inc_cls_head=inc_cls_head
       self.shared_feat_layer=shared_feat_layer
       self.n_streams=1
       
-      if merge_pooling_type=="MaxTimes":
+      if merge_pooling_type=="MaxTimes" or merge_pooling_type=="MaxTimes" or merge_pooling_type=="AverageTimes" or merge_pooling_type=="WeightedAverageTimes":
         self.merge_pooling_features=feat_size
-      elif merge_pooling_type=="MinMaxTimes":
+      elif merge_pooling_type=="MinMaxTimes" or merge_pooling_type=="MinMaxTimes":
         self.merge_pooling_features=2*feat_size
       else:
         self.merge_pooling_features=merge_pooling_features
@@ -530,6 +560,7 @@ class TEClassifierParallel(torch.nn.Module):
       return result
     else:
       return torch.nn.Softmax(dim=1)(result)
+  
 
 #-------------------------
 class TEClassifierReferencePoint(torch.nn.Module):
@@ -545,6 +576,10 @@ class TEClassifierReferencePoint(torch.nn.Module):
               metric_type="Euclidean",
               device=None, dtype=None):
     super().__init__()
+    #Save configuration to dict
+    self.config=save_config(locals())
+    #static mehthod for saving dict
+    self.save_config=types.MethodType(write_config_to_json, self)    
     #Number of categories/classes
     self.n_target_levels=len(target_levels)
     #Embedding dim
@@ -736,6 +771,8 @@ class TEClassifierReferencePoint(torch.nn.Module):
       return logits
     else:
       return self.prob_builder_act(logits)
+  
+ 
 ###################
 
 class TEClassifierPrototype(torch.nn.Module):
@@ -750,6 +787,10 @@ class TEClassifierPrototype(torch.nn.Module):
               metric_type="Euclidean",
               device=None, dtype=None):
     super().__init__()
+    #Save configuration to dict
+    self.config=save_config(locals())
+    #static mehthod for saving dict
+    self.save_config=types.MethodType(write_config_to_json, self) 
 
     n_target_levels=len(target_levels)
 
@@ -758,8 +799,13 @@ class TEClassifierPrototype(torch.nn.Module):
         self.cls_pooling_features=feat_size
       elif cls_pooling_type=="MinMaxTimes":
         self.cls_pooling_features=2*feat_size
+      elif cls_pooling_type=="AverageTimes":
+        self.cls_pooling_features=feat_size
+      elif cls_pooling_type=="WeightedAverageTimes":
+        self.cls_pooling_features=feat_size
       else:
         self.cls_pooling_features=cls_pooling_features
+
       self.core_net=TEClassifierSequential(
         times=times, 
         features=features, 
@@ -823,8 +869,13 @@ class TEClassifierPrototype(torch.nn.Module):
         self.merge_pooling_features=feat_size
       elif merge_pooling_type=="MinMaxTimes":
         self.merge_pooling_features=2*feat_size
+      elif merge_pooling_type=="AverageTimes":
+        self.merge_pooling_features=feat_size
+      elif merge_pooling_type=="WeightedAverageTimes":
+        self.merge_pooling_features=feat_size  
       else:
         self.merge_pooling_features=merge_pooling_features
+        
       self.core_net=TEClassifierParallel(
         times=times, 
         features=features, 
@@ -890,8 +941,11 @@ class TEClassifierPrototype(torch.nn.Module):
     self.classes=torch.from_numpy(np.copy(target_levels))
     self.n_classes=n_target_levels
 
-    self.trained_prototypes=torch.ones(1)
-    self.class_labels=torch.ones(1)
+    #self.trained_prototypes=torch.ones(1)
+    #self.class_labels=torch.ones(1)
+    self.register_buffer("trained_prototypes",torch.rand((self.n_classes,self.embedding_dim)))
+    self.register_buffer("class_labels",torch.arange(end=self.n_classes))
+    
     self.projection_type=projection_type
     
     if self.projection_type=="Regular":
@@ -935,47 +989,69 @@ class TEClassifierPrototype(torch.nn.Module):
     self.class_mean=layer_class_mean()
     self.metric=layer_protonet_metric(metric_type=metric_type)
     
-  def forward(self, input_q,classes_q=None,input_s=None,classes_s=None, prediction_mode=True):
-    #Sample set
-    if input_s is None or classes_s is None:
-      prototypes=self.trained_prototypes
-      class_labels=self.class_labels
-    else:
-      #Get class labels in the samples which are also used for the query set
-      class_labels=torch.unique(classes_s,sorted=True)
+  def forward(self, input_q,classes_q=None,input_s=None,classes_s=None,class_labels=None, prediction_mode=True):
+    if self.training:
       n_classes=class_labels.size()[0]
-      
       #Recode class labels in order to start at 0 for sample and query
       sample_classes=self.recode_classes(classes_s,class_labels)
-
+      #Calculate Embeddings
+      input_all=torch.cat((input_q,input_s),dim=0)
+      embeddings_all=self.embed(input_all)
+      embeddings_q,embeddings_s=torch.split(embeddings_all,(input_q.size(0),input_s.size(0)),dim=0)
       #Calculate Prototypes      
-      prototypes=self.calc_prototypes(input_s=input_s,classes=sample_classes,total_classes=n_classes)
-      
-    #Query set
-    query_embeddings=self.embed(input_q)
-
-    #Calc distance from query embeddings to global prototypes
-    distances=self.metric(x=query_embeddings,prototypes=prototypes)
-    logits=torch.exp(-distances)
-
-    if prediction_mode==False:
-      if classes_q==None:
-        query_classes=None
-      else:
-        query_classes=self.recode_classes(classes_q,class_labels)
-      probabilities=logits  
-      return probabilities, distances, query_classes, query_embeddings, prototypes
+      prototypes=self.calc_prototypes(input_s=embeddings_s,classes=sample_classes,total_classes=n_classes)
     else:
-      probabilities=torch.nn.Softmax(dim=1)(logits)
-      return probabilities
+    #Sample set
+      if input_s is None or classes_s is None or class_labels is None:
+        prototypes=self.trained_prototypes
+        class_labels=self.class_labels
+        embeddings_q=self.embed(input_q)
+      else:
+        #Get class labels in the samples which are also used for the query set
+        #class_labels=torch.unique(classes_s,sorted=True)
+        n_classes=class_labels.size()[0]
+        #Recode class labels in order to start at 0 for sample and query
+        sample_classes=self.recode_classes(classes_s,class_labels)
+        #Calculate embeddings
+        input_all=torch.cat((input_q,input_s),dim=0)
+        embeddings_all=self.embed(input_all)
+        embeddings_q,embeddings_s=torch.split(embeddings_all,(input_q.size(0),input_s.size(0)),dim=0)
+        #Calc prototypes
+        prototypes=self.calc_prototypes(input_s=embeddings_s,classes=sample_classes,total_classes=n_classes)
+    #Calc distance from query embeddings to global prototypes
+    distances=self.metric(x=embeddings_q,prototypes=prototypes)
+    logits=torch.exp(-distances)
+    if self.training:
+      query_classes=self.recode_classes(classes_q,class_labels)
+      probabilities=logits 
+      return probabilities, distances, query_classes, embeddings_q, prototypes
+    else:  
+      if prediction_mode==False:
+        #if classes_q==None:
+        #  query_classes=None
+        #else:
+        query_classes=self.recode_classes(classes_q,class_labels)
+        probabilities=logits  
+        return probabilities, distances, query_classes, embeddings_q, prototypes
+      else:
+        probabilities=torch.nn.functional.softmax(logits,dim=1)
+        return probabilities
     
   def recode_classes(self,class_vector,class_labels):
-    n_labels=class_labels.size()[0]
-    new_classes=class_vector.clone()
-    for index in range(n_labels):
-      con=(new_classes==class_labels[index])
-      new_classes=torch.where(condition=con,input=torch.tensor(index),other=new_classes)
-    return new_classes
+    #n_labels=class_labels.size()[0]
+    #new_classes=class_vector.clone()
+    #for index in range(n_labels):
+    #  con=(new_classes==class_labels[index])
+    #  new_classes=torch.where(condition=con,input=torch.tensor(index),other=new_classes)
+    #return new_classes
+    # Erzeugt eine Matrix der Form [Anzahl_Klassen, Tensor_Größe]
+    matches = (class_vector.unsqueeze(0) == class_labels.unsqueeze(1))
+    
+    # Erzeugt die neuen Indizes direkt auf dem richtigen Device
+    indices = torch.arange(class_labels.size(0), device=class_vector.device).unsqueeze(1)
+    
+    # Multipliziert die Maske mit den Indizes und summiert sie auf
+    return (matches * indices).sum(dim=0)    
   
   def get_distances(self,inputs,prototypes):
     distances=self.metric(x=self.embed(inputs),prototypes=prototypes)
@@ -990,13 +1066,12 @@ class TEClassifierPrototype(torch.nn.Module):
     return embeddings
   
   def calc_prototypes(self,input_s,classes,total_classes):
-    prototypes=self.embed(input_s)
-    prototypes=self.class_mean(x=prototypes,classes=classes,total_classes=total_classes)
+    prototypes=self.class_mean(x=input_s,classes=classes,total_classes=total_classes)
     return prototypes
   
   def set_trained_prototypes(self,prototypes,class_lables):
-    self.trained_prototypes=torch.nn.Parameter(prototypes)
-    self.class_labels=class_lables
+    self.trained_prototypes.copy_(prototypes)
+    self.class_labels.copy_(class_lables)
     
   def get_trained_prototypes(self):
     return self.trained_prototypes

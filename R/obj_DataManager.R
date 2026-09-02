@@ -498,6 +498,27 @@ DataManagerClassifier <- R6::R6Class(
       if (self$config$add_matrix_map) {
         self$datasets$data_labeled_pseudo <- private$add_matrix_form(self$datasets$data_labeled_pseudo)
       }
+    },
+    #---------------------------------------------------------------------------
+    #' @description Method for requesting the minimal number of cases over all folds
+    #' and over training, validation, and test data set.
+    #' @return Returns an integer.
+    get_min_n=function(){
+      sample_list=self$get_samples()
+      n_vector=vector()
+      for(i in seq_along(sample_list)){
+        sub_list=sample_list[[i]]
+        for (j in seq_along(sub_list)){
+          sub_sub_list=sub_list[[j]]
+          if(!is.null(sub_sub_list)){
+            n_vector=append(x=n_vector,
+                            values = length(sub_sub_list)
+                            )
+          }
+        }
+      }
+      min_n=min(n_vector,na.rm = TRUE)
+      return(min_n)
     }
     #-----------------------------------------------------------------------------
   ),
