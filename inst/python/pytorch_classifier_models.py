@@ -941,8 +941,6 @@ class TEClassifierPrototype(torch.nn.Module):
     self.classes=torch.from_numpy(np.copy(target_levels))
     self.n_classes=n_target_levels
 
-    #self.trained_prototypes=torch.ones(1)
-    #self.class_labels=torch.ones(1)
     self.register_buffer("trained_prototypes",torch.rand((self.n_classes,self.embedding_dim)))
     self.register_buffer("class_labels",torch.arange(end=self.n_classes))
     
@@ -993,8 +991,8 @@ class TEClassifierPrototype(torch.nn.Module):
     if self.training:
       n_classes=class_labels.size()[0]
       #Recode class labels in order to start at 0 for sample and query
-      sample_classes=self.recode_classes(classes_s,class_labels)
-      query_classes=self.recode_classes(classes_q,class_labels)
+      sample_classes=self.recode_classes(classes_s,class_labels).detach()
+      query_classes=self.recode_classes(classes_q,class_labels).detach()
       #Calculate Embeddings
       input_all=torch.cat((input_q,input_s),dim=0)
       embeddings_all=self.embed(input_all)
@@ -1006,13 +1004,20 @@ class TEClassifierPrototype(torch.nn.Module):
       logits=torch.exp(-distances)
       return logits, distances, query_classes, embeddings_q, prototypes
     else:
-      prototypes=self.trained_prototypes
-      class_labels=self.class_labels
+      if input_s is None or classes_s is None or class_labels is None:
+        prototypes=self.trained_prototypes
+        class_labels=self.class_labels
+      else:
+        n_classes=class_labels.size()[0]
+        sample_classes=self.recode_classes(classes_s,class_labels).detach()
+        class_labels=torch.unique(sample_classes,sorted=True)
+        embeddings_s=self.embed(input_s)
+        prototypes=self.calc_prototypes(input_s=embeddings_s,classes=sample_classes,total_classes=n_classes)
       embeddings_q=self.embed(input_q)
-      query_classes=self.recode_classes(classes_q,class_labels)
       distances=self.metric(x=embeddings_q,prototypes=prototypes)
       logits=torch.exp(-distances)
       if prediction_mode==False:
+        query_classes=self.recode_classes(classes_q,class_labels)
         return logits, distances, query_classes, embeddings_q, prototypes
       else:
         probabilities=torch.nn.functional.softmax(logits,dim=1)
@@ -1055,13 +1060,13 @@ class TEClassifierPrototype(torch.nn.Module):
     distances=self.metric(x=self.embed(inputs),prototypes=prototypes)
     return distances
   
-  def get_metric_scale_factor(self):
-    return self.metric.get_scaling_factor()
-  
-  def embed(self,inputs):
+  def embed(self, inputs):
     embeddings=self.core_net(inputs)
     embeddings=self.embedding_head(embeddings)
     return embeddings
+    
+  def get_metric_scale_factor(self):
+    return self.metric.get_scaling_factor()
   
   def calc_prototypes(self,input_s,classes,total_classes):
     prototypes=self.class_mean(x=input_s,classes=classes,total_classes=total_classes)

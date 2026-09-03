@@ -641,7 +641,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
               ncol = n_col,
               data = rnorm(n = n_col * n_row, mean = 0L, sd = 1L)
             )
-          )
+          )$copy()
         ),
         class_lables = torch$from_numpy(
           reticulate::np_array(
@@ -649,7 +649,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
             from = 0L,
             to = (length(private$model_config$target_levels) - 1L)
           )
-        )
+        )$copy()
         )
       )
     },
