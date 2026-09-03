@@ -1004,20 +1004,24 @@ class TEClassifierPrototype(torch.nn.Module):
       logits=torch.exp(-distances)
       return logits, distances, query_classes, embeddings_q, prototypes
     else:
-      if input_s is None or classes_s is None or class_labels is None:
+      if input_s is None or (classes_s is None and class_labels is None):
         prototypes=self.trained_prototypes
         class_labels=self.class_labels
       else:
-        n_classes=class_labels.size()[0]
+        if class_labels is None:
+          class_labels=torch.unique(classes_s,sorted=True)
         sample_classes=self.recode_classes(classes_s,class_labels).detach()
-        class_labels=torch.unique(sample_classes,sorted=True)
+        n_classes=class_labels.size()[0]
         embeddings_s=self.embed(input_s)
         prototypes=self.calc_prototypes(input_s=embeddings_s,classes=sample_classes,total_classes=n_classes)
       embeddings_q=self.embed(input_q)
       distances=self.metric(x=embeddings_q,prototypes=prototypes)
       logits=torch.exp(-distances)
       if prediction_mode==False:
-        query_classes=self.recode_classes(classes_q,class_labels)
+        if classes_q is not None:
+          query_classes=self.recode_classes(classes_q,class_labels)
+        else: 
+          query_classes=None
         return logits, distances, query_classes, embeddings_q, prototypes
       else:
         probabilities=torch.nn.functional.softmax(logits,dim=1)
