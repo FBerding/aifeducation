@@ -315,7 +315,8 @@ class ModelTrainer():
     Ns=Ns,
     Nq=Nq,
     separate=sampling_separate,
-    shuffle=sampling_shuffle)
+    shuffle=sampling_shuffle
+    )
     trainloader=torch.utils.data.DataLoader(
       train_data,
       pin_memory = pin_memory,
@@ -324,14 +325,14 @@ class ModelTrainer():
       val_data,
       pin_memory = pin_memory,
       batch_size=Ns+Nq,
-      drop_last=comp_use,
+      drop_last=True,
       shuffle=False)
     if not (test_data is None):
       testloader=torch.utils.data.DataLoader(
         test_data,
         pin_memory =pin_memory,
         batch_size=Ns+Nq,
-        drop_last=comp_use,
+        drop_last=True,
         shuffle=False)
     else:
       testloader=None
