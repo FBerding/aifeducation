@@ -27,7 +27,7 @@ class MetaLernerBatchSampler(torch.utils.data.sampler.Sampler):
         self.shuffle=shuffle
 
         #Get the available classes in targets
-        self.classes=torch.unique(targets).numpy()
+        self.classes=torch.unique(targets).numpy().astype(int)
         #Get the number of classes
         self.n_classes=len(self.classes)
         #Calculate the batch size depending on Ns and Nq
@@ -37,6 +37,8 @@ class MetaLernerBatchSampler(torch.utils.data.sampler.Sampler):
         self.indices_per_class={}
         #Create dictornary thats sorts the number of cases per class
         self.cases_per_class={}
+        #create ictornary thats stores the number of batches per class
+        self.batches_per_class={}
         #Gather indicies per class and cases per class
         for c in self.classes:
           self.indices_per_class[c]=torch.where(targets==c)[0]
@@ -66,100 +68,87 @@ class MetaLernerBatchSampler(torch.utils.data.sampler.Sampler):
             #Calculate number of cases
             self.sample_cases_per_class[c]=len(self.sample_indices_per_class[c])
             self.query_cases_per_class[c]=len(self.query_indices_per_class[c])
+            #Calculate batches per class
+            self.batches_per_class[c]=min(self.sample_cases_per_class[c]//self.Ns, self.query_cases_per_class[c]//self.Nq)
         else:
           #Create a random permutation if separate is False and shuffle is False
           #If shuffle is True random sampling is applied during iter
           if self.shuffle is False:
             for c in self.classes:
               self.indices_per_class[c]=self.indices_per_class[c][torch.randperm(self.cases_per_class[c])]
+          for c in self.classes:    
+            self.batches_per_class[c]=self.cases_per_class[c]//(self.Ns+self.Nq)
           
         #Calculate number of batches
-        self.number_batches=self.cases_per_class[max(self.cases_per_class,key=self.cases_per_class.get)]//(self.Ns+self.Nq)
-        
+        self.number_batches=min(self.batches_per_class.values())
+
     def __iter__(self):
       for current_iter in range(self.number_batches):
         #Create list for saving the results per class temporarily 
         batch_sample=[]
         batch_query=[]
-      
+        batches_class_sample=[[] for _ in range(self.n_classes)]
+        batches_class_query=[[] for _ in range(self.n_classes)]
+        batches_sample=[]
+        batches_query=[]
+        
         if self.separate is False:
-          if self.shuffle is True:
-            for c in self.classes:
-              #Calculate permutations for the random sample for each class
+          for c in self.classes:
+            batch_query=[]
+            batch_sample=[]
+            if self.shuffle is True:
               permutations=self.indices_per_class[c][torch.randperm(self.cases_per_class[c])]
+            else:
+              permutations=self.indices_per_class[c]
+            counter=1
+            for idx in permutations:
+              if counter<=self.Ns:
+                batch_sample.append(idx)
+                counter+=1
+              elif counter>self.Ns and counter<=(self.Ns+self.Nq):
+                batch_query.append(idx)
+                counter+=1
+              if(counter==(self.Ns+self.Nq)+1):
+                batches_class_sample[c].append(batch_sample)
+                batches_class_query[c].append(batch_query)
+                batch_query=[]
+                batch_sample=[]
+                counter=1
+            #Result is a list of batches for every class      
+        else:
+          for c in self.classes:
+            if self.shuffle is True:
+              permutations_query=self.query_indices_per_class[c][torch.randperm(self.query_indices_per_class[c])]
+              permutations_sample=self.sample_indices_per_class[c][torch.randperm(self.sample_indices_per_class[c])]
+            else:
+              permutations_query=self.query_indices_per_class[c]
+              permutations_sample=self.sample_indices_per_class[c]
+            counter=1
+            for idx in permutations_query:
+              if counter<=self.Nq:
+                batch_query.append(idx)
+                counter+=1
+              if counter==self.Nq:
+                batches_class_query[c].append(batches_query)
+                batch_query=[]
+                counter=1
+            for idx in permutations_sample:    
+              if counter<=self.Ns:
+                batch_sample.append(idx)
+                counter+=1
+              if counter==self.Nq:
+                batches_class_sample[c].append(batch_sample)
+                batch_sample=[]
+                counter=1
 
-              #Calculat the indexes for selecting the first Ns+Nq indices
-              if(self.cases_per_class[c]>=self.Ns+self.Nq):
-                ids_sample=np.array(range(0,self.Ns))
-                ids_query=np.array(range(self.Ns,(self.Ns+self.Nq)))
-              else:
-                #For the case that the number of cases is lower as Ns+Nq adjust proportional
-                tmp_Ns=max(1,math.floor(self.cases_per_class[c]*self.Ns/(self.Ns+self.Nq))-1)
-                tmp_Nq=self.cases_per_class[c]-tmp_Ns
-                ids_sample=np.array(range(0,tmp_Ns))
-                ids_query=np.array(range(tmp_Ns,(tmp_Ns+tmp_Nq)))
-
-              #Extract the final indices
-              perm_sample=permutations[ids_sample].numpy()
-              perm_query=permutations[ids_query].numpy()
-              
-              #Add them to batch
-              batch_sample.extend(perm_sample)
-              batch_query.extend(perm_query)
-          else:
-            for c in self.classes:
-              #Calculate indices. If the end of all cases is reached for this class
-              #start at beginng and fill the list
-              index_shift= (1+current_iter)*(self.Ns+self.Nq)
-              ids_sample=np.array(range((0+index_shift),(self.Ns+index_shift)))%self.cases_per_class[c]
-              ids_query=np.array(range((self.Ns+index_shift),((self.Ns+self.Nq)+index_shift)))%self.cases_per_class[c]
-              
-              #Extract the final indices
-              perm_sample=self.indices_per_class[c][ids_sample].numpy()
-              perm_query=self.indices_per_class[c][ids_query].numpy()
-            
-              #Add them to batch
-              batch_sample.extend(perm_sample)
-              batch_query.extend(perm_query)
-        if self.separate is True:
-          if self.shuffle is True:
-            for c in self.classes:
-              #Calculate permutations for the random sample for each class
-              permutations_sample=self.sample_indices_per_class[c][torch.randperm(self.sample_cases_per_class[c])]
-              permutations_query=self.query_indices_per_class[c][torch.randperm(self.query_cases_per_class[c])]
-              
-              #Calculat the indexes for selecting the first Ns+Nq indices
-              ids_sample=np.array(range(0,self.Ns))
-              ids_query=np.array(range(0,self.Nq))
-              
-              #Extract the final indices
-              perm_sample=permutations_sample[ids_sample].numpy()
-              perm_query=permutations_query[ids_query].numpy()
-                
-              #Add them to batch
-              batch_sample.extend(perm_sample)
-              batch_query.extend(perm_query)
-          else:
-            #Calculate indices. If the end of all cases is reached for this class
-            #start at beginng and fill the list
-            index_shift_sample= (1+current_iter)*self.Ns
-            index_shift_query= (1+current_iter)*self.Nq
-            for c in self.classes:
-              ids_sample=np.array(range((0+index_shift_sample),(self.Ns+index_shift_sample)))%self.sample_cases_per_class[c]
-              ids_query=np.array(range((0+index_shift_query),(self.Nq+index_shift_query)))%self.query_cases_per_class[c]
-              
-              #Extract the final indices
-              perm_sample=self.sample_indices_per_class[c][ids_sample].numpy()
-              perm_query=self.query_indices_per_class[c][ids_query].numpy()
-              
-              #Add them to batch
-              batch_sample.extend(perm_sample)
-              batch_query.extend(perm_query)
-        #Create the final batch
-        #Add first the sample of all classes and then the query of all classes
-        batch=[]
-        batch=batch_sample+batch_query
-        yield batch
+        for i in range(self.number_batches):
+          final_batch=[]
+          for c in self.classes:
+            final_batch.extend(batches_class_sample[c][i])
+          for c in self.classes:
+            final_batch.extend(batches_class_query[c][i])
+          final_batch_int = [t.item() for t in final_batch]
+          yield final_batch_int
       
     def __len__(self):
       return self.number_batches
