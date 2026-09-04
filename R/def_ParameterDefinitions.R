@@ -50,7 +50,7 @@ get_param_dict <- function() {
     allowed_values = NULL,
     desc = "If `TRUE` model and loss are compiled to speed up training.",
     default_value = TRUE,
-    test_values = TRUE
+    test_values = FALSE
   )
   param$comp_mode<- list(
     type = "string",
@@ -1766,7 +1766,7 @@ get_param_dict <- function() {
     min = NULL,
     max = NULL,
     allow_null = FALSE,
-    allowed_values = c("Max", "MinMax","Average","WeightedAverage"),
+    allowed_values = c("Max", "Average","WeightedAverage"),
     desc = "Type of extracting intermediate features.",
     gui_box = "Classifiction Pooling Layer",
     gui_label = "Feature Extraction Method",
