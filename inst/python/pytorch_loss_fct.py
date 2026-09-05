@@ -41,7 +41,7 @@ def create_ordinal_weights(targets):
     weights = torch.abs(index_matrix.unsqueeze(0) - class_idx.unsqueeze(1)) + 1
     n_factors = torch.sum(weights, dim=1, keepdim=True)
     weights = weights / n_factors
-    return weights
+    return weights.detach()
     
 
 class focal_loss(torch.nn.Module):
@@ -59,7 +59,7 @@ class focal_loss(torch.nn.Module):
   
   def forward(self,prediction,target):
     if self.scale_level=="ordinal":
-      prediction=(1/create_ordinal_weights(target))*prediction
+      prediction=prediction+torch.abs(create_ordinal_weights(target)*prediction)
     #Shape (Batch)
     ce=self.cross_entropy(prediction,target)
     #Shape (Batch, n_classes)
