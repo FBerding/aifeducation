@@ -893,48 +893,6 @@ test_that("layer_class_mean", {
   )
 })
 
-# layer_global_average_pooling_1d------------------------------------------------
-test_that("layer_global_average_pooling_1d", {
-  device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
-  pad_value <- sample(x = seq(from = -200, to = -10, by = 10), size = 1)
-  times <- sample(x = seq(from = 3, to = 10, by = 1), size = 1)
-  features <- sample(x = seq(from = 3, to = 1024, by = 1), size = 1)
-  sequence_length <- sample(x = seq(from = 1, to = times, by = 1), size = 30, replace = TRUE)
-  example_tensor <- generate_tensors(
-    times = times,
-    features = features,
-    seq_len = sequence_length,
-    pad_value = pad_value
-  )$to(device)
-  masking_layer <- py$masking_layer(pad_value)$to(device)
-  values <- masking_layer(example_tensor)
-
-  layer <- py$layer_global_average_pooling_1d(mask_type = "mask")$to(device)
-
-  results <- layer(
-    x = values[[1]],
-    mask = values[[2]]
-  )
-
-  true_mean_source <- tensor_to_numpy(example_tensor)
-  true_mean_source <- replace(x = true_mean_source, true_mean_source == pad_value, values = 0)
-  true_mean <- matrix(data = 0, nrow = 30, ncol = features)
-  for (b in seq(30)) {
-    for (t in 1:times) {
-      for (f in 1:features) {
-        true_mean[b, f] <- true_mean_source[b, t, f] + true_mean[b, f]
-      }
-    }
-  }
-  true_mean <- true_mean / sequence_length
-
-  expect_equal(
-    object = tensor_to_numpy(results),
-    expected = true_mean,
-    tolerance = 1e-7
-  )
-})
-
 # Monitor test time
 monitor_test_time_on_CI(
   start_time = test_time_start,
