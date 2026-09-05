@@ -583,7 +583,8 @@ class ModelTrainer():
           self.static_input.copy_(inputs)
           self.static_label.copy_(labels)
           
-          class_labels=torch.unique(labels,sorted=True)
+          #class_labels=torch.unique(labels,sorted=True)
+          class_labels=torch.arange(end=self.n_classes)
           class_labels=class_labels.to(self.device,dtype=self.dtype,non_blocking=True)
           self.static_class_labels.copy_(class_labels)
           #Validation stept
