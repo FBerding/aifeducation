@@ -591,9 +591,6 @@ class TEClassifierReferencePoint(torch.nn.Module):
       if cls_times_pooling_type=="Max":
         self.cls_pooling_features=self.embedding_dim
         self.cls_times_pooling_type="MaxTimes"
-      elif cls_times_pooling_type=="MinMax":
-        self.cls_pooling_features=2*self.embedding_dim
-        self.cls_times_pooling_type="MinMaxTimes"
       elif cls_times_pooling_type=="Average":
         self.cls_pooling_features=self.embedding_dim
         self.cls_times_pooling_type="AverageTimes"  
