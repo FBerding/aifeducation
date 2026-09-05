@@ -1644,7 +1644,9 @@ classifier$train(
   lr_epochs = 75,
   lr_warm_up_ratio = 0.05,
   optimizer = "AdamW",
-  amp = TRUE
+  amp = TRUE,
+  comp_use=TRUE,
+  comp_mode="reduce_overhead"
 )
 ```
 
@@ -2209,7 +2211,9 @@ classifier_prototype$train(
   lr_scheduler = "None",
   lr_warm_up_ratio = 0.05,
   optimizer = "AdamW",
-  amp = TRUE
+  amp = TRUE,
+  comp_use=TRUE,
+  comp_mode="reduce_overhead"
 )
 ```
 
@@ -2659,7 +2663,9 @@ feature_extractor$train(
   ml_trace = 0,
   optimizer = "AdamW",
   amp = TRUE,
-  lr_warm_up_ratio = 0.10
+  lr_warm_up_ratio = 0.10,
+  comp_use=TRUE,
+  comp_mode="reduce_overhead"
 )
 ```
 
@@ -2804,7 +2810,9 @@ classifier_with_fe$train(
   lr_scheduler = "None",
   lr_warm_up_ratio = 0.05,
   optimizer = "AdamW",
-  amp = TRUE
+  amp = TRUE,
+  comp_use=TRUE,
+  comp_mode="reduce_overhead"
 )
 ```
 
