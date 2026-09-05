@@ -73,7 +73,7 @@ class MetaLernerBatchSampler(torch.utils.data.sampler.Sampler):
         else:
           #Create a random permutation if separate is False and shuffle is False
           #If shuffle is True random sampling is applied during iter
-          if self.shuffle is False:
+          if self.shuffle is True:
             for c in self.classes:
               self.indices_per_class[c]=self.indices_per_class[c][torch.randperm(self.cases_per_class[c])]
           for c in self.classes:    
@@ -117,26 +117,31 @@ class MetaLernerBatchSampler(torch.utils.data.sampler.Sampler):
             #Result is a list of batches for every class      
         else:
           for c in self.classes:
+            batch_sample=[]
+            batch_query=[]
             if self.shuffle is True:
-              permutations_query=self.query_indices_per_class[c][torch.randperm(self.query_indices_per_class[c])]
-              permutations_sample=self.sample_indices_per_class[c][torch.randperm(self.sample_indices_per_class[c])]
+              permutations_query=self.query_indices_per_class[c][torch.randperm(self.query_cases_per_class[c])]
+              permutations_sample=self.sample_indices_per_class[c][torch.randperm(self.sample_cases_per_class[c])]
             else:
               permutations_query=self.query_indices_per_class[c]
               permutations_sample=self.sample_indices_per_class[c]
             counter=1
+            
             for idx in permutations_query:
               if counter<=self.Nq:
                 batch_query.append(idx)
                 counter+=1
-              if counter==self.Nq:
-                batches_class_query[c].append(batches_query)
+              if counter==self.Nq+1:
+                batches_class_query[c].append(batch_query)
                 batch_query=[]
                 counter=1
+            
+            counter=1
             for idx in permutations_sample:    
               if counter<=self.Ns:
                 batch_sample.append(idx)
                 counter+=1
-              if counter==self.Nq:
+              if counter==self.Ns+1:
                 batches_class_sample[c].append(batch_sample)
                 batch_sample=[]
                 counter=1
