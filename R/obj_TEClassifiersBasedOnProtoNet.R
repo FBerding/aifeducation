@@ -74,6 +74,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
     #' @param amp `r get_param_doc_desc("amp")`
     #' @param comp_use `r get_param_doc_desc("comp_use")`
     #' @param comp_mode `r get_param_doc_desc("comp_mode")`
+    #' @param ddp_use `r get_param_doc_desc("ddp_use")`
     #' @param Ns `r get_param_doc_desc("Ns")`
     #' @param Nq `r get_param_doc_desc("Nq")`
     #' @param loss_alpha `r get_param_doc_desc("loss_alpha")`

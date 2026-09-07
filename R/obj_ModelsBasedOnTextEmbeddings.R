@@ -1078,7 +1078,6 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         if (self$last_training$config$lr_scheduler=="Linear"){
           #Select lr rate with lowest increase
           lr_idx <- min(which(relevant_range$smoothed_delta == max(relevant_range$smoothed_delta)))
-          best_idx<- min(which(relevant_range$smoothed_delta == min(relevant_range$smoothed_delta)))
         }  else {
           #Select learning rate with maximum increase
           lr_idx <- min(which(relevant_range$smoothed_delta == min(relevant_range$smoothed_delta)))
@@ -1109,6 +1108,8 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
           trace = self$last_training$config$trace
         )
       } else {
+        self$last_training$config$lr_rate <- 1e-3
+        self$last_training$config$lr_min <- 1e-4
         print_message(
           msg = paste0(
             "No good learning rates could be identified. ",
@@ -1120,8 +1121,6 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
           ),
           trace = self$last_training$config$trace
         )
-        self$last_training$config$lr_rate <- 1e-3
-        self$last_training$config$lr_min <- 1e-4
       }
       # Reduce to relevant columns
       lr_estimation_results <- lr_estimation_results[c(

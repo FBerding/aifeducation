@@ -127,6 +127,7 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param amp `r get_param_doc_desc("amp")`
     #' @param comp_use `r get_param_doc_desc("comp_use")`
     #' @param comp_mode `r get_param_doc_desc("comp_mode")`
+    #' @param ddp_use `r get_param_doc_desc("ddp_use")`
     #' @note This model requires that the underlying [TextEmbeddingModel] uses `pad_value=0`. If
     #' this condition is not met the pad value is switched before training.
     #' @return Function does not return a value. It changes the object into a trained classifier.
