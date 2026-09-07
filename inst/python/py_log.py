@@ -131,12 +131,12 @@ class ProgressLogger:
     self.last_point=0.0
   def print_progress(self,trace,epoch,epochs):
       if trace:
-        if epochs<=0:
+        if epoch<=0:
           last_point=self.start_time
         else:
           last_point=self.last_point
         current_point=datetime.datetime.now()
-        running_time=(current_point-last_point)/intervalls
+        running_time=(current_point-last_point)
         self.last_point=current_point
         
         rt=(epochs-epoch)*running_time
