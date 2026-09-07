@@ -486,6 +486,25 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       )
     },
     #-------------------------------------------------------------------------
+    check_and_set_ddp=function(){
+      if(self$last_training$config$ddp_use){
+        if(detec_os()!="linux"){
+          self$last_training$config$ddp_use=FALSE
+          message("DDP is currently supported only on Linux.")
+        } else {
+          if(!torch$cuda$is_available()){
+            self$last_training$config$ddp_use=FALSE
+            message("DDP is disabled because cuda devices are not available.")
+          } else {
+            if(torch$cuda$device_count()<=1L){
+              self$last_training$config$ddp_use=FALSE
+              message("DDP is disabled because there is only one cuda device.")
+            }
+          }
+        }
+      }
+    },
+    #-------------------------------------------------------------------------
     check_size_of_data=function(data_manager){
       #Check Batch Size
       #Ensures that at least two batches exist
@@ -969,7 +988,10 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         }
         estimates <- private$estimate_learning_rates(
           data_manager,
-          total_epochs = total_epochs
+          total_epochs = total_epochs,
+          comp_use = self$last_training$config$comp_use,
+          comp_mode=self$last_training$config$comp_mode,
+          comp_backend=self$last_training$config$comp_backend
         )
         private$lr_statistics <- private$select_learning_rates(
           estimates,
@@ -1042,7 +1064,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       )
       # Selecht the best values from the increasing side of the graph
       if (nrow(relevant_range) > 0L) {
-        best_idx <- min(which(relevant_range$delta == min(relevant_range$delta)))
+        best_idx <- min(which(relevant_range$smoothed_delta == min(relevant_range$smoothed_delta)))
         relevant_range <- relevant_range[best_idx:nrow(relevant_range), ]
 
         relevant_range <- relevant_range[order(relevant_range$lr_rate, decreasing = TRUE), ]
@@ -1050,12 +1072,19 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         if (any(relevant_range$turning_points)) {
           best_idx <- min(which(relevant_range$turning_points))
         } else {
-          best_idx <- min(which(relevant_range$delta == min(relevant_range$delta)))
+          best_idx <- min(which(relevant_range$smoothed_delta == min(relevant_range$smoothed_delta)))
+        }
+
+        if (self$last_training$config$lr_scheduler=="Linear"){
+          #Select lr rate with lowest increase
+          lr_idx <- min(which(relevant_range$smoothed_delta == max(relevant_range$smoothed_delta)))
+          best_idx<- min(which(relevant_range$smoothed_delta == min(relevant_range$smoothed_delta)))
+        }  else {
+          #Select learning rate with maximum increase
+          lr_idx <- min(which(relevant_range$smoothed_delta == min(relevant_range$smoothed_delta)))
         }
 
         best <- relevant_range$lr_rate[best_idx]
-
-        lr_idx <- max(which(relevant_range$delta == max(relevant_range$delta)))
         lr <- relevant_range$lr_rate[lr_idx]
 
         if (best > lr) {

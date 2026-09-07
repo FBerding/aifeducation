@@ -654,7 +654,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
       )
     },
     #--------------------------------------------------------------------------
-    estimate_learning_rates = function(data_manager, total_epochs) {
+    estimate_learning_rates = function(data_manager, total_epochs,comp_use,comp_mode,comp_backend) {
       data_manager$set_state(
         iteration = self$last_training$config$n_folds + 1L,
         step = NULL
@@ -703,6 +703,8 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
       lr_estimation_results <- py$calc_lr_rate(
         trace = self$last_training$config$ml_trace,
         epochs = as.integer(total_epochs),
+        times=as.integer(self$get_model_config()$times),
+        features=as.integer(self$get_model_config()$features),
         model = private$model,
         filepath = file.path(private$dir_checkpoint, "best_weights.pt"),
         optimizer_method = self$last_training$config$optimizer,
@@ -815,6 +817,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         comp_use=self$last_training$config$comp_use,
         comp_backend=self$last_training$config$comp_backend,
         comp_mode=self$last_training$config$comp_mode,
+        ddp_use=self$last_training$config$ddp_use,
         Ns = as.integer(tmp_ns),
         Nq = as.integer(tmp_nq),
         loss_alpha = self$last_training$config$loss_alpha,

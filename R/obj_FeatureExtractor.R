@@ -167,6 +167,7 @@ TEFeatureExtractor <- R6::R6Class(
 
       #Check config of compilation
       private$check_and_set_compiler_backend_mode()
+      private$check_and_set_ddp()
 
       # set up logger
       private$set_up_logger(log_dir = log_dir, log_write_interval = log_write_interval)
@@ -235,6 +236,7 @@ TEFeatureExtractor <- R6::R6Class(
         comp_use=self$last_training$config$comp_use,
         comp_backend=self$last_training$config$comp_backend,
         comp_mode=self$last_training$config$comp_mode,
+        ddp_use=self$last_training$config$ddp_use,
         lr_rate = self$last_training$config$lr_rate,
         lr_warm_up_ratio = self$last_training$config$lr_warm_up_ratio,
         lr_min = self$last_training$config$lr_min,
@@ -551,11 +553,13 @@ TEFeatureExtractor <- R6::R6Class(
       }
     },
     #--------------------------------------------------------------------------
-    estimate_learning_rates = function(dataset, total_epochs) {
+    estimate_learning_rates = function(dataset, total_epochs,comp_use,comp_mode,comp_backend) {
       lr_estimation_results <- py$calc_lr_rate(
         trace = self$last_training$config$ml_trace,
         epochs = as.integer(total_epochs),
         model = private$model,
+        times=as.integer(self$get_model_config()$times),
+        features=as.integer(self$get_model_config()$features),
         filepath = file.path(private$dir_checkpoint, "best_weights.pt"),
         optimizer_method = self$last_training$config$optimizer,
         loss_fct_name = "MSELoss",
