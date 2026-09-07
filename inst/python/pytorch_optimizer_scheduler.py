@@ -17,11 +17,11 @@ import math
 
 def get_Optimizer(optimizer_method,params,lr_rate):
   if optimizer_method=="Adam":
-    optimizer=torch.optim.Adam(lr=lr_rate,params=params,weight_decay=1e-5)
+    optimizer=torch.optim.Adam(lr=lr_rate,params=params,weight_decay=lr_rate/10)
   elif optimizer_method=="RMSprop":
     optimizer=torch.optim.RMSprop(lr=lr_rate,params=params,momentum=0.90)
   elif optimizer_method=="AdamW":
-    optimizer=torch.optim.AdamW(lr=lr_rate,params=params,weight_decay=1e-5, amsgrad=True)
+    optimizer=torch.optim.AdamW(lr=lr_rate,params=params,weight_decay=lr_rate/10, amsgrad=True)
   elif optimizer_method=="SGD":
     optimizer=torch.optim.SGD(params=params, lr=lr_rate, momentum=0.90, dampening=0, weight_decay=0, nesterov=False, maximize=False, foreach=None, differentiable=False, fused=None)
   return optimizer
