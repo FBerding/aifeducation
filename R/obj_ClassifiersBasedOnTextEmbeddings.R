@@ -427,6 +427,42 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         padded_rows[9L], self$count_parameter(), "\n",
         padded_rows[10L], self$get_model_config()$use_fe, "\n"
       )
+    },
+    plot_reliability_distribution=function(measures="all"){
+      available_measures_names=colnames(classifier$reliability$test_metric)
+      if(measures=="all"){
+        measures=available_measures_names
+      }
+      selected_measures=intersect(measures,measures_names)
+      if(length(selected_measures)<=0L){
+        stop("Selected measures are not valid. Possible values are: ",
+             toString(available_measures_names)
+        )
+      }
+
+      plot_data=matrix(
+        ncol = 2L,
+        nrow = nrow(self$reliability$test_metric)*ncol(self$reliability$test_metric),
+        dimnames = list(NULL,c("measure","value"))
+      )
+      counter=1L
+      for (i in seq.int(nrow(self$reliability$test_metric))){
+        for (j in seq.int(ncol(self$reliability$test_metric))){
+          plot_data[counter,1]=colnames(self$reliability$test_metric)[j]
+          plot_data[counter,2]=self$reliability$test_metric[i,j]
+          counter=counter+1
+        }
+      }
+      plot_data=as.data.frame(plot_data)
+      plot_data=subset(plot_data,plot_data$measure%in%selected_measures)
+      plot_data$measure=factor(plot_data$measure)
+      plot_data$value=as.numeric(plot_data$value)
+      plot_data=na.omit(plot_data)
+
+      plot=ggplot2::ggplot(data=plot_data)+
+        ggplot2::geom_boxplot(ggplot2::aes(x=measure,y=value))+
+        ggplot2::coord_flip(ylim=c(0L,1L))
+      return(plot)
     }
   ),
   private = list(
@@ -1103,6 +1139,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         comp_use=self$last_training$config$comp_use,
         comp_backend=self$last_training$config$comp_backend,
         comp_mode=self$last_training$config$comp_mode,
+        ddp_use=self$last_training$config$ddp_use,
         lr_warm_up_ratio = self$last_training$config$lr_warm_up_ratio,
         epochs = as.integer(self$last_training$config$epochs),
         trace = as.integer(self$last_training$config$ml_trace),
@@ -1353,6 +1390,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
 
       #Check config of compilation
       private$check_and_set_compiler_backend_mode()
+      private$check_and_set_ddp()
 
       # set up logger
       private$set_up_logger(log_dir = args$log_dir, log_write_interval = args$log_write_interval)
@@ -1509,7 +1547,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       return(sample_weights)
     },
     #-------------------------------------------------------------------------
-    estimate_learning_rates = function(data_manager, total_epochs) {
+    estimate_learning_rates = function(data_manager, total_epochs,comp_use,comp_mode,comp_backend) {
       data_manager$set_state(
         iteration = self$last_training$config$n_folds + 1L,
         step = NULL
@@ -1551,6 +1589,11 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       lr_estimation_results <- py$calc_lr_rate(
         trace = self$last_training$config$ml_trace,
         epochs = as.integer(total_epochs),
+        times=as.integer(self$get_model_config()$times),
+        features=as.integer(self$get_model_config()$features),
+        comp_use=comp_use,
+        comp_mode=comp_mode,
+        comp_backend=comp_backend,
         model = private$model,
         filepath = file.path(private$dir_checkpoint, "best_weights.pt"),
         optimizer_method = self$last_training$config$optimizer,
