@@ -749,10 +749,15 @@ class TEClassifierReferencePoint(torch.nn.Module):
     self.logit_builder=torch.nn.Sequential(
       torch.nn.Linear(
         in_features=2*self.n_target_levels,
-        out_features=self.n_target_levels,
+        out_features=2*self.n_target_levels,
         bias=False
       ),
-      torch.nn.GELU(approximate='none')
+      torch.nn.GELU(approximate='none'),
+      torch.nn.Linear(
+        in_features=2*self.n_target_levels,
+        out_features=self.n_target_levels,
+        bias=False
+      )
     )
     #ref_pointidx
     self.ref_point_idx=torch.nn.parameter.Buffer(torch.arange(start=0,end=2*self.n_target_levels))
