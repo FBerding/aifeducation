@@ -1632,7 +1632,7 @@ classifier$train(
   sustain_interval = 15,
   sustain_log_level = "error",
   epochs = 2000,
-  batch_size = 32,
+  batch_size = 8,
   trace = TRUE,
   ml_trace = 0,
   log_dir = NULL,
@@ -1640,13 +1640,13 @@ classifier$train(
   n_cores = auto_n_cores(),
   lr_rate = 0.0,
   lr_min = 0.0,
-  lr_scheduler = "None",
+  lr_scheduler = "Linear",
   lr_epochs = 75,
-  lr_warm_up_ratio = 0.05,
+  lr_warm_up_ratio = 0.02,
   optimizer = "AdamW",
   amp = TRUE,
   comp_use=TRUE,
-  comp_mode="reduce_overhead"
+  comp_mode="reduce-overhead"
 )
 ```
 
@@ -1927,6 +1927,17 @@ You can access these values as follows:
 classifier$reliability$standard_measures_mean
 ```
 
+In order to analysis the quality of training over all folds you can additionally request a
+box plot. The Figure below shows which performance the classifier reached. 
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Box Plot of Performance Measures"),fig.align="center"}
+classifier$plot_reliability_distribution(measures="all")
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
 Finally, you can plot a coding stream scheme showing how the cases of
 different classes are labeled. 
 
@@ -2193,8 +2204,8 @@ classifier_prototype$train(
   sustain_interval = 15,
   sustain_log_level = "error",
   epochs = 2000,
-  batch_size = 32,
-  Ns = 18,
+  batch_size = 8,
+  Ns = 6,
   Nq = 3,
   loss_alpha = 0.50,
   loss_margin = 0.05,
@@ -2208,12 +2219,12 @@ classifier_prototype$train(
   lr_rate = 0.0,
   lr_min = 0.0,
   lr_epochs = 75,
-  lr_scheduler = "None",
-  lr_warm_up_ratio = 0.05,
+  lr_scheduler = "Linear",
+  lr_warm_up_ratio = 0.02,
   optimizer = "AdamW",
   amp = TRUE,
   comp_use=TRUE,
-  comp_mode="reduce_overhead"
+  comp_mode="reduce-overhead"
 )
 ```
 
@@ -2658,14 +2669,14 @@ feature_extractor$train(
   lr_rate = 0.0,
   lr_min = 0.0,
   lr_epochs = 75,
-  lr_scheduler = "None",
+  lr_scheduler = "Linear",
   trace = TRUE,
   ml_trace = 0,
   optimizer = "AdamW",
   amp = TRUE,
   lr_warm_up_ratio = 0.10,
   comp_use=TRUE,
-  comp_mode="reduce_overhead"
+  comp_mode="reduce-overhead"
 )
 ```
 
@@ -2798,7 +2809,7 @@ classifier_with_fe$train(
   sustain_interval = 15,
   sustain_log_level = "error",
   epochs = 4000,
-  batch_size = 32,
+  batch_size = 8,
   trace = TRUE,
   ml_trace = 0,
   log_dir = NULL,
@@ -2807,12 +2818,12 @@ classifier_with_fe$train(
   lr_rate = 0.0,
   lr_min = 0.0,
   lr_epochs = 75,
-  lr_scheduler = "None",
-  lr_warm_up_ratio = 0.05,
+  lr_scheduler = "Linear",
+  lr_warm_up_ratio = 0.02,
   optimizer = "AdamW",
   amp = TRUE,
   comp_use=TRUE,
-  comp_mode="reduce_overhead"
+  comp_mode="reduce-overhead"
 )
 ```
 
