@@ -81,9 +81,11 @@ classifier$configure(
   skip_connection_type = "ResidualGate",
   #cls_pooling_type = "WeightedAverageTimes",
   #cls_pooling_features = 50,
+  #cls_head_type = "PairwiseOrthogonal",
+  #cls_head_type = "Regular",
   cls_times_pooling_type = "WeightedAverage",
   cls_input_normalize="BatchNorm",
-  metric_type = "CosineDistance",
+  #metric_type = "CosineDistance",
   feat_act_fct = "Tanh",
   feat_size = 384,
   feat_bias = TRUE,
@@ -130,6 +132,149 @@ classifier$configure(
   tf_residual_type = "ResidualGate"
 )
 
+print(classifier)
+
+classifier$train(
+  data_embeddings = review_embeddings,
+  data_targets = review_labels,
+  data_folds = 2,
+  data_val_size = 0.25,
+  loss_cls_fct_name =  "FocalLoss",
+  #loss_cls_fct_name =  "CrossEntropyLoss",
+  loss_balance_class_weights = TRUE,
+  loss_balance_sequence_length = TRUE,
+  use_sc = FALSE,
+  sc_method = "knnor",
+  sc_min_k = 1,
+  sc_max_k = 10,
+  use_pl = FALSE,
+  pl_max_steps = 3,
+  pl_max = 1.00,
+  pl_anchor = 1.00,
+  pl_min = 0.00,
+  sustain_track = TRUE,
+  sustain_iso_code = "DEU",
+  sustain_region = NULL,
+  sustain_interval = 15,
+  sustain_log_level = "error",
+  epochs = 20,
+  batch_size = 16,
+  trace = TRUE,
+  ml_trace = 1,
+  log_dir = NULL,
+  log_write_interval = 10,
+  n_cores = auto_n_cores(),
+  lr_rate = 1e-4,
+  lr_min = 1e-4,
+  lr_scheduler = "Linear",
+  lr_warm_up_ratio = 0.05,
+  lr_epochs = 30,
+  optimizer = "AdamW",
+  amp = TRUE,
+  comp_use=TRUE,
+  ddp_use=TRUE
+)
+
+classifier$reliability$test_metric_mean
+classifier$plot_learning_rate()
+
+classifier$reliability$test_metric
+
+measures=c("kalpha_nominal" ,      "kalpha_ordinal")
+available_measures_names=colnames(classifier$reliability$test_metric)
+selected_measures=intersect(measures,measures_names)
+if(length(selected_measures)<=0L){
+  stop("Selected measures are not valid. Possible values are: ",
+       toString(available_measures_names)
+       )
+}
+
+plot_data=matrix(
+  ncol = 2L,
+  nrow = nrow(classifier$reliability$test_metric)*ncol(classifier$reliability$test_metric),
+  dimnames = list(NULL,c("measure","value"))
+  )
+counter=1L
+for (i in seq.int(nrow(classifier$reliability$test_metric))){
+  for (j in seq.int(ncol(classifier$reliability$test_metric))){
+    plot_data[counter,1]=colnames(classifier$reliability$test_metric)[j]
+    plot_data[counter,2]=classifier$reliability$test_metric[i,j]
+    counter=counter+1
+  }
+}
+plot_data=as.data.frame(plot_data)
+plot_data=subset(plot_data,plot_data$measure%in%selected_measures)
+plot_data$measure=factor(plot_data$measure)
+plot_data$value=as.numeric(plot_data$value)
+plot_data=na.omit(plot_data)
+
+plot=ggplot2::ggplot(data=plot_data)+
+  ggplot2::geom_boxplot(ggplot2::aes(x=measure,y=value))+
+  ggplot2::coord_flip(ylim=c(0L,1L))
+plot
+
+com_classifier=classifier
+com_classifier$last_training$learning_time
+#-------------------------------------------------------------------------------
+classifier <- TEClassifierParallel$new()
+classifier$configure(
+  label = "ReferencePoint classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+  text_embeddings = review_embeddings,
+  feature_extractor = NULL,
+  target_levels = c("neg", "pos"),
+  #skip_connection_type = "ResidualGate",
+  merge_pooling_type = "WeightedAverageTimes",
+  merge_pooling_features = 50,
+  cls_head_type = "PairwiseOrthogonal",
+  cls_input_normalize="BatchNorm",
+  shared_feat_layer = TRUE,
+  feat_act_fct = "Tanh",
+  feat_size = 384,
+  feat_bias = TRUE,
+  feat_dropout = 0.02,
+  feat_parametrizations = "None",
+  feat_normalization_type = "LayerNorm",
+  ng_conv_act_fct = "GELU",
+  ng_conv_n_layers = 1,
+  ng_conv_ks_min = 2,
+  ng_conv_ks_max = 4,
+  ng_conv_bias = FALSE,
+  ng_conv_dropout = 0.1,
+  ng_conv_parametrizations = "None",
+  ng_conv_normalization_type = "RMSNorm",
+  ng_conv_residual_type = "ResidualGate",
+  dense_act_fct = "ELU",
+  dense_n_layers = 1,
+  dense_dropout = 0.30,
+  dense_bias = FALSE,
+  dense_parametrizations = "None",
+  dense_normalization_type = "PowerNorm",
+  dense_residual_type = "ResidualGate",
+  rec_act_fct = "Tanh",
+  rec_n_layers = 0,
+  rec_type = "GRU",
+  rec_bidirectional = FALSE,
+  rec_dropout = 0.2,
+  rec_bias = FALSE,
+  rec_parametrizations = "None",
+  rec_normalization_type = "PowerNorm",
+  rec_residual_type = "ResidualGate",
+  tf_act_fct = "SwiGLU",
+  tf_dense_dim = 3*384,
+  tf_n_layers = 1,
+  tf_dropout_rate_1 = 0.1,
+  tf_dropout_rate_2 = 0.4,
+  tf_attention_type = "MultiHead",
+  tf_positional_type = "absolute",
+  tf_num_heads = 2,
+  tf_bias = FALSE,
+  tf_parametrizations = "None",
+  tf_normalization_type = "PowerNorm",
+  tf_normalization_position = "Post",
+  tf_residual_type = "ResidualGate",
+  merge_attention_type = "Fourier"
+)
+
 classifier
 print(classifier$count_parameter())
 classifier$train(
@@ -173,9 +318,6 @@ classifier$train(
 
 classifier$reliability$test_metric_mean
 
-com_classifier=classifier
-com_classifier$last_training$learning_time
-
 #--------------------------------------------------------------------------------------
 devtools::load_all()
 load_all_py_scripts()
@@ -188,6 +330,7 @@ classifier_prototype$configure(
   skip_connection_type = "ResidualGate",
   cls_pooling_features = 25,
   cls_pooling_type = "WeightedAverageTimes",
+  cls_input_normalize="BatchNorm",
   projection_type = "Regular",
   metric_type = "Euclidean",
   feat_act_fct = "Tanh",
@@ -259,11 +402,11 @@ classifier_prototype$train(
   sustain_log_level = "error",
   epochs = 300,
   batch_size = 32,
-  Ns = 3,
+  Ns = 5,
   Nq = 3,
   loss_alpha = 0.50,
   loss_margin = 0.05,
-  sampling_separate = FALSE,
+  sampling_separate = TRUE,
   sampling_shuffle = TRUE,
   trace = TRUE,
   ml_trace = 1,

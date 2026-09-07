@@ -74,10 +74,10 @@ embeddings <- tem$embed_large(
 devtools::load_all()
 load_all_py_scripts()
 batch_size=64
-losses=c("FocalLoss")
+losses=c("FocalLossOrdinal")
 results=list()
 
-feat_size=192
+feat_size=384
 loss="AEMLoss"
 classifier <- TEClassifierParallelReferencePoint$new()
 classifier$configure(
@@ -105,7 +105,7 @@ classifier$configure(
   ng_conv_normalization_type = "PowerNorm",
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "GELU",
-  dense_n_layers = 1,
+  dense_n_layers = 0,
   dense_dropout = .20,
   dense_bias = FALSE,
   dense_parametrizations = "None",
@@ -122,7 +122,7 @@ classifier$configure(
   rec_residual_type = "ResidualGate",
   tf_act_fct = "SwiGLU",
   tf_dense_dim = ceiling(2.67 * feat_size),
-  tf_n_layers = 0,
+  tf_n_layers = 1,
   tf_dropout_rate_1 = 0.1,
   tf_dropout_rate_2 = .30,
   tf_attention_type = "MultiHead",
@@ -161,15 +161,15 @@ classifier$train(
   sustain_region = NULL,
   sustain_interval = 15,
   sustain_log_level = "error",
-  epochs = 20,
-  batch_size = 64,
+  epochs = 5000,
+  batch_size = 1024,
   trace = TRUE,
   ml_trace = 1,
   log_dir = NULL,
   log_write_interval = 10,
   n_cores = auto_n_cores(),
-  lr_rate = 1e-5,
-  lr_min = 1e-5,
+  lr_rate = 1e-1,
+  lr_min = 1e-3,
   lr_scheduler = "None",
   lr_warm_up_ratio = 0.05,
   lr_epochs = 5L,
@@ -177,6 +177,9 @@ classifier$train(
   amp = TRUE,
   comp_use = TRUE
 )
+
+classifier$reliability$test_metric_mean
+
 
 
 for( loss in losses){
