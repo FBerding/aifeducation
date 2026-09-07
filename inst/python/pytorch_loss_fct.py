@@ -38,7 +38,7 @@ def create_ordinal_weights(targets):
     n_classes = targets.size(1)
     class_idx = torch.argmax(targets, dim=1).detach()
     index_matrix = torch.arange(n_classes, dtype=class_idx.dtype, device=class_idx.device)
-    weights = torch.abs(index_matrix.unsqueeze(0) - class_idx.unsqueeze(1)) + 1
+    weights = torch.abs(index_matrix.unsqueeze(0) - class_idx.unsqueeze(1))
     n_factors = torch.sum(weights, dim=1, keepdim=True)
     weights = weights / n_factors
     return weights.detach()
@@ -58,19 +58,20 @@ class focal_loss(torch.nn.Module):
     self.softmax=torch.nn.Softmax(dim=1)
   
   def forward(self,prediction,target):
+    prob=self.softmax(prediction)
+    #shape (Batch, n_classes)
+    focal_factor=torch.pow(input=(1-prob),exponent=self.gamma)
+    #shape(Batch)
+    focal_factor=torch.sum(target*focal_factor,dim=1)
     if self.scale_level=="ordinal":
-      prediction=prediction+torch.abs(create_ordinal_weights(target)*prediction)
+      penality=prob*create_ordinal_weights(target) #(Batch, n_classes)
+      penality=torch.sum(penality,dim=1) #(Batch)
+    else:
+      penality=0.0
     #Shape (Batch)
     ce=self.cross_entropy(prediction,target)
-    #Shape (Batch, n_classes)
-    with torch.no_grad():
-      prob=self.softmax(prediction)
-      #shape (Batch, n_classes)
-      focal_factor=torch.pow(input=(1-prob),exponent=self.gamma)
-      #shape(Batch)
-      focal_factor=torch.sum(target*focal_factor,dim=1)
     #Shape (Batch)
-    focal=focal_factor*ce
+    focal=focal_factor*ce+penality
     return focal
     
 class multi_way_contrastive_loss(torch.nn.Module):
