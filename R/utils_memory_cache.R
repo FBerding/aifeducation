@@ -112,7 +112,7 @@ get_compiler_backend=function(){
       return("inductor")
     }
   } else if (running_os=="linux"){
-    return("TorchInductor")
+    return("inductor")
   } else if(running_os=="mac"){
     if (torch$cuda$is_available()){
       return("aot_eager")
