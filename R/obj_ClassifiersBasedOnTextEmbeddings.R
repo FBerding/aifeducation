@@ -392,7 +392,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       )
       return(tmp_plot)
     },
-    #' @description Method for requesting a plot the coding stream.
+    #' @description Method for requesting a plot of the coding stream.
     #' The plot shows how the cases of different categories/classes are
     #' assigned to a the available classes/categories. The visualization
     #' is helpful for analyzing the consequences of coding errors.
@@ -428,12 +428,16 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         padded_rows[10L], self$get_model_config()$use_fe, "\n"
       )
     },
+    #' @description Method for requesting a plot showing the box plots
+    #' for the performance measures across folds.
+    #' @param measures `vector` of `strings` Names of the measures to plot.
+    #' @return Returns a plot of class `ggplot` visualizing the training process.
     plot_reliability_distribution=function(measures="all"){
       available_measures_names=colnames(classifier$reliability$test_metric)
       if(measures=="all"){
         measures=available_measures_names
       }
-      selected_measures=intersect(measures,measures_names)
+      selected_measures=intersect(measures,available_measures_names)
       if(length(selected_measures)<=0L){
         stop("Selected measures are not valid. Possible values are: ",
              toString(available_measures_names)
