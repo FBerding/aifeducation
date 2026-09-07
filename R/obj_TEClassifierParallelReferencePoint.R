@@ -13,7 +13,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 #' @title Text embedding classifier with a neural net
-#' @description `r build_documentation_for_model(model_name="TEClassifierSequentialReferencePoint",cls_type="prob",core_type="parallel",input_type="text_embeddings")`
+#' @description `r build_documentation_for_model(model_name="TEClassifierParallelReferencePoint",cls_type="prob",core_type="parallel",input_type="text_embeddings")`
 #'
 #' @return Returns a new object of this class ready for configuration or for loading
 #' a saved classifier.
@@ -230,4 +230,4 @@ TEClassifierParallelReferencePoint <- R6::R6Class(
 )
 
 # Add Classifier to central index
-TEClassifiers_class_names <- append(x = TEClassifiers_class_names, values = "TEClassifierSequentialReferencePoint")
+TEClassifiers_class_names <- append(x = TEClassifiers_class_names, values = "TEClassifierParallelReferencePoint")
