@@ -167,7 +167,10 @@ be added to the input during training. Allowed values:
   lr_scheduler = "None",
   lr_epochs = 50L,
   optimizer = "AdamW",
-  amp = FALSE
+  amp = FALSE,
+  comp_use = FALSE,
+  comp_mode = "reduce-overhead",
+  ddp_use = FALSE
 )}
     \if{html}{\out{</div>}}
   }
@@ -250,6 +253,16 @@ Set this value to \code{0.0} requests an automatic search for a good learning ra
 recommended to set this parameter to \code{TRUE}. If you encounter problems set to \code{FALSE}.
 * \code{FALSE}: Use full precision.
 * \code{TRUE}: Use automatic mixed precision (amp) with gradient scaling.}
+      \item{\code{comp_use}}{\code{bool} If \code{TRUE} model and loss are compiled to speed up training.}
+      \item{\code{comp_mode}}{\code{string} Determines the mode for compilation. Different modes are only available if
+the compilation backend is 'triton.'. Allowed values:
+\itemize{
+\item 'default'
+\item 'reduce-overhead'
+\item 'max-autotune'
+\item 'max-autotune-no-cudagraphs'
+}}
+      \item{\code{ddp_use}}{\code{bool} If \code{TRUE} model uses all available gpus for training.}
     }
     \if{html}{\out{</div>}}
   }

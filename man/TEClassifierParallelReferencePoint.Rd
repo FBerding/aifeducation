@@ -136,6 +136,7 @@ Other Classification:
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="check_feature_extractor_object_type"><a href='../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-check_feature_extractor_object_type'><code>ClassifiersBasedOnTextEmbeddings$check_feature_extractor_object_type()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="load_from_disk"><a href='../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-load_from_disk'><code>ClassifiersBasedOnTextEmbeddings$load_from_disk()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="plot_coding_stream"><a href='../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-plot_coding_stream'><code>ClassifiersBasedOnTextEmbeddings$plot_coding_stream()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="plot_reliability_distribution"><a href='../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-plot_reliability_distribution'><code>ClassifiersBasedOnTextEmbeddings$plot_reliability_distribution()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="plot_training_history"><a href='../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-plot_training_history'><code>ClassifiersBasedOnTextEmbeddings$plot_training_history()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="predict"><a href='../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-predict'><code>ClassifiersBasedOnTextEmbeddings$predict()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="print"><a href='../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-print'><code>ClassifiersBasedOnTextEmbeddings$print()</code></a></span></li>
@@ -160,6 +161,7 @@ Other Classification:
   skip_connection_type = "ResidualGate",
   metric_type = "Euclidean",
   shared_feat_layer = TRUE,
+  cls_input_normalize = "BatchNorm",
   feat_act_fct = "ELU",
   feat_size = 50L,
   feat_bias = TRUE,
@@ -207,7 +209,7 @@ Other Classification:
   merge_attention_type = "MultiHead",
   merge_num_heads = 2L,
   merge_normalization_type = "LayerNorm",
-  merge_times_pooling_type = "MinMaxTimes"
+  merge_times_pooling_type = "MinMax"
 )}
     \if{html}{\out{</div>}}
   }
@@ -240,6 +242,12 @@ indicating a higher category/class. For nominal data the order does not matter.}
 \item 'CosineDistance'
 }}
       \item{\code{shared_feat_layer}}{\code{bool} If \code{TRUE} all streams use the same feature layer. If \code{FALSE} all streams use their own feature layer.}
+      \item{\code{cls_input_normalize}}{\code{string} Type of normalization applied to data before passing to any layers of the net. Allowed values:
+\itemize{
+\item 'BatchNorm'
+\item 'PowerNorm'
+\item 'None'
+}}
       \item{\code{feat_act_fct}}{\code{string} Activation function for the specified layers. Allowed values:
 \itemize{
 \item 'ELU'
@@ -475,7 +483,6 @@ indicating a higher category/class. For nominal data the order does not matter.}
       \item{\code{merge_times_pooling_type}}{\code{string} Type of extracting intermediate features. Allowed values:
 \itemize{
 \item 'Max'
-\item 'MinMax'
 \item 'Average'
 \item 'WeightedAverage'
 }}

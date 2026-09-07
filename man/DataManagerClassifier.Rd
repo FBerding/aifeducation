@@ -74,6 +74,7 @@ the final training can be requested with \code{i+1}.}
     \item \href{#method-DataManagerClassifier-get_test_dataset}{\code{DataManagerClassifier$get_test_dataset()}}
     \item \href{#method-DataManagerClassifier-create_synthetic}{\code{DataManagerClassifier$create_synthetic()}}
     \item \href{#method-DataManagerClassifier-add_replace_pseudo_data}{\code{DataManagerClassifier$add_replace_pseudo_data()}}
+    \item \href{#method-DataManagerClassifier-get_min_n}{\code{DataManagerClassifier$get_min_n()}}
     \item \href{#method-DataManagerClassifier-clone}{\code{DataManagerClassifier$clone()}}
   }
 }
@@ -417,6 +418,22 @@ that a call of this method will override an existing data set in the correspondi
     This method does nothing return. It generates a new data set for synthetic cases which are stored as an
 object of class \code{datasets.arrow_dataset.Dataset} in the field \code{datasets$data_labeled_pseudo}. Please note that
 a call of this method will override an existing data set in the corresponding field.
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DataManagerClassifier-get_min_n"></a>}}
+\if{latex}{\out{\hypertarget{method-DataManagerClassifier-get_min_n}{}}}
+\subsection{\code{DataManagerClassifier$get_min_n()}}{
+  Method for requesting the minimal number of cases over all folds
+and over training, validation, and test data set.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DataManagerClassifier$get_min_n()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Returns an integer.
 title Create cross-validation samples
 description Function creates cross-validation samples and ensures that the relative frequency for every
 category/label within a fold equals the relative frequency of the category/label within the initial data.

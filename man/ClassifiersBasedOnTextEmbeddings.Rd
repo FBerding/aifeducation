@@ -76,6 +76,7 @@ recall, and f1 for every fold.
     \item \href{#method-ClassifiersBasedOnTextEmbeddings-plot_training_history}{\code{ClassifiersBasedOnTextEmbeddings$plot_training_history()}}
     \item \href{#method-ClassifiersBasedOnTextEmbeddings-plot_coding_stream}{\code{ClassifiersBasedOnTextEmbeddings$plot_coding_stream()}}
     \item \href{#method-ClassifiersBasedOnTextEmbeddings-print}{\code{ClassifiersBasedOnTextEmbeddings$print()}}
+    \item \href{#method-ClassifiersBasedOnTextEmbeddings-plot_reliability_distribution}{\code{ClassifiersBasedOnTextEmbeddings$plot_reliability_distribution()}}
     \item \href{#method-ClassifiersBasedOnTextEmbeddings-clone}{\code{ClassifiersBasedOnTextEmbeddings$clone()}}
   }
 }
@@ -354,7 +355,7 @@ with active pseudo labeling.}
 \if{html}{\out{<a id="method-ClassifiersBasedOnTextEmbeddings-plot_coding_stream"></a>}}
 \if{latex}{\out{\hypertarget{method-ClassifiersBasedOnTextEmbeddings-plot_coding_stream}{}}}
 \subsection{\code{ClassifiersBasedOnTextEmbeddings$plot_coding_stream()}}{
-  Method for requesting a plot the coding stream.
+  Method for requesting a plot of the coding stream.
 The plot shows how the cases of different categories/classes are
 assigned to a the available classes/categories. The visualization
 is helpful for analyzing the consequences of coding errors.
@@ -393,6 +394,31 @@ is helpful for analyzing the consequences of coding errors.
   }
   \subsection{Returns}{
     Prints a short description of the object.
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-ClassifiersBasedOnTextEmbeddings-plot_reliability_distribution"></a>}}
+\if{latex}{\out{\hypertarget{method-ClassifiersBasedOnTextEmbeddings-plot_reliability_distribution}{}}}
+\subsection{\code{ClassifiersBasedOnTextEmbeddings$plot_reliability_distribution()}}{
+  Method for requesting a plot showing the box plots
+for the performance measures across folds.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ClassifiersBasedOnTextEmbeddings$plot_reliability_distribution(
+  measures = "all"
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{measures}}{\code{vector} of \code{strings} Names of the measures to plot.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Returns a plot of class \code{ggplot} visualizing the training process.
   }
 }
 

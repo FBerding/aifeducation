@@ -65,6 +65,7 @@ Other R6 Classes for Developers:
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="check_feature_extractor_object_type"><a href='../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-check_feature_extractor_object_type'><code>ClassifiersBasedOnTextEmbeddings$check_feature_extractor_object_type()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="load_from_disk"><a href='../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-load_from_disk'><code>ClassifiersBasedOnTextEmbeddings$load_from_disk()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="plot_coding_stream"><a href='../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-plot_coding_stream'><code>ClassifiersBasedOnTextEmbeddings$plot_coding_stream()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="plot_reliability_distribution"><a href='../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-plot_reliability_distribution'><code>ClassifiersBasedOnTextEmbeddings$plot_reliability_distribution()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="plot_training_history"><a href='../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-plot_training_history'><code>ClassifiersBasedOnTextEmbeddings$plot_training_history()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="predict"><a href='../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-predict'><code>ClassifiersBasedOnTextEmbeddings$predict()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="print"><a href='../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-print'><code>ClassifiersBasedOnTextEmbeddings$print()</code></a></span></li>
@@ -120,7 +121,10 @@ on the validation data set is used as the final model.
   lr_scheduler = "None",
   lr_epochs = 50L,
   optimizer = "AdamW",
-  amp = FALSE
+  amp = FALSE,
+  comp_use = FALSE,
+  comp_mode = "reduce-overhead",
+  ddp_use = FALSE
 )}
     \if{html}{\out{</div>}}
   }
@@ -247,6 +251,16 @@ Set this value to \code{0.0} requests an automatic search for a good learning ra
 recommended to set this parameter to \code{TRUE}. If you encounter problems set to \code{FALSE}.
 * \code{FALSE}: Use full precision.
 * \code{TRUE}: Use automatic mixed precision (amp) with gradient scaling.}
+      \item{\code{comp_use}}{\code{bool} If \code{TRUE} model and loss are compiled to speed up training.}
+      \item{\code{comp_mode}}{\code{string} Determines the mode for compilation. Different modes are only available if
+the compilation backend is 'triton.'. Allowed values:
+\itemize{
+\item 'default'
+\item 'reduce-overhead'
+\item 'max-autotune'
+\item 'max-autotune-no-cudagraphs'
+}}
+      \item{\code{ddp_use}}{\code{bool} If \code{TRUE} model uses all available gpus for training.}
     }
     \if{html}{\out{</div>}}
   }
