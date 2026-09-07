@@ -70,6 +70,20 @@ allows the model to perform n-gram detection of n-grams (meta perspective). All 
 A regular recurrent layer either as Gated Recurrent Unit (GRU) or Long Short-Term Memory (LSTM) layer. Uses
 PyTorchs implementation. All parameters with the prefix \emph{rec_} can be used to configure this layer.
 
+\strong{Merge Layer}
+
+\emph{Description}
+
+Layer for combining the output of different layers. All inputs must be sequential data of shape (Batch, Times, Features).
+First, pooling over time is applied extracting the minimal and/or maximal features.
+Second, the pooled tensors are combined by calculating their weighted sum. Different attention mechanism can be used
+to dynamically calculate the corresponding weights. This allows the model to decide which part of the data is most usefull.
+Finally, pooling over features can be applied extracting a specific number of maximal and/or minimal features.
+Pooling over times is mandatory. Pooling over features is optional and can lead to a lose of information.
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{A normalization of all input at the begining of the layer is possible. All parameters with the prefix *merge_* can be used to configure this layer.
+}\if{html}{\out{</div>}}
+
 \strong{Training and Prediction}
 
 For the creation and training of a
