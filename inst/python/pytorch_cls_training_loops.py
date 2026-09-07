@@ -36,7 +36,7 @@ class ModelTrainerManager():
     self.train_args=train_args
     self.backend_ddp="gloo"
     self.world_size=1
-  
+
   @staticmethod
   def init_trainer(model_type,ddp_use,train_args):
     #Init Trainer
@@ -129,8 +129,9 @@ class ModelTrainer():
     self.world_size=world_size
   #------------------------------------------------------------------------------
   def config_for_StandardClassifier(self,model,features,times,final_dim,loss_cls_fct_name, optimizer_method,scheduler_type,amp, lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,batch_size,
-    train_data,val_data,filepath,use_callback,n_classes,class_weights,comp_use,comp_backend,comp_mode,test_data=None,
+    train_data,val_data,filepath,use_callback,n_classes,class_weights,comp_use,comp_backend,comp_mode,ddp_use,test_data=None,
     log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
+    self.ddp_use=ddp_use
     self.model=model
     self.features=features
     self.times=times
@@ -165,10 +166,11 @@ class ModelTrainer():
       name=self.loss_cls_fct_name,
       class_weights=self.class_weights
     )
-  def config_for_ClassifierPrototype(self,model,features,times,final_dim,loss_pt_fct_name , optimizer_method, scheduler_type, amp,comp_use,comp_backend,comp_mode,lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,Ns,Nq,
+  def config_for_ClassifierPrototype(self,model,features,times,final_dim,loss_pt_fct_name , optimizer_method, scheduler_type, amp,ddp_use,comp_use,comp_backend,comp_mode,lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,Ns,Nq,
     loss_alpha, loss_margin, train_data,val_data,filepath,use_callback,n_classes,sampling_separate,sampling_shuffle,test_data=None,
     log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
     self.model=model
+    self.ddp_use=ddp_use
     self.features=features
     self.times=times
     self.final_dim=final_dim
@@ -208,9 +210,10 @@ class ModelTrainer():
       alpha=self.loss_alpha
     )
   def config_for_TEFeatureExtractor(self,model,optimizer_method,times,features,scheduler_type,amp, lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,batch_size,
-    train_data,val_data,filepath,use_callback,comp_use,comp_backend,comp_mode,
+    train_data,val_data,filepath,use_callback,comp_use,comp_backend,comp_mode,ddp_use,
     log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
     self.model=model
+    self.ddp_use=ddp_use
     self.optimizer_method=optimizer_method
     self.times=times
     self.features=features
@@ -715,11 +718,13 @@ class ModelTrainer():
         self.elc=epoch+1
 
   def check_convergence(self,train_results):
-    if self.model_type=="ClassifierStandards":
+    if self.model_type=="ClassifierStandard" or self.model_type=="ClassifierPrototype":
       if train_results["loss"]<1e-3 and train_results["s_avg_iota"]>=.98:
-        if trace:
+        if self.trace:
           print("\n")
-      return True
+        return True
+      else:
+        return False
     
   def run_epochs(self):
     if self.model_type=="ClassifierStandard":
@@ -982,9 +987,13 @@ def add_metrics(metrics,storage,cblock,epoch):
 
 #=============================================================
 
-def calc_lr_rate_loss(model,device,current_dtype,optimizer,loss_fct,dataloader,n_classes=None,Ns=None,Nq=None,start_mode=True):
+def calc_lr_rate_loss(model,device,current_dtype,optimizer,loss_fct,dataloader,comp_use,comp_mode,comp_backend,n_classes=None,Ns=None,Nq=None,start_mode=True):
     loss_complete=0
-    model.train()
+    if comp_use:
+      trainer=torch.compile(model,mode=comp_mode,fullgraph=False,dynamic=True,backend=comp_backend)
+    else:
+      trainer=model
+    trainer.train()
 
     if isinstance(model,TEClassifierSequential) or isinstance(model,TEClassifierParallel) or isinstance(model,TEClassifierReferencePoint):
       for batch in dataloader:
@@ -1000,9 +1009,12 @@ def calc_lr_rate_loss(model,device,current_dtype,optimizer,loss_fct,dataloader,n
            sample_weights=torch.ones((inputs.size(0)),device=device,dtype=current_dtype)/inputs.size(0)
         if not start_mode:
           optimizer.zero_grad()
-        outputs=model(inputs,prediction_mode=False)
+
+        outputs=trainer(inputs,prediction_mode=False)
         loss=loss_fct(outputs,labels)*sample_weights.detach()
         loss=loss.mean()
+        if torch.isnan(loss).any():
+          raise ValueError("NANs detected during estimating learning rates.")
         if not start_mode:
           loss.backward()
           optimizer.step()
@@ -1011,17 +1023,19 @@ def calc_lr_rate_loss(model,device,current_dtype,optimizer,loss_fct,dataloader,n
       for batch in dataloader:
         inputs=batch["input"]
         labels=batch["labels"]
+        
         sample_inputs=inputs[0:(n_classes*Ns)].clone()
         query_inputs=inputs[(n_classes*Ns):(n_classes*(Ns+Nq))].clone()
         sample_classes=labels[0:(n_classes*Ns)].clone()
         query_classes=labels[(n_classes*Ns):(n_classes*(Ns+Nq))].clone()
+        
         sample_inputs = sample_inputs.to(device,dtype=current_dtype)
         query_inputs = query_inputs.to(device,dtype=current_dtype)
         sample_classes = sample_classes.to(device,dtype=current_dtype)
         query_classes = query_classes.to(device,dtype=current_dtype)
         if not start_mode:
           optimizer.zero_grad()
-        outputs=model(
+        outputs=trainer(
           input_q=query_inputs,
           classes_q=query_classes,
           input_s=sample_inputs,
@@ -1034,6 +1048,8 @@ def calc_lr_rate_loss(model,device,current_dtype,optimizer,loss_fct,dataloader,n
           metric_scale_factor=model.get_metric_scale_factor().detach(),
           logits=outputs[0]
         )
+        if torch.isnan(loss).any():
+          raise ValueError("NANs detected during estimating learning rates.")
         if not start_mode:
           loss.backward()
           optimizer.step()      
@@ -1046,16 +1062,18 @@ def calc_lr_rate_loss(model,device,current_dtype,optimizer,loss_fct,dataloader,n
         labels=labels.to(device,dtype=current_dtype)
         if not start_mode:
           optimizer.zero_grad()
-        outputs=model(inputs,encoder_mode=False)
+        outputs=trainer(inputs,encoder_mode=False)
         loss=loss_fct(outputs,labels)
         loss=loss.mean()
+        if torch.isnan(loss).any():
+          raise ValueError("NANs detected during estimating learning rates.")
         if not start_mode:
           loss.backward()
           optimizer.step()
         loss_complete+=loss
     return loss_complete
 
-def calc_lr_rate(trace,model,epochs,filepath,optimizer_method,loss_fct_name,dataset,batch_size,class_weights,Ns=None,Nq=None,n_classes=None,separate=None,shuffle=None,alpha=None,margin=None):
+def calc_lr_rate(trace,model,epochs,times,features,filepath,optimizer_method,loss_fct_name,dataset,comp_use,comp_mode,comp_backend,batch_size,class_weights,Ns=None,Nq=None,n_classes=None,separate=None,shuffle=None,alpha=None,margin=None):
   #Prepare objects
   device=get_device()
   current_dtype=get_dtype(device)
@@ -1073,7 +1091,7 @@ def calc_lr_rate(trace,model,epochs,filepath,optimizer_method,loss_fct_name,data
     loss_fct=torch.nn.MSELoss()
   
   loss_fct.to(device=device,dtype=current_dtype)  
-  
+ 
   if isinstance(model,TEClassifierPrototype):
     ProtoNetSampler_Train=MetaLernerBatchSampler(
     targets=dataset["labels"][range(0,len(dataset))],
@@ -1091,29 +1109,30 @@ def calc_lr_rate(trace,model,epochs,filepath,optimizer_method,loss_fct_name,data
       dataset,
       batch_size=batch_size,
       pin_memory=True if device=="cuda" else False,
-      shuffle=True
+      shuffle=True,
+      drop_last=True
     )
   #Save model weights
   torch.save(model.state_dict(),filepath)
   
   counter=0
   learning_rates=np.zeros((30))
-  for i in range(1,6):
+  for i in range(1,8):
     if i==0:
-      tmp_range=range(0,3)
+      #tmp_range=range(0,3)
+      tmp_range=[1,3]
     else:
-      tmp_range=range(0,4)
+      tmp_range=[3,1]
     for j in tmp_range:
       base=(j+1)/4
       learning_rates[counter]=base/(10**i)
       counter+=1
-
   results=np.zeros((4,30))
 
   #Set up logger
   PrgInd=ProgressLogger()
   PrgInd.set_start_time()
-  total_iter=len(learning_rates)
+  total_iter=counter-1
   for j in range(0,total_iter):
     #Reset model
     model.load_state_dict(torch.load(filepath,weights_only=False))
@@ -1136,11 +1155,15 @@ def calc_lr_rate(trace,model,epochs,filepath,optimizer_method,loss_fct_name,data
       optimizer=optimizer,
       loss_fct=loss_fct,
       dataloader=dataloader,
-      start_mode=True
+      start_mode=True,
+      comp_use=comp_use,
+      comp_mode=comp_mode,
+      comp_backend=comp_backend
     )
     start_loss=start_loss/len(dataloader) 
     # Calculate tranining data
-    epoch_loss_m=start_loss
+    #epoch_loss_m=start_loss
+    loss_final=0.0
     for i in range(0,epochs):
       epoch_loss=calc_lr_rate_loss(
         device=device,
@@ -1152,20 +1175,26 @@ def calc_lr_rate(trace,model,epochs,filepath,optimizer_method,loss_fct_name,data
         optimizer=optimizer,
         loss_fct=loss_fct,
         dataloader=dataloader,
-        start_mode=False
+        start_mode=False,
+        comp_use=comp_use,
+        comp_mode=comp_mode,
+        comp_backend=comp_backend
       )
       epoch_loss=epoch_loss/len(dataloader)
       #Count improvments
-      if(epoch_loss<=epoch_loss_m):
-        results[1,j]+=1
-      #Set current loss to as the other loss  
-      epoch_loss_m=epoch_loss
-    #Update logger  
+      #if(epoch_loss<=epoch_loss_m):
+      #  results[1,j]+=1
+      #Set current loss as the other loss  
+      #epoch_loss_m=epoch_loss
+      if i >= min(epochs*9//10,epochs-1):
+        loss_final=loss_final+epoch_loss
+    #Update logger
+    loss_final=loss_final/min((epochs-(epochs*9//10)),1)
     PrgInd.print_progress(trace=trace,epoch=j,epochs=total_iter)
     #Add final data
     results[0,j]=tmp_lr_rate
     results[2,j]=start_loss.detach()
-    results[3,j]=epoch_loss.detach()
+    results[3,j]=loss_final.detach()
   return results
 
 #=============================================================
@@ -1281,7 +1310,7 @@ if __name__ == "__main__":
     # Liste, um alle erfolgreich geladenen Module und Objekte zwischenzuspeichern
     geladene_module = []
     alle_objekte = {}
-
+    print("0")
     # 1. SCHRITT: Alle Module normal laden und registrieren
     for file_name in os.listdir(aife_dir):
         if file_name.endswith(".py") and file_name != "__init__.py":
@@ -1319,7 +1348,7 @@ if __name__ == "__main__":
                 print(
                     f"Error loading {file_name}: {e}", file=sys.stderr
                 )
-
+    print("2")
     # 2. SCHRITT: WICHTIG – Gegenseitige Kreuz-Injektion (Cross-Injection)
     # Wir schreiben jedes gefundene Objekt in den globalen Namensraum der aktuellen Session...
     for name, obj in alle_objekte.items():
@@ -1331,6 +1360,7 @@ if __name__ == "__main__":
               
     # load model
     print(masking_layer)
+    print("3")
     with open(tmp_dir+"/nn_configs.json", "r", encoding="utf-8") as file:
       model_config = json.load(file)
     model_definition= globals()[model_config["class_name"]]
@@ -1352,6 +1382,7 @@ if __name__ == "__main__":
       train_args["class_weights"]=torch.from_numpy(np.array(train_args["class_weights"]))
     #Create trainer
     print(train_args)
+    print("4")
     trainer=ModelTrainer(model_type,ddp_use)
     if model_type=="ClassifierStandard":
       trainer.config_for_StandardClassifier(**train_args)
@@ -1362,6 +1393,7 @@ if __name__ == "__main__":
     trainer.set_rank_word_size(rank=rank,world_size=world_size)
     #Set up ddp
     print(trainer)
+    print("5")
     os.environ["MASTER_ADDR"] = "localhost"
     os.environ["MASTER_PORT"] = "12355" # Freier Port auf dem System
     if dist.is_initialized():
