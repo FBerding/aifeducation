@@ -336,7 +336,7 @@ class ModelTrainer():
       train_data,
       pin_memory = pin_memory,
       batch_sampler=ProtoNetSampler_Train)
-    if not (test_data is None):
+    if not (val_data is None):
       valloader=torch.utils.data.DataLoader(
         val_data,
         pin_memory = pin_memory,
