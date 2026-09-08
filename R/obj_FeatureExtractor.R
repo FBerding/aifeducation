@@ -228,39 +228,18 @@ TEFeatureExtractor <- R6::R6Class(
       private$calculate_learning_rate(extractor_dataset$train)
 
       # Start Training----------------------------------------------------------
-      train_args=list(
-        model = private$model,
-        optimizer_method = self$last_training$config$optimizer,
-        features=as.integer(private$text_embedding_model["features"]),
-        times=as.integer(private$text_embedding_model["times"]),
-        amp = self$last_training$config$amp,
-        comp_use=self$last_training$config$comp_use,
-        comp_backend=self$last_training$config$comp_backend,
-        comp_mode=self$last_training$config$comp_mode,
-        ddp_use=self$last_training$config$ddp_use,
-        lr_rate = self$last_training$config$lr_rate,
-        lr_warm_up_ratio = self$last_training$config$lr_warm_up_ratio,
-        lr_min = self$last_training$config$lr_min,
-        scheduler_type = self$last_training$config$lr_scheduler,
-        epochs = as.integer(self$last_training$config$epochs),
-        trace = as.integer(self$last_training$config$ml_trace),
-        batch_size = as.integer(self$last_training$config$batch_size),
+      trainer_manager=private$create_trainer_manager(
         train_data = extractor_dataset$train,
         val_data = extractor_dataset$test,
-        filepath = file.path(private$dir_checkpoint, "best_weights.pt"),
+        test_data = NULL,
+        class_weights = NULL,
+        reset_model = TRUE,
         use_callback = TRUE,
         log_dir = private$log_config$log_dir,
         log_write_interval = private$log_config$log_write_interval,
         log_top_value = log_top_value,
         log_top_total = log_top_total,
         log_top_message = log_top_message
-      )
-      trainer_manager=py$ModelTrainerManager(
-        model_type="TEFeatureExtractor",
-        ddp_use=self$last_training$config$ddp_use,
-        train_args=train_args,
-        tmp_dir=create_and_get_tmp_dir(),
-        aife_dir=system.file("python", package = "aifeducation")
       )
       tmp_history <-trainer_manager$do_training()
       self$last_training$history <- private$prepare_history_data(tmp_history)
@@ -554,26 +533,73 @@ TEFeatureExtractor <- R6::R6Class(
       }
     },
     #--------------------------------------------------------------------------
-    estimate_learning_rates = function(dataset, total_epochs,comp_use,comp_mode,comp_backend) {
-      lr_estimation_results <- py$calc_lr_rate(
-        trace = self$last_training$config$ml_trace,
-        epochs = as.integer(total_epochs),
+    create_trainer_manager=function(train_data = NULL,
+                                    val_data = NULL,
+                                    test_data = NULL,
+                                    reset_model = FALSE,
+                                    use_callback = TRUE,
+                                    log_dir = NULL,
+                                    class_weights= NULL,
+                                    log_write_interval = 10L,
+                                    log_top_value = NULL,
+                                    log_top_total = NULL,
+                                    log_top_message = NULL){
+
+      #Model args
+      train_args=list(
         model = private$model,
-        times=as.integer(self$get_model_config()$times),
-        features=as.integer(self$get_model_config()$features),
-        filepath = file.path(private$dir_checkpoint, "best_weights.pt"),
         optimizer_method = self$last_training$config$optimizer,
-        loss_fct_name = "MSELoss",
-        dataset = dataset,
+        features=as.integer(private$text_embedding_model["features"]),
+        times=as.integer(private$text_embedding_model["times"]),
+        amp = self$last_training$config$amp,
+        comp_use=self$last_training$config$comp_use,
+        comp_backend=self$last_training$config$comp_backend,
+        comp_mode=self$last_training$config$comp_mode,
+        ddp_use=self$last_training$config$ddp_use,
+        lr_rate = self$last_training$config$lr_rate,
+        lr_warm_up_ratio = self$last_training$config$lr_warm_up_ratio,
+        lr_min = self$last_training$config$lr_min,
+        scheduler_type = self$last_training$config$lr_scheduler,
+        epochs = as.integer(self$last_training$config$epochs),
+        trace = as.integer(self$last_training$config$ml_trace),
         batch_size = as.integer(self$last_training$config$batch_size),
+        train_data = train_data,
+        val_data = val_data,
+        filepath = file.path(private$dir_checkpoint, "best_weights.pt"),
+        use_callback = TRUE,
+        log_dir = private$log_config$log_dir,
+        log_write_interval = private$log_config$log_write_interval,
+        log_top_value = log_top_value,
+        log_top_total = log_top_total,
+        log_top_message = log_top_message
+      )
+
+      trainer_manager=py$ModelTrainerManager(
+        model_type="TEFeatureExtractor",
+        ddp_use=self$last_training$config$ddp_use,
+        train_args=train_args,
+        tmp_dir=create_and_get_tmp_dir(),
+        aife_dir=system.file("python", package = "aifeducation")
+      )
+      return(trainer_manager)
+    },
+    #--------------------------------------------------------------------------
+    estimate_learning_rates = function(dataset, total_epochs) {
+      trainer_manager=private$create_trainer_manager(
+        train_data = dataset,
+        val_data = NULL,
+        test_data = NULL,
         class_weights = NULL,
-        Ns = NULL,
-        Nq = NULL,
-        separate = NULL,
-        shuffle = NULL,
-        alpha = NULL,
-        margin = NULL,
-        n_classes = NULL
+        reset_model = TRUE,
+        use_callback = FALSE,
+        log_dir = self$last_training$config$log_dir,
+        log_write_interval = self$last_training$config$log_write_interval,
+        log_top_value = 0.0,
+        log_top_total = 1.0,
+        log_top_message = "NA"
+      )
+      lr_estimation_results=trainer_manager$calc_lr_rate(
+        epochs=as.integer(total_epochs)
       )
       return(lr_estimation_results)
     }

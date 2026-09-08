@@ -988,10 +988,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         }
         estimates <- private$estimate_learning_rates(
           data_manager,
-          total_epochs = total_epochs,
-          comp_use = self$last_training$config$comp_use,
-          comp_mode=self$last_training$config$comp_mode,
-          comp_backend=self$last_training$config$comp_backend
+          total_epochs = total_epochs
         )
         private$lr_statistics <- private$select_learning_rates(
           estimates,
@@ -1001,9 +998,8 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
     },
     #--------------------------------------------------------------------------
     select_learning_rates = function(lr_estimation_results, total_epochs) {
-      lr_estimation_results <- t(lr_estimation_results)
       lr_estimation_results <- lr_estimation_results[order(lr_estimation_results[, 1], decreasing = TRUE), ]
-      colnames(lr_estimation_results) <- c("lr_rate", "n_improvments", "start_loss", "final_loss")
+      colnames(lr_estimation_results) <- c("lr_rate", "start_loss", "final_loss")
       lr_estimation_results <- as.data.frame(lr_estimation_results)
       lr_estimation_results <- subset(
         x = lr_estimation_results,

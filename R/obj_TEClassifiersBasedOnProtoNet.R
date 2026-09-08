@@ -655,7 +655,68 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
       )
     },
     #--------------------------------------------------------------------------
-    estimate_learning_rates = function(data_manager, total_epochs,comp_use,comp_mode,comp_backend) {
+    create_trainer_manager=function(train_data = NULL,
+                                    val_data = NULL,
+                                    test_data = NULL,
+                                    reset_model = FALSE,
+                                    Ns=NULL,
+                                    Nq=NULL,
+                                    use_callback = TRUE,
+                                    log_dir = NULL,
+                                    class_weights= NULL,
+                                    log_write_interval = 10L,
+                                    log_top_value = NULL,
+                                    log_top_total = NULL,
+                                    log_top_message = NULL){
+
+      #Model args
+      train_args=list(
+        model = private$model,
+        features=as.integer(private$model_config$features),
+        times=as.integer(private$model_config$times),
+        final_dim=as.integer(private$model_config$embedding_dim),
+        loss_pt_fct_name = self$last_training$config$loss_pt_fct_name,
+        optimizer_method = self$last_training$config$optimizer,
+        lr_rate = self$last_training$config$lr_rate,
+        lr_warm_up_ratio = self$last_training$config$lr_warm_up_ratio,
+        lr_min = self$last_training$config$lr_min,
+        scheduler_type = self$last_training$config$lr_scheduler,
+        amp = self$last_training$config$amp,
+        comp_use=self$last_training$config$comp_use,
+        comp_backend=self$last_training$config$comp_backend,
+        comp_mode=self$last_training$config$comp_mode,
+        ddp_use=self$last_training$config$ddp_use,
+        Ns = as.integer(Ns),
+        Nq = as.integer(Nq),
+        loss_alpha = self$last_training$config$loss_alpha,
+        loss_margin = self$last_training$config$loss_margin,
+        trace = as.integer(self$last_training$config$ml_trace),
+        use_callback = use_callback,
+        train_data = train_data,
+        val_data = val_data,
+        test_data = test_data,
+        epochs = as.integer(self$last_training$config$epochs),
+        sampling_separate = self$last_training$config$sampling_separate,
+        sampling_shuffle = self$last_training$config$sampling_shuffle,
+        filepath = file.path(private$dir_checkpoint, "best_weights.pt"),
+        n_classes = as.integer(length(private$model_config$target_levels)),
+        log_dir = log_dir,
+        log_write_interval = log_write_interval,
+        log_top_value = log_top_value,
+        log_top_total = log_top_total,
+        log_top_message = log_top_message
+      )
+      trainer_manager=py$ModelTrainerManager(
+        model_type="ClassifierPrototype",
+        ddp_use=self$last_training$config$ddp_use,
+        train_args=train_args,
+        tmp_dir=create_and_get_tmp_dir(),
+        aife_dir=system.file("python", package = "aifeducation")
+      )
+      return(trainer_manager)
+    },
+    #--------------------------------------------------------------------------
+    estimate_learning_rates = function(data_manager, total_epochs) {
       data_manager$set_state(
         iteration = self$last_training$config$n_folds + 1L,
         step = NULL
@@ -701,26 +762,25 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
 
       lr_dataset <- lr_dataset$with_format("torch")
 
-      lr_estimation_results <- py$calc_lr_rate(
-        trace = self$last_training$config$ml_trace,
-        epochs = as.integer(total_epochs),
-        times=as.integer(self$get_model_config()$times),
-        features=as.integer(self$get_model_config()$features),
-        model = private$model,
-        filepath = file.path(private$dir_checkpoint, "best_weights.pt"),
-        optimizer_method = self$last_training$config$optimizer,
-        loss_fct_name = self$last_training$config$loss_pt_fct_name,
-        dataset = lr_dataset,
-        batch_size = as.integer(self$last_training$config$batch_size),
+      trainer_manager=private$create_trainer_manager(
+        train_data = lr_dataset,
+        val_data = NULL,
+        test_data = NULL,
+        Ns=tmp_ns,
+        Nq=tmp_nq,
         class_weights = NULL,
-        Ns = as.integer(tmp_ns),
-        Nq = as.integer(tmp_nq),
-        separate = self$last_training$config$sampling_separate,
-        shuffle = self$last_training$config$sampling_shuffle,
-        alpha = self$last_training$config$loss_alpha,
-        margin = self$last_training$config$loss_margin,
-        n_classes = as.integer(length(private$model_config$target_levels))
+        reset_model = TRUE,
+        use_callback = FALSE,
+        log_dir = self$last_training$config$log_dir,
+        log_write_interval = self$last_training$config$log_write_interval,
+        log_top_value = 0.0,
+        log_top_total = 1.0,
+        log_top_message = "NA"
       )
+      lr_estimation_results=trainer_manager$calc_lr_rate(
+        epochs=as.integer(total_epochs)
+      )
+      return(lr_estimation_results)
     },
     #--------------------------------------------------------------------------
     basic_train = function(train_data = NULL,
@@ -803,48 +863,20 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         pytorch_test_data <- NULL
       }
 
-      train_args=list(
-        model = private$model,
-        features=as.integer(private$model_config$features),
-        times=as.integer(private$model_config$times),
-        final_dim=as.integer(private$model_config$embedding_dim),
-        loss_pt_fct_name = self$last_training$config$loss_pt_fct_name,
-        optimizer_method = self$last_training$config$optimizer,
-        lr_rate = self$last_training$config$lr_rate,
-        lr_warm_up_ratio = self$last_training$config$lr_warm_up_ratio,
-        lr_min = self$last_training$config$lr_min,
-        scheduler_type = self$last_training$config$lr_scheduler,
-        amp = self$last_training$config$amp,
-        comp_use=self$last_training$config$comp_use,
-        comp_backend=self$last_training$config$comp_backend,
-        comp_mode=self$last_training$config$comp_mode,
-        ddp_use=self$last_training$config$ddp_use,
-        Ns = as.integer(tmp_ns),
-        Nq = as.integer(tmp_nq),
-        loss_alpha = self$last_training$config$loss_alpha,
-        loss_margin = self$last_training$config$loss_margin,
-        trace = as.integer(self$last_training$config$ml_trace),
-        use_callback = use_callback,
+      trainer_manager=private$create_trainer_manager(
         train_data = pytorch_train_data,
         val_data = pytorch_val_data,
         test_data = pytorch_test_data,
-        epochs = as.integer(self$last_training$config$epochs),
-        sampling_separate = self$last_training$config$sampling_separate,
-        sampling_shuffle = self$last_training$config$sampling_shuffle,
-        filepath = file.path(private$dir_checkpoint, "best_weights.pt"),
-        n_classes = as.integer(length(private$model_config$target_levels)),
+        Ns=tmp_ns,
+        Nq=tmp_nq,
+        reset_model = reset_model,
+        use_callback = use_callback,
         log_dir = log_dir,
+        class_weights= class_weights,
         log_write_interval = log_write_interval,
         log_top_value = log_top_value,
         log_top_total = log_top_total,
         log_top_message = log_top_message
-      )
-      trainer_manager=py$ModelTrainerManager(
-        model_type="ClassifierPrototype",
-        ddp_use=self$last_training$config$ddp_use,
-        train_args=train_args,
-        tmp_dir=create_and_get_tmp_dir(),
-        aife_dir=system.file("python", package = "aifeducation")
       )
       tmp_history <-trainer_manager$do_training()
       # provide rownames and replace -100
