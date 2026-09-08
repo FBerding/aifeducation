@@ -34,8 +34,8 @@ class ModelTrainerManager():
     self.aife_dir=aife_dir
     self.ddp_use=ddp_use
     self.train_args=train_args
-    self.backend_ddp="gloo"
-    self.world_size=1
+    self.backend_ddp="nccl"
+    self.world_size=torch.cuda.device_count()
 
   @staticmethod
   def init_trainer(model_type,ddp_use,train_args):
@@ -452,7 +452,11 @@ class ModelTrainer():
         if self.trace: 
           print("Compile model with "+self.comp_backend+" and DDP.")
         #self.trainer=torch.compile(DDP(self.trainer, device_ids=[self.device]),backend=self.comp_backend,fullgraph=True,dynamic=False,mode=self.comp_mode)
-        self.trainer=DDP(torch.compile(self.trainer,backend=self.comp_backend,fullgraph=True,dynamic=False,mode=self.comp_mode),device_ids=[self.device])
+        self.trainer=DDP(
+          torch.compile(self.trainer,backend=self.comp_backend,fullgraph=True,dynamic=False,mode=self.comp_mode),
+          device_ids=[self.device],
+          static_graph=True
+        )
       else:
         if self.trace: 
           print("Compile model with "+self.comp_backend+".")
@@ -461,7 +465,7 @@ class ModelTrainer():
       if self.ddp_use:
         if self.trace:
           print("Train model with DDP.")
-        self.trainer=DDP(self.trainer, device_ids=[self.device])
+        self.trainer=DDP(self.trainer, device_ids=[self.device],static_graph=True)
       else:
         self.trainer=self.trainer
       
@@ -711,18 +715,25 @@ class ModelTrainer():
   def check_and_set_checkpoints_cls(self,epoch,acc_val,bacc_val,avg_iota_val,val_loss):
     if self.use_callback==True:
         if (avg_iota_val>self.best_val_avg_iota) or (avg_iota_val==self.best_val_avg_iota and acc_val>self.best_acc) or (avg_iota_val==self.best_val_avg_iota and acc_val==self.best_acc and val_loss<self.best_val_loss):
-          if isinstance(self.trainer.model, torch._dynamo.eval_frame.OptimizedModule):
-            print("model is compiled")
-            torch.save(self.trainer.model._orig_mod.state_dict(),self.filepath)
-          else:
-            torch.save(self.trainer.model.state_dict(),self.filepath)
+          if isinstance(self.trainer, DDP):
+            if isinstance(self.trainer.module.model, torch._dynamo.eval_frame.OptimizedModule):
+              print("model is compiled")
+              torch.save(self.trainer.module.model._orig_mod.state_dict(),self.filepath)
+            else:
+              torch.save(self.trainer.module.model.state_dict(),self.filepath)
+          else:  
+            if isinstance(self.trainer.model, torch._dynamo.eval_frame.OptimizedModule):
+              print("model is compiled")
+              torch.save(self.trainer.model._orig_mod.state_dict(),self.filepath)
+            else:
+              torch.save(self.trainer.model.state_dict(),self.filepath)
           self.best_bacc=bacc_val
           self.best_val_avg_iota=avg_iota_val
           self.best_acc=acc_val
           self.best_val_loss=val_loss
           self.metric_storage["checkpoints"][epoch]=1
           self.elc=epoch+1
-          
+  
   def check_and_set_checkpoints_loss(self,epoch,val_loss):
     if self.use_callback==True:
       if val_loss<=self.best_val_loss:
@@ -1183,7 +1194,6 @@ if __name__ == "__main__":
     # Liste, um alle erfolgreich geladenen Module und Objekte zwischenzuspeichern
     geladene_module = []
     alle_objekte = {}
-    print("0")
     # 1. SCHRITT: Alle Module normal laden und registrieren
     for file_name in os.listdir(aife_dir):
         if file_name.endswith(".py") and file_name != "__init__.py":
@@ -1232,8 +1242,6 @@ if __name__ == "__main__":
             modul.__dict__[name] = obj
               
     # load model
-    print(masking_layer)
-    print("3")
     with open(tmp_dir+"/nn_configs.json", "r", encoding="utf-8") as file:
       model_config = json.load(file)
     model_definition= globals()[model_config["class_name"]]
@@ -1254,8 +1262,6 @@ if __name__ == "__main__":
     if "class_weights" in train_args:
       train_args["class_weights"]=torch.from_numpy(np.array(train_args["class_weights"]))
     #Create trainer
-    print(train_args)
-    print("4")
     trainer=ModelTrainer(model_type,ddp_use)
     if model_type=="ClassifierStandard":
       trainer.config_for_StandardClassifier(**train_args)
@@ -1265,11 +1271,10 @@ if __name__ == "__main__":
       trainer.config_for_TEFeatureExtractor(**train_args)
     trainer.set_rank_word_size(rank=rank,world_size=world_size)
     #Set up ddp
-    print(trainer)
-    print("5")
     os.environ["MASTER_ADDR"] = "localhost"
     os.environ["MASTER_PORT"] = "12355" # Freier Port auf dem System
-    if dist.is_initialized():
+    if rank==0:
+      if dist.is_initialized():
        dist.destroy_process_group()
     dist.init_process_group(
         backend=backend_ddp,
