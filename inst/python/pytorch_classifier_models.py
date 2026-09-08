@@ -105,7 +105,6 @@ class TEClassifierSequential(torch.nn.Module):
           normalization_type=feat_normalization_type
       )
       
-      
       if tf_n_layers >0:
         self.stack_tf_encoder_layer=stack_tf_encoder_layer(
           dense_dim=tf_dense_dim,
@@ -586,6 +585,8 @@ class TEClassifierReferencePoint(torch.nn.Module):
     self.embedding_dim=feat_size
     #Metric Type
     self.metric_type=metric_type
+    #
+    self.num_ref_points=10
     #Core net
     if core_net_type=="sequential":
       if cls_times_pooling_type=="Max":
@@ -738,7 +739,7 @@ class TEClassifierReferencePoint(torch.nn.Module):
     self.prob_builder_act=torch.nn.Softmax(dim=1)
     #Reference Points
     self.ref_points=torch.nn.Embedding(
-      num_embeddings=2*self.n_target_levels, 
+      num_embeddings=self.num_ref_points*self.n_target_levels, 
       embedding_dim=self.embedding_dim, 
       padding_idx=None, 
       max_norm=None, 
@@ -746,21 +747,27 @@ class TEClassifierReferencePoint(torch.nn.Module):
       scale_grad_by_freq=False, 
       sparse=False
     )
+    nn.init.orthogonal_(self.ref_points.weight)
     self.logit_builder=torch.nn.Sequential(
       torch.nn.Linear(
-        in_features=2*self.n_target_levels,
-        out_features=2*self.n_target_levels,
+        in_features=self.num_ref_points*self.n_target_levels,
+        out_features=self.num_ref_points*self.n_target_levels,
         bias=False
       ),
-      torch.nn.GELU(approximate='none'),
+      #torch.nn.GELU(approximate='none'),
       torch.nn.Linear(
-        in_features=2*self.n_target_levels,
+        in_features=self.num_ref_points*self.n_target_levels,
+        out_features=self.num_ref_points*self.n_target_levels,
+        bias=False
+      ),
+      torch.nn.Linear(
+        in_features=self.num_ref_points*self.n_target_levels,
         out_features=self.n_target_levels,
         bias=False
       )
     )
     #ref_pointidx
-    self.ref_point_idx=torch.nn.parameter.Buffer(torch.arange(start=0,end=2*self.n_target_levels))
+    self.ref_point_idx=torch.nn.parameter.Buffer(torch.arange(start=0,end=self.num_ref_points*self.n_target_levels))
   def get_ref_points(self):
     idx=torch.unsqueeze(self.ref_point_idx,dim=0)
     points = self.ref_points(idx)
@@ -776,8 +783,8 @@ class TEClassifierReferencePoint(torch.nn.Module):
       x=embeddings,
       prototypes=ref_points
     )
-    logits = - distances / (2 * self.temperature())
-    logits=self.logit_builder(1+logits)
+    distances_scaled = - distances / (2 * self.temperature())
+    logits=self.logit_builder(distances_scaled)
     if prediction_mode==False:
       return logits
     else:

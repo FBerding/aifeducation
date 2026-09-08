@@ -50,6 +50,15 @@ class ModelTrainerManager():
       trainer.config_for_TEFeatureExtractor(**train_args)
     return trainer 
   
+  def calc_lr_rate(self,epochs):
+      #Disable ddp
+      self.ddp_use
+      #Init Trainer
+      trainer=self.init_trainer(self.model_type,self.ddp_use,self.train_args)
+      #Start Estimation
+      estimates=trainer.calc_lr_rate(epochs)
+      return estimates
+  
   def do_training(self):
     #If no ddp should be used
     if self.ddp_use==False:
@@ -291,14 +300,17 @@ class ModelTrainer():
       num_workers=0,
       sampler=get_sampler(train_data,ddp_use=ddp_use,rank=self.device,world_size=self.world_size),
       shuffle=not ddp_use)
-    valloader=torch.utils.data.DataLoader(
-      val_data,
-      batch_size=batch_size,
-      pin_memory=pin_memory,
-      drop_last =True,
-      num_workers=0,
-      sampler=get_sampler(val_data,ddp_use=ddp_use,rank=self.device,world_size=self.world_size),
-      shuffle=not ddp_use)
+    if not (val_data is None):
+      valloader=torch.utils.data.DataLoader(
+        val_data,
+        batch_size=batch_size,
+        pin_memory=pin_memory,
+        drop_last =True,
+        num_workers=0,
+        sampler=get_sampler(val_data,ddp_use=ddp_use,rank=self.device,world_size=self.world_size),
+        shuffle=not ddp_use)
+    else:
+      valloader=None
     if not (test_data is None):
       testloader=torch.utils.data.DataLoader(
         test_data,
@@ -324,12 +336,15 @@ class ModelTrainer():
       train_data,
       pin_memory = pin_memory,
       batch_sampler=ProtoNetSampler_Train)
-    valloader=torch.utils.data.DataLoader(
-      val_data,
-      pin_memory = pin_memory,
-      batch_size=Ns+Nq,
-      drop_last=True,
-      shuffle=False)
+    if not (test_data is None):
+      valloader=torch.utils.data.DataLoader(
+        val_data,
+        pin_memory = pin_memory,
+        batch_size=Ns+Nq,
+        drop_last=True,
+        shuffle=False)
+    else:
+      valloader=None
     if not (test_data is None):
       testloader=torch.utils.data.DataLoader(
         test_data,
@@ -403,7 +418,9 @@ class ModelTrainer():
   def prepare_logger(self):
     self.PrgInd=ProgressLogger()
     self.PrgInd.set_start_time()
-    total_steps=len(self.trainloader)+len(self.valloader)
+    total_steps=len(self.trainloader)
+    if not (self.valloader is None):
+      total_steps=total_steps+len(self.valloader)
     if not (self.test_data is None):
       total_steps=total_steps+len(self.testloader)
     self.logger=LogWriter(
@@ -730,100 +747,120 @@ class ModelTrainer():
     if self.model_type=="ClassifierStandard":
       for epoch in range(self.epochs):
         train_results=self.run_epoch_cls(cblock="train",epoch=epoch,dataloader=self.trainloader)
-        val_results=self.run_epoch_cls(cblock="val",epoch=epoch,dataloader=self.valloader)
+        if self.valloader is not None:
+          val_results=self.run_epoch_cls(cblock="val",epoch=epoch,dataloader=self.valloader)
         if self.testloader is not None:
           test_results=self.run_epoch_cls("test",epoch=epoch,dataloader=self.testloader)
         #Update logger   
         self.logger.reset_value(level="bottom")
         self.logger.inc_value(level="middle")
-        #Callback-------------------------------------------------------------------
-        self.check_and_set_checkpoints_cls(
-          epoch=epoch,
-          acc_val=val_results["accuracy"],
-          bacc_val=val_results["balanced_accuracy"],
-          avg_iota_val=val_results["s_avg_iota"],
-          val_loss=val_results["loss"]
-        )
-        #Trace---------------------------------------------------------------------
-        self.PrgInd.print_epoch_results(
-          trace=self.trace,
-          loss_only=False,
-          metric_storage=self.metric_storage,
-          epoch=epoch,
-          epochs=self.epochs,
-          metric_criterion="s_avg_iota",
-          best_metric=self.best_val_avg_iota,
-          best_loss=self.best_val_loss,
-          elc=self.elc
-        )
-        #Check if there are furhter information for training-----------------------
-        # If there are no addtiononal information. Stop training and continue
-        if self.check_convergence(train_results):
-          break
-    elif self.model_type=="ClassifierPrototype":
-      for epoch in range(self.epochs):
-        train_results=self.run_epoch_cls_pt(cblock="train",epoch=epoch,dataloader=self.trainloader)
-        val_results=self.run_epoch_cls_pt(cblock="val",epoch=epoch,dataloader=self.valloader)
-        if self.testloader is not None:
-          test_results=self.run_epoch_cls_pt("test",epoch=epoch,dataloader=self.testloader)
-        #Update logger   
-        self.logger.reset_value(level="bottom")
-        self.logger.inc_value(level="middle")
-        #Callback-------------------------------------------------------------------
-        self.check_and_set_checkpoints_cls(
-          epoch=epoch,
-          acc_val=val_results["accuracy"],
-          bacc_val=val_results["balanced_accuracy"],
-          avg_iota_val=val_results["s_avg_iota"],
-          val_loss=val_results["loss"]
-        )
-        #Trace---------------------------------------------------------------------
-        self.PrgInd.print_epoch_results(
-          trace=self.trace,
-          loss_only=False,
-          metric_storage=self.metric_storage,
-          epoch=epoch,
-          epochs=self.epochs,
-          metric_criterion="s_avg_iota",
-          best_metric=self.best_val_avg_iota,
-          best_loss=self.best_val_loss,
-          elc=self.elc
-        )
-        #Check if there are furhter information for training-----------------------
-        # If there are no addtiononal information. Stop training and continue
-        if self.check_convergence(train_results):
-          break
-        
-    elif self.model_type=="TEFeatureExtractor":
-        for epoch in range(self.epochs):
-          train_results=self.run_epoch_autoencoder(cblock="train",epoch=epoch,dataloader=self.trainloader)
-          val_results=self.run_epoch_autoencoder(cblock="val",epoch=epoch,dataloader=self.valloader)
-          #Update logger   
-          self.logger.reset_value(level="bottom")
-          self.logger.inc_value(level="middle")
+        if self.valloader is not None:
           #Callback-------------------------------------------------------------------
-          self.check_and_set_checkpoints_loss(
+          self.check_and_set_checkpoints_cls(
             epoch=epoch,
+            acc_val=val_results["accuracy"],
+            bacc_val=val_results["balanced_accuracy"],
+            avg_iota_val=val_results["s_avg_iota"],
             val_loss=val_results["loss"]
           )
           #Trace---------------------------------------------------------------------
           self.PrgInd.print_epoch_results(
             trace=self.trace,
-            loss_only=True,
+            loss_only=False,
             metric_storage=self.metric_storage,
             epoch=epoch,
             epochs=self.epochs,
-            metric_criterion="loss",
-            best_metric=None,
+            metric_criterion="s_avg_iota",
+            best_metric=self.best_val_avg_iota,
             best_loss=self.best_val_loss,
             elc=self.elc
           )
+          #Check if there are furhter information for training-----------------------
+          # If there are no addtiononal information. Stop training and continue
+          if self.check_convergence(train_results):
+            break
+    elif self.model_type=="ClassifierPrototype":
+      for epoch in range(self.epochs):
+        train_results=self.run_epoch_cls_pt(cblock="train",epoch=epoch,dataloader=self.trainloader)
+        if self.valloader is not None:
+          val_results=self.run_epoch_cls_pt(cblock="val",epoch=epoch,dataloader=self.valloader)
+        if self.testloader is not None:
+          test_results=self.run_epoch_cls_pt("test",epoch=epoch,dataloader=self.testloader)
+        #Update logger   
+        self.logger.reset_value(level="bottom")
+        self.logger.inc_value(level="middle")
+        if self.valloader is not None:
+          #Callback-------------------------------------------------------------------
+          self.check_and_set_checkpoints_cls(
+            epoch=epoch,
+            acc_val=val_results["accuracy"],
+            bacc_val=val_results["balanced_accuracy"],
+            avg_iota_val=val_results["s_avg_iota"],
+            val_loss=val_results["loss"]
+          )
+          #Trace---------------------------------------------------------------------
+          self.PrgInd.print_epoch_results(
+            trace=self.trace,
+            loss_only=False,
+            metric_storage=self.metric_storage,
+            epoch=epoch,
+            epochs=self.epochs,
+            metric_criterion="s_avg_iota",
+            best_metric=self.best_val_avg_iota,
+            best_loss=self.best_val_loss,
+            elc=self.elc
+          )
+          #Check if there are furhter information for training-----------------------
+          # If there are no addtiononal information. Stop training and continue
+          if self.check_convergence(train_results):
+            break
+        
+    elif self.model_type=="TEFeatureExtractor":
+        for epoch in range(self.epochs):
+          train_results=self.run_epoch_autoencoder(cblock="train",epoch=epoch,dataloader=self.trainloader)
+          if self.valloader is not None:
+            val_results=self.run_epoch_autoencoder(cblock="val",epoch=epoch,dataloader=self.valloader)
+          #Update logger   
+          self.logger.reset_value(level="bottom")
+          self.logger.inc_value(level="middle")
+          if self.valloader is not None:
+            #Callback-------------------------------------------------------------------
+            self.check_and_set_checkpoints_loss(
+              epoch=epoch,
+              val_loss=val_results["loss"]
+            )
+            #Trace---------------------------------------------------------------------
+            self.PrgInd.print_epoch_results(
+              trace=self.trace,
+              loss_only=True,
+              metric_storage=self.metric_storage,
+              epoch=epoch,
+              epochs=self.epochs,
+              metric_criterion="loss",
+              best_metric=None,
+              best_loss=self.best_val_loss,
+              elc=self.elc
+            )
     else:
       print("Error")
   
   def print_final_performance(self):
     if self.model_type!="TEFeatureExtractor":
       self.PrgInd.print_final_performance(trace=self.trace,metric_storage=self.metric_storage,elc=self.elc)
+  
+  def get_learning_rates(self):
+    learning_rates=[]
+    for i in range(1,8):
+      if i==0:
+        #tmp_range=range(0,3)
+        tmp_range=[1,3]
+      else:
+        tmp_range=[3,1]
+      for j in tmp_range:
+        base=(j+1)/4
+        learning_rates.append(base/(10**i))
+    return np.array(learning_rates)
+
     
   def do_training(self):
     # 1. Prepare Model
@@ -846,6 +883,54 @@ class ModelTrainer():
     if self.use_callback==True:
       self.model.load_state_dict(torch.load(self.filepath,weights_only=True))
     return self.metric_storage
+  
+  def calc_lr_rate(self,epochs):
+    #1. Set learning rates
+    learning_rates=self.get_learning_rates()
+    #2. Create Model
+    self.create_ModelWithLoss()
+    #3. Save weights
+    torch.save(self.model_w_loss.state_dict(),self.filepath)
+    #4. Deactive scheduler
+    self.scheduler_type="None"
+    trace=self.trace
+    self.trace=0
+    #5. Set epoochs
+    self.epochs=epochs
+    # 6. prepare container for results
+    results=np.zeros([len(learning_rates),3])
+    #7. Calculate metrics
+    counter=0
+    PrgInd=ProgressLogger()
+    PrgInd.set_start_time()
+    for lr_rate in learning_rates:
+      #1.Reset weights
+      self.model_w_loss.load_state_dict(torch.load(self.filepath,weights_only=True))
+      #2. Set learning rate
+      self.lr_rate=lr_rate
+      #3. Prepare Model
+      self.prepare_ModelWithLoss()
+      # 4. Prepare Datasloader
+      self.prepare_dataloader()
+      # 5. Create Optimizer, Scheduler, and Scaler for AMP
+      self.create_optimizer_scaler_scheduler()
+      # 6. Create static objects for faster compilation
+      self.create_static_container()
+      # 7. Create objects for storing learning history
+      self.create_metric_container()
+      # 8. Prepare Logger
+      self.prepare_logger()
+      # 9. Run Epochs
+      self.run_epochs()
+      # 10. Save results for loss
+      results[counter,0]=lr_rate
+      results[counter,1]=self.metric_storage["loss"][0][0]
+      results[counter,2]=self.metric_storage["loss"][0][epochs-1]
+      PrgInd.print_progress(trace=trace,epoch=counter,epochs=len(learning_rates))
+      counter+=1
+    return results  
+      
+      
     
 #------------------------------------------------------------------------------
 
@@ -984,218 +1069,6 @@ def add_metrics(metrics,storage,cblock,epoch):
     idx=2
   for key in metrics.keys():
     storage[key][idx,epoch]=metrics[key]
-
-#=============================================================
-
-def calc_lr_rate_loss(model,device,current_dtype,optimizer,loss_fct,dataloader,comp_use,comp_mode,comp_backend,n_classes=None,Ns=None,Nq=None,start_mode=True):
-    loss_complete=0
-    if comp_use:
-      trainer=torch.compile(model,mode=comp_mode,fullgraph=False,dynamic=True,backend=comp_backend)
-    else:
-      trainer=model
-    trainer.train()
-
-    if isinstance(model,TEClassifierSequential) or isinstance(model,TEClassifierParallel) or isinstance(model,TEClassifierReferencePoint):
-      for batch in dataloader:
-        inputs=batch["input"]
-        labels=batch["labels"]
-        inputs = inputs.to(device,dtype=current_dtype)
-        labels=labels.to(device,dtype=current_dtype)
-        if "sample_weights" in batch.keys():
-          sample_weights=batch["sample_weights"]
-          sample_weights=torch.reshape(input=sample_weights,shape=(sample_weights.size(dim=0),1))
-          sample_weights=sample_weights.to(device,dtype=current_dtype)
-        else:
-           sample_weights=torch.ones((inputs.size(0)),device=device,dtype=current_dtype)/inputs.size(0)
-        if not start_mode:
-          optimizer.zero_grad()
-
-        outputs=trainer(inputs,prediction_mode=False)
-        loss=loss_fct(outputs,labels)*sample_weights.detach()
-        loss=loss.mean()
-        if torch.isnan(loss).any():
-          raise ValueError("NANs detected during estimating learning rates.")
-        if not start_mode:
-          loss.backward()
-          optimizer.step()
-        loss_complete+=loss
-    elif isinstance(model,TEClassifierPrototype):
-      for batch in dataloader:
-        inputs=batch["input"]
-        labels=batch["labels"]
-        
-        sample_inputs=inputs[0:(n_classes*Ns)].clone()
-        query_inputs=inputs[(n_classes*Ns):(n_classes*(Ns+Nq))].clone()
-        sample_classes=labels[0:(n_classes*Ns)].clone()
-        query_classes=labels[(n_classes*Ns):(n_classes*(Ns+Nq))].clone()
-        
-        sample_inputs = sample_inputs.to(device,dtype=current_dtype)
-        query_inputs = query_inputs.to(device,dtype=current_dtype)
-        sample_classes = sample_classes.to(device,dtype=current_dtype)
-        query_classes = query_classes.to(device,dtype=current_dtype)
-        if not start_mode:
-          optimizer.zero_grad()
-        outputs=trainer(
-          input_q=query_inputs,
-          classes_q=query_classes,
-          input_s=sample_inputs,
-          classes_s=sample_classes,
-          prediction_mode=False
-        )
-        loss=loss_fct(
-          classes_q=outputs[2],
-          distance_matrix=outputs[1],
-          metric_scale_factor=model.get_metric_scale_factor().detach(),
-          logits=outputs[0]
-        )
-        if torch.isnan(loss).any():
-          raise ValueError("NANs detected during estimating learning rates.")
-        if not start_mode:
-          loss.backward()
-          optimizer.step()      
-        loss_complete+=loss
-    else:
-      for batch in dataloader:
-        inputs=batch["input"]
-        labels=batch["labels"]
-        inputs = inputs.to(device,dtype=current_dtype)
-        labels=labels.to(device,dtype=current_dtype)
-        if not start_mode:
-          optimizer.zero_grad()
-        outputs=trainer(inputs,encoder_mode=False)
-        loss=loss_fct(outputs,labels)
-        loss=loss.mean()
-        if torch.isnan(loss).any():
-          raise ValueError("NANs detected during estimating learning rates.")
-        if not start_mode:
-          loss.backward()
-          optimizer.step()
-        loss_complete+=loss
-    return loss_complete
-
-def calc_lr_rate(trace,model,epochs,times,features,filepath,optimizer_method,loss_fct_name,dataset,comp_use,comp_mode,comp_backend,batch_size,class_weights,Ns=None,Nq=None,n_classes=None,separate=None,shuffle=None,alpha=None,margin=None):
-  #Prepare objects
-  device=get_device()
-  current_dtype=get_dtype(device)
-  model.to(device=device,dtype=current_dtype)
-  
-  if isinstance(model,TEClassifierPrototype):
-    loss_fct=get_loss_cls_pt_fct(
-      name=loss_fct_name,
-      alpha=alpha,
-      margin=margin
-    )
-  elif isinstance(model,TEClassifierSequential) or isinstance(model,TEClassifierParallel) or isinstance(model,TEClassifierReferencePoint):
-    loss_fct=get_loss_cls_fct(name=loss_fct_name,class_weights=class_weights)
-  elif isinstance(model,LSTMAutoencoder_with_Mask_PT) or isinstance(model,DenseAutoencoder_with_Mask_PT):
-    loss_fct=torch.nn.MSELoss()
-  
-  loss_fct.to(device=device,dtype=current_dtype)  
- 
-  if isinstance(model,TEClassifierPrototype):
-    ProtoNetSampler_Train=MetaLernerBatchSampler(
-    targets=dataset["labels"][range(0,len(dataset))],
-    Ns=Ns,
-    Nq=Nq,
-    separate=separate,
-    shuffle=shuffle)
-    dataloader=torch.utils.data.DataLoader(
-      dataset,
-      pin_memory = True if device=="cuda" else False,
-      batch_sampler=ProtoNetSampler_Train
-    )
-  else:
-    dataloader=torch.utils.data.DataLoader(
-      dataset,
-      batch_size=batch_size,
-      pin_memory=True if device=="cuda" else False,
-      shuffle=True,
-      drop_last=True
-    )
-  #Save model weights
-  torch.save(model.state_dict(),filepath)
-  
-  counter=0
-  learning_rates=np.zeros((30))
-  for i in range(1,8):
-    if i==0:
-      #tmp_range=range(0,3)
-      tmp_range=[1,3]
-    else:
-      tmp_range=[3,1]
-    for j in tmp_range:
-      base=(j+1)/4
-      learning_rates[counter]=base/(10**i)
-      counter+=1
-  results=np.zeros((4,30))
-
-  #Set up logger
-  PrgInd=ProgressLogger()
-  PrgInd.set_start_time()
-  total_iter=counter-1
-  for j in range(0,total_iter):
-    #Reset model
-    model.load_state_dict(torch.load(filepath,weights_only=False))
-    #set learning rate
-    tmp_lr_rate=learning_rates[j]
-    #Create a new Optimizer for every test
-    optimizer=get_Optimizer(
-      optimizer_method,
-      params=model.parameters(),
-      lr_rate=tmp_lr_rate
-    )
-    # Calculate start loss
-    start_loss=calc_lr_rate_loss(
-      device=device,
-      current_dtype=current_dtype,
-      Ns=Ns,
-      Nq=Nq,
-      n_classes=n_classes,
-      model=model,
-      optimizer=optimizer,
-      loss_fct=loss_fct,
-      dataloader=dataloader,
-      start_mode=True,
-      comp_use=comp_use,
-      comp_mode=comp_mode,
-      comp_backend=comp_backend
-    )
-    start_loss=start_loss/len(dataloader) 
-    # Calculate tranining data
-    #epoch_loss_m=start_loss
-    loss_final=0.0
-    for i in range(0,epochs):
-      epoch_loss=calc_lr_rate_loss(
-        device=device,
-        current_dtype=current_dtype,
-        Ns=Ns,
-        Nq=Nq,
-        n_classes=n_classes,
-        model=model,
-        optimizer=optimizer,
-        loss_fct=loss_fct,
-        dataloader=dataloader,
-        start_mode=False,
-        comp_use=comp_use,
-        comp_mode=comp_mode,
-        comp_backend=comp_backend
-      )
-      epoch_loss=epoch_loss/len(dataloader)
-      #Count improvments
-      #if(epoch_loss<=epoch_loss_m):
-      #  results[1,j]+=1
-      #Set current loss as the other loss  
-      #epoch_loss_m=epoch_loss
-      if i >= min(epochs*9//10,epochs-1):
-        loss_final=loss_final+epoch_loss
-    #Update logger
-    loss_final=loss_final/min((epochs-(epochs*9//10)),1)
-    PrgInd.print_progress(trace=trace,epoch=j,epochs=total_iter)
-    #Add final data
-    results[0,j]=tmp_lr_rate
-    results[2,j]=start_loss.detach()
-    results[3,j]=loss_final.detach()
-  return results
 
 #=============================================================
 def check_and_set_checkpoints_cls(use_callback,model,filepath,epoch,metric_storage,best_val_avg_iota,best_val_loss,best_acc,best_bacc,acc_val,bacc_val,avg_iota_val,val_loss,elc):
