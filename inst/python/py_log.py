@@ -175,7 +175,7 @@ class ProgressLogger:
         loss=metric_storage["loss"]
         train_loss=loss[0,epoch]
         val_loss=loss[1,epoch]
-        print("{:.4f} % | {} | Train Loss {:.8f} | Val Loss {:.8f} Best {:.8f} | ELC: {} | ETA {}".format(
+        print("{:.4f} % | Steps: {} | Train Loss {:.8f} | Val Loss {:.8f} Best {:.8f} | ELC: {} | ETA {}".format(
               (epoch+1)/epochs,
               total_steps,
               train_loss,
@@ -193,7 +193,7 @@ class ProgressLogger:
         loss=metric_storage["loss"]
         train_loss=loss[0,epoch]
         val_loss=loss[1,epoch]
-        print("{:.4f} % | {} | Train Loss {:.6f} {} {:.3f} | Val Loss {:.6f} Best {:.6f} {} {:.3f} Best {:.3f} | ELC: {} | ETA {}".format(
+        print("{:.4f} % | Steps: {} | Train Loss {:.6f} {} {:.3f} | Val Loss {:.6f} Best {:.6f} {} {:.3f} Best {:.3f} | ELC: {} | ETA {}".format(
               (epoch+1)/epochs,
               total_steps,
               train_loss,
