@@ -4,12 +4,14 @@ editor_options:
     wrap: 72
 ---
 
-# aifeducation 1.1.7
+# aifeducation 1.2.0 - Performance Update
 
 **General**
 
 - Refactoring of all python layers to allow compilation without graph breaks. We organized 
-  training loops for classifiers and TEFeatureExtractors new to improve maintenance. 
+  training loops for classifiers and TEFeatureExtractors new to improve maintenance.
+- Learning rate calculation starts now with a learning rate of 1e-3.
+- Logger now prints the total number of steps/batches within each epoch. 
 
 **Classifiers**
 
@@ -22,6 +24,7 @@ editor_options:
 - Added gradient clipping to training loops.
 - Added options for data normalization before any data is passed to the net.
 - All classifiers now support compilation to speed up training.
+- Added a new method to plot classification performance across folds.
 
 **TEFeatureExtractor**
 

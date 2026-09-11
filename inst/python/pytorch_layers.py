@@ -266,19 +266,6 @@ class dense_layer_with_mask(torch.nn.Module):
     
     self.residual_connection=layer_residual_connection(residual_type,self.pad_value)  
 
-    #self.turning_layer=turning_layer(
-    #  features=self.output_size,
-    #  times=self.times,
-    #  pad_value=self.pad_value,
-    #  act_fct="GELU",
-    #  normalization_type="tf_normalization_position",
-    #  dropout=dropout,
-    #  parametrizations=self.parametrizations,
-    #  device=None, 
-    #  dtype=None,
-    #  residual_type=residual_type
-    #)
-      
   def forward(self,x,mask_times):
     y=self.dense(x)
     y,mask_times=self.normalization_layer(y,mask_times)
@@ -523,7 +510,6 @@ class layer_mutiple_n_gram_convolution(torch.nn.Module):
     
     self.device=device
     self.dtype=dtype
-    
     self.bias=bias
     self.parametrizations=parametrizations
 
@@ -573,13 +559,11 @@ class layer_mutiple_n_gram_convolution(torch.nn.Module):
   def forward(self, x,mask_times):
     #Extract Features
     #Padding is insert within the layers. No Post-Processing required.
-    for i in range(len(self.layer_list)):
-      current_layer=self.layer_list[i]
-      tmp=current_layer(x,mask_times)[0]
-      if i==0:
-        y=tmp
-      else:
-        y=torch.cat((y,tmp),dim=2)
+    outputs = []
+    for current_layer in self.layer_list:
+      tmp = current_layer(x, mask_times)[0]
+      outputs.append(tmp)
+    y = torch.cat(outputs, dim=2)
     
     y,mask_times=self.normalization_layer(x=y,mask_times=mask_times)    
     y=self.act_fct(y)
@@ -594,18 +578,13 @@ class layer_pack_and_masking(torch.nn.Module):
     super().__init__()
   
   def forward(self,x,mask_times):
-    seq_len=get_SeqLen_from_mask(mask_times)
-    x=torch.nn.utils.rnn.pack_padded_sequence(
-    input=x,
-    lengths=seq_len.to("cpu",dtype=torch.int),
-    enforce_sorted=False, 
-    batch_first=True)
-    return x, mask_times
+    mask_features=get_FeatureMask_from_mask(mask=mask_times,num_features=x.size(2))
+    y=torch.where(mask_features,0.0,x)
+    return y, mask_times
 
 class layer_unpack_and_masking(torch.nn.Module):
   def __init__(self,sequence_length,pad_value):
     super().__init__()
-    self.sequence_length=sequence_length
     if isinstance(pad_value, torch.Tensor):
         #self.pad_value = pad_value.detach().float()
         self.register_buffer("pad_value",pad_value.clone().float())
@@ -614,12 +593,9 @@ class layer_unpack_and_masking(torch.nn.Module):
         self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
     
   def forward(self,x,mask_times):
-    x=torch.nn.utils.rnn.pad_packed_sequence(
-    sequence=x,
-    total_length=self.sequence_length,
-    padding_value=self.pad_value,
-    batch_first=True)[0]
-    return x,mask_times
+    mask_features=get_FeatureMask_from_mask(mask=mask_times,num_features=x.size(2))
+    y=torch.where(mask_features,self.pad_value,x)
+    return y,mask_times
 
 #layer transformer_encoder_fourier 
 class layer_fourier_transformation(torch.nn.Module):
@@ -1063,27 +1039,28 @@ class turning_layer(torch.nn.Module):
     #calc alpha
     #x: (B,T,F)
     alpha=torch.matmul(x,self.weights_alpha) # B, T
+    alpha=self.act_fct(alpha)
     alpha=360*torch.nn.functional.sigmoid(torch.clamp(alpha, min=-10, max=10)) #B
     alpha=torch.unsqueeze(alpha,dim=2)
     alpha=torch.unsqueeze(alpha,dim=3) # (B,T,1,1)
     alpha=alpha.expand((x.size(0),x.size(1),self.features,self.features)) #(B,T,F,F)
     #Calc Cosinus
-    cosinus_value=torch.cos(alpha) #(B,F,F)
-    cos_weights= self.act_fct(self.weights_cosinus)
-    cos_weights=torch.unsqueeze(cos_weights,dim=0)
-    cos_weights=cos_weights.expand(x.size(0),self.features,self.features)
-    cosinus_value=cos_factor*cosinus_value #(B, F, F)
+    cosinus_value=torch.cos(alpha) #(B,T,F,F)
+    cos_weights=torch.unsqueeze(self.cos_weights,dim=0) #(1,F,F)
+    cos_weights=torch.unsqueeze(self.cos_weights,dim=0) #(1,1,F,F)
+    cos_weights=cos_weights.expand(x.size(0),1,self.features,self.features)#(B,1,F,F)
+    cosinus_value=cos_factor*cosinus_value #(B, T, F, F)
     #Calc Sinus
-    sinus_value=torch.sin(alpha) #(B,F,F)
-    sin_weights= self.act_fct(self.sin_weights)
-    sin_weights=torch.unsqueeze(sin_weights,dim=0)
-    sin_weights=sin_weights.expand(x.size(0),self.features,self.features)
-    sinus_value=sin_weights*sinus_value #(B,F,F)
+    sinus_value=torch.sin(alpha) #(B,T,F,F)
+    sin_weights=torch.unsqueeze(self.sin_weights,dim=0) #(1,F,F)
+    sin_weights=torch.unsqueeze(self.sin_weights,dim=0) #(1,1,F,F)
+    sin_weights=sin_weights.expand(x.size(0),1,self.features,self.features)#(B,1,F,F)
+    sinus_value=sin_weights*sinus_value #(B,1,F,F)
     #Final calculation
-    turning_matrix=cosinus_value+sinus_value #(B, F, F)
-    xe=torch.unsqueeze(x,dim=2)
-    y=torch.matmul(turining_matrix, xe) #(B,F,1)
-    y=torch.squeeze(y,dim=2)
+    turning_matrix=cosinus_value+sinus_value #(B,1, F, F)
+    xe=torch.unsqueeze(x,dim=1) #(B,1,T,F)
+    y=torch.matmul(turning_matrix, xe) #(B,1,T,F)
+    y=torch.squeeze(y,dim=1) #(B,T,F)
 
     y,mask_times=self.normalization_layer(y,mask_times)
     y,mask_times=self.dropout(x=y,mask_times=mask_times)

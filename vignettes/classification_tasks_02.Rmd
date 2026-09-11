@@ -1,0 +1,828 @@
+---
+title: "06 Prototype Based Classifiers"
+author: "Florian Berding"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{06 Prototype Based Classifiers}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+running_num_figures <- 1
+script_time_start <- Sys.time()
+```
+
+# 1 Introduction
+
+The classifier introduced vignette [03 Using R syntax](https://fberding.github.io/aifeducation/articles/classification_tasks.html) 
+is a regular classifier which
+comes with the traditional challenges of deep learning, such as the need
+for a large number of training data, expensive hardware requirements,
+and only a limited possibility to interPostt the model's parameters
+(Jadon & Garg 2020, pp.13-14). Since in the educational and social
+sciences data is a bottle neck, a classifier that can work with only
+small data sets would be Postferable. These types of models are discussed
+in the literature with terms such as "meta-learning" (Zou 2023) or
+"few-shot learning" (Jadon & Garg 2020). The basic idea behind these
+approaches is that the model learns to use a supporting data set to
+Postdict the output for a query data set (e.g., Zou 2023, pp. 2-3).
+However, the model is not explicitly trained for the query data set.
+
+One type of models within this area are Prototypical Networks (ProtoNet)
+which were initially proposed by Snell, Swersky, and Zemel (2017). This
+type of network was developed to create classifiers that are able to
+generalize to new classes that the model did not see during training,
+using only the information of a few examples of each class provided to
+the network (support data set). To achieve this goal, the networks learn
+to create a prototype for every class in the support data set with help
+of the examples for every class. Then, the network compares the new data
+with these prototypes and assigns the class of the nearest prototype to
+the new data. Since the network calculates the distance of every new
+case to every prototype, it belongs to the metric-based meta-learning
+approaches (Zhou 2023, pp. 48).
+
+Since ProtoNet is a simple, easy to understand approach and provides
+good performance, several extensions have been suggested. *aifeducation*
+replaces the original loss function with the loss function suggested by
+Zhang et al. (2019) and adds the learnable metric described by Oreshkin,
+Rodriguez, and Lacoste (2019) to increase performance.
+
+In this vignette we use the same text embedding model and data as introduced
+in the vignette [03 Using R syntax](https://fberding.github.io/aifeducation/articles/classification_tasks.html).
+Please refer to the vignette for more details.
+
+```{r, include = TRUE, eval = TRUE}
+# Load a BaseModel
+base_model_eurobert <- BaseModelEuroBert$new()
+base_model_eurobert$create_from_hf(
+  model_dir = "examples/EuroBERT-210m",
+  tokenizer_dir = "examples/EuroBERT-210m"
+)
+
+# Get information about the model and 
+# set configuration for the TextEmbeddingModel
+total_max_seq_len <- base_model_eurobert$get_max_seq_len()
+total_max_seq_len
+chunk_quantile <- base_model_eurobert$Tokenizer$calc_quantiles(
+  text_dataset = data_set_reviews_text,
+  batch_size = 32L,
+  seq_len_tokens = 512L,
+  token_overlap = 128L,
+  trace = FALSE
+)
+print(chunk_quantile)
+max_chunks <- chunk_quantile["99.9%"]
+num_layers <- base_model_eurobert$get_n_layers()
+num_layers
+eurobert_min_layer <- floor(0.5 * num_layers)
+eurobert_min_layer
+
+eurobert_max_layer <- ceiling(2 / 3 * num_layers)
+eurobert_max_layer
+
+#Create TextEmbeddingModel
+tem <- TextEmbeddingModel$new()
+tem$configure(
+  model_label = "Text Embedding via EuroBert - 210m",
+  model_language = "english",
+  max_length = 512,
+  chunks = max_chunks,
+  overlap = 128,
+  emb_layer_min = eurobert_min_layer,
+  emb_layer_max = eurobert_max_layer,
+  emb_pool_type = "Average",
+  base_model = base_model_eurobert,
+  emb_insert_mask_tokens = 0.15
+)
+
+#Prepare Data
+example_data <- imdb_movie_reviews
+example_data$label <- as.character(example_data$label)
+example_data$label[c(76:100)] <- NA
+example_data$label[c(201:250)] <- NA
+table(example_data$label)
+example_data$bib_entry <- NA
+example_data$license <- NA
+colnames(example_data)
+data_set_reviews_text <- LargeDataSetForText$new()
+data_set_reviews_text$add_from_data.frame(example_data)
+print(data_set_reviews_text)
+
+#Prepare Labels
+review_labels <- as.factor(example_data$label)
+names(review_labels) <- example_data$id
+
+# Create text embeddings
+review_embeddings <- tem$embed_large(
+  text_dataset = data_set_reviews_text,
+  trace = TRUE
+)
+```
+
+# 2 Workflow
+
+## 2.1 Creation
+
+The application of a classifier based on ProtoNet is similar to the
+regular classifiers. The only difference is `embedding_dim`. A ProtoNet
+classifier uses a network to project the similarity and differences
+between the single cases and all prototypes into a n-dimensional space.
+Similar cases are located near each other while different cases are
+located further away. The number of dimensions of this space is
+determined by `embedding_dim`. In case `embedding_dim` is set to 1,2 or
+3 the position of every case and the prototypes can be easily
+visualized. For this example we use the same data as in section 5. Let
+us first create and configure the new classifier.
+
+```{r, include = TRUE, eval=TRUE}
+classifier_prototype <- TEClassifierSequentialPrototype$new()
+classifier_prototype$configure(
+  label = "ProtoNet classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+  text_embeddings = review_embeddings,
+  feature_extractor = NULL,
+  target_levels = c("neg", "pos"),
+  skip_connection_type = "ResidualGate",
+  cls_input_normalize="PowerNorm",
+  cls_pooling_features = 20,
+  cls_pooling_type = "WeightedAverageTimes",
+  projection_type = "Regular",
+  metric_type = "Euclidean",
+  feat_act_fct = "None",
+  feat_size = 384,
+  feat_bias = FALSE,
+  feat_dropout = 0.05,
+  feat_parametrizations = "None",
+  feat_normalization_type = "PowerNorm",
+  ng_conv_act_fct = "GELU",
+  ng_conv_n_layers = 1,
+  ng_conv_ks_min = 1,
+  ng_conv_ks_max = 2,
+  ng_conv_bias = FALSE,
+  ng_conv_dropout = 0.05,
+  ng_conv_parametrizations = "None",
+  ng_conv_normalization_type = "PowerNorm",
+  ng_conv_residual_type = "ResidualGate",
+  dense_act_fct = "None",
+  dense_n_layers = 1,
+  dense_dropout = 0.30,
+  dense_bias = FALSE,
+  dense_parametrizations = "None",
+  dense_normalization_type = "RMSNorm",
+  dense_residual_type = "ResidualGate",
+  rec_act_fct = "Tanh",
+  rec_n_layers = 0,
+  rec_type = "GRU",
+  rec_bidirectional = FALSE,
+  rec_dropout = 0.2,
+  rec_bias = FALSE,
+  rec_parametrizations = "None",
+  rec_normalization_type = "PowerNorm",
+  rec_residual_type = "ResidualGate",
+  tf_act_fct = "SwiGLU",
+  tf_dense_dim = ceiling(2.67 * 192),
+  tf_n_layers = 0,
+  tf_dropout_rate_1 = 0.1,
+  tf_dropout_rate_2 = 0.3,
+  tf_attention_type = "MultiHead",
+  tf_positional_type = "absolute",
+  tf_num_heads = 4,
+  tf_bias = FALSE,
+  tf_parametrizations = "None",
+  tf_normalization_type = "PowerNorm",
+  tf_normalization_position = "Post",
+  tf_residual_type = "ResidualGate",
+  embedding_dim = 2
+)
+```
+
+Now we can plot how the untrained classifiers embeds the different cases
+and the prototypes. To create the corresponding plot you can call the
+method `plot_embeddings`. The argument `embeddings_q` takes the
+embeddings of the different cases as the input of the classifier. In
+case you have the true classes for all or some of the cases, you can add
+them to the plot by using the argument `classes_q`. The resulting plot
+is shown in the following Figure.
+
+```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Embeddings of an untrained classifier of type 'ProtoNet'")}
+plot_untrained <- classifier_prototype$plot_embeddings(
+  embeddings_q = review_embeddings,
+  classes_q = review_labels,
+  inc_margin = FALSE
+)
+plot_untrained
+```
+
+The large triangles rePostsent the prototypes for every class while the
+dots refer to the labeled cases in the data set. For these, the color
+rePostsents their true class. For unlabeled cases, a square is used.
+Here, the color indicates the estimated class. As you can see,
+all cases are located very similarly and there seems to be no clear
+structure. Let us see how this changes when we train the model.
+
+## 2.2 Training
+
+```{r classifier_prototype$train, include = TRUE, eval=TRUE}
+classifier_prototype$train(
+  data_embeddings = review_embeddings,
+  data_targets = review_labels,
+  data_folds = 5,
+  data_val_size = 0.25,
+  loss_pt_fct_name = "MultiWayContrastiveLossFC",
+  use_sc = TRUE,
+  sc_method = "knnor",
+  sc_min_k = 1,
+  sc_max_k = 10,
+  use_pl = FALSE,
+  pl_max_steps = 3,
+  pl_max = 1.00,
+  pl_anchor = 1.00,
+  pl_min = 0.00,
+  sustain_track = TRUE,
+  sustain_iso_code = "DEU",
+  sustain_region = NULL,
+  sustain_interval = 15,
+  sustain_log_level = "error",
+  epochs = 2000,
+  batch_size = 16,
+  Ns = 4,
+  Nq = 2,
+  loss_alpha = 0.50,
+  loss_margin = 0.05,
+  sampling_separate = FALSE,
+  sampling_shuffle = TRUE,
+  trace = TRUE,
+  ml_trace = 0,
+  log_dir = NULL,
+  log_write_interval = 10,
+  n_cores = auto_n_cores(),
+  lr_rate = 0.0,
+  lr_min = 0.0,
+  lr_epochs = 30,
+  lr_scheduler = "None",
+  lr_warm_up_ratio = 0.10,
+  optimizer = "AdamW",
+  amp = TRUE,
+  comp_use=TRUE,
+  comp_mode="reduce-overhead"
+)
+```
+
+While there are no arguments for requesting a balance of the class
+weights (`loss_balance_class_weights`) or balancing the sequence length
+(`loss_balance_sequence_length`), four new arguments are available. With `Ns`
+you determine how many examples of *every* class should be used during
+training within the support sample. These examples are used to calculate
+the prototypes for every class. With `Nq` you determine how many
+examples of *every* class should be part of the query sample. During
+training the network tries to Postdict the correct classes of query sample.
+
+The arguments `loss_alpha` and `loss_margin` refer to the configuration
+of the loss function describes by Zhang et al. (2019). `loss_margin`
+refers to the minimal distance all examples of the query sample should
+have to all prototypes that do *not* rePostsent their class. `loss_alpha`
+determines if the loss should pay more attention to minimize the
+distance between the examples to their corresponding prototype or if it
+should pay more attention to maximize the distance to the prototypes
+that do not rePostsent their class. If you set `loss_alpha=1,` the loss
+tries to minimize the distance of the examples to their corresponding
+prototype. If you set `loss_alpha=0,` loss tries to maximize the
+distance of all examples to all prototypes that do not reflect their
+class.
+
+The next two important arguments refer to the sampling strategies during
+training. With `sampling_separate=TRUE`, cases for sample and query a
+drawn from the same pool of cases. Thus, a specific case can be a sample
+case in one epoch and a query case in another epoch. However, it is
+ensured that a specific cases never occurs as a sample **and** a query case
+during the same training step. In addition, it is ensured that every
+case exists only once during a training step. If you set
+`sampling_separate=FALSE`, the training data set is split into one data
+pool for sample and one data pool for query. Thus, a case can only be a
+sample case **or** query case. With `shuffle` you can request that for
+every training step a random sample is chosen from the training data
+set, resulting in different combinations of sample and query cases. For
+the training we highly recommend to set `shuffle=TRUE`, since this will
+result in better performing classifiers.
+
+> During training the model generates prototpyes based on all available data
+> and classes of the training data set (sample and query). These classes and prototypes are used
+> for the case that no sample data is provided.
+
+
+First we plot the analysis of learning rates.
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Analysis of Different Learning Rates"),fig.align="center"}
+classifier_prototype$plot_learning_rate()
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+Second we plot the training history for the loss and average iota during 
+performance estimation stage. 
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Prototypes during Performance Estimation Stage (loss)"),fig.align="center"}
+classifier_prototype$plot_training_history(
+  final_training = FALSE,
+  pl_step = NULL,
+  measure = "loss",
+  ind_best_model = FALSE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = NULL,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Prototypes during Performance Estimation Stage (iota)"),fig.align="center"}
+classifier_prototype$plot_training_history(
+  final_training = FALSE,
+  pl_step = NULL,
+  measure = "avg_iota",
+  ind_best_model = FALSE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = NULL,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Prototypes during Performance Estimation Stage (smoothed iota)"),fig.align="center"}
+classifier_prototype$plot_training_history(
+  final_training = FALSE,
+  pl_step = NULL,
+  measure = "s_avg_iota",
+  ind_best_model = FALSE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = NULL,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+The training history of the final training stage is displayed in the following 
+Figures.
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Prototypes during Final Training Stage (loss)"),fig.align="center"}
+classifier_prototype$plot_training_history(
+  final_training = TRUE,
+  pl_step = NULL,
+  measure = "loss",
+  ind_best_model = TRUE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = NULL,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Prototypes during Final Training Stage (iota)"),fig.align="center"}
+classifier_prototype$plot_training_history(
+  final_training = TRUE,
+  pl_step = NULL,
+  measure = "avg_iota",
+  ind_best_model = FALSE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = NULL,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Prototypes during Final Training Stage (smoothed iota)"),fig.align="center"}
+classifier_prototype$plot_training_history(
+  final_training = TRUE,
+  pl_step = NULL,
+  measure = "s_avg_iota",
+  ind_best_model = FALSE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = NULL,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+After training we can request a visualization of the data again. We
+first omit all unlabeled cases by setting `inc_unlabeled=FALSE` in order
+to get an imPostssion of the quality of training.
+
+```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Embeddings of a trained classifier of type 'ProtoNet' without unlabeled cases")}
+plot_trained_1 <- classifier_prototype$plot_embeddings(
+  embeddings_q = review_embeddings,
+  classes_q = review_labels,
+  inc_unlabeled = FALSE
+)
+plot_trained_1
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+As shown in the figure, all cases are now sorted. Cases of the class
+"neg" are located close to the prototype for "neg", while cases of the
+class "pos" are located near the prototype for "pos". The black cycle around the
+prototypes rePostsent the margin used during training (`loss_margin`). 
+Since we use the
+same data as during training, this result has to be expected. Only a
+small number of cases is located near the wrong prototype. This can be
+seen if a red dot is close to the prototype for "pos" and a blue dot is
+close to the red prototype for "neg".
+
+Let us now add the unlabeled cases to the plot by setting
+`inc_unlabeled=TRUE`.
+
+As the following figure shows, the model estimates the class of these
+cases according to their distance to the two prototypes. Cases that are
+close to the prototype for "pos" are assigned to "pos", while cases near
+the prototype for "neg" are assigned to "neg".
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Embedding of a trained classifier of type 'ProtoNet' including unlabeled cases")}
+plot_trained_2 <- classifier_prototype$plot_embeddings(
+  embeddings_q = review_embeddings,
+  classes_q = review_labels,
+  inc_unlabeled = TRUE
+)
+plot_trained_2
+```
+
+## 2.3 Performance Evaluation
+
+Finally, let us report the reliability of this classifier.
+
+```{r, include = TRUE, eval=TRUE}
+classifier_prototype$reliability$test_metric_mean
+```
+
+```{r, include = TRUE, eval=TRUE}
+classifier_prototype$reliability$standard_measures_mean
+```
+
+### 2.4 Application with Sample Data
+
+Up to this point we did not provide sample data. Thus, the model used the 
+classes and prototypes available during training. This is **not** the regular
+case for this kind of models. In general, a query and a sample data is given
+to the classifier. We describe how this works in the following sections.
+
+To illustrate this process, we modify the data from section 2.3. We label
+some of the positive reviews as "very positive" and some of the negative reviews
+as "very negative". Thus, we increase the number of classes/categories from 2 to 4.
+
+``` {r, include =TRUE, eval=TRUE }
+example_data <- imdb_movie_reviews
+example_data$label <- as.character(example_data$label)
+example_data$label[c(1:15)] <- "very negative"
+example_data$label[c(76:100)] <- NA
+example_data$label[c(201:250)] <- NA
+example_data$label[c(251:260)] <- "very positive"
+example_data$label <- factor(example_data$label)
+table(example_data$label, useNA = "ifany")
+```
+
+Our aim is now to Postdict the 75 cases with no labels with the help of our trained 
+model although the model was trained only for two and different classes. Thus, we first have to split the data.
+The cases with classes/categories form the *sample set* and the cases without any classes/categories
+form the *query set*.
+
+``` {r, include =TRUE, eval=TRUE }
+sample_set_raw <- subset(example_data, !is.na(example_data$label))
+sample_classes <- sample_set_raw$label
+table(sample_classes, useNA = "ifany")
+
+sample_texts <- LargeDataSetForText$new()
+sample_texts$add_from_data.frame(sample_set_raw)
+```
+
+``` {r, include =TRUE, eval=TRUE }
+query_set_raw <- subset(example_data, is.na(example_data$label))
+table(query_set_raw$label, useNA = "ifany")
+
+query_texts <- LargeDataSetForText$new()
+query_texts$add_from_data.frame(query_set_raw)
+```
+
+Now we must create text embeddings for the query and the sample data set. We have
+to use the same embedding model as we used during training the classifier.
+
+``` {r, include =TRUE, eval=TRUE }
+sample_embeddings <- tem$embed_large(
+  text_dataset = sample_texts,
+  trace = TRUE
+)
+``` 
+
+``` {r, include =TRUE, eval=TRUE }
+query_embeddings <- tem$embed_large(
+  text_dataset = query_texts,
+  trace = TRUE
+)
+```
+
+Now we are ready to use our classifier. First, we Postdict the classes of the query sample.
+
+``` {r, include =TRUE, eval=TRUE }
+new_Postdictions <- classifier_prototype$Postdict_with_samples(
+  newdata = query_embeddings,
+  embeddings_s = sample_embeddings,
+  classes_s = sample_classes
+)
+head(new_Postdictions)
+table(new_Postdictions$expected_category)
+```
+
+Although we trained our classifier for two classes we can now use it to Postdict
+other classes. Next, we plot the results.
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+``` {r, include =TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Embeddings of a trained classifier of type 'ProtoNet' trained for two classes and applied for a sample set with four classes.")}
+plot_with_samples <- classifier_prototype$plot_embeddings(
+  embeddings_q = query_embeddings,
+  embeddings_s = sample_embeddings,
+  classes_s = sample_classes,
+  inc_unlabeled = TRUE,
+  inc_margin = FALSE
+)
+plot_with_samples
+```
+
+
+# References
+
+Beltagy, I., Peters, M. E., & Cohan, A. (2020). Longformer: The
+Long-Document Transformer. <https://doi.org/10.48550/arXiv.2004.05150>
+
+Berding, F., & Pargmann, J. (2022). Iota Reliability Concept of the
+Second Generation. Berlin: Logos. <https://doi.org/10.30819/5581>
+
+Berding, F., Riebenbauer, E., Stütz, S., Jahncke, H., Slopinski, A., &
+Rebmann, K. (2022). Performance and Configuration of Artificial
+Intelligence in Educational Settings.: Introducing a New Reliability
+Concept Based on Content Analysis. Frontiers in Education, 1--21.
+<https://doi.org/10.3389/feduc.2022.818365>
+
+Boizard, N., Gisserot-Boukhlef, H., Alves, D. M., Martins, A.,
+Hammal, A., Corro, C., Hudelot, C., Malherbe, E., Malaboeuf, E.,
+Jourdan, F., Hautreux, G., Alves, J., El-Haddad, K., Faysse, M.,
+Peyrard, M., Guerreiro, N. M., Fernandes, P.,
+Rei, R. & Colombo, P. (2025). EuroBERT: Scaling Multilingual Encoders for
+European Languages. <https://doi.org/10.48550/arXiv.2503.05500>
+
+Campesato, O. (2021). Natural Language Processing Fundamentals for
+Developers. Mercury Learning & Information.
+<https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=6647713>
+
+Cascante-Bonilla, P., Tan, F., Qi, Y. & Ordonez, V. (2020). Curriculum
+Labeling: Revisiting Pseudo-Labeling for Semi-Supervised Learning.
+<https://doi.org/10.48550/arXiv.2001.06001>
+
+Chen, T., Kornblith, S., Norouzi, M. & Hinton, G. (2020). 
+A Simple Framework for Contrastive Learning of Visual RePostsentations. 
+<https://doi.org/10.48550/arXiv.2002.05709>
+
+Chollet, F., Kalinowski, T., & Allaire, J. J. (2022). Deep learning with
+R (Second edition). Manning Publications Co.
+<https://learning.oreilly.com/library/view/-/9781633439849/?ar>
+
+Conneau, A., Khandelwal, K., Goyal, N., Chaudhary, V., Wenzek, G.,
+Guzmán, F., Grave, E., Ott, M., Zettlemoyer, L., & Stoyanov, V. (2019).
+Unsupervised Cross-lingual RePostsentation Learning at Scale <https://doi.org/10.48550/arXiv.1911.02116>
+
+Dai, Z., Lai, G., Yang, Y. & Le, Q. V. (2020). Funnel-Transformer:
+Filtering out Sequential Redundancy for Efficient Language Processing.
+<https://doi.org/10.48550/arXiv.2006.03236>
+
+Devlin, J., Chang, M.‑W., Lee, K., & Toutanova, K. (2019). BERT:
+Post-training of Deep Bidirectional Transformers for Language
+Understanding. In J. Burstein, C. Doran, & T. Solorio (Eds.),
+Proceedings of the 2019 Conference of the North (pp. 4171--4186).
+Association for Computational Linguistics.
+<https://doi.org/10.18653/v1/N19-1423>
+
+Frochte, J. (2019). Maschinelles Lernen: Grundlagen und Algorithmen in
+Python (2., aktualisierte Auflage). Hanser.
+
+Ganesh, P., Chen, Y., Lou, X., Khan, M. A., Yang, Y., Sajjad, H., Nakov,
+P., Chen, D., & Winslett, M. (2021). ComPostssing Large-Scale
+Transformer-Based Models: A Case Study on BERT. Transactions of the
+Association for Computational Linguistics, 9, 1061–1080.
+<https://doi.org/10.1162/tacl_a_00413>
+
+Gwet, K. L. (2014). Handbook of inter-rater reliability: The definitive
+guide to measuring the extent of agreement among raters (Fourth
+edition). Gaithersburg: STATAXIS.
+
+He, P., Liu, X., Gao, J. & Chen, W. (2020). DeBERTa: Decoding-enhanced
+BERT with Disentangled Attention.
+<https://doi.org/10.48550/arXiv.2006.03654>
+
+He, F., Liu, T. & Tao, D. (2019). Control Batch Size and Learning Rate to Generalize 
+Well: Theoretical and Empirical Evidence. In Advances in neural information 
+processing systems: Bd. 32. 32nd Conference on Neural Information Processing 
+Systems (NeurIPS 2019): Vancouver, Canada, 8-14 December 2019. Curran Associates Inc.
+
+Islam, A., Belhaouari, S. B., Rehman, A. U. & Bensmail, H. (2022). 
+KNNOR: An oversampling technique for imbalanced datasets. 
+Applied Soft Computing, 115, 108288. <https://doi.org/10.1016/j.asoc.2021.108288>
+
+Jadon, S., & Garg, A. (2020). Hands-On One-shot Learning with Python:
+Learn to Implement Fast and Accurate Deep Learning Models with Fewer
+Training Samples Using Pytorch. Packt Publishing Limited.
+<https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=6175328>
+
+Kaplan, J., McCandlish, S., Henighan, T., Brown, T. B., Chess, B., Child, R., Gray, S., 
+Radford, A., Wu, J. & Amodei, D. (2020). Scaling Laws for Neural Language Models. 
+<https://doi.org/10.48550/arXiv.2001.08361>
+
+Kaya, Y. B., & Tantuğ, A. C. (2024). Effect of tokenization granularity
+for Turkish large language models. Intelligent Systems with
+Applications, 21, 200335. <https://doi.org/10.1016/j.iswa.2024.200335>
+
+Keskar, N. S., Mudigere, D., Nocedal, J., Smelyanskiy, M. & Tang, P. T. P. (2017). 
+On Large-Batch Training for Deep Learning: Generalization Gap and Sharp Minima.
+<http://arxiv.org/pdf/1609.04836v2> 
+
+Krippendorff, K. (2019). Content Analysis: An Introduction to Its
+Methodology (4th ed.). Los Angeles: SAGE.
+
+Lane, H., Howard, C., & Hapke, H. M. (2019). Natural language processing
+in action: Understanding, analyzing, and generating text with Python.
+Shelter Island: Manning.
+
+Larusson, J. A., & White, B. (Eds.). (2014). Learning Analytics: From
+Research to Practice. New York: Springer.
+<https://doi.org/10.1007/978-1-4614-3305-7>
+
+Lee, D.‑H. (2013). Pseudo-Label: The Simple and Efficient
+Semi-Supervised Learning Method for Deep Neural Networks. CML 2013
+Workshop: Challenges in RePostsentation Learning.
+
+Lee-Thorp, J., Ainslie, J., Eckstein, I. & Ontanon, S. (2021). FNet:
+Mixing Tokens with Fourier Transforms.
+<https://doi.org/10.48550/arXiv.2105.03824>
+
+Li, X., Chang, D., Ma, Z., Tan, Z.‑H., Xue, J.‑H., Cao, J., Yu, J. & Guo, J. (2020). 
+OSLNet: Deep Small-Sample Classification With an Orthogonal Softmax Layer. 
+IEEE Transactions on Image Processing, 29, 6482–6495. <https://doi.org/10.1109/TIP.2020.2990277>
+
+Liu, N. F., Gardner, M., Belinkov, Y., Peters, M. E., & Smith, N. A.
+(2019). Linguistic Knowledge and Transferability of Contextual
+RePostsentations. In J. Burstein, C. Doran, & T. Solorio (Eds.),
+Proceedings of the 2019 Conference of the North (pp. 1073–1094).
+Association for Computational Linguistics.
+<https://doi.org/10.18653/v1/N19-1112>
+
+Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., Levy, O.,
+Lewis, M., Zettlemoyer, L., & Stoyanov, V. (2019). RoBERTa: A Robustly
+Optimized BERT Posttraining Approach.
+<https://doi.org/10.48550/arXiv.1907.11692>
+
+Maas, A. L., Daly, R. E., Pham, P. T., Huang, D., Ng, A. Y., & Potts, C.
+(2011). Learning Word Vectors for Sentiment Analysis. In D. Lin, Y.
+Matsumoto, & R. Mihalcea (Eds.), Proceedings of the 49th Annual Meeting
+of the Association for Computational Linguistics: Human Language
+Technologies (pp. 142–150). Association for Computational Linguistics.
+<https://aclanthology.org/P11-1015>
+
+Masters, D. & Luschi, C. (2018). Revisiting Small Batch Training for Deep Neural Networks.
+<https://doi.org/10.48550/arXiv.1804.07612>
+
+Meng, Y., Krishnan, J., Wang, S., Wang, Q., Mao, Y., Fang, H., Ghazvininejad, M., 
+Han, J., & Zettlemoyer, L. (2023). RePostsentation Deficiency in Masked Language Modeling. arXiv. 
+<https://doi.org/10.48550/ARXIV.2302.02060>
+
+Oreshkin, B. N., Rodriguez, P., & Lacoste, A. (2018). TADAM: Task
+dependent adaptive metric for improved few-shot learning. Advance online
+publication. <https://doi.org/10.48550/arXiv.1805.10123>
+
+Papilloud, C., & Hinneburg, A. (2018). Qualitative Textanalyse mit
+Topic-Modellen: Eine Einführung für Sozialwissenschaftler. Wiesbaden:
+Springer. <https://doi.org/10.1007/978-3-658-21980-2>
+
+Pappagari, R., Zelasko, P., Villalba, J., Carmiel, Y., & Dehak, N.
+(2019). Hierarchical Transformers for Long Document Classification. In
+2019 IEEE Automatic Speech Recognition and Understanding Workshop (ASRU)
+(pp. 838--844). IEEE. <https://doi.org/10.1109/ASRU46091.2019.9003958>
+
+Pennington, J., Socher, R., & Manning, C. D. (2014). GloVe: Global
+Vectors for Word RePostsentation. Proceedings of the 2014 Conference on
+Empirical Methods in Natural Language Processing.
+<https://aclanthology.org/D14-1162.pdf>
+
+Ranjan, & Chitta. (2019). Build the right Autoencoder — Tune and
+Optimize using PCA principles.: Part I.
+<https://towardsdatascience.com/build-the-right-autoencoder-tune-and-optimize-using-pca-principles-part-i-1f01f821999b>
+
+Schreier, M. (2012). Qualitative Content Analysis in Practice. Los
+Angeles: SAGE.
+
+Snell, J., Swersky, K., & Zemel, R. S. (2017). Prototypical Networks for
+Few-shot Learning. <https://doi.org/10.48550/arXiv.1703.05175>
+
+Song, K., Tan, X., Qin, T., Lu, J. & Liu, T.‑Y. (2020). MPNet: Masked
+and Permuted Post-training for Language Understanding.
+<https://doi.org/10.48550/arXiv.2004.09297>
+
+Takeshita, S., Takeshita, Y., Ruffinelli, D. & Ponzetto, S. P. (2025). Randomly 
+Removing 50% of Dimensions in Text Embeddings has Minimal Impact on Retrieval and 
+Classification Tasks. <https://doi.org/10.48550/arXiv.2508.17744>
+
+Tunstall, L., Werra, L. von, Wolf, T., & Géron, A. (2022). Natural
+language processing with transformers: Building language applications
+with hugging face (Revised edition). Heidelberg: O'Reilly.
+
+Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez,
+A. N., Kaiser, L., & Polosukhin, I. (2017). Attention Is All You Need.
+<https://doi.org/10.48550/arXiv.1706.03762>
+
+Warner, B., Chaffin, A., Clavié, B., Weller, O., Hallström, O., Taghadouini, S., 
+Gallagher, A., Biswas, R., Ladhak, F., Aarsen, T., Cooper, N., Adams, G., 
+Howard, J. & Poli, I. (2024). Smarter, Better, Faster, Longer: A Modern Bidirectional 
+Encoder for Fast, Memory Efficient, and Long Context Finetuning and Inference.
+<https://doi.org/10.48550/arXiv.2412.13663>
+
+Wu, Y., Schuster, M., Chen, Z., Le, Q. V., Norouzi, M., Macherey, W.,
+Krikun, M., Cao, Y., Gao, Q., Macherey, K., Klingner, J., Shah, A.,
+Johnson, M., Liu, X., Kaiser, Ł., Gouws, S., Kato, Y., Kudo, T., Kazawa,
+H., . . . Dean, J. (2016). Google's Neural Machine Translation System:
+Bridging the Gap between Human and Machine Translation.
+<https://doi.org/10.48550/arXiv.1609.08144>
+
+Zhang, X., Nie, J., Zong, L., Yu, H., & Liang, W. (2019). One Shot
+Learning with Margin. In Q. Yang, Z.-H. Zhou, Z. Gong, M.-L. Zhang, &
+S.-J. Huang (Eds.), Lecture Notes in Computer Science. Advances in
+Knowledge Discovery and Data Mining (Vol. 11440, pp. 305–317). Springer
+International Publishing. <https://doi.org/10.1007/978-3-030-16145-3_24>
+
+Zou, L. (2023). Meta-Learning: Theory, Algorithms and Applications.
+Elsevier Science & Technology.
+<https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=7134465>
+
+# Script runtime
+
+```{r, include = TRUE}
+cat(paste("script runtime:", format(Sys.time() - script_time_start, digits = 3L)))
+```
+
+
+
+
+

@@ -1634,6 +1634,21 @@ get_param_dict <- function() {
     test_values = NULL
   )
 
+  param$cls_n_ref_points=list(
+    type = "int",
+    min = 2,
+    max = NULL,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    values_desc = NULL,
+    desc = "Number of reference points for classification",
+    gui_box = "General Settings",
+    gui_label = "Reference Points",
+    default_value = 3,
+    default_historic = NULL,
+    test_values = c(3,4)
+  )
+
   param$cls_input_normalize=param$normalization_type
   param$cls_input_normalize$desc="Type of normalization applied to data before passing to any layers of the net."
   param$cls_input_normalize$allowed_values=c(

@@ -69,14 +69,13 @@ class stack_dense_layer(torch.nn.Module):
 
   def forward(self,x,mask_times):
     y=x
-    for r in range(self.n_layers):
-      current_layer=self.layer_list[r]
-      y,mask_times=current_layer(x=y,mask_times=mask_times)
+    for current_layer in self.layer_list:
+      y, mask_times = current_layer(x=y, mask_times=mask_times)
     y,mask_times=self.residual_connection(x=x,y=y,mask_times=mask_times)
     return y,mask_times
     
   def calc_output_shape(self):
-    return self.output_size
+    return self.hidden_size
 
 #Recurrent Layer stack with mask
 class stack_recurrent_layers(torch.nn.Module): 
@@ -137,7 +136,6 @@ class stack_recurrent_layers(torch.nn.Module):
       )
 
     self.unpack=layer_unpack_and_masking(sequence_length=self.times,pad_value=self.pad_value)
-    
     self.residual_type=residual_type
     self.residual_connection=layer_residual_connection(self.residual_type,self.pad_value)  
     
@@ -215,9 +213,8 @@ class stack_tf_encoder_layer(torch.nn.Module):
   def forward(self,x,mask_times):
     y=self.positional_embedding_layer(x)
     y=torch.where(get_FeatureMask_from_mask(mask_times,self.features),self.pad_value,y)
-    for r in range(self.n_layers):
-      current_layer=self.layer_list[r]
-      y,mask_times=current_layer(y,mask_times)
+    for current_layer in self.layer_list:
+      y, mask_times = current_layer(x=y, mask_times=mask_times)
     y,mask_times=self.residual_connection(x,y,mask_times)
     return y,mask_times
 
@@ -268,9 +265,8 @@ class stack_n_gram_convolution(torch.nn.Module):
 
   def forward(self,x,mask_times):
     y=x
-    for r in range(self.n_layers):
-      current_layer=self.layer_list[r]
-      y,mask_times=current_layer(y,mask_times)
+    for current_layer in self.layer_list:
+      y, mask_times = current_layer(x=y, mask_times=mask_times)
     #Residual connection
     y,mask_times=self.residual_connection(x,y,mask_times)
     return y,mask_times

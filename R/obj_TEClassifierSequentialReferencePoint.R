@@ -32,8 +32,10 @@ TEClassifierSequentialReferencePoint <- R6::R6Class(
     #' @param feature_extractor `r get_param_doc_desc("feature_extractor")`
     #' @param target_levels `r get_param_doc_desc("target_levels")`
     #' @param skip_connection_type `r get_param_doc_desc("skip_connection_type")`
+    #' @param cls_n_ref_points `r get_param_doc_desc("cls_n_ref_points")`
     #' @param cls_times_pooling_type `r get_param_doc_desc("cls_times_pooling_type")`
     #' @param cls_input_normalize `r get_param_doc_desc("cls_input_normalize")`
+    #' @param embedding_dim `r get_param_doc_desc("embedding_dim")`
     #' @param feat_act_fct `r get_param_doc_desc("feat_act_fct")`
     #' @param feat_size `r get_param_doc_desc("feat_size")`
     #' @param feat_bias `r get_param_doc_desc("feat_bias")`
@@ -86,6 +88,8 @@ TEClassifierSequentialReferencePoint <- R6::R6Class(
                          feature_extractor = NULL,
                          target_levels = NULL,
                          skip_connection_type = "ResidualGate",
+                         cls_n_ref_points=3,
+                         embedding_dim=2,
                          cls_times_pooling_type = "MinMaxTimes",
                          cls_input_normalize = "BatchNorm",
                          metric_type = "Euclidean",
@@ -153,6 +157,8 @@ TEClassifierSequentialReferencePoint <- R6::R6Class(
         metric_type = private$model_config$metric_type,
         cls_times_pooling_type = private$model_config$cls_times_pooling_type,
         cls_input_normalize = private$model_config$cls_input_normalize,
+        cls_n_ref_points= private$model_config$cls_n_ref_points,
+        embedding_dim = as.integer(private$model_config$embedding_dim),
         feat_act_fct = private$model_config$feat_act_fct,
         feat_size = as.integer(private$model_config$feat_size),
         feat_bias = private$model_config$feat_bias,

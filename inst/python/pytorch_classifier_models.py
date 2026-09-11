@@ -227,6 +227,8 @@ class TEClassifierSequential(torch.nn.Module):
                 pre_dense=True,
                 device=device, 
                 dtype=dtype)
+            
+            
 
   def forward(self,x,prediction_mode=True):
     y_original,mask_original=self.masking_layer(x)
@@ -511,6 +513,7 @@ class TEClassifierParallel(torch.nn.Module):
                 pre_dense=True,
                 device=device, 
                 dtype=dtype)
+              
 
   def forward(self,x,prediction_mode=True):
     y,mask=self.masking_layer(x)
@@ -563,7 +566,7 @@ class TEClassifierParallel(torch.nn.Module):
 
 #-------------------------
 class TEClassifierReferencePoint(torch.nn.Module):
-  def __init__(self,times, features, pad_value,target_levels,core_net_type,skip_connection_type="ResidualGate",inc_cls_head=True,cls_type="regular", cls_input_normalize="None",
+  def __init__(self,times, features, pad_value,target_levels,core_net_type,skip_connection_type="ResidualGate",cls_n_ref_points=2,embedding_dim=2,inc_cls_head=True,cls_type="regular", cls_input_normalize="None",
               shared_feat_layer=True, feat_act_fct="ELU",feat_size=50,feat_bias=True,feat_dropout=0.0,feat_parametrizations="None",feat_normalization_type="LayerNorm",
               ng_conv_act_fct="ELU",ng_conv_n_layers=0,ng_conv_ks_min=2, ng_conv_ks_max=4,ng_conv_dropout=0.1, ng_conv_bias=False, ng_conv_parametrizations="None", ng_conv_residual_type="ResidualGate",ng_conv_normalization_type="LayerNorm",
               dense_act_fct="ELU",dense_n_layers=0,dense_dropout=0.0,dense_bias=False,dense_parametrizations="None", dense_residual_type="ResidualGate",dense_normalization_type="LayerNorm",
@@ -582,16 +585,17 @@ class TEClassifierReferencePoint(torch.nn.Module):
     #Number of categories/classes
     self.n_target_levels=len(target_levels)
     #Embedding dim
-    self.embedding_dim=feat_size
+    self.embedding_dim=embedding_dim
     #Metric Type
     self.metric_type=metric_type
-    #
-    self.num_ref_points=10
+    # number ref points
+    self.cls_n_ref_points=2
     #Core net
     if core_net_type=="sequential":
       if cls_times_pooling_type=="Max":
         self.cls_pooling_features=self.embedding_dim
         self.cls_times_pooling_type="MaxTimes"
+        self.projection_input=feat_size
       elif cls_times_pooling_type=="Average":
         self.cls_pooling_features=self.embedding_dim
         self.cls_times_pooling_type="AverageTimes"  
@@ -732,14 +736,18 @@ class TEClassifierReferencePoint(torch.nn.Module):
         merge_normalization_type=merge_normalization_type
       )
     #Layer for the projection
-    self.embedding_normalization=torch.tanh
+    self.projection_layer=torch.nn.Linear(
+        in_features=feat_size,
+        out_features=self.embedding_dim,
+        bias=False
+    )
     self.distance_layer = layer_protonet_metric(metric_type=self.metric_type)
     #Prob Builder
     self.softmax_temp = torch.nn.parameter.Parameter((torch.ones(1)))
     self.prob_builder_act=torch.nn.Softmax(dim=1)
     #Reference Points
     self.ref_points=torch.nn.Embedding(
-      num_embeddings=self.num_ref_points*self.n_target_levels, 
+      num_embeddings=self.cls_n_ref_points, 
       embedding_dim=self.embedding_dim, 
       padding_idx=None, 
       max_norm=None, 
@@ -748,26 +756,14 @@ class TEClassifierReferencePoint(torch.nn.Module):
       sparse=False
     )
     nn.init.orthogonal_(self.ref_points.weight)
-    self.logit_builder=torch.nn.Sequential(
-      torch.nn.Linear(
-        in_features=self.num_ref_points*self.n_target_levels,
-        out_features=self.num_ref_points*self.n_target_levels,
-        bias=False
-      ),
-      #torch.nn.GELU(approximate='none'),
-      torch.nn.Linear(
-        in_features=self.num_ref_points*self.n_target_levels,
-        out_features=self.num_ref_points*self.n_target_levels,
-        bias=False
-      ),
-      torch.nn.Linear(
-        in_features=self.num_ref_points*self.n_target_levels,
+    self.logit_builder=torch.nn.Linear(
+        in_features=self.cls_n_ref_points,
         out_features=self.n_target_levels,
         bias=False
-      )
     )
+    
     #ref_pointidx
-    self.ref_point_idx=torch.nn.parameter.Buffer(torch.arange(start=0,end=self.num_ref_points*self.n_target_levels))
+    self.ref_point_idx=torch.nn.parameter.Buffer(torch.arange(start=0,end=self.cls_n_ref_points))
   def get_ref_points(self):
     idx=torch.unsqueeze(self.ref_point_idx,dim=0)
     points = self.ref_points(idx)
@@ -777,7 +773,7 @@ class TEClassifierReferencePoint(torch.nn.Module):
     return self.softmax_temp**2 + 1e-4
   def forward(self,x,prediction_mode=True):
     embeddings=self.core_net(x) #(B,F)
-    embeddings=self.embedding_normalization(embeddings)
+    embeddings=self.projection_layer(embeddings)
     ref_points=self.get_ref_points()
     distances=self.distance_layer(
       x=embeddings,
@@ -1062,19 +1058,8 @@ class TEClassifierPrototype(torch.nn.Module):
     return probabilities
     
   def recode_classes(self,class_vector,class_labels):
-    #n_labels=class_labels.size()[0]
-    #new_classes=class_vector.clone()
-    #for index in range(n_labels):
-    #  con=(new_classes==class_labels[index])
-    #  new_classes=torch.where(condition=con,input=torch.tensor(index),other=new_classes)
-    #return new_classes
-    # Erzeugt eine Matrix der Form [Anzahl_Klassen, Tensor_Größe]
     matches = (class_vector.unsqueeze(0) == class_labels.unsqueeze(1))
-    
-    # Erzeugt die neuen Indizes direkt auf dem richtigen Device
     indices = torch.arange(class_labels.size(0), device=class_vector.device).unsqueeze(1)
-    
-    # Multipliziert die Maske mit den Indizes und summiert sie auf
     class_ids_new=(matches * indices).sum(dim=0)
     return class_ids_new.detach()    
   
