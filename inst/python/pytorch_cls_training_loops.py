@@ -541,38 +541,40 @@ class ModelTrainer():
     total_loss=0.0
     confusion_matrix=torch.zeros(size=(self.n_classes,self.n_classes),device=self.device,dtype=self.dtype)
     prob_confusion_matrix=torch.zeros(size=(self.n_classes,self.n_classes),device=self.device,dtype=self.dtype)
-    if cblock=="train":
-      self.trainer.train()
-      ctx=torch.enable_grad()
+    
+    is_train = (cblock == "train")
+    
+    if is_train:
+        self.trainer.train()
     else:
-      self.trainer.eval()
-      ctx=torch.no_grad()
-
-    for batch in dataloader:
-      with ctx:
+        self.trainer.eval()
+        
+    ctx = torch.enable_grad() if is_train else torch.no_grad()
+    
+    idx_sample_end = self.n_classes * self.Ns
+    idx_query_end = self.n_classes * (self.Ns + self.Nq)
+    
+    with ctx:  
+      for batch in dataloader:
         inputs=batch["input"]
         labels=batch["labels"]
-        if cblock=="train":
+        
+        if is_train:
           self.optimizer.zero_grad(set_to_none=True)
           
-          sample_inputs=inputs[0:(self.n_classes*self.Ns)].clone()
-          query_inputs=inputs[(self.n_classes*self.Ns):(self.n_classes*(self.Ns+self.Nq))].clone()
-          sample_classes=labels[0:(self.n_classes*self.Ns)].clone()
-          query_classes=labels[(self.n_classes*self.Ns):(self.n_classes*(self.Ns+self.Nq))].clone()
-          
-          sample_inputs = sample_inputs.to(self.device,dtype=self.dtype,non_blocking=True)
-          query_inputs = query_inputs.to(self.device,dtype=self.dtype,non_blocking=True)
-          sample_classes = sample_classes.to(self.device,dtype=self.dtype,non_blocking=True)
-          query_classes = query_classes.to(self.device,dtype=self.dtype,non_blocking=True)
+          sample_inputs = inputs[0:idx_sample_end]
+          query_inputs = inputs[idx_sample_end:idx_query_end]
+          sample_classes = labels[0:idx_sample_end]
+          query_classes = labels[idx_sample_end:idx_query_end]
           
           class_labels=torch.unique(sample_classes,sorted=True)
-          class_labels=class_labels.to(self.device,dtype=self.dtype,non_blocking=True)
-          
-          self.static_sample_inputs.copy_(sample_inputs)
-          self.static_query_inputs.copy_(query_inputs)
-          self.static_sample_classes.copy_(sample_classes)
-          self.static_query_classes.copy_(query_classes)
-          self.static_class_labels.copy_(class_labels)
+         
+          self.static_sample_inputs.copy_(sample_inputs, non_blocking=True)
+          self.static_query_inputs.copy_(query_inputs, non_blocking=True)
+          self.static_sample_classes.copy_(sample_classes, non_blocking=True)
+          self.static_query_classes.copy_(query_classes, non_blocking=True)
+          self.static_class_labels.copy_(class_labels, non_blocking=True)  
+
           #Train Step
           with torch.autocast(device_type=self.device_type, dtype=self.amp_dtype, enabled=self.amp):
             loss, outputs=self.trainer(
@@ -583,32 +585,28 @@ class ModelTrainer():
                 static_class_labels=self.static_class_labels
                 )
           #Backward
-          if cblock=="train":
-            self.amp_scaler.scale(loss).backward()
-            self.amp_scaler.unscale_(self.optimizer)
-            torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0,foreach=True)
-            self.amp_scaler.step(self.optimizer)
-            self.amp_scaler.update()
-            if self.scheduler is not None:
-              self.scheduler.step() 
+          self.amp_scaler.scale(loss).backward()
+          self.amp_scaler.unscale_(self.optimizer)
+          torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0,foreach=True)
+          self.amp_scaler.step(self.optimizer)
+          self.amp_scaler.update()
+          if self.scheduler is not None:
+            self.scheduler.step() 
           #Calculate CLS Statistics    
           loss=loss.detach()
           assert torch.isnan(loss).any, "NANs in loss detected."
-          outputs=outputs
           #Metrics
           total_loss +=loss.item()
           pred_idx=outputs[0].detach().max(dim=1).indices.to(dtype=torch.long,device=self.device)
           label_idx=query_classes.to(dtype=torch.long,device=self.device)  
+        
         else:
-          inputs = inputs.to(self.device,dtype=self.dtype,non_blocking=True)
-          labels = labels.to(self.device,dtype=self.dtype,non_blocking=True)
-          self.static_input.copy_(inputs)
-          self.static_label.copy_(labels)
+          self.static_input.copy_(inputs,non_blocking=True)
+          self.static_label.copy_(labels,non_blocking=True)
           
           #class_labels=torch.unique(labels,sorted=True)
           class_labels=torch.arange(end=self.n_classes)
-          class_labels=class_labels.to(self.device,dtype=self.dtype,non_blocking=True)
-          self.static_class_labels.copy_(class_labels)
+          self.static_class_labels.copy_(class_labels,non_blocking=True)
           #Validation stept
           with torch.autocast(device_type=self.device_type, dtype=self.amp_dtype, enabled=self.amp):
             loss,outputs=self.trainer(
@@ -618,10 +616,10 @@ class ModelTrainer():
               static_sample_classes=None,
               static_class_labels=self.static_class_labels
               )
-      #Metrics
-      total_loss +=loss.item()
-      pred_idx=outputs[0].detach().max(dim=1).indices.to(dtype=torch.long,device=self.device)
-      label_idx=outputs[2].detach().to(dtype=torch.long,device=self.device)
+          #Metrics
+          total_loss +=loss.item()
+          pred_idx=outputs[0].detach().max(dim=1).indices.to(dtype=torch.long,device=self.device)
+          label_idx=outputs[2].detach().to(dtype=torch.long,device=self.device)
       
       confusion_matrix+=multiclass_confusion_matrix(input=pred_idx,target=label_idx,num_classes=self.n_classes,normalize = None)
       prob_confusion_matrix+=create_p_confusion_matrix(torch.nn.Softmax(dim=1)(outputs[0].detach()),label_idx=label_idx,num_classes=self.n_classes)
@@ -632,7 +630,7 @@ class ModelTrainer():
       self.logger.write_history_log(self.metric_storage["loss"])
     
     #Calculate prototypes
-    if cblock=="train":
+    if is_train:
       self.trainer.eval()
       with torch.no_grad():
         class_mean_prototypes,class_label=calc_trained_prototypes_batch(
