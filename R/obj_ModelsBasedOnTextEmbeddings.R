@@ -1071,16 +1071,16 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
           best_idx <- min(which(relevant_range$smoothed_delta == min(relevant_range$smoothed_delta)))
         }
 
-        if (self$last_training$config$lr_scheduler=="Linear"){
-          #Select lr rate with lowest increase
-          lr_idx <- min(which(relevant_range$smoothed_delta == max(relevant_range$smoothed_delta)))
-        }  else {
           #Select learning rate with maximum increase
           lr_idx <- min(which(relevant_range$smoothed_delta == min(relevant_range$smoothed_delta)))
-        }
+
 
         best <- relevant_range$lr_rate[best_idx]
         lr <- relevant_range$lr_rate[lr_idx]
+
+        if (self$last_training$config$lr_scheduler=="Linear"){
+        lr=1e-6
+          }
 
         if (best > lr) {
           self$last_training$config$lr_rate <- best
