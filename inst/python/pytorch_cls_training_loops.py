@@ -510,6 +510,7 @@ class ModelTrainer():
             self.scheduler.step()
         #Calculate CLS Statistics
         loss=loss.detach()
+        assert torch.isnan(loss).any, "NANs in loss detected."
         output=output.detach()
         total_loss +=loss
         label_idx=labels.max(dim=1).indices
@@ -592,6 +593,7 @@ class ModelTrainer():
               self.scheduler.step() 
           #Calculate CLS Statistics    
           loss=loss.detach()
+          assert torch.isnan(loss).any, "NANs in loss detected."
           outputs=outputs
           #Metrics
           total_loss +=loss.item()
@@ -690,6 +692,7 @@ class ModelTrainer():
             self.scheduler.step()
         #Calculate CLS Statistics
         loss=loss.detach()
+        assert torch.isnan(loss).any, "NANs in loss detected."
         output=output.detach()
         #Metrics
         total_loss +=loss.item()
@@ -770,6 +773,7 @@ class ModelTrainer():
             metric_storage=self.metric_storage,
             epoch=epoch,
             epochs=self.epochs,
+            total_steps=len(self.trainloader),
             metric_criterion="s_avg_iota",
             best_metric=self.best_val_avg_iota,
             best_loss=self.best_val_loss,
@@ -805,6 +809,7 @@ class ModelTrainer():
             metric_storage=self.metric_storage,
             epoch=epoch,
             epochs=self.epochs,
+            total_steps=len(self.trainloader),
             metric_criterion="s_avg_iota",
             best_metric=self.best_val_avg_iota,
             best_loss=self.best_val_loss,
@@ -836,6 +841,7 @@ class ModelTrainer():
               metric_storage=self.metric_storage,
               epoch=epoch,
               epochs=self.epochs,
+              total_steps=len(self.trainloader),
               metric_criterion="loss",
               best_metric=None,
               best_loss=self.best_val_loss,
@@ -850,7 +856,7 @@ class ModelTrainer():
   
   def get_learning_rates(self):
     learning_rates=[]
-    for i in range(1,8):
+    for i in range(3,8):
       if i==0:
         #tmp_range=range(0,3)
         tmp_range=[1,3]
