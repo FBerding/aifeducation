@@ -31,7 +31,9 @@ TEClassifierParallelReferencePoint <- R6::R6Class(
     #' @param text_embeddings `r get_param_doc_desc("text_embeddings")`
     #' @param feature_extractor `r get_param_doc_desc("feature_extractor")`
     #' @param target_levels `r get_param_doc_desc("target_levels")`
+    #' @param cls_n_ref_points `r get_param_doc_desc("cls_n_ref_points")`
     #' @param cls_input_normalize `r get_param_doc_desc("cls_input_normalize")`
+    #' @param embedding_dim `r get_param_doc_desc("embedding_dim")`
     #' @param skip_connection_type `r get_param_doc_desc("skip_connection_type")`
     #' @param shared_feat_layer `r get_param_doc_desc("shared_feat_layer")`
     #' @param feat_act_fct `r get_param_doc_desc("feat_act_fct")`
@@ -90,6 +92,8 @@ TEClassifierParallelReferencePoint <- R6::R6Class(
                          text_embeddings = NULL,
                          feature_extractor = NULL,
                          target_levels = NULL,
+                         cls_n_ref_points=3,
+                         embedding_dim=2,
                          skip_connection_type = "ResidualGate",
                          metric_type = "Euclidean",
                          shared_feat_layer = TRUE,
@@ -163,6 +167,8 @@ TEClassifierParallelReferencePoint <- R6::R6Class(
         metric_type=private$model_config$metric_type,
         shared_feat_layer = private$model_config$shared_feat_layer,
         cls_input_normalize=private$model_config$cls_input_normalize,
+        cls_n_ref_points= private$model_config$cls_n_ref_points,
+        embedding_dim = as.integer(private$model_config$embedding_dim),
         feat_act_fct = private$model_config$feat_act_fct,
         feat_size = as.integer(private$model_config$feat_size),
         feat_bias = private$model_config$feat_bias,
