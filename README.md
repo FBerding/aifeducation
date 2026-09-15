@@ -21,49 +21,51 @@ status](https://www.r-pkg.org/badges/version/aifeducation)](https://CRAN.R-proje
 
 <!-- badges: end -->
 
-The R package *Artificial Intelligence for Education (aifeducation)* is
-designed for the special requirements of educators, educational
-researchers, and social researchers. The target audience of this package
-are educators and researchers with no coding skills who would like to
-develop their own models, as well as people who would like to use those
-models created by other researchers/educators. The package supports the
-application of Artificial Intelligence (AI) for Natural Language
-Processing tasks such as text embedding and classification under the
-special conditions of the educational and social sciences.
+The R package *Artificial Intelligence for Education (aifeducation)* has
+been designed to meet the specific needs of educators, educational
+researchers, and social researchers. It is intended for those without
+coding skills who wish to develop their own models, as well as for those
+who wish to use models created by others. The package supports the
+application of artificial intelligence (AI) to natural language
+processing tasks such as text embedding and classification in
+educational and social science contexts.
 
 ## Features Overview
 
-- Simple usage of artificial intelligence by providing routines for the
-  most important tasks of educators and researchers from social and
+- The simple usage of artificial intelligence provides routines for the
+  most important tasks of educators and researchers in the social and
   educational sciences.
-- Provides a graphical user interface (AI for Education - Studio),
-  allowing users to work with AI without the need for coding skills.
-- Supports ‘PyTorch’ as the core machine learning framework which is
+- Users can work with AI without needing to know how to code, thanks to
+  the graphical user interface (AI for Education - Studio).
+- It supports PyTorch as the core machine learning framework, which is
   widely used in research.
-- Implements the advantages of the python library ‘datasets’, increasing
-  computational speed and allowing the use of very large data sets.
-- Uses safetensors for saving models in ‘PyTorch’.
+- It implements the advantages of the Python library ‘datasets’,
+  increasing computational speed and enabling the use of very large
+  datasets.
+- Learning rates are calculated automatically.  
+- It uses ‘safetensors’ to save models in ‘PyTorch’.
 - Supports pre-trained language models from Hugging Face.
-- Supports ModernBERT, MPNet, BERT, RoBERTa, DeBERTa, Funnel Transformer
-  and more for creating context-sensitive text embeddings. A list of all
-  supported models can be found
+- It supports ModernBERT, MPNet, BERT, RoBERTa, DeBERTa, Funnel
+  Transformer and more for creating context-sensitive text embeddings. A
+  list of all supported models can be found
   [here](https://fberding.github.io/aifeducation/articles/a02_base_model_types.html).
-- Makes sharing pre-trained models very easy.
-- Integrates sustainability tracking for training and inference.
-- Integrates an approach to calculate FLOPS based on model’s
-  architecture.
-- Integrates special statistical techniques for dealing with data
-  structures common in the social and educational sciences.
+- It makes sharing pre-trained models very easy.
+- It integrates sustainability tracking for training and inference.
+- Integrates an approach to calculating FLOPS based on the architecture
+  of the model.
+- Integrates special statistical techniques for handling data structures
+  common in social and educational sciences.
 - Supports the classification of long text documents.
 
-Currently, the package focuses on classification tasks which can either
-be used to diagnose characteristics of learners from written material or
-to estimate the properties of learning and teaching material. In the
-future, more tasks will be implemented.
+Currently, the package focuses on classification tasks, which can be
+used either to diagnose characteristics of learners from written
+material, or to estimate the properties of learning and teaching
+materials. More tasks will be implemented in the future.
 
 ## Installation
 
-You can install the latest stable version of the package from CRAN with:
+You can install the latest stable version of the package from CRAN using
+the following command:
 
 ``` r
 install.packages("aifeducation")
@@ -79,7 +81,7 @@ devtools::install_github(repo="FBerding/aifeducation",
                          dependencies = "Imports")
 ```
 
-Further instructions for installation can be found in vignette [01 Get
+Further installation instructions can be found in the vignette [01 Get
 Started](https://fberding.github.io/aifeducation/articles/aifeducation.html).
 
 > Please note that an update of your version of *aifeducation* may
@@ -99,35 +101,35 @@ style="width:100.0%" alt="Figure 1: Aifeducation Studio" />
 Studio</figcaption>
 </figure>
 
-*AI for Education - Studio* allows users to easily develop, train,
-apply, document, and analyse AI models without any coding skills. See
-the corresponding vignette for more details: [02 Using the graphical
+*AI for Education – Studio* allows users to develop, train, apply,
+document and analyse AI models with ease, even without coding skills.
+See the corresponding vignette for more details: [02 Using the graphical
 user interface Aifeducation -
 Studio](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html).
 
 ## Sustainability
 
-Training AI models consumes time and energy. To help researchers
-estimate the ecological impact of their work, a sustainability tracker
-is implemented. It is based on the python library ‘codecarbon’ by Courty
-et al. (2023). This tracker allows to estimate the energy consumption
-for CPUs, GPUs and RAM during training and derives a value for CO2
-emission. This value is based on the energy mix in the country where the
-computer is located.
+Training AI models is time-consuming and energy-intensive. To help
+researchers estimate the ecological impact of their work, a
+sustainability tracker has been implemented. It is based on the Python
+library ‘codecarbon’ by Courty et al. (2023). The tracker estimates
+energy consumption for CPUs, GPUs, and RAM during training, and
+calculates CO₂ emissions. This value is based on the energy mix in the
+country where the computer is located.
 
 ## PyTorch as Machine Learning Framework
 
-The core machine learning framework of this package is ‘PyTorch’,
-providing a broad support of graphical devices to accelerate
-computations, access to new and unique model architectures, and a high
-compatibility of models across different versions of this machine
-learning framework.
+The core machine learning framework of this package is PyTorch, which
+provides broad support for graphics processing units (GPUs) to
+accelerate computations, access to new and unique model architectures,
+and high compatibility of models across different versions of the
+framework.
 
 ## Model Life Cycle
 
-Research requires reproducibility and traceability. Thus, starting with
-version 1.0.0 of this package, it has top priority to ensure that
-already trained models work with future versions of this package.
+Reproducibility is essential for research. Therefore, ensuring that
+models that have already been trained work with future versions of this
+package is a top priority from version 1.0.0 onwards.
 
 ## Classification Tasks
 
@@ -141,93 +143,92 @@ Funnel-Transformer (Dai et al. 2020).
 
 *aifeducation* supports the use of pre-trained transformer models
 provided by [Hugging Face](https://huggingface.co/) and the creation of
-new transformers, allowing educators and researchers to develop
-specialized and domain-specific models. See [04 Model configuration and
-training](https://fberding.github.io/aifeducation/articles/model_configuration.html)
-for details about the configuration of a new model.
+new transformers. This allows educators and researchers to develop
+specialised, domain-specific models. For details about the configuration
+of a new model, see [04 Model configuration and
+training](https://fberding.github.io/aifeducation/articles/model_configuration.html).
 
 The package supports the analysis of long texts. Depending on the
-method, long texts are transformed into vectors at once, or, if too
-long, are split into several chunks which results in a sequence of
-vectors.
+method, long texts are either transformed into vectors immediately or
+split into several chunks if they are too long, resulting in a sequence
+of vectors.
 
 ### Training AI under Challenging Conditions
 
-For the second step within a classification task, *aifeducation*
-integrates some important statistical and mathematical methods for
-dealing with the main challenges in educational and social sciences for
-applying AI. These are:
+In the second step of a classification task, aifeducation integrates
+important statistical and mathematical methods to address the main
+challenges of applying AI in educational and social sciences. These are:
 
-- **digital data availability:** In the educational and social sciences,
-  data is often only available in handwritten form. For example, in
-  schools or universities, students often solve tasks by creating
-  handwritten documents. Thus, educators and researchers first have to
-  transform analogue data into a digital form, involving human action.
-  This makes data generation expensive and time-consuming, leading to
+- **digital data availability:** In the social and educational sciences,
+  data is often only available in handwritten form. For instance,
+  students at school or university frequently complete tasks by creating
+  handwritten documents. This means that educators and researchers must
+  first transform analogue data into digital form, a process that
+  involves human action. This makes data generation expensive and
+  time-consuming, resulting in *small datasets*.
+- **high privacy policy standards:** Furthermore, in the social and
+  educational sciences, data often refers to humans and/or their
+  actions. These kinds of data are protected by privacy policies in many
+  countries, which limit access to and usage of data and result in
   *small data sets*.
-- **high privacy policy standards:** Furthermore, in the educational and
-  social sciences, data often refers to humans and/or their actions.
-  These kinds of data are protected by privacy policies in many
-  countries, limiting access to and the usage of data, which also
-  results in *small data sets*.
-- **long research tradition:** Educational and social sciences have a
-  long research tradition in generating insights into social phenomena
-  as well as learning and teaching. These insights have to be
-  incorporated into applications of AI (e.g., Luan et al. 2020; Wong et
-  al. 2019). This makes supervised machine learning a very important
-  technology since it provides a link between educational and social
-  theories or models on the one hand and machine learning on the other
-  hand (Berding et al. 2022). However, this kind of machine learning
-  requires humans to generate a valid data set for the training process,
-  leading to *small data sets*.
-- **complex constructs:** Compared to classification tasks where, for
-  instance, AI has to differentiate between a ‘good’ or a ‘bad’ movie
-  review, constructs in the educational and social sciences are more
-  complex. For example, some research instruments in motivational
-  psychology require to infer personal motifs from written essays (e.g.,
-  Gruber & Kreuzpointner 2013). A reliable and valid interpretation of
-  this kind of information requires well qualified human raters, making
-  data generation expensive. This also *limits the size of a data set*.
-- **imbalanced data:** Finally, data in the educational and social
-  sciences often occurs in an imbalanced pattern as several empirical
-  studies show (Bloemen 2011; Stütz et al. 2022). Imbalanced means that
-  some categories or characteristics of a data set have very high
-  absolute frequencies compared to other categories and characteristics.
-  Imbalance during AI training guides algorithms to focus and prioritize
-  the categories and characteristics with high absolute frequencies,
-  increasing the risk to miss categories/characteristics with low
-  frequencies (Haixiang et al. 2017). This can lead AI to prefer special
-  groups of people/material, imply false recommendations and
-  conclusions, or to miss rare categories or characteristics.
+- **long research tradition:** The educational and social sciences have
+  a long tradition of generating insights into social phenomena, as well
+  as learning and teaching. These insights must be incorporated into AI
+  applications (e.g. Luan et al. 2020; Wong et al. 2019). Supervised
+  machine learning is therefore a very important technology, providing a
+  link between educational and social theories or models and machine
+  learning (Berding et al. 2022). However, this kind of machine learning
+  requires humans to generate valid data sets for the training process,
+  resulting in *small data sets*.
+- **complex constructs:** Compared to classification tasks, such as
+  differentiating between a ‘good’ or ‘bad’ movie review, constructs in
+  the educational and social sciences are more complex. Some
+  motivational psychology research instruments, for example, require
+  personal motives to be inferred from written essays (Gruber &
+  Kreuzpointner 2013). Reliably and validly interpreting this kind of
+  information requires highly qualified human raters, which makes data
+  generation expensive. This also limits the size of a dataset.
+- **imbalanced data:** Finally, as several empirical studies have shown
+  (Bloemen 2011; Stütz et al. 2022), data in the educational and social
+  sciences often occurs in imbalanced patterns. This means that some
+  categories or characteristics of a dataset have very high absolute
+  frequencies compared to others. During AI training, imbalance causes
+  algorithms to focus on and prioritise categories and characteristics
+  with high absolute frequencies, increasing the risk of missing
+  categories/characteristics with low frequencies (Haixiang et
+  al. 2017). This can cause AI systems to favour certain groups of
+  people or types of material, make false recommendations, and draw
+  incorrect conclusions. It can also cause them to miss rare categories
+  or characteristics.
 
-In order to deal with the problem of imbalanced data sets, the package
-integrates the *Synthetic Minority Oversampling Technique* into the
-learning process. Currently, the *K-Nearest Neighbor OveRsampling
-Approach (KNNOR)* developed by Islam et al. (2022) is available in fast
-C++. This approach reached high performance across different tasks and
-data sets compared to other techniques (Islam et al. 2022).
+To address the issue of imbalanced datasets, the package incorporates
+the *Synthetic Minority Oversampling Technique* (SMOTE) into the
+learning process. The K-Nearest Neighbour Oversampling Approach (KNNOR),
+which was developed by Islam et al. (2022), is currently available in
+fast C++. Compared to other techniques, this approach has been shown to
+perform well across different tasks and datasets (Islam et al. 2022).
 
-In order to address the problem of small data sets, training loops of AI
-integrate *pseudo-labeling* (e.g., Lee 2013). Pseudo-labeling is a
-technique which can be used for supervised learning. More specifically,
-educators and researchers rate a part of a data set and train AI with
-this very part. The remainder of the data is not processed by humans.
-Instead, AI uses this part of data to learn on its own. Thus, educators
-and researchers only have to provide additional data for the AI’s
-learning process without coding it themselves. This offers the
-possibility to add more data to the training process and reduce labor
-cost.
+To address the issue of limited data sets, AI training loops incorporate
+a technique known as *pseudo-labelling* (e.g. Lee 2013).
+Pseudo-labelling is a supervised learning technique. More specifically,
+educators and researchers rate part of a dataset, which is then used to
+train the AI. The rest of the data is not processed by humans. Instead,
+the AI uses this data to learn independently. Therefore, educators and
+researchers only need to provide additional data for the AI’s learning
+process rather than coding it themselves. This makes it possible to add
+more data to the training process while reducing labour costs.
 
 ### Evaluating Performance
 
-Classification tasks in machine learning are comparable to the empirical
-method of *content analysis* from the social sciences. This method looks
-back on a long research tradition and an ongoing discussion on how to
-evaluate the reliability and validity of generated data. In order to
-provide a link to this research tradition and to provide educators as
-well as educational and social researchers with performance measures
-they are more familiar with, every AI trained with this package is
-evaluated with the following measures and concepts:
+In machine learning, classification tasks can be compared to the
+empirical method of *content analysis* used in the social sciences. This
+method has a long research tradition, as well as an ongoing discussion
+about how to evaluate the reliability and validity of the data it
+generates. To establish a connection with this research tradition and
+provide educators and educational and social researchers with
+performance measures with which they are more familiar, every AI trained
+with this package is evaluated using the following measures and
+concepts:
 
 - Iota Concept of the Second Generation (Berding & Pargmann 2022).
 - Krippendorff’s Alpha (Krippendorff 2019).
@@ -249,15 +250,17 @@ are also available:
 
 ## Sharing Trained AI
 
-Since the package is based on ‘PyTorch’ and the transformer library,
-every trained AI can be shared with other educators and researchers. The
-package supports an easy use of pre-trained AI within *R*, but also
-provides the possibility to export trained AI to other environments.
+As the package is based on PyTorch and the Transformer library, any
+trained AI model can be shared with other educators and researchers. The
+package not only supports the straightforward use of pre-trained AI
+within *R*, but also provides the option to export trained AI to other
+environments.
 
-Using a pre-trained AI for classification only requires the classifier
-and the corresponding text embedding model. Use *AI for Education
-Studio* or just load both to *R* and start predictions. Vignette [02
-Using the graphical user interface Aifeducation -
+To use a pre-trained AI model for classification purposes, you only need
+the classifier itself and the corresponding text embedding model. Either
+use AI for Education Studio or simply load both to R and start making
+predictions. Vignette [02 Using the graphical user interface
+Aifeducation -
 Studio](https://fberding.github.io/aifeducation/articles/gui_aife_studio.html)
 describes how to use the user interface. Vignette [03 Using R
 syntax](https://fberding.github.io/aifeducation/articles/classification_tasks.html)
