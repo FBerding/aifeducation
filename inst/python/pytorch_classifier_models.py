@@ -52,6 +52,7 @@ class TEClassifierSequential(torch.nn.Module):
               dense_act_fct="ELU",dense_n_layers=0,dense_dropout=0.0,dense_bias=False,dense_parametrizations="None", dense_residual_type="ResidualGate",dense_normalization_type="LayerNorm",
               rec_act_fct="Tanh",rec_n_layers=0,rec_type="GRU",rec_bidirectional=False,rec_dropout=0.0,rec_bias=False,rec_parametrizations="None",rec_residual_type="ResidualGate",rec_normalization_type="LayerNorm", 
               tf_act_fct="ELU",tf_dense_dim=50,tf_n_layers=0,tf_dropout_rate_1=0.0,tf_dropout_rate_2=0.0,tf_attention_type="MultiHead",tf_positional_type ="absolute",tf_num_heads=1,tf_bias=False,tf_parametrizations="None",tf_residual_type="ResidualGate",tf_normalization_type="LayerNorm", tf_normalization_position="pre",
+              final_normalization_type="PowerNorm",
               device=None, dtype=None):
       super().__init__()
       #Save configuration to dict
@@ -192,6 +193,7 @@ class TEClassifierSequential(torch.nn.Module):
           features=feat_size,
           pooling_type=self.cls_pooling_type_times,
           pad_value=pad_value)
+      
       if self.cls_pooling_type == "Max" or self.cls_pooling_type == "Min" or self.cls_pooling_type == "MinMax":     
           self.cls_pooling_features=cls_pooling_features
           self.summarize_layer_features=layer_adaptive_extreme_pooling_1d(
@@ -205,6 +207,14 @@ class TEClassifierSequential(torch.nn.Module):
           self.cls_pooling_features=2*self.feat_size
           self.summarize_layer_features=torch.nn.Identity()     
       self.residual_connection=layer_residual_connection(skip_connection_type,pad_value)  
+      
+      self.final_normalization=get_layer_normalization(
+        name=final_normalization_type,
+        times=1, 
+        features=self.cls_pooling_features,
+        pad_value=self.pad_value,
+        eps=1e-6
+      )
       
       if inc_cls_head==True:
         if cls_type=="Regular":
@@ -241,10 +251,11 @@ class TEClassifierSequential(torch.nn.Module):
     y_final,mask_final=self.residual_connection(y_resized,y,mask)
     y_st=self.summarize_layer_time(y_final,get_FeatureMask_from_mask(mask_final,y_final.size(2))) #(B,F)
     y_sf=self.summarize_layer_features(y_st) #(B,C)
+    y_norm,_=self.final_normalization(y_sf,None) #(B,C)
     if self.inc_cls_head==True:
-      y_c=self.classification_head(y_sf)
+      y_c=self.classification_head(y_norm)
     else:
-      y_c=y_sf
+      y_c=y_norm
     if prediction_mode==False:
       return y_c
     else:
@@ -258,6 +269,7 @@ class TEClassifierParallel(torch.nn.Module):
               rec_act_fct="Tanh",rec_n_layers=0,rec_type="GRU",rec_bidirectional=False,rec_dropout=0.0,rec_bias=False,rec_parametrizations="None", rec_residual_type="ResidualGate",rec_normalization_type="LayerNorm",
               tf_act_fct="ELU",tf_dense_dim=50,tf_n_layers=0,tf_dropout_rate_1=0.0,tf_dropout_rate_2=0.0,tf_attention_type="MultiHead",tf_positional_type ="absolute",tf_num_heads=1,tf_bias=False,tf_parametrizations="None",tf_residual_type="ResidualGate",tf_normalization_type="LayerNorm", tf_normalization_position="pre",
               merge_attention_type="MultiHead",merge_num_heads=1,merge_normalization_type="LayerNorm",merge_pooling_type="MinMax",merge_pooling_features=2,
+              final_normalization_type="PowerNorm",
               device=None, dtype=None):
       super().__init__()
       #Save configuration to dict
@@ -485,6 +497,7 @@ class TEClassifierParallel(torch.nn.Module):
         n_input_streams=self.n_streams,
         pooling_type=merge_pooling_type,
         normalization_type=merge_normalization_type,
+        final_normalization_type=final_normalization,
         pad_value=pad_value,
         attention_type=merge_attention_type,
         num_heads=merge_num_heads,
@@ -576,6 +589,7 @@ class TEClassifierReferencePoint(torch.nn.Module):
               cls_times_pooling_type="MinMax",
               merge_times_pooling_type="MinMax",
               metric_type="Euclidean",
+              final_normalization_type="PowerNorm",
               device=None, dtype=None):
     super().__init__()
     #Save configuration to dict
@@ -659,7 +673,8 @@ class TEClassifierReferencePoint(torch.nn.Module):
         tf_normalization_type=tf_normalization_type,
         tf_normalization_position=tf_normalization_position,
         device=device, 
-        dtype=dtype
+        dtype=dtype,
+        final_normalization_type=final_normalization_type
       )
     elif core_net_type=="parallel":
       if merge_times_pooling_type=="Max":
@@ -733,7 +748,8 @@ class TEClassifierReferencePoint(torch.nn.Module):
         dtype=dtype,
         merge_attention_type=merge_attention_type,
         merge_num_heads=merge_num_heads,
-        merge_normalization_type=merge_normalization_type
+        merge_normalization_type=merge_normalization_type,
+        final_normalization_type=final_normalization_type,
       )
     #Layer for the projection
     self.projection_layer=torch.nn.Linear(
@@ -799,6 +815,7 @@ class TEClassifierPrototype(torch.nn.Module):
               merge_attention_type="MultiHead",merge_num_heads=1,merge_normalization_type="LayerNorm",merge_pooling_features=2,merge_pooling_type="MinMax",
               cls_pooling_features=2,cls_pooling_type="MinMax",
               metric_type="Euclidean",
+              final_normalization_type="PowerNorm",
               device=None, dtype=None):
     super().__init__()
     #Save configuration to dict
@@ -876,7 +893,8 @@ class TEClassifierPrototype(torch.nn.Module):
         tf_normalization_type=tf_normalization_type,
         tf_normalization_position=tf_normalization_position,
         device=device, 
-        dtype=dtype
+        dtype=dtype,
+        final_normalization_type=final_normalization_type
       )
     elif core_net_type=="parallel":
       if merge_pooling_type=="MaxTimes":
@@ -948,7 +966,8 @@ class TEClassifierPrototype(torch.nn.Module):
         dtype=dtype,
         merge_attention_type=merge_attention_type,
         merge_num_heads=merge_num_heads,
-        merge_normalization_type=merge_normalization_type
+        merge_normalization_type=merge_normalization_type,
+        final_normalization_type=final_normalization_type
       )
       
     self.embedding_dim=embedding_dim

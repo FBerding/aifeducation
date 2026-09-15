@@ -789,7 +789,7 @@ class layer_tf_encoder(torch.nn.Module):
 
 #Merge Leyer
 class merge_layer(torch.nn.Module):
-  def __init__(self,times,features,n_extracted_features,n_input_streams,pad_value,pooling_type="Max",normalization_type="None",attention_type="MultiHead",num_heads=1,device=None,dtype=None):
+  def __init__(self,times,features,n_extracted_features,n_input_streams,pad_value,pooling_type="Max",normalization_type="None",final_normalization_type="PowerNorm",attention_type="MultiHead",num_heads=1,device=None,dtype=None):
     super().__init__()
     
     self.times=times
@@ -877,6 +877,14 @@ class merge_layer(torch.nn.Module):
       bias=True, 
       device=device, 
       dtype=dtype)
+      
+    self.final_normalization=get_layer_normalization(
+        name=final_normalization_type,
+        times=1, 
+        features=self.n_input_streams,
+        pad_value=self.pad_value,
+        eps=1e-6
+      )
 
   def forward(self,tensor_list,mask_times):
     #Extract features by pooling and conotate to a new sequence
@@ -904,6 +912,7 @@ class merge_layer(torch.nn.Module):
     final=torch.matmul(input=weights, other=extracted_seq)
     final=torch.squeeze(final,dim=1)
     final=self.pooling_over_features(final)
+    final,_=self.final_normalization(final,None)
     return final
 
 
@@ -988,9 +997,11 @@ class layer_protonet_metric(torch.nn.Module):
 
 #Turning Layer
 class turning_layer(torch.nn.Module):
-  def __init__(self,features,times,pad_value,act_fct="ELU",normalization_type="LayerNorm",dropout=0.0,parametrizations="None",device=None, dtype=None,residual_type="None"):
+  def __init__(self,input_size,output_size,times,pad_value,connection_type="Regular",act_fct="ELU",bias=False,normalization_type="LayerNorm",dropout=0.0,parametrizations="None",device=None, dtype=None,residual_type="None"):
     super().__init__()
-    self.features=features
+    self.input_size=input_size
+    self.features=output_size
+    self.bias=bias
     if isinstance(pad_value, torch.Tensor):
         self.pad_value = pad_value.detach().float()
         #self.register_buffer("pad_value",pad_value.clone().float())
@@ -998,10 +1009,24 @@ class turning_layer(torch.nn.Module):
         self.pad_value = torch.tensor(pad_value,dtype=torch.float)
         #self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
     self.times=times
-    self.dropout=dropout
-    self.parametrizations=parametrizations
-    self.act_fct_name=act_fct
+    #Bias
+    if self.bias:
+      self.bias_param=torch.nn.parameter.Parameter(data=torch.zeros((1)), requires_grad=True)
+    else:
+      self.register_buffer('bias_param', torch.zeros((1)))
+    #Projekction
+    if input_size!=output_size:
+      self.projection=torch.nn.Linear(
+        in_features=input_size, 
+        out_features=output_size, 
+        bias=False, 
+        device=device, 
+        dtype=dtype
+      )
+    else:
+      self.projection=torch.nn.Identity()
     #Act Fct
+    self.act_fct_name=act_fct
     self.act_fct=get_act_fct(self.act_fct_name,input_dim=self.features,output_dim=self.features)
     #Normalization Layer
     self.normalization_layer=get_layer_normalization(
@@ -1013,8 +1038,9 @@ class turning_layer(torch.nn.Module):
     #weights
     self.weights_cosinus=torch.nn.parameter.Parameter(data=torch.rand((self.features,self.features)))
     self.weights_sinus=torch.nn.parameter.Parameter(data=torch.rand((self.features,self.features)))
-    self.weights_alpha=torch.nn.parameter.Parameter(data=torch.rand((self.features)))
+    self.weights_alpha=torch.nn.parameter.Parameter(data=torch.rand((self.features,1)))
     #Weight Parametrizations  
+    self.parametrizations=parametrizations
     if self.parametrizations=="OrthogonalWeights":
       torch.nn.utils.parametrizations.orthogonal(module=self, name='weights_cosinus',orthogonal_map="matrix_exp")
       torch.nn.utils.parametrizations.orthogonal(module=self, name='weights_sinus',orthogonal_map="matrix_exp")
@@ -1028,6 +1054,7 @@ class turning_layer(torch.nn.Module):
       torch.nn.utils.spectral_norm(module=self, name='weights_sinus', n_power_iterations=1, eps=1e-12, dim=None)
       torch.nn.utils.spectral_norm(module=self, name='weights_alpha', n_power_iterations=1, eps=1e-12, dim=None)
     #Dropout
+    self.dropout=dropout
     if self.dropout>0:
       self.dropout=layer_dropout_with_mask(p=self.dropout,pad_value=self.pad_value)
     else:
@@ -1036,31 +1063,32 @@ class turning_layer(torch.nn.Module):
     self.residual_connection=layer_residual_connection(residual_type,self.pad_value)    
   
   def forward(self,x,mask_times):
+    #Projection
+    x=self.projection(x)
     #calc alpha
     #x: (B,T,F)
-    alpha=torch.matmul(x,self.weights_alpha) # B, T
+    alpha=torch.squeeze(torch.matmul(x,self.weights_alpha),dim=2)+self.bias_param # B, T
     alpha=self.act_fct(alpha)
-    alpha=360*torch.nn.functional.sigmoid(torch.clamp(alpha, min=-10, max=10)) #B
     alpha=torch.unsqueeze(alpha,dim=2)
     alpha=torch.unsqueeze(alpha,dim=3) # (B,T,1,1)
     alpha=alpha.expand((x.size(0),x.size(1),self.features,self.features)) #(B,T,F,F)
     #Calc Cosinus
     cosinus_value=torch.cos(alpha) #(B,T,F,F)
-    cos_weights=torch.unsqueeze(self.cos_weights,dim=0) #(1,F,F)
-    cos_weights=torch.unsqueeze(self.cos_weights,dim=0) #(1,1,F,F)
+    cos_weights=torch.unsqueeze(self.weights_cosinus,dim=0) #(1,F,F)
+    cos_weights=torch.unsqueeze(cos_weights,dim=0) #(1,1,F,F)
     cos_weights=cos_weights.expand(x.size(0),1,self.features,self.features)#(B,1,F,F)
-    cosinus_value=cos_factor*cosinus_value #(B, T, F, F)
+    cosinus_value=cos_weights*cosinus_value #(B, T, F, F)
     #Calc Sinus
     sinus_value=torch.sin(alpha) #(B,T,F,F)
-    sin_weights=torch.unsqueeze(self.sin_weights,dim=0) #(1,F,F)
-    sin_weights=torch.unsqueeze(self.sin_weights,dim=0) #(1,1,F,F)
+    sin_weights=torch.unsqueeze(self.weights_sinus,dim=0) #(1,F,F)
+    sin_weights=torch.unsqueeze(sin_weights,dim=0) #(1,1,F,F)
     sin_weights=sin_weights.expand(x.size(0),1,self.features,self.features)#(B,1,F,F)
     sinus_value=sin_weights*sinus_value #(B,1,F,F)
     #Final calculation
     turning_matrix=cosinus_value+sinus_value #(B,1, F, F)
-    xe=torch.unsqueeze(x,dim=1) #(B,1,T,F)
-    y=torch.matmul(turning_matrix, xe) #(B,1,T,F)
-    y=torch.squeeze(y,dim=1) #(B,T,F)
+    xe=torch.unsqueeze(x,dim=3) #(B,T,F,1)
+    y=torch.matmul(turning_matrix, xe) #(B,T,1,F)
+    y=torch.squeeze(y,dim=3) #(B,T,F)
 
     y,mask_times=self.normalization_layer(y,mask_times)
     y,mask_times=self.dropout(x=y,mask_times=mask_times)

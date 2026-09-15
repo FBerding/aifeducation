@@ -17,23 +17,6 @@ import numpy as np
 import math
 import safetensors
 
-#def create_ordinal_weights(targets):
-#  with torch.no_grad():
-#    n_classes=targets.size(1)
-#    class_idx=torch.argmax(targets,dim=1)+1
-#    class_idx=torch.unsqueeze(class_idx,dim=1)
-#    class_idx=class_idx.expand((class_idx.size(0),n_classes))
-#
-#    index_matrix=torch.arange(start=1,end=n_classes+1,step=1,dtype=class_idx.dtype, device=class_idx.device)
-#    index_matrix=torch.unsqueeze(index_matrix,dim=0)
-#    index_matrix=index_matrix.expand((class_idx.size(0),class_idx.size(1)))
-#    
-#    weights=torch.abs(index_matrix-class_idx)+1
-#    n_factors=torch.sum(weights,dim=1,keepdim=True)
-#    n_factors=n_factors.expand(weights.size())
-#    weights=weights/n_factors
-#    return weights
-
 def create_ordinal_weights(targets):
     n_classes = targets.size(1)
     class_idx = torch.argmax(targets, dim=1).detach()
@@ -190,3 +173,14 @@ class aem_loss_pt(torch.nn.Module):
       target=targets.float()
     ).mean()
     return loss    
+
+class feature_extractor_loss(torch.nn.Module):
+  def __init__(self):
+    super().__init__()
+    self.mse_loss=torch.nn.MSELoss()
+    self.cov_loss=calc_SquaredCovSum
+  def forward(self,input,target,latent_space):
+    input_n=torch.nn.functional.normalize(input, p=2.0, dim=2, eps=1e-12, out=None)
+    target_n=torch.nn.functional.normalize(target, p=2.0, dim=2, eps=1e-12, out=None)
+    loss=torch.sqrt(self.mse_loss(input_n,target_n)).mean()+self.cov_loss(latent_space)
+    return(loss)
