@@ -16,7 +16,7 @@ testthat::skip_if_not(
   message = "Folder with old models is not available"
 )
 
-versions <- c("1.0.1", "1.1.1")
+versions <- c("1.0.1", "1.1.1","x.x.x")
 
 for (version in versions) {
   test_that(paste("TEM", version), {
