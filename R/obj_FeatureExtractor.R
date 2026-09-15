@@ -46,6 +46,7 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param label `r get_param_doc_desc("label")`
     #' @param text_embeddings `r get_param_doc_desc("text_embeddings")`
     #' @param features `r get_param_doc_desc("features")`
+    #' @param te_n_layers `r get_param_doc_desc("te_n_layers")`
     #' @param method `r get_param_doc_desc("method")`
     #' @param orthogonal_method `r get_param_doc_desc("orthogonal_method")`
     #' @param noise_factor `r get_param_doc_desc("noise_factor")`
