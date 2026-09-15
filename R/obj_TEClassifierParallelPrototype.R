@@ -95,6 +95,7 @@ TEClassifierParallelPrototype <- R6::R6Class(
     #' @param metric_type `r get_param_doc_desc("metric_type")`
     #' @param embedding_dim `r get_param_doc_desc("embedding_dim")`
     #' @param projection_type `r get_param_doc_desc("projection_type")`
+    #' @param final_normalization_type `r get_param_doc_desc("final_normalization_type")`
     #' @return Function does nothing return. It modifies the current object.
     configure = function(name = NULL,
                          label = NULL,
@@ -153,7 +154,8 @@ TEClassifierParallelPrototype <- R6::R6Class(
                          merge_num_heads = 1L,
                          merge_normalization_type = "LayerNorm",
                          merge_pooling_features = 50L,
-                         merge_pooling_type = "MinMaxTimes",
+                         merge_pooling_type = "MinMaxTimes"                         ,
+                         final_normalization_type="PowerNorm",
                          embedding_dim = 2L) {
       arguments <- get_called_args(n = 1L)
       arguments$core_net_type <- "parallel"
@@ -223,7 +225,8 @@ TEClassifierParallelPrototype <- R6::R6Class(
         merge_pooling_features = as.integer(private$model_config$merge_pooling_features),
         merge_pooling_type = private$model_config$merge_pooling_type,
         embedding_dim = as.integer(private$model_config$embedding_dim),
-        core_net_type = private$model_config$core_net_type
+        core_net_type = private$model_config$core_net_type,
+        final_normalization_type=private$model_config$final_normalization_type
       )
       private$set_random_prototypes()
     },

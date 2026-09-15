@@ -80,6 +80,7 @@ TEClassifierSequential <- R6::R6Class(
     #' @param tf_normalization_type `r get_param_doc_desc("tf_normalization_type")`
     #' @param tf_normalization_position `r get_param_doc_desc("tf_normalization_position")`
     #' @param tf_residual_type `r get_param_doc_desc("tf_residual_type")`
+    #' @param final_normalization_type `r get_param_doc_desc("final_normalization_type")`
     #' @return Function does nothing return. It modifies the current object.
     configure = function(name = NULL,
                          label = NULL,
@@ -134,7 +135,8 @@ TEClassifierSequential <- R6::R6Class(
                          tf_parametrizations = "None",
                          tf_normalization_type = "LayerNorm",
                          tf_normalization_position = "Pre",
-                         tf_residual_type = "ResidualGate") {
+                         tf_residual_type = "ResidualGate",
+                         final_normalization_type="PowerNorm") {
       private$do_configuration(args = get_called_args(n = 1L))
     }
   ),
@@ -197,7 +199,8 @@ TEClassifierSequential <- R6::R6Class(
         tf_parametrizations = private$model_config$tf_parametrizations,
         tf_normalization_type = private$model_config$tf_normalization_type,
         tf_normalization_position = private$model_config$tf_normalization_position,
-        tf_residual_type = private$model_config$tf_residual_type
+        tf_residual_type = private$model_config$tf_residual_type,
+        final_normalization_type=private$model_config$final_normalization_type
       )
     },
     #--------------------------------------------------------------------------
