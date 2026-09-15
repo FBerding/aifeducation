@@ -1522,6 +1522,18 @@ get_param_dict <- function() {
     test_values = NULL
   )
 
+  param$te_n_layers <- list(
+    type = "int",
+    allow_null = FALSE,
+    min = 1L,
+    max = Inf,
+    allowed_values = NULL,
+    desc = "Number of layers.",
+    gui_box = "General Settings",
+    gui_label = "Number of Layers",
+    default_value = 3L,
+    test_values = c(2L, 3L)
+  )
 
   param$noise_factor <- list(
     type = "double",
@@ -1662,6 +1674,8 @@ get_param_dict <- function() {
   param$cls_input_normalize$default_value = "BatchNorm"
   param$cls_input_normalize$default_historic = "None"
   param$cls_input_normalize$test_values = NULL
+
+  param$final_normalization_type=param$normalization_type
 
   param$feat_normalization_type <- param$normalization_type
   param$feat_normalization_type$gui_box <- "Feature Layer"
