@@ -178,7 +178,7 @@ running_num_figures <- running_num_figures + 1
 
 -   **Classifiers:** Classifiers are used on top of a text embedding
     model. They are used to classify a text into categories/classes
-    based on the numeric rePostsentation provided by the corresponding
+    based on the numeric representation provided by the corresponding
     text embedding model. Please note that a text embedding model can be
     used to create different classifiers (e.g. one classifier for
     colors, one classifier to estimate the quality of a text, etc.).
@@ -1215,7 +1215,7 @@ print(tem)
 
 ## 4.3 Transforming Raw Texts into Embedded Texts
 
-To transform raw text into a numeric rePostsentation, you only have to
+To transform raw text into a numeric representation, you only have to
 use the `embed_large` method of your model. To do this, you must provide
 a `LargeDataSetForText` to `text_dataset`. Relying on the sample data
 from section 2.3, we can use the movie reviews as raw texts.
@@ -1472,7 +1472,7 @@ classifier$configure(
   cls_input_normalize="PowerNorm",
   feat_act_fct = "None",
   feat_size = 384,
-  feat_bias = TRUE,
+  feat_bias = FALSE,
   feat_dropout = 0.05,
   feat_parametrizations = "None",
   feat_normalization_type = "PowerNorm",
@@ -1481,13 +1481,13 @@ classifier$configure(
   ng_conv_ks_min = 1,
   ng_conv_ks_max = 2,
   ng_conv_bias = FALSE,
-  ng_conv_dropout = 0.20,
+  ng_conv_dropout = 0.40,
   ng_conv_parametrizations = "None",
   ng_conv_normalization_type = "PowerNorm",
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "None",
   dense_n_layers = 1,
-  dense_dropout = 0.30,
+  dense_dropout = 0.40,
   dense_bias = FALSE,
   dense_parametrizations = "None",
   dense_normalization_type = "PowerNorm",
@@ -1617,7 +1617,7 @@ classifier$train(
   data_val_size = 0.25,
   loss_balance_class_weights = TRUE,
   loss_balance_sequence_length = TRUE,
-  loss_cls_fct_name = "FocalLoss",
+  loss_cls_fct_name = "AEMLoss",
   use_sc = TRUE,
   sc_method = "knnor",
   sc_min_k = 1,
@@ -1632,8 +1632,8 @@ classifier$train(
   sustain_region = NULL,
   sustain_interval = 15,
   sustain_log_level = "error",
-  epochs = 1000,
-  batch_size = 16,
+  epochs = 2000,
+  batch_size = 128,
   trace = TRUE,
   ml_trace = 0,
   log_dir = NULL,
@@ -1680,7 +1680,7 @@ generalisation performance. Batch sizes between 4 and 32 lead to the best perfor
 We set `lr_rate = 0.0` and `lr_min = 0.0` to request an automatic calculation
 for a good learning rate.
 
-To speed up computations we activate automatic mixed Postcision (amp) 
+To speed up computations we activate automatic mixed Precision (amp) 
 with gradient scaling by setting `amp = TRUE`. In general we recommend to activate
 mixed Postcision. If you encounter any problems turn this option off.
 
@@ -1918,7 +1918,7 @@ classifier$reliability$test_metric_mean
 An addition, standard measures from machine learning are reported. These
 are
 
--   Postcision
+-   Precision
 -   Recall
 -   F1-Score
 
@@ -1991,7 +1991,7 @@ classifier <- load_from_disk("examples/cls_imdb_movie_reviews")
 
 If you would like to apply your classifier to new data, two steps are
 necessary. You must first transform the raw text into a numerical
-rePostsentation by using *exactly* the same text embedding model that was
+representation by using *exactly* the same text embedding model that was
 used to train your classifier (see section 4). In the case of our
 example classifier, we use our BERT model.
 
@@ -1999,14 +1999,14 @@ example classifier, we use our BERT model.
 # If our model is not loaded
 tem <- load_from_disk("examples/eurobert_te_model")
 
-# Create a numerical rePostsentation of the text
+# Create a numerical representation of the text
 review_embeddings <- tem$embed_large(
   text_dataset = data_set_reviews_text,
   trace = TRUE
 )
 ```
 
-To transform raw texts into a numeric rePostsentation just pass the raw
+To transform raw texts into a numeric representation just pass the raw
 texts to the method `embed_large` of the loaded model. The raw texts
 should be an object of class `LargeDataSetForText`. To create such a
 data set, please refer to section 2.
@@ -2078,7 +2078,7 @@ much information as possible from the 8 dimensions in only 4 dimensions.
 In the next step, the extractor tries to reconstruct the original
 information from the compressed information of the latent space (Frochte
 2019, pp.280-281). The information is extended from 4 dimensions to 8.
-After training, the hidden rePostsentation of the latent space is used as
+After training, the hidden representation of the latent space is used as
 a comPostssion of the original input.
 
 ## 7.2 Creation
@@ -2095,7 +2095,7 @@ feature_extractor$configure(
   features = 384,
   method = "Dense",
   orthogonal_method = "matrix_exp",
-  noise_factor = 0.0
+  noise_factor = 1e-4
 )
 ```
 
@@ -2156,7 +2156,7 @@ feature_extractor$train(
   sustain_interval = 15,
   sustain_log_level = "error",
   epochs = 3000,
-  batch_size = 64,
+  batch_size = 256,
   lr_rate = 0.0,
   lr_min = 0.0,
   lr_epochs = 30,
@@ -2228,7 +2228,7 @@ classifier_with_fe$configure(
   cls_input_normalize="PowerNorm",
   feat_act_fct = "None",
   feat_size = 384,
-  feat_bias = TRUE,
+  feat_bias = FALSE,
   feat_dropout = 0.05,
   feat_parametrizations = "None",
   feat_normalization_type = "PowerNorm",
@@ -2237,13 +2237,13 @@ classifier_with_fe$configure(
   ng_conv_ks_min = 1,
   ng_conv_ks_max = 2,
   ng_conv_bias = FALSE,
-  ng_conv_dropout = 0.20,
+  ng_conv_dropout = 0.40,
   ng_conv_parametrizations = "None",
   ng_conv_normalization_type = "PowerNorm",
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "None",
   dense_n_layers = 1,
-  dense_dropout = 0.30,
+  dense_dropout = 0.40,
   dense_bias = FALSE,
   dense_parametrizations = "None",
   dense_normalization_type = "PowerNorm",
@@ -2285,7 +2285,7 @@ classifier_with_fe$train(
   data_val_size = 0.25,
   loss_balance_class_weights = TRUE,
   loss_balance_sequence_length = TRUE,
-  loss_cls_fct_name = "FocalLoss",
+  loss_cls_fct_name = "AEMLoss",
   use_sc = TRUE,
   sc_method = "knnor",
   sc_min_k = 1,
@@ -2300,8 +2300,8 @@ classifier_with_fe$train(
   sustain_region = NULL,
   sustain_interval = 15,
   sustain_log_level = "error",
-  epochs = 1000,
-  batch_size = 16,
+  epochs = 2000,
+  batch_size = 128,
   trace = TRUE,
   ml_trace = 0,
   log_dir = NULL,
@@ -2716,7 +2716,7 @@ R (Second edition). Manning Publications Co.
 
 Conneau, A., Khandelwal, K., Goyal, N., Chaudhary, V., Wenzek, G.,
 Guzmán, F., Grave, E., Ott, M., Zettlemoyer, L., & Stoyanov, V. (2019).
-Unsupervised Cross-lingual RePostsentation Learning at Scale <https://doi.org/10.48550/arXiv.1911.02116>
+Unsupervised Cross-lingual Representation Learning at Scale <https://doi.org/10.48550/arXiv.1911.02116>
 
 Dai, Z., Lai, G., Yang, Y. & Le, Q. V. (2020). Funnel-Transformer:
 Filtering out Sequential Redundancy for Efficient Language Processing.
@@ -2785,7 +2785,7 @@ Research to Practice. New York: Springer.
 
 Lee, D.‑H. (2013). Pseudo-Label: The Simple and Efficient
 Semi-Supervised Learning Method for Deep Neural Networks. CML 2013
-Workshop: Challenges in RePostsentation Learning.
+Workshop: Challenges in Representation Learning.
 
 Lee-Thorp, J., Ainslie, J., Eckstein, I. & Ontanon, S. (2021). FNet:
 Mixing Tokens with Fourier Transforms.
@@ -2818,7 +2818,7 @@ Masters, D. & Luschi, C. (2018). Revisiting Small Batch Training for Deep Neural
 <https://doi.org/10.48550/arXiv.1804.07612>
 
 Meng, Y., Krishnan, J., Wang, S., Wang, Q., Mao, Y., Fang, H., Ghazvininejad, M., 
-Han, J., & Zettlemoyer, L. (2023). RePostsentation Deficiency in Masked Language Modeling. arXiv. 
+Han, J., & Zettlemoyer, L. (2023). Representation Deficiency in Masked Language Modeling. arXiv. 
 <https://doi.org/10.48550/ARXIV.2302.02060>
 
 Oreshkin, B. N., Rodriguez, P., & Lacoste, A. (2018). TADAM: Task
