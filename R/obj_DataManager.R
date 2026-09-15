@@ -501,20 +501,22 @@ DataManagerClassifier <- R6::R6Class(
     },
     #---------------------------------------------------------------------------
     #' @description Method for requesting the minimal number of cases over all folds
-    #' and over training, validation, and test data set.
+    #' and over training and validation. Test data is excluded.
     #' @return Returns an integer.
     get_min_n=function(){
       sample_list=self$get_samples()
       n_vector=vector()
       for(i in seq_along(sample_list)){
-        sub_list=sample_list[[i]]
+                          sub_list=sample_list[[i]]
         for (j in seq_along(sub_list)){
+          if (j<=2L){
           sub_sub_list=sub_list[[j]]
           if(!is.null(sub_sub_list)){
             n_vector=append(x=n_vector,
                             values = length(sub_sub_list)
                             )
           }
+        }
         }
       }
       min_n=min(n_vector,na.rm = TRUE)
