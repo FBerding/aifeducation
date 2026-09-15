@@ -57,6 +57,7 @@ TEFeatureExtractor <- R6::R6Class(
                          label = NULL,
                          text_embeddings = NULL,
                          features = 128L,
+                         te_n_layers=3,
                          method = "dense",
                          orthogonal_method = "matrix_exp",
                          noise_factor = 0.2) {
@@ -511,6 +512,7 @@ TEFeatureExtractor <- R6::R6Class(
           times = as.integer(private$text_embedding_model["times"]),
           features_in = as.integer(private$text_embedding_model["features"]),
           features_out = as.integer(private$model_config$features),
+          te_n_layers= as.integer(private$model_config$te_n_layers),
           noise_factor = private$model_config$noise_factor,
           pad_value = private$text_embedding_model$pad_value
         )
@@ -518,6 +520,7 @@ TEFeatureExtractor <- R6::R6Class(
         private$model <- feature_extractor <- py$DenseAutoencoder_with_Mask_PT(
           features_in = as.integer(private$text_embedding_model["features"]),
           features_out = as.integer(private$model_config$features),
+          te_n_layers= as.integer(private$model_config$te_n_layers),
           noise_factor = private$model_config$noise_factor,
           pad_value = private$text_embedding_model$pad_value,
           orthogonal_method = private$model_config$orthogonal_method

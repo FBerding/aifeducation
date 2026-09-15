@@ -694,7 +694,8 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         use_callback = use_callback,
         train_data = train_data,
         val_data = val_data,
-        test_data = test_data,
+        #test_data = test_data,
+        test_data = NULL,
         epochs = as.integer(self$last_training$config$epochs),
         sampling_separate = self$last_training$config$sampling_separate,
         sampling_shuffle = self$last_training$config$sampling_shuffle,
@@ -804,18 +805,10 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
       }
 
       # Adjust Ns and Nq to current frequencies
-      if(is.null(test_data)){
         min_total_freq <- min(
           min(table(extract_column_from_py_dataset(py_dataset = train_data, column_name = "labels", format = "R"))),
           min(table(extract_column_from_py_dataset(py_dataset = val_data, column_name = "labels", format = "R")))
         )-1
-      } else {
-        min_total_freq <- min(
-          min(table(extract_column_from_py_dataset(py_dataset = train_data, column_name = "labels", format = "R"))),
-          min(table(extract_column_from_py_dataset(py_dataset = val_data, column_name = "labels", format = "R"))),
-          min(table(extract_column_from_py_dataset(py_dataset = test_data, column_name = "labels", format = "R")))
-        )-1
-      }
 
       if (min_total_freq < (self$last_training$config$Ns + self$last_training$config$Nq)) {
         factor <- (self$last_training$config$Ns) / (self$last_training$config$Ns + self$last_training$config$Nq)

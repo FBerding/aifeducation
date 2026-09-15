@@ -85,6 +85,7 @@ TEClassifierParallelReferencePoint <- R6::R6Class(
     #' @param merge_normalization_type `r get_param_doc_desc("merge_normalization_type")`
     #' @param merge_times_pooling_type `r get_param_doc_desc("merge_times_pooling_type")`
     #' @param metric_type `r get_param_doc_desc("metric_type")`
+    #' @param final_normalization_type `r get_param_doc_desc("final_normalization_type")`
     #'
     #' @return Function does nothing return. It modifies the current object.
     configure = function(name = NULL,
@@ -145,7 +146,8 @@ TEClassifierParallelReferencePoint <- R6::R6Class(
                          merge_attention_type = "MultiHead",
                          merge_num_heads = 2L,
                          merge_normalization_type = "LayerNorm",
-                         merge_times_pooling_type = "MinMax"
+                         merge_times_pooling_type = "MinMax",
+                         final_normalization_type="PowerNorm"
                          ) {
       arguments <- get_called_args(n = 1L)
       arguments$core_net_type <- "parallel"
@@ -217,7 +219,8 @@ TEClassifierParallelReferencePoint <- R6::R6Class(
         merge_attention_type = private$model_config$merge_attention_type,
         merge_normalization_type = private$model_config$merge_normalization_type,
         merge_num_heads = as.integer(private$model_config$merge_num_heads),
-        merge_times_pooling_type = private$model_config$merge_times_pooling_type
+        merge_times_pooling_type = private$model_config$merge_times_pooling_type,
+        final_normalization_type=private$model_config$final_normalization_type
       )
     },
     #--------------------------------------------------------------------------

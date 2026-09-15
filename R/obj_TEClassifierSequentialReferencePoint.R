@@ -81,6 +81,7 @@ TEClassifierSequentialReferencePoint <- R6::R6Class(
     #' @param tf_normalization_position `r get_param_doc_desc("tf_normalization_position")`
     #' @param tf_residual_type `r get_param_doc_desc("tf_residual_type")`
     #' @param metric_type `r get_param_doc_desc("metric_type")`
+    #' @param final_normalization_type `r get_param_doc_desc("final_normalization_type")`
     #' @return Function does nothing return. It modifies the current object.
     configure = function(name = NULL,
                          label = NULL,
@@ -136,7 +137,8 @@ TEClassifierSequentialReferencePoint <- R6::R6Class(
                          tf_parametrizations = "None",
                          tf_normalization_type = "LayerNorm",
                          tf_normalization_position = "Pre",
-                         tf_residual_type = "ResidualGate") {
+                         tf_residual_type = "ResidualGate",
+                         final_normalization_type="PowerNorm") {
       arguments <- get_called_args(n = 1L)
       arguments$core_net_type <- "sequential"
       private$do_configuration(args = arguments)
@@ -203,7 +205,8 @@ TEClassifierSequentialReferencePoint <- R6::R6Class(
         tf_normalization_type = private$model_config$tf_normalization_type,
         tf_normalization_position = private$model_config$tf_normalization_position,
         tf_residual_type = private$model_config$tf_residual_type,
-        core_net_type = private$model_config$core_net_type
+        core_net_type = private$model_config$core_net_type,
+        final_normalization_type=private$model_config$final_normalization_type
       )
     },
     #--------------------------------------------------------------------------

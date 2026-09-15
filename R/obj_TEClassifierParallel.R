@@ -84,6 +84,7 @@ TEClassifierParallel <- R6::R6Class(
     #' @param merge_normalization_type `r get_param_doc_desc("merge_normalization_type")`
     #' @param merge_pooling_features `r get_param_doc_desc("merge_pooling_features")`
     #' @param merge_pooling_type `r get_param_doc_desc("merge_pooling_type")`
+    #' @param final_normalization_type `r get_param_doc_desc("final_normalization_type")`
     #' @return Function does nothing return. It modifies the current object.
     configure = function(name = NULL,
                          label = NULL,
@@ -141,7 +142,8 @@ TEClassifierParallel <- R6::R6Class(
                          merge_num_heads = 1L,
                          merge_normalization_type = "LayerNorm",
                          merge_pooling_features = 50L,
-                         merge_pooling_type = "MinMaxTimes") {
+                         merge_pooling_type = "MinMaxTimes",
+                         final_normalization_type="PowerNorm") {
       private$do_configuration(args = get_called_args(n = 1L))
     }
   ),
@@ -206,7 +208,8 @@ TEClassifierParallel <- R6::R6Class(
         merge_normalization_type = private$model_config$merge_normalization_type,
         merge_num_heads = as.integer(private$model_config$merge_num_heads),
         merge_pooling_features = as.integer(private$model_config$merge_pooling_features),
-        merge_pooling_type = private$model_config$merge_pooling_type
+        merge_pooling_type = private$model_config$merge_pooling_type,
+        final_normalization_type=private$model_config$final_normalization_type
       )
     },
     #--------------------------------------------------------------------------

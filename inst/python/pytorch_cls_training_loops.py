@@ -248,7 +248,7 @@ class ModelTrainer():
     self.log_top_total=log_top_total
     self.log_top_message=log_top_message
     #Loss
-    self.loss_fct=torch.nn.MSELoss()
+    self.loss_fct=feature_extractor_loss()
   def get_device(self):
     return 'cuda' if torch.cuda.is_available() else 'cpu'
   def get_device_type(self):
@@ -557,7 +557,6 @@ class ModelTrainer():
     
     idx_sample_end = self.n_classes * self.Ns
     idx_query_end = self.n_classes * (self.Ns + self.Nq)
-    
     with ctx:  
       for batch in dataloader:
         inputs=batch["input"]
@@ -624,9 +623,9 @@ class ModelTrainer():
           total_loss +=loss.item()
           pred_idx=outputs[0].detach().max(dim=1).indices.to(dtype=torch.long,device=self.device)
           label_idx=outputs[2].detach().to(dtype=torch.long,device=self.device)
-      
-      confusion_matrix+=multiclass_confusion_matrix(input=pred_idx,target=label_idx,num_classes=self.n_classes,normalize = None)
-      prob_confusion_matrix+=create_p_confusion_matrix(torch.nn.Softmax(dim=1)(outputs[0].detach()),label_idx=label_idx,num_classes=self.n_classes)
+          
+        confusion_matrix+=multiclass_confusion_matrix(input=pred_idx,target=label_idx,num_classes=self.n_classes,normalize = None)
+        prob_confusion_matrix+=create_p_confusion_matrix(torch.nn.Softmax(dim=1)(outputs[0].detach()),label_idx=label_idx,num_classes=self.n_classes)
       
       #Update log file
       self.logger.inc_value("bottom")
@@ -695,7 +694,7 @@ class ModelTrainer():
         #Calculate CLS Statistics
         loss=loss.detach()
         assert torch.isnan(loss).any, "NANs in loss detected."
-        output=output.detach()
+        output=output[0].detach()
         #Metrics
         total_loss +=loss.item()
         #Update log file
@@ -1138,7 +1137,9 @@ class ModelWithLoss(torch.nn.Module):
     return loss, outputs
   def train_and_eval_feature_extractor(self,static_input,static_target):
     output=self.model(static_input,encoder_mode=False)
-    loss=self.loss_fct(output,static_target).mean()
+    predictions=output[0]
+    latent_space=output[1]
+    loss=self.loss_fct(predictions,static_target,latent_space)
     return loss, output
 
 

@@ -25,6 +25,7 @@ editor_options:
 - Added options for data normalization before any data is passed to the net.
 - All classifiers now support compilation to speed up training.
 - Added a new method to plot classification performance across folds.
+- Added a final normalization layer to all models.
 
 **TEFeatureExtractor**
 

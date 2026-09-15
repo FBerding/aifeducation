@@ -48,7 +48,7 @@ test_that("stack_dense_layer", {
     dtype = values[[1]]$dtype,
     device = device,
     residual_type = "ResidualGate"
-  )$to(device)
+  )$to(device,dtype=values[[1]]$dtype)
   layer$eval()
 
   y <- layer(
