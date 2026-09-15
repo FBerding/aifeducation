@@ -29,98 +29,43 @@ script_time_start <- Sys.time()
 
 # 1 Introduction and Overview
 
-## 1.1 Postface
+## 1.1 Basic Concepts
 
-This vignette introduces the package *aifeducation* and its usage with
-*R* syntax. For users who are unfamiliar with *R* or those who do not
-have coding skills in relevant languages (e.g. python), we recommend to
-start with the graphical user interface *AI for Education - Studio* which
+This vignette introduces the aifeducation package and its usage with *R* syntax. We recommend that users who are unfamiliar with *R* or who lack coding skills in relevant languages (e.g. Python) start with the graphical user interface *AI for Education - Studio* which
 is described in the vignette [02 Using the graphical user interface
 Aifeducation - Studio](gui_aife_studio.html).
 
-We assume that *aifeducation* is installed as described in vignette [01
+We assume that *aifeducation* is installed as described in the vignette [01
 Get
 Started](https://fberding.github.io/aifeducation/articles/aifeducation.html).
-The introduction starts with a brief explanation of basic concepts,
-which are necessary to work with this package.
+The introduction begins with a brief explanation of the basic concepts necessary for working with this package.
 
-## 1.2 Basic Concepts
+In the social and educational sciences, it is important to attribute scientific concepts to observations. This enables researchers to comprehend the observation, generate new insights, and develop recommendations for research and practice.
 
-In the educational and social sciences, assigning scientific concepts to
-an observation is an important task that allows researchers to
-understand an observation, to generate new insights, and to derive
-recommendations for research and practice.
+In educational science, several areas deal with this kind of task. For example, diagnosing students' characteristics is an important part of a teacher's role and necessary for understanding and promoting learning.
+Another example is learning analytics, which uses data about students to create learning environments adapted to their individual needs. Similarly, educational institutions such as schools and universities can use this information to make data-driven decisions about performance (Laurusson & White 2014), as well as identifying areas for improvement. In any case, real-world observations are aligned with scientific models in order to apply scientific knowledge as a technology to improve learning and instruction.
 
-In educational science, several areas deal with this kind of task. For
-example, diagnosing students' characteristics is an important aspect of
-a teachers' profession and necessary to understand and promote learning.
-Another example is the use of learning analytics, where data about
-students is used to provide learning environments adapted to their
-individual needs. On another level, educational institutions such as
-schools and universities can use this information for data-driven
-performance decisions (Laurusson & White 2014) as well as where and how
-to improve it. In any case, a real-world observation is aligned with
-scientific models to use scientific knowledge as a technology for
-improved learning and instruction.
+Supervised machine learning is a concept that establishes a link between real-world observations and existing scientific models and theories (Berding et al. 2022). For educational science, this is advantageous because it enables researchers to apply AI using existing knowledge and insights. However, this approach has a drawback: training AI requires information about real-world observations and the corresponding alignment with scientific models and theories.
 
-Supervised machine learning is one concept that allows a link between
-real-world observations and existing scientific models and theories
-(Berding et al. 2022). For educational science, this is a great
-advantage because it allows researchers to use the existing knowledge
-and insights to apply AI. The drawback of this approach is that the
-training of AI requires both information about the real world
-observations and information on the corresponding alignment with
-scientific models and theories.
+Written texts are a valuable source of data in educational science, since textual data can be found almost everywhere in the realm of learning and teaching (Berding et al. 2022). For example, teachers often set tasks for students to complete in written form.
+Students then have to create a solution to the task, which they often document with a short written essay or presentation. This data can be used to analyse learning and teaching. Teachers' written tasks may provide insights into the quality of instruction, while students' solutions may provide insights into their learning outcomes and prerequisites.
 
-A valuable source of data in educational science are written texts,
-since textual data can be found almost everywhere in the realm of
-learning and teaching (Berding et al. 2022). For example, teachers often
-require students to solve a task which they provide in a written form.
-Students have to create a solution for the tasks which they often
-document with a short written essay or a Postsentation. This data can be
-used to analyze learning and teaching. Teachers' written tasks for their
-students may provide insights into the quality of instruction while
-students' solutions may provide insights into their learning outcomes
-and Postrequisites.
+AI can be a helpful assistant when it comes to analysing textual data, since this is a challenging and time-consuming task for humans.
 
-AI can be a helpful assistant in analyzing textual data since the
-analysis of textual data is a challenging and time-consuming task for
-humans.
+>Please note that this vignette does not cover an introduction to content analysis, natural language processing or machine learning.
+>If you would like to learn more, please refer to the cited literature.
 
-> Please note that an introduction to content analysis, natural language
-> processing or machine learning is beyond the scope of this vignette.
-> If you would like to learn more, please refer to the cited literature.
-
-Before we start, it is necessary to introduce a definition of our
-understanding of some basic concepts, since applying AI to educational
-contexts means to combine the knowledge of different scientific
-disciplines using different, sometimes overlapping, concepts. Even
-within a single research area, concepts are not unified. Figure `r running_num_figures`
-illustrates this package's understanding.
+Before we begin, we must introduce our definitions of some basic concepts, since applying AI to educational contexts involves combining knowledge from different scientific disciplines that use different — and sometimes overlapping — concepts. Even within a single research area, concepts are not unified.
+Figure `r running_num_figures` illustrates the approach adopted in this package.
 
 ![Figure `r running_num_figures`: Understanding of Central Concepts](classif_fig_01.png){width="100%"}
 ```{r, include = FALSE}
 running_num_figures <- running_num_figures + 1
 ```
 
-Since *aifeducation* looks at the application of AI for classification
-tasks from the perspective of the empirical method of content analysis,
-there is some overlapping between the concepts of content analysis and
-machine learning. In content analysis, a phenomenon like performance or
-colors can be described as a scale/dimension which is made up by several
-categories (e.g. Schreier 2012, pp. 59). In our example, an exam's
-performance (scale/dimension) could be "good", "average" or "poor". In
-terms of colors (scale/dimension) categories could be "blue", "green",
-etc. Machine learning literature uses other words to describe this kind
-of data. In machine learning, "scale" and "dimension" correspond to the
-term "label" while "categories" refer to the term "classes" (Chollet,
-Kalinowski & Allaire 2022, p. 114).
+Since *aifeducation* looks at the application of AI for classification tasks from the perspective of the empirical method of content analysis, there is some overlap between the concepts of content analysis and machine learning. In content analysis, phenomena such as performance or colours can be described as a scale or dimension made up of several categories (e.g. Schreier 2012, pp. 59). In our example, an exam performance could be described as "good", "average" or "poor". In terms of colours, categories could be "blue", "green", etc. The machine learning literature uses different terminology to describe this type of data. In machine learning, 'scale' and 'dimension' correspond to the term 'label', while 'categories' correspond to the term 'classes' (Chollet, Kalinowski & Allaire 2022, p. 114).
 
-With these clarifications, classification means that a text is assigned
-to the correct category of a scale or, respectively, that the text is
-labeled with the correct class. As Figure `r running_num_figures` illustrates, two kinds of
-data are necessary to train an AI to classify text in line with
-supervised machine learning principles.
+With these clarifications, classification means assigning a text to the correct category on a scale, or labelling the text with the correct class. As illustrated in Figure `r running_num_figures`, two types of data are required to train an AI to classify text in accordance with supervised machine learning principles.
 
 ![Figure `r running_num_figures`: Basic Structure of Supervised Machine Learning](classif_fig_02.png){width="100%"}
 
@@ -128,34 +73,24 @@ supervised machine learning principles.
 running_num_figures <- running_num_figures + 1
 ```
 
-By providing AI with both the textual data as input data and the
-corresponding information about the class as target data, AI can learn
-which texts imply a specific class or category. In the above exam
-example, AI can learn which texts imply a "good", an "average" or a
-"poor" judgment. After training, AI can be applied to new texts and
-predict the most likely class of every new text. The generated class can
-be used for further statistical analysis or to derive recommendations
-about learning and teaching.
+By providing AI with textual data as input and class-specific target data, it can learn to recognise texts that imply a specific class or category. In the above exam example, the AI can learn to recognise texts that imply a "good", "average" or "poor" judgement. Once trained, the AI can be applied to new texts to predict their class. This classification can then be used for further statistical analysis or to derive recommendations about learning and teaching.
 
-In use cases as described in this vignette, AI has to "understand"
-natural language: „Natural language processing is an area of research in
+In use cases as described in this vignette, AI has to "understand" natural language:
+„Natural language processing is an area of research in
 computer science and artificial intelligence (AI) concerned with
 processing natural languages such as English and Mandarin. This
 processing generally involves translating natural language into data
 (numbers) that a computer can use to learn about the world. (…)” (Lane ,
 Howard & Hapke 2019, p. 4)
 
-Thus, the first step is to transform raw texts into a a form that is
-usable for a computer, hence raw texts must be transformed into numbers.
-In modern approaches, this is usually done through word embeddings.
-Campesato (2021, p. 102) describes them as "the collective name for a
+Thus, the first step is to transform raw text into a form usable by a computer. This involves converting raw text into numbers.
+In modern approaches, this is typically achieved using word embeddings.
+Campesato (2021, p. 102) describes these as "the collective name for a
 set of language modeling and feature learning techniques (...) where
 words or phrases from the vocabulary are mapped to vectors of real
 numbers." The definition of a word vector is similar: „Word vectors
 rePostsent the semantic meaning of words as vectors in the context of the
-training corpus." (Lane, Howard & Hapke 2019, p. 191). In the next step,
-the words or text embeddings can be used as input data and the labels as
-target data when training AI to classify a text.
+training corpus." (Lane, Howard & Hapke 2019, p. 191). In the next step, the words or text embeddings can be used as the input data and the labels as the target data when training an AI system to classify text.
 
 In *aifeducation,* these steps are covered with three different types of
 models, as shown in Figure `r running_num_figures`.
@@ -166,44 +101,33 @@ models, as shown in Figure `r running_num_figures`.
 running_num_figures <- running_num_figures + 1
 ```
 
--   **Base Models:** The base models contain the capacities to
-    understand natural language. In general, these are transformers such
-    as BERT, RoBERTa, etc. A huge number of Post-trained models can be
-    found on [Hugging Face](https://huggingface.co/).
+-   **Base Models:** The base models have the ability to understand natural language. 
+    These are generally transformers such as BERT and RoBERTa. A large number of 
+    pre-trained models can be found on  [Hugging Face](https://huggingface.co/).
 
--   **Text Embedding Models:** The modes are built on top of base models
-    and store directions on how to use these base models for converting
-    raw texts into sequences of numbers. Please note that the same base
-    model can be used to create different text embedding models.
+-   **Text Embedding Models:** These models are built on top of base models and 
+    store instructions for using these base models to convert raw text into sequences 
+    of numbers. Please note that the same base model can be used to create different text embedding models.
 
--   **Classifiers:** Classifiers are used on top of a text embedding
-    model. They are used to classify a text into categories/classes
-    based on the numeric representation provided by the corresponding
-    text embedding model. Please note that a text embedding model can be
-    used to create different classifiers (e.g. one classifier for
-    colors, one classifier to estimate the quality of a text, etc.).
+-   **Classifiers:** Classifiers are used in conjunction with a text embedding model. 
+    They classify text into categories or classes based on the numeric representation 
+    provided by the corresponding text embedding model. Please note that a text embedding 
+    model can be used to create different classifiers (e.g. one for colours, one to estimate text quality, etc.).
 
 # 2 Start Working
 
 ## 2.1 Starting a New Session
 
-Before you can work with *aifeducation,* you must set up a new *R*
-session. First, you can load `aifeducation`.
-Second, it is necessary that you set up python via 'reticulate'
-and chose the environment where all necessary python libraries are
-available.  In case you installed
-python as suggested in vignette [01 Get started](aifeducation.html) you
-may start a new session like this:
+Before you can start working with *aifeducation*, you must set up a new R session. First, load aifeducation.
+Next, you need to set up Python via 'reticulate' and select the environment in which all the necessary Python libraries are available.  If you installed Python as suggested in vignette [01 Get started](aifeducation.html), you can start a new session like this:
 
 ```{r, include = TRUE, eval = TRUE}
 library(aifeducation)
 prepare_session()
 ```
 
-> Please remember: Every time you start a new session in *R,*
-> you have to load the library `aifeducation` and to configure python. 
-> We recommend to use the function `Postpare_session` because it performs all
-> necessary steps for setting up python correctly.
+>Please remember: Each time you start a new session in *R*, you must load the *aifeducation* library and configure Python. 
+>We recommend using the function 'prepare_session' because it performs all the necessary steps for correctly setting up Python.
 
 Now you can start your work.
 
@@ -212,34 +136,22 @@ Now you can start your work.
 ### 2.2.1 Introduction
 
 In the context of use cases for *aifeducation,* three different types of
-data are necessary: raw texts, text embeddings, and target data which
-rePostsent the categories/classes of a text.
+data are necessary: raw text, text embeddings and target data, which 
+represent the categories/classes of a text.
 
-To deal with the first two types and to allow the use of large data sets
-that may not fit into the memory of your machine, the packages ships
-with two specialized objects.
+To address the first two types and enable the use of large data sets that may exceed your machine's memory capacity, the package ships with two specialised objects.
 
-The first is `LargeDataSetForText`. Objects of this class are used to
-read raw texts from .txt, .pdf, and .xlsx files and store them for
-further computations. The second is `LargeDataSetForTextEmbeddings`
-which are used to store the text embeddings of raw texts which are
-generated with `TextEmbeddingModel`s. We will describe the
-transformation of raw texts into text embeddings later.
+The first is `LargeDataSetForText`. Objects of this class are used to read raw text from .txt, .pdf and .xlsx files and store it for further computations. The second is the `LargeDataSetForTextEmbeddings` class, which stores the text embeddings of raw texts generated with `TextEmbeddingModel`s. We will describe the transformation of raw texts into text embeddings later.
 
 ### 2.2.2 Raw Texts
 
-The creation of a `LargeDataSetForText` is necessary if you would like
-to create or train a base model or to generate text embeddings. In case
-you would like to create such a data set for the first time you have to
-create an empty data set first:
+You need to create a `LargeDataSetForText` if you want to create or train a base model or generate text embeddings. If you are creating such a dataset for the first time, you must first create an empty dataset.
 
 ```{r, include = TRUE, eval = FALSE}
 raw_texts <- LargeDataSetForText$new()
 ```
 
-To fill this object with raw texts
-different methods are available depending on the file type you use for
-storing raw texts.
+Different methods are available to fill this object with raw texts, depending on the file type used for storing them.
 
 **.txt files**
 
@@ -298,25 +210,13 @@ raw_texts$add_from_files_txt(
 )
 ```
 
-The data set will now read all the raw texts in the main folder and will
-assign every text the corresponding bib entry, license, etc. Please note
-that adding a `bib_entry.txt`, `license.txt`, `url_license.txt`,
-`text_license.txt`, and `url_soruce.text` to every folder is optional.
-If there is no such file in the corresponding folder, there will be an
-empty entry in the data set. However, against the backdrop of the
-European AI Act, we recommend to provide both the license and
-bibliographic information to make the documentation of your models more
-straightforward. Furthermore, some licenses such as those provided by
-Creative Commons require statements about the creators, a copyright
-note, a URL or link to the source material (if possible), the license of
-the material and a URL or link to the license's text on the internet or
-the license text itself. Please check the licenses of the material you
-are using for the requirements.
+The data set will now read all the raw texts in the main folder and assign each text the corresponding bibliographic entry, licence, etc. Please note that adding a bib_entry.txt, license.txt, url_license.txt, text_license.txt and url_source.txt to every folder is optional.
+If there is no such file in the corresponding folder, an empty entry will appear in the dataset. However, against the backdrop of the European AI Act, we recommend providing both the licence and bibliographic information to make documenting your models more straightforward. Furthermore, some licences, such as those provided by Creative Commons, require statements about the creators, a copyright note, a URL or link to the source material (if possible), the licence of the material, and a URL or link to the licence text online, or the licence text itself. Please check the licences of the material you are using to determine the specific requirements.
 
 **.pdf files**
 
 The second alternative is to use .pdf files as a source for raw texts.
-Here, the necessary structure is similar to .txt files:
+The necessary structure here is similar to that of .txt files:
 
 -   Create a main folder for storing your data.
 -   Store every raw text/document into a *single* .pdf file into its
@@ -360,7 +260,7 @@ Applying these rules may result in a data structure as follows:
         -   text_license.txt
         -   url_source.txt
 
-Please not that all files except the text file must be .txt, not .pdf.
+>Please note that all files except the text file should have a .txt extension, not a .pdf extension.
 
 Now you can call the method `add_from_files_pdf` by passing the path to
 the directory of the main folder to `dir_path`.
@@ -372,37 +272,26 @@ raw_texts$add_from_files_pdf(
 )
 ```
 
-As stated above, `bib_entry.txt`, `license.txt`, `url_license.txt`,
-`text_license.txt`, and `url_soruce.text` are optional.
+As stated above, `bib_entry.txt`, `license.txt`, `url_license.txt`, `text_license.txt` and `url_source.txt` are optional.
 
 **.xlsx files**
 
-The third alternative is to store the raw texts into .xlsx files. This
-alternative is useful if you have many small raw texts. For raw texts
-that are very large such as books or papers we recommend to store them
-as .txt or .pdf files.
+The third option is to save the raw texts as .xlsx files. This alternative is useful if you have many small raw texts. For very large texts, such as books or papers, we recommend storing them as .txt or .pdf files.
 
-In order to add raw texts from .xlsx files, the files need a special
-structure:
+In order to add raw text from .xlsx files, the files need a special structure:
 
--   Create a main folder for storing all .xlsx files you would like to
-    read.
--   All .xlsx files must contain the names of the columns in the first
-    row and the names must be identical for each column across all .xslx
-    files you would like to read.
--   Every .xslx files must contain a column storing the text ID and must
-    contain a column storing the raw text. Every text must have a unique
-    ID across all .xlsx files.
--   Every .xslx file can contain an additional column for the bib entry.
--   Every .xslx file can contain an additional column for the license.
--   Every .xslx file can contain an additional column for the license's
-    URL.
--   Every .xslx file can contain an additional column for the license's 
-    text.
--   Every .xslx file can contain an additional column for the source's
-    URL.
+-   Create a main folder for storing all the .xlsx files that you want to read.
+-   All .xlsx files must contain the names of the columns in the first row, and these names 
+    must be identical for each column across all the files you wish to read.
+-   Each .xlsx file must contain a column for storing the text ID and a column 
+    for storing the raw text. Every text must have a unique ID across all .xlsx files.
+-   Each .xlsx file can contain an additional column for the bibliographic entry.
+-   Every .xlsx file can contain an additional column for the licence.
+-   Every .xlsx file can contain an additional column for the licence URL.
+-   Every .xslx file can contain an additional column for the licence text.
+-   Every .xlsx file can contain an additional column for the source's URL.
 
-Your .xlsx file may look like
+Your .xlsx file might look something like this:
 
 | id | text | bib | license | url_license | text_license | url_source |
 |-----------|-----------|-----------|-----------|-----------|-----------|-----------|
@@ -410,9 +299,7 @@ Your .xlsx file may look like
 | a3 | This is a second example. | Author (2022) | CC BY | Example URL | Text | Example URL |
 | ... | ... | ... | ... |  |  |  |
 
-Now you can call the method `add_from_files_xlsx` by passing the path to
-the directory of the main folder to `dir_path`. Please do not forget to
-specify the column names for ID and text as well as for the other columns.
+You can now call the method `add_from_files_xlsx` by passing the path to the main folder directory to `dir_path`. Remember to specify the column names for ID and text, as well as for the other columns.
 
 ```{r, include = TRUE, eval = FALSE}
 raw_texts$add_from_files_xlsx(
@@ -428,28 +315,23 @@ raw_texts$add_from_files_xlsx(
 ```
 
 
-**Cleant text**
+**Clean text**
 
-For .txt and .pdf files you can set the argument `clean_text=TRUE`. This requests 
-an algorithm that should Post-process the raw texts and applies the following modifications:
-
+For .txt and .pdf files, set the argument `clean_text=TRUE`. This will prompt an algorithm to post-process the raw text and apply the following modifications:
+ 
 * Some special symbols are removed.
-* All spaces at the beginning and the end of a row are removed.
-* Multiple spaces are reduced to single space.
-* All rows with a number from 1 to 999 at the beginning or at the end are removed (header and footer).
-* List of content is removed.
-* Hyphenation is made undone.
+* All spaces at the beginning and end of a line are removed.
+* Multiple spaces are reduced to a single space.
+* All rows containing a number from 1 to 999 at the beginning or end (header and footer) are removed.
+* The list of contents is removed.
+* Hyphenation is undone.
 * Line breaks within a paragraph are removed.
 * Multiple line breaks are reduced to a single line break.
 
-The aim of these changes is to provide a clean plain text in order to increase
-the performance and quality of all analyses. 
+These changes aim to provide clean plain text to increase the performance and quality of all analyses.
 
 **IDs**
-In case of .xlsx files, the texts' IDs
-are set to the IDs stored in the corresponding column for ID. In case of
-.pdf and .txt files, the file names are used as ID (without the file
-extension).
+For .xlsx files, the text IDs are set to the IDs stored in the corresponding ID column. For .pdf and .txt files, the file names are used as the ID (without the file extension).
 
 > Please note that a consequence of this is that two files *text_01.txt*
 > and *text_01.pdf* have the same ID, which is not allowed. Please
@@ -457,9 +339,7 @@ extension).
 
 **Saving and loading a data set**
 
-Once you have create a `LargeDataSetForText` you can save your data to
-disk by calling the function `save_to_disk`. In our example the code
-would be:
+Once you have created a `LargeDataSetForText`, you can save your data to disk by calling the `save_to_disk` function. In our example, the code would be as follows:
 
 ```{r, include = TRUE, eval = FALSE}
 save_to_disk(
@@ -469,15 +349,9 @@ save_to_disk(
 )
 ```
 
-The argument `object` requires the object you would like to save. In our
-case this is `raw_texts`. With `dir_path` you specific the location
-where to save the object and with `folder_name` you define the name of
-the folder that will be created within that directory. In this folder
-the data set is saved.
+The argument `object` requires the object that you would like to save. In our case, this is 'raw_texts'. With `dir_path`, you specify the location in which to save the object, and with `folder_name`, you define the name of the folder that will be created within that directory. The data set is saved in this folder.
 
-To load an existing data set, you can call the function `load_from_disk`
-with the directory path where you stored the data. In our case this
-would be:
+To load an existing data set, call the function `load_from_disk` with the directory path where you stored the data. In our case, this would be:
 
 ```{r, include = TRUE, eval = FALSE}
 raw_text_dataset <- load_from_disk("examples/raw_texts")
@@ -487,20 +361,12 @@ Now you can work with your data.
 
 ### 2.2.3 Text Embeddings
 
-The numerical rePostsentations of raw texts (called text embeddings) are
-stored with objects of class `LargeDataSetForTextEmbeddings`. These
-kinds of data sets are generated by some models such as
-`TextEmbeddingModel`s. Thus, you will never need to create such a data
-set manually.
+The numerical representations of raw text, known as text embeddings, are stored with objects of the class `LargeDataSetForTextEmbeddings.` These kinds of data sets are generated by models such as `TextEmbeddingModel.` Therefore, it is not necessary to create such a data set manually.
 
-However, you will need this kind of data set to train a classifier or to
-predict the categories/classes of raw texts. Thus, it may be
-advantageous to save already transformed data. You can save and load an
-object of this class with the functions `save_to_disk` and
-`load_from_disk`.
+However, you will need this type of data set to train a classifier or predict the categories/classes of raw texts. Therefore, it may be advantageous to save transformed data. You can save and load an object of this class using the functions `save_to_disk` and `load_from_disk`.
 
 Let us assume that we have a `LargeDataSetForTextEmbeddings` called
-*text_embeddings*. Saving this object may look like:
+*text_embeddings*. Saving this object might look like this:
 
 ```{r, include = TRUE, eval = FALSE}
 save_to_disk(
@@ -510,8 +376,7 @@ save_to_disk(
 )
 ```
 
-The data set will be saved at `examples/text_embeddings`. Loading this data
-set may look like:
+The dataset will be saved in the 'examples/text_embeddings' folder. Loading this data set may look like this:
 
 ```{r, include = TRUE, eval = FALSE}
 new_text_embeddings <- load_from_disk("examples/text_embeddings")
@@ -519,33 +384,17 @@ new_text_embeddings <- load_from_disk("examples/text_embeddings")
 
 ### 2.2.4 Target Data
 
-The last data type necessary for working with `aifeducation` are the
-categories/classes of given raw texts. For this kind of data we
-currently do not provide a special object. You just need a *named*
-`factor` storing the classes/categories for a dimension. It is also
-important that the names equal the ID of the corresponding raw
-texts/text embeddings since matching the classes/categories to texts is
-done with the help of these names.
+The final data type required for working with *aifeducation* is the categories/classes of the raw text provided. We currently do not provide a special object for this kind of data. You just need a *named* `factor` storing the classes/categories for a dimension. It is also important that the names equal the ID of the corresponding raw texts/text embeddings, as matching the classes/categories to texts is done using these names.
 
 Saving and loading can be done with *R*'s functions `save` and `load`.
 
 ## 2.3 Example Data for this Vignette
 
-To illustrate the steps in this vignette, we cannot use data from
-educational settings since these data is generally protected by privacy
-policies. Therefore, we use a subset of the Standford Movie Review
-Dataset provided by Maas et al. (2011) which is part of the package. You
-can access the data set with `imdb_movie_reviews`.
+To illustrate the steps in this vignette, we cannot use data from educational settings, as such data are generally protected by privacy policies. Therefore, we have used a subset of the Stanford Movie Review Dataset, which was provided by Maas et al. (2011) and is included in the package. You can access the dataset with `imdb_movie_reviews.`
 
-We now have a data set with three columns. The first column contains the
-raw text, the second contains the rating of the movie (positive or
-negative), and the third column the ID of the movie review. About 200
-reviews imply a positive rating of a movie and about 100 imply a
-negative rating.
+We now have a dataset with three columns. The first contains the raw text, the second the rating of the film (positive or negative) and the third the ID of the film review. Approximately 200 reviews imply a positive rating of a film, and around 100 imply a negative rating.
 
-For this tutorial, we modify this data set by setting about 50 positive
-and 25 negative reviews to `NA`, indicating that these reviews are not
-labeled.
+In this tutorial, we will modify the data set by setting approximately 50 positive and 25 negative reviews to `NA`, to indicate that these reviews are unlabelled.
 
 ```{r, include = TRUE, eval = TRUE}
 example_data <- imdb_movie_reviews
@@ -554,18 +403,14 @@ example_data$label[c(76:100)] <- NA
 example_data$label[c(201:250)] <- NA
 table(example_data$label)
 ```
-
-We will now create a `LargeDataSetForText` from this `data.frame`.
-Before we can do this we must ensure that the `data.set` has all
-necessary columns:
+We will now create a `LargeDataSetForText` object from this `data.frame`.
+Before we can do this, however, we must ensure that the data set has all the necessary columns.
 
 ```{r, include = TRUE, eval = TRUE}
 colnames(example_data)
 ```
 
-Now we have to add two columns. For this tutorial we do not add any
-bibliographic or license information although this is recommended in
-practice.
+Now, we need to add two columns. For this tutorial, we will not be adding any bibliographic or licence information, although this is recommended in practice.
 
 ```{r, include = TRUE, eval = TRUE}
 example_data$bib_entry <- NA
@@ -573,8 +418,7 @@ example_data$license <- NA
 colnames(example_data)
 ```
 
-Now the `data.frame` is ready as input for our data set. The "label"
-column will not be included.
+The `data.frame` is now ready as input for our data set. The 'label' column will not be included.
 
 ```{r, include = TRUE, eval = TRUE}
 data_set_reviews_text <- LargeDataSetForText$new()
@@ -587,63 +431,41 @@ You can inspect the data set with `print`.
 print(data_set_reviews_text)
 ```
 
-We save the categories/labels within a separate factor.
+We save the categories/labels within a separate `factor`.
 
 ```{r, include = TRUE, eval = TRUE}
 review_labels <- as.factor(example_data$label)
 names(review_labels) <- example_data$id
 ```
 
-We will now use this data to show you how to use the different objects
-and functions in *aifeducation*.
+We will now use this data to demonstrate how to use the various objects and functions in *aifeducation*.
 
 # 3 Base Models
 
 ## 3.1 Overview
 
-Base models are the foundation of all further models in *aifeducation*.
-At the moment, these are transformer models such modernBERT (Warner et al. 2024), 
-MPNet (Song et al. 2020), BERT (Devlin et al. 2019), RoBERTa (Liu et al. 2019), and
-Funnel-Transformer (Dai et al. 2020). In general, these models are trained on
-a large corpus of general texts in the first step. In the next step, the
-models are fine-tuned to domain-specific texts and/or fine-tuned for
-specific tasks. Since the creation of base models requires a huge number
-of texts resulting in high computational time, it is recommended to use
-Post-trained models. These can be found on [Hugging
-Face](https://huggingface.co/). Sometimes, however, it is more
+Base models form the foundation of all subsequent models in *aifeducation*.
+Currently, these are Transformer models such as ModernBERT (Warner et al. 2024), MPNet (Song et al. 2020), BERT (Devlin et al. 2019), RoBERTa (Liu et al. 2019) and Funnel-Transformer (Dai et al. 2020). In general, these models are first trained on a large corpus of general texts. Next, the models are fine-tuned to domain-specific texts and/or specific tasks. As creating base models requires a large amount of text, resulting in high computational time, it is recommended to use pre-trained models. These can be found on [Hugging Face](https://huggingface.co/). However, sometimes it is more straightforward to create a new model to fit a specific purpose. Sometimes, however, it is more
 straightforward to create a new model to fit a specific purpose.
-*aifeducation* supports the option to both create and train/fine-tune
-base models.
+*aifeducation* supports the option to create and train/fine-tune base models.
 
-In this chapter we concentrate on creating a new model. The usage of a Post-trained model
-from [Hugging Face](https://huggingface.co/) is described in chapter 4.
+In this chapter, we focus on developing a new model. Chapter 4 describes the use of a pre-trained model from [Hugging Face](https://huggingface.co/). Each transformer model comprises two parts: 
 
-Every transformer model is composed of two parts: 
-
-1. the tokenizer which
-  splits raw texts into smaller pieces to model a large number of words
-  with a limited, small number of tokens and 
-2. the neural network that is
-  used to model the capabilities for understanding natural language.
+1.  The tokenizer, which splits raw text into smaller pieces in order to model a large number of 
+    words using a limited number of tokens.
+2.  The neural network, which is used to model the capability to understand natural language.
 
 ## 3.2 Creation of a Tokenizer
 
-The first stept is to set up a tokenizer.
-
-In *aifeducation* you can choose between different models. In this example we use
-a WordPieceTokenizer. To create a new one we first call the method `new`.
+The first step is to set up a tokenizer. In *aifeducation*, you can choose from a variety of models. In this example, we use a `WordPieceTokenizer.` To create a new tokenizer, we first call the `new` method.
 
 ```{r, include = TRUE, eval = TRUE}
 tokenizer <- WordPieceTokenizer$new()
 ```
 
-Now we have an empty tokenizer which we can configure by calling the corresponding method.
-The available parameter depend on the kind of tokenizer. In the case of a WordPieceTokenizer
-we have only two options. The first, `vocab_size` determines how many tokens the 
-tokenizer should know. The second determines if all words should be transformed to lower case 
-before tokenization. since we use only a very small data set for illustrating the usage of the
-package we set `vocab_size = 200`. In real case applications this value should be larger.
-You can find more information on this topic in vignette [04 Model configuration and training](model_configuration.html).
+We now have an empty tokenizer that can be configured by calling the relevant method.
+The available parameters depend on the type of tokenizer. In the case of a `WordPieceTokenizer`, we only have two options. The first, `vocab_size`, determines how many tokens the tokenizer should recognise. The second (`vocab_do_lower_case`) determines whether all words should be transformed to lowercase before tokenization. Since we are only using a very small data set to illustrate the usage of the package, we set `vocab_size = 200`. In real-world applications, this value should be larger.
+You can find more information on this topic in the vignette [04 Model configuration and training](model_configuration.html).
 
 ```{r, include = TRUE, eval = TRUE}
 tokenizer$configure(
@@ -652,22 +474,11 @@ tokenizer$configure(
 )
 ```
 
-In the next step we have to train the model by calling the method `train`. Here
-we pass a dataset for text to the parameter `text_dataset`. This raw text is used
-to train the model. 
+The next step is to train the model by calling the `train` method. Here, we pass a text data set to the parameter `text_dataset`. This raw text is then used to train the model. 
 
-In addition, we can set up sustainability tracking of this process to estimate its 
-ecological impact with help of the python
-library `codecarbon`. Thus, `sustain_track` is set to `TRUE` by default.
-If you use the sustainability tracker you must provide the alpha-3 code
-for the country where your computer is located (e.g., "CAN"="Canada",
-"DEU"="Germany"). A list with the codes can be found on
-[Wikipedia](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3). The
-reason is that different countries use different sources and techniques
-for generating their energy resulting in a specific impact on CO2
-emissions. For the USA and Canada you can additionally specify a region
-by setting `sustain_region`. Please refer to the documentation of
-`codecarbon` for more information.
+In addition, we can use the Python library `codecarbon` to set up sustainability tracking of this process and estimate its ecological impact. Therefore, the `sustain_track` parameter is set to `TRUE` by default.
+If you use the sustainability tracker, you must provide the three-letter code for the country in which your computer is located (e.g. "CAN" for Canada, "DEU" for Germany). You can find a list of these codes on
+[Wikipedia](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3). This is because different countries use different sources and techniques for generating energy, resulting in a specific impact on CO₂ emissions. For the USA and Canada, you can also specify a region by setting sustain_region. Please refer to the 'codecarbon' documentation for more information.
 
 ```{r, include = TRUE, eval = TRUE}
 tokenizer$train(
@@ -682,10 +493,7 @@ tokenizer$train(
 )
 ```
 
-Training a tokenizer is a very fast process. Thus, even for a huge number of texts
-the computations should take only some minutes.
-
-Now the model is ready to use. At the beginning we can explore some tokenizer statistics.
+Training a tokenizer is a very fast process. Therefore, even a large quantity of texts should only take a few minutes to process. The model is now ready to use. Initially, we can explore some tokeniser statistics.
 
 ```{r, include = TRUE, eval = TRUE}
 # We use t() to improve the readability of the table
@@ -696,20 +504,16 @@ t(tokenizer$get_tokenizer_statistics())
 mu_g <- tokenizer$get_tokenizer_statistics()$mu_g
 ```
 
-In this table you can see an estimation of the number of words for the whole training data set,
-the total number of tokens resulting from the raw texts and the number of sequences 
-if the length of a sequence is limited to the value shown in the column 'max_token_length'.
-Furthermore, you can see the three statistics proposed by Kaya and Tantug (2024, p.5).
-$\mu_t$ refers to the average number of tokens per sequence, $\mu_w$ refers to the
-average number of words per sequence, and $\mu_g$ refers to the average number of tokens per word.
-$\mu_g$ is called the tokenizer granularity rate and describes how many tokens are
-necessary to rePostsent a single word. This value is very important as a higher value implies
-that the same text is spitted into a longer sequence of tokens than for a tokenizer
-with a lower value. Since large language models have a maximum limit on the length
-of a token sequence this value has in impact on how many words of a text can be 
-processed by a base model. 
+This table provides an estimation of the number of words in the entire training dataset, the total number of tokens resulting from the raw texts, and the number of sequences if the length of a sequence is limited to the value shown in the 'max_token_length' column.
+Furthermore, the three statistics proposed by Kaya and Tantug (2024, p. 5) are shown.
 
-If you would like to see how the tokenizer works you can call the method 'encode'.
+- $\mu_t$ refers to the average number of tokens per sequence, 
+- $\mu_w$ refers to the average number of words per sequence, and 
+- $\mu_g$ refers to the average number of tokens per word.
+
+The tokenizer granularity rate, $\mu_g$, describes how many tokens are necessary to represent a single word. This value is important because a higher value means that the same text is split into a longer sequence of tokens than with a tokenizer with a lower value. Since large language models have a maximum limit on the length of a token sequence, this value impacts how many words of a text can be processed by a base model.
+
+To see how the tokenizer works, call the `encode` method.
 
 ```{r, include = TRUE, eval = TRUE}
 tokenizer$encode(
@@ -718,8 +522,8 @@ tokenizer$encode(
   token_to_int = FALSE
 )
 ```
-Here you can see that the tokenizer split the words into several tokens and adds
-some special tokens.
+
+As you can see here, the tokenizer splits the words into several tokens and adds some special tokens.
 
 ```{r, include = TRUE, eval = TRUE}
 tokenizer$encode(
@@ -728,12 +532,11 @@ tokenizer$encode(
   token_to_int = TRUE
 )
 ```
-If you change the parameter `token_to_int = TRUE` you receive the same result but
-instead of the tokens you get the index of the token in the tokenizer's vocabulary.
-For example the id 0 refers to the token [CLS] in this example.
 
-In the case you have a sequence of id and would like to know which tokens belong 
-to these numbers you can call the method `decode`.
+Changing the parameter to `token_to_int = TRUE` produces the same result, but instead of the tokens, you get the index of the token in the tokenizer's vocabulary.
+For example, in this example, the ID 0 refers to the token [CLS].
+
+If you have a sequence of IDs and would like to know which tokens correspond to these numbers, you can call the `decode` method.
 
 ```{r, include = TRUE, eval = TRUE}
 tokenizer$decode(
@@ -741,18 +544,17 @@ tokenizer$decode(
   to_token = TRUE
 )
 ```
-If you would like to analyse the ecological impact of training the tokenizer you
-can  get an estimation of energy consumption and CO2-emission.
+
+If you would like to analyse the ecological impact of training the tokenizer, you can get an estimate of the energy consumption and CO₂ emissions involved.
 
 ```{r, include = TRUE, eval = TRUE}
 # We use t() to improve the readability of the table
 t(tokenizer$get_sustainability_data("training"))
 ```
 
-Since tokenizers can be trained very efficient these values will be very low in most cases.
+Since tokenizers can be trained very efficiently, these values will usually be very low.
 
-Finally, you can save and load your model. This is done for all object with
-the function pair `save_to_disk` and `load_from_disk`.
+Finally, you can save and load your model. This is done for all objects using the functions `save_to_disk` and `load_from_disk`.
 
 ```{r, include = TRUE, eval = TRUE}
 save_to_disk(
@@ -776,11 +578,7 @@ Now you are ready to create a base model.
 
 ## 3.3 Creating a BaseModel
 
-At the beginning you can choose between the different supported
-transformer architectures. Depending on the architecture, you have
-different options determining the shape of your neural network. For this
-vignette we use a BERT (Devlin et al. 2019) model which can be created
-with the function `aife_transformer.make`. 
+At the outset, you can select from the various supported transformer architectures. Depending on the architecture chosen, different options are available for determining the shape of your neural network. For this vignette, we use a BERT model (Devlin et al. 2019).
 
 ```{r, include = TRUE, eval = TRUE}
 base_model_bert <- BaseModelBert$new()
@@ -797,37 +595,23 @@ base_model_bert$configure(
 )
 ```
 
-We first create an empty model with `new`. In the next step you can configure your model.
-The available parameter depend on the type of model. In this example we
-create a model with 4 hidden layers, a hidden size of 64, and 4 attention heads. The maximum length
-of the sequence of tokens is 512. Since the tokenizer granularity rate is `r mu_g` this
-allows the model to process a sequence of average  `r mu_g*512` words.
+First, we create an empty model with 'new'. You can then configure your model in the next step.
+The available parameters depend on the model type. In this example, we create a model with four hidden layers, a hidden size of 64 and four attention heads. The maximum sequence length is 512 tokens. 
+Since the tokenizer granularity rate is `r mu_g` this
+allows the model to process an average of `r mu_g*512` words.
 
-Please note that with `max_position_embeddings` you determine how many
-tokens your transformer can process. If your text has more tokens, these
-tokens are ignored. However, if you would like to analyze long
-documents, please avoid to increase this number too significantly
-because the computational time does not increase in a linear way but
-quadratic (Beltagy, Peters & Cohan 2020). For long documents you can use
-another architecture of BERT (e.g. Longformer from Beltagy, Peters &
-Cohan 2020) or split a long document into several chunks which are used
-sequentially for classification (e.g. Pappagari et al. 2019). Using
-chunks is supported by *aifedcuation* for all models.
+Please note that the value of the `max_position_embeddings` parameter determines how many tokens your transformer can process. If your text contains more tokens than this number, the additional tokens are ignored. However, if you would like to analyse long documents, please avoid increasing this number too significantly because the computational time increases quadratically rather than linearly (Beltagy, Peters & Cohan 2020). For long documents, you can use another Transformer architecture (e.g. Longformer, Beltagy, Peters & Cohan 2020), or split a long document into several sequential chunks for classification (e.g. Pappagari et al. 2019). Using chunks is supported by *aifedcuation* for all models.
 
-The parameter `tokenizer` requires an tokenizer object. Here we use the model
-created in section 3.2.
+The parameter `tokenizer` requires a tokenizer object. Here, we use the model created in Section 3.2.
 
 > The vignette [04 Model configuration and training](model_configuration.html)
 > provides details on how to configure a base model.
 
-Now your model is ready. You can save it with the function `save_to_disk` or continue
-with training. 
+Your model is now ready. You can either save it using the `save_to_disk` function or continue with training.
 
 ## 3.3 Train/Fine-Tune a Base Model
 
-If you would like to train a new base model (see section 3.2) for the
-first time or want to adapt a Post-trained model to a domain-specific
-language or task, you can call the corresponding `train`-method. 
+If you want to train a new base model for the first time (see section 3.2) or adapt a pre-trained model to a domain-specific language or task, you can call the corresponding `train` method.
 
 ```{r base_model_bert$train, include = TRUE, eval = TRUE}
 base_model_bert$train(
@@ -853,43 +637,24 @@ base_model_bert$train(
 )
 ```
 
-The data for training must be passed to `text_dataset`. This object should be of class
-`LargeDataSetForText` as described in section 2.2.2.
-In this example we use the text from the movie reviews. Please note, that this data set 
-is to small for training a new transformer. We use this here only for a fast running illustration. 
-For real use cases a larger data set is necessary. 
+The data for training must be passed to `text_dataset`. This object should be of the `LargeDataSetForText` class, as described in Section 2.2.2.
+In this example, we use text from movie reviews. Please note that this data set is too small for training a new Transformer. We are using it here only to provide a quick demonstration. 
+For real use cases, a larger data set is necessary.
 
-In case of a
-Bert model, the learning objective is *Masked Language Modeling*. 
-Other
-models may use other learning objectives. Please refer to the
-documentation for more details on every model.
-You set the way masking is done
-with `p_mask` and `whole_word`. In the case of `whole_word=FALSE` a number of tokens is masked.
-In the case of `whole_word=TRUE` all tokens belonging to a specific number of words are masked. 
-The number of words/tokens is chosen with `p_mask`. 
+For a Bert model, the learning objective is masked language modelling. 
+Other models may use different learning objectives. Please refer to the documentation for more details on each model.
+You can set how masking is done using the `p_mask` and `whole_word` parameters. If `whole_word` is set to `FALSE`, a number of tokens are masked. If `whole_word` is set to `TRUE`, all tokens belonging to a specific number of words are masked. The number of words/tokens is chosen using `p_mask`.
 
-You can set the length of token sequences with `max_sequence_length` leading the tokenizer
-to split long texts into several sequences with the given size. With `val_size`, 
-you set how many of the generated sequences should be used for the validation sample. 
+You can set the length of token sequences using the `max_sequence_length` parameter, which instructs the tokenizer to split long texts into several sequences of the specified size. Using the `val_size` parameter, you can specify how many of the generated sequences should be used for the validation sample.
 
-Since creating a transformer model is energy consuming, *aifeducation*
-allows you to estimate its ecological impact with help of the python
-library `codecarbon`. Thus, `sustain_track` is set to `TRUE` by default.
-If you use the sustainability tracker you must provide the alpha-3 code
-for the country where your computer is located (e.g., "CAN"="Canada",
-"DEU"="Germany"). A list with the codes can be found on
-[Wikipedia](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3). The
-reason is that different countries use different sources and techniques
-for generating their energy resulting in a specific impact on CO2
-emissions. For the USA and Canada you can additionally specify a region
-by setting `sustain_region`. Please refer to the documentation of
-`codecarbon` for more information.
+Since creating a transformer model is energy-consuming, *aifeducation*
+allows you to estimate its ecological impact with the help of the Python library 'codecarbon.' Thus, the `sustain_track` parameter is set to `TRUE` by default.
+If you use the sustainability tracker, you must provide the three-letter code for the country in which your computer is located (e.g. "CAN" for Canada, "DEU" for Germany). You can find a list of these codes on
+[Wikipedia](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3). This is because different countries use different sources and techniques for generating energy, resulting in a specific impact on CO₂ emissions. For the USA and Canada, you can also specify a region by setting `sustain_region`. Please refer to the 'codecarbon' documentation for more information.
 
-If you work on a machine and your graphic device only has small memory
-capacity, please reduce the batch size significantly. 
+If you are working on a machine with a small memory capacity, please reduce the batch size significantly.
+Once the training is complete, you can save the entire model using the `save_to_disk` function.
 
-After training has finished you can save the entire model with `save_to_disk`.
 
 ```{r, include = TRUE, eval = TRUE}
 save_to_disk(
@@ -899,12 +664,13 @@ save_to_disk(
 )
 ```
 
-To use the model you can load it with
+To use the model, load it with
+
 ```{r, include = TRUE, eval = TRUE}
 base_model_bert <- load_from_disk("examples/example_base_model_bert")
 ```
 
-In order to use the model for the fill-mask task you can call `fill_mask`.
+To use the model for the fill-mask task, call the `fill_mask` method
 
 ```{r, include = TRUE, eval = TRUE}
 base_model_bert$fill_mask(
@@ -913,9 +679,8 @@ base_model_bert$fill_mask(
 )
 ```
 
-Here you can provide a text with a mask token indicating the gab the model should close.
-As a result you get the logits, the token id and the concrete token the model suggests to
-replace the mask token with.
+Here, you can provide a text containing a masked token to indicate the gap that the model should fill.
+In return, you will receive the logits, the token ID and the specific token that the model suggests replacing the mask token with.
 
 You get a short summary of an object of this class with `print`.
 
@@ -925,11 +690,11 @@ print(base_model_bert)
 
 ## 3.4 Analyzing a BaseModel
 
-If you would like to further investigate a base model you can use some specific methods.
+If you would like to investigate a base model further, you can use specific methods for this purpose.
 
 **Training History**
 
-A plot of the training history of the last training can be shown as follows:
+The training history from the last training session can be displayed as follows:
 
 ```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Example of a Training History for a BaseModel.")}
 base_model_bert$plot_training_history(
@@ -943,22 +708,18 @@ running_num_figures <- running_num_figures + 1
 
 **Sustainability of Training**
 
-To explore the ecological impact of the training and fine-tuning of a model you can
-call `get_sustainability_data("training")`.
+To explore the ecological impact of training and fine-tuning a model, call  `get_sustainability_data("training")`.
 
 ```{r, include = TRUE, eval = TRUE}
 # We use t() to improve the readability of the table
 t(base_model_bert$get_sustainability_data("training"))
 ```
 
-The resulting table provides you detailed information on every single training run with
-active sustainability tracking.
+The resulting table provides detailed information on every training run, with active sustainability tracking.
 
 **Sustainability of Inference**
 
-Not only the ecological impact of the training is important but also the energy
-consumption and CO2-emission during inference. You can estimate the ecological impact
-by calling the method `estimate_sustainability_inference_fill_mask`.
+The ecological impact of the training is important, as are the energy consumption and CO2 emissions during inference. You can estimate the ecological impact by calling the `estimate_sustainability_inference_fill_mask` method.
 
 ```{r, include = TRUE, eval = TRUE}
 base_model_bert$estimate_sustainability_inference_fill_mask(
@@ -972,11 +733,7 @@ base_model_bert$estimate_sustainability_inference_fill_mask(
 )
 ```
 
-Here can you provide a text data set which forms the base for estimating the 
-energy conspumtion during a fill-mask task. With `n` you determine the number of
-texts to be used.
-
-The results of every run can be accessed via `get_sustainability_data("inference")`.
+Here, you can provide a text dataset which forms the basis for estimating energy consumption during a fill-mask task. You determine the number of texts to be used with `n`. The results of each run can be accessed using the command `get_sustainability_data("inference")`.
 
 ```{r, include = TRUE, eval = TRUE}
 # We use t() to improve the readability of the table
@@ -994,27 +751,20 @@ table.
 t(base_model_bert$get_flops_estimates())
 ```
 
-At the moment only an architecture-based approach is available. The number of FLOPS
-is not counted directly. Instead it is estimated approximately. The column 'flops_bp_1'
-describes the number of FLOPS for all forwand and backward passes.
+Currently, only an architecture-based approach is available. The number of FLOPS is not counted directly. Instead, it is estimated approximately. The 'flops_bp_1' column describes the number of FLOPS for all forward and backward passes.
 
-Kaplan et al. (2020, p. 7) propose that as a rule of thumb the backward pass has the
-FLOPS of the forward pass multiplied with factor 2. The resulting FLOPS for all
-forward and backward passes of a training run are shown in column 'flops_bp_2'. 
+Kaplan et al. (2020, p. 7) propose that, as a rule of thumb, the backward pass has FLOPS equal to those of the forward pass multiplied by 2. The resulting FLOPS for all forward and backward passes in a training run are shown in column 'flops_bp_2'.
 
-All columns do **not** include computations for a validation or test sample.
+None of the columns include computations for a validation or test sample.
 
 ## 3.5 Creating a BaseModel from Hugging Face
 
-In the case you would like to use a Post-trained model from hugging face you can
-create a base model as follows:
+If you would like to use a pre-trained model from Hugging Face, you can create a base model as follows:
 
-- Chose a model on Hugging Face. Please ensure that the model's architecture is 
-  supported by *aifeducation*.
-- Download the relevant files (model and tokenizer) into a folder on your machine.
+- Choose a model on Hugging Face. Ensure that the model's architecture is supported by *aifeducation.*
+- Download the relevant files (model and tokeniser) into a folder on your machine.
 - Create an empty base model for the corresponding architecture.
-- Call the method `create_from_hf` and provide the path the the folder where you stored
-  the model and the tokenizer.
+- Call the method `create_from_hf` and provide the path to the folder where you stored the model and tokenizer.
 
 ```{r, include = TRUE, eval = FALSE}
 base_model_bert_hf <- BaseModelBert$new()
@@ -1024,45 +774,26 @@ base_model_bert_hf$create_from_hf(
 )
 ```
 
-Now you can use the model as all other base models in *aifedcuation*. For example, you
-can train the model as described above or you can use the model as foundation for a 
-TextEmbeddingModel.
+You can now use the model in the same way as all the other base models in *aifedcuation.* For example, you can train the model as described above, or use it as the basis for a `TextEmbeddingModel`.
 
 # 4 Text Embedding Models
 
 ## 4.1 Introduction
 
-The text embedding model is used to transform raw texts into numerical rePostsentations. 
-In order to create a new model, you need a base model that provides the
-ability to understand natural language. A text embedding model is stored
-as an object of class `TextEmbeddingModel`. 
+The text embedding model transforms raw text into numerical representations. 
+To create a new model, you need a base model with the ability to understand natural language. A text embedding model is stored as an object of the class `TextEmbeddingModel`.
 
-In *aifedcuation*, the transformation of raw texts into numbers is a
-separate step from downstream tasks such as classification. This is to
-reduce computational time on machines with low performance. By
-separating text embedding from other tasks, the text embedding has to be
-calculated only once and can be used for different tasks at the same
-time. Another advantage is that the training of the downstream tasks
-involves only the downstream tasks an not the parameters of the
-embedding model, making training less time-consuming, thus decreasing
-computational intensity. Finally, this approach allows the analysis of
-long documents by applying the same algorithm to different parts of a text.
+In *aifeducation*, the process of converting raw text into numerical data is a separate step from downstream tasks such as classification. This reduces computational time on low-performance machines. By separating text embedding from other tasks, the embedding only needs to be calculated once and can be used for different tasks simultaneously. Another advantage is that training the downstream tasks involves only the tasks themselves and not the parameters of the embedding model, making training less time-consuming and decreasing computational intensity. Finally, this approach enables long documents to be analysed by applying the same algorithm to different parts of a text.
 
-The text embedding model provides a unified interface: After creating
-the model with different methods, the handling of the model is always
-the same.
+The text embedding model provides a unified interface. After creating the model using different methods, it is always handled in the same way.
 
 ## 4.2 Create a Text Embedding Model
 
-First you have to choose the base model that forms the foundation of
-your new text embedding model. 
-In order to illustrate its use we 
-apply a Post-trained model from [Hugging Face](https://huggingface.co/) called 
-[EuroBERT-210m](https://huggingface.co/EuroBERT/EuroBERT-210m).
-It is based on the work by Boizard et al. (2025). 
-Download all files into a new folder. Here we store the model in  `"examples/EuroBERT-210m"`.
+First, you must choose the base model on which your new text embedding model will be built. 
+To illustrate its use, we apply a pre-trained model from [Hugging Face](https://huggingface.co/) called [EuroBERT-210m](https://huggingface.co/EuroBERT/EuroBERT-210m).It is based on the work by Boizard et al. (2025). 
+Download all the files into a new folder. We will store the model here: `"examples/EuroBERT-210m"`.
 
-We first load the base model as described in section 3.
+As described in Section 3, we first load the base model.
 
 ```{r, include = TRUE, eval = TRUE}
 base_model_eurobert <- BaseModelEuroBert$new()
@@ -1072,41 +803,20 @@ base_model_eurobert$create_from_hf(
 )
 ```
 
-Now we can create the TextEmbeddingModel. At the beginning we have to chose
-a value for `chunks` and for `overlap`.
-Using a transformer model for text embedding is not a problem since your text
-does not provide more tokens than the transformer can process. This
-maximum value is set in the configuration of the transformer (see
-section 3.3). We can request a base model's maximum sequence length with:
+Now, we can create the `TextEmbeddingModel`. First, we need to choose a value for both `chunks` and `overlap`.
+Using a transformer model for text embedding is not a problem, as long as your text does not contain more tokens than the transformer can process. This maximum value is set in the transformer's configuration (see section 3.3). We can request the maximum sequence length of a base model with:
 
 ```{r, include = TRUE, eval = TRUE}
 total_max_seq_len <- base_model_eurobert$get_max_seq_len()
 total_max_seq_len
 ```
 
-If the text produces more tokens, the last tokens are
-ignored. In some instances you might want to analyze long texts. In
-these situations, reducing the text to the first tokens (e.g. only the
-first 512 tokens) could result in a problematic loss of information. To
-deal with these situations, you can configure a text embedding model in
-*aifecuation* to split long texts into several chunks which are
-processed by the base model. The maximum number of chunks is set with
-`chunks`. 
+If the text produces more tokens than can be accommodated, the last ones are ignored. In some instances, you may wish to analyse long texts. Reducing the text to the first tokens (e.g. the first 512 tokens) could result in a problematic loss of information in these situations. To deal with this, you can configure a text embedding model in *aifecuation* to split long texts into several chunks, each of which is processed by the base model. The maximum number of chunks is set with the `chunks` parameter. 
 
-Since transformers are able to account for the context, it may be useful
-to interconnect every chunk to bring context into the calculations. This
-can be done with `overlap` to determine how many tokens of the end of a
-prior chunk should be added to the next.
+Since transformers can account for context, it may be useful to interconnect every chunk in order to incorporate context into the calculations. This can be achieved using the `overlap` parameter, which determines how many tokens from the end of a prior chunk should be added to the next.
 
-In order to support you in this decision the tokenizer of a BaseModel can 
-calculate how many chunks are necessary to cover a specific quantile of texts completely.
-We illustrate this with an example. Lets assume that we want an overlap of 128
-(`token_overlap`) tokens between each chunk. 
-Our BaseModel can process `r total_max_seq_len` tokens at maximum. 
-In this example we use only 512 tokens as the foundation of every text embedding.
-Passing 
-these values to the `calc_quantiles` method of the tokenizer of our BaseModel reveals the
-following quantiles:
+To support you in this decision, the tokenizer of a base model can calculate how many chunks are needed to cover a specific quantile of texts in full. We will illustrate this with an example. Let's assume that we want an overlap of 128 tokens (`token_overlap`) between each chunk. Our `BaseModel` can process a maximum of `r total_max_seq_len` tokens. In this example, we use 512 tokens as the basis for each text embedding.
+Passing these values to the `calc_quantiles` method of the tokenizer reveals the following quantiles:
 
 ```{r, include = TRUE, eval = TRUE}
 chunk_quantile <- base_model_eurobert$Tokenizer$calc_quantiles(
@@ -1120,33 +830,16 @@ print(chunk_quantile)
 max_chunks <- chunk_quantile["99.9%"]
 ```
 
-If we would like to ensure that about 90% of the texts are completely covered
-by our text embedding model with the given configuration we need
-`r chunk_quantile["90%"]` chunks. To ensure
-that 99.9% of the text are fully rePostsented we need `r chunk_quantile["99.9%"]` 
-chunks. Here, we choose the 99.9% quantile which requires `r chunk_quantile["99.9%"]`.
-Altogether, this model can analyse a maximum
-of `r 512+(chunk_quantile["99.9%"]-1)*(512-128)` tokens of a text.
+To ensure that approximately 90% of texts are fully covered by our text embedding model with the given configuration, we require `r chunk_quantile`[`"90%"`] chunks. To ensure that 99.9% of the text is fully represented, we need `r chunk_quantile["90%"]` chunks. We have chosen the 99.9% quantile, which requires `r chunk_quantile["99.9%"]`. In total, this model can analyse a maximum of `r 512+(chunk_quantile["99.9%"]-1)*(512-128)` tokens of text.
 
-Finally, you have to decide from which hidden layer(s) the embeddings
-should be drawn. With `emb_layer_min` and `emb_layer_max` you can decide
-from which layers the average value for every token should be
-calculated. Please note that the calculation considers all layers
-between `emb_layer_min` and `emb_layer_max`. The maximum number 
-of available layers can be requested with:
+Finally, you need to decide which hidden layer or layers the embeddings should be drawn from. Using the parameters `emb_layer_min` and `emb_layer_max`, you can specify the layers from which the average value for each token should be calculated. Please note that the calculation considers all layers between `emb_layer_min` and `emb_layer_max`. You can request the maximum number of available layers with:
 
 ```{r, include = TRUE, eval = TRUE}
 num_layers <- base_model_eurobert$get_n_layers()
 num_layers
 ```
 
-In their initial work,
-Devlin et al. (2019) used the hidden states of different layers for
-classification. A study conducted by Liu et al. (2019, p. 1078)
-investigates the performance of models on 16 linguistic tasks, revealing
-that for transformers, there is no single best layer, but the best
-layers are located in an area in the middle and up to the two-thirds
-layer. Thus, we use the following layers:
+In their initial work, Devlin et al. (2019) used the hidden states of different layers for classification. A study by Liu et al. (2019, p. 1078) investigated the performance of models on 16 linguistic tasks and revealed that, for transformers, there is no single best layer; rather, the best layers are located in the middle and up to the two-thirds layer. Thus, we use the following layers:
 
 ```{r, include = TRUE, eval = TRUE}
 eurobert_min_layer <- floor(0.5 * num_layers)
@@ -1156,21 +849,14 @@ eurobert_max_layer <- ceiling(2 / 3 * num_layers)
 eurobert_max_layer
 ```
 
-With `emb_pool_type,` you decide which tokens are used for pooling
-within every layer. In the case of `emb_pool_type="CLS",` only the cls
-token is used. In the case of `emb_pool_type="Average"` all tokens
-within a layer are averaged except padding tokens.
+Using the `emb_pool_type` parameter, you can specify which tokens are used for pooling within each layer. With the "CLS" option, only the CLS token is used. With the "Average" option, all tokens within a layer are averaged, except for padding tokens.
 
-With `emb_insert_mask_tokens` you can request that a specific percentage of tokens
-is replaced with the model's masking token. This can increase the performance
-on subsequent tasks. The reason is that the mask language modeling applied during
-training does not match the conditions during application since working
-with texts outside training does not require to mask tokens (Meng et al. 2024, p. 1). 
+The `emb_insert_mask_tokens` parameter allows you to specify the percentage of tokens to be replaced with the model's masking token. This can improve performance on subsequent tasks. This is because the masked language modelling applied during training does not match the conditions during application, since working with texts outside of training does not require tokens to be masked (Meng et al. 2024, p. 1).
 
 > The vignette [04 Model configuration and training](model_configuration.html)
 > provides details on how to configure a text embedding model.
 
-Do not forget to pass the base model to the parameter `base_model`.
+Remember to pass the base model to the parameter called `base_model`.
 
 ```{r, include = TRUE, eval = TRUE}
 tem <- TextEmbeddingModel$new()
@@ -1188,25 +874,22 @@ tem$configure(
 )
 ```
 
-After deciding about the configuration, you can use your model.
-You can see the number of learnable parameters of the underlying base model with
+Once you have decided on the configuration, you can start using your model.
+You can view the number of learnable parameters of the underlying base model.
 
 ```{r, include = TRUE, eval = TRUE}
 tem$BaseModel$count_parameter()
 ```
-Another important value is the number of features which you can request by calling `get_n_features`.
+
+Another important value is the number of features that can be requested using the method `get_n_features`.
+
 ```{r, include = TRUE, eval = TRUE}
 tem$get_n_features()
 ```
 
-This number describes the number of dimensions for a text embedding. That is, the number
-of dimensions which is used to characterize the content
-of every chunk of text. This value is important as it determines the complexity 
-a classifier or feature extractor has to deal with. Some of classifier's and
-feature extractor's parameters depend on this value. We elaborate this at the relevant point
-for the different models.
+This number describes the number of dimensions used to characterise a text embedding. In other words, it is the number of dimensions used to characterise the content of every piece of text. This value is important because it determines the complexity that a classifier or feature extractor has to deal with. Some parameters of classifiers and feature extractors depend on this value. We will elaborate on this at the relevant point for the different models.
 
-You get a short summary of an object of this class with `print`.
+The `print` function provides a brief summary of an object of this class.
 
 ```{r, include = TRUE, eval = TRUE}
 print(tem)
@@ -1215,10 +898,7 @@ print(tem)
 
 ## 4.3 Transforming Raw Texts into Embedded Texts
 
-To transform raw text into a numeric representation, you only have to
-use the `embed_large` method of your model. To do this, you must provide
-a `LargeDataSetForText` to `text_dataset`. Relying on the sample data
-from section 2.3, we can use the movie reviews as raw texts.
+To transform raw text into a numeric representation, simply use the `embed_large` method of your model. To do this, you must provide a `LargeDataSetForText` to `text_dataset.` Using the sample data from section 2.3, we can use the movie reviews as the raw text.
 
 ```{r, include = TRUE, eval = TRUE}
 review_embeddings <- tem$embed_large(
@@ -1227,11 +907,7 @@ review_embeddings <- tem$embed_large(
 )
 ```
 
-The method `embed_large`creates an object of class
-`LargeDataSetForTextEmbeddings`. This is just a data set consisting of
-the embeddings of every text. The embeddings are an array, of which the
-first dimension refers to specific texts, the second dimension refers to
-chunks/sequences, and the third dimension refers to the features.
+The method `embed_large` creates an object of the class `LargeDataSetForTextEmbeddings.` This is simply a data set consisting of the embeddings of each text. The embeddings are an array, where the first dimension refers to specific texts, the second to chunks/sequences and the third to features.
 
 You can inspect the data set with `print`.
 
@@ -1239,17 +915,13 @@ You can inspect the data set with `print`.
 print(review_embeddings)
 ```
 
-With the embedded texts you now have the input to train a new classifier
-or to apply a Post-trained classifier for Predicting categories/classes.
-In the next chapter we will show you how to use these classifiers. But
-before we start, we will show you how to save and load your model.
+You now have the input to train a new classifier or apply a pre-trained one for predicting categories/classes with the embedded texts.
+The next chapter will show you how to use these classifiers. But before we begin, we will demonstrate how to save and load your model.
 
 ## 4.4 Saving and Loading Embedded Texts
 
-Since transforming raw texts into text embeddings is time and energy consuming
-we recommend to save them to disk in order to use the embeddings for further tasks and analysis.
-
-To save the them just call the function `save_to_disk` as shown below.
+Since the process of transforming raw text into text embeddings is time-consuming, we recommend saving them to disk in order to use the embeddings for further tasks and analysis.
+To do this, simply call the function save_to_disk, as shown below.
 
 ```{r, include = TRUE, eval = TRUE}
 save_to_disk(
@@ -1260,18 +932,14 @@ save_to_disk(
 ```
 
 To load the embeddings you can call the function `load_from_disk`.
+
 ```{r, include = TRUE, eval = TRUE}
 review_embeddings <- load_from_disk("examples/imdb_movie_reviews")
 ```
 
 ## 4.5 Saving and Loading Text Embedding Models
 
-Saving a created text embedding model is very easy in *aifeducation* by
-using the function `save_to_disk`. This function provides a unique
-interface for all text embedding models. For saving your work you can
-pass your model to `object` and the directory where to save the model to
-`dir_path`. With `folder_name` you can determine the name of the folder
-that should be created in that directory to store the model.
+In *aifeducation*, saving a created text embedding model is very easy using the function `save_to_disk`. This function provides a unique interface for all text embedding models. To save your work, pass your model to the `object` parameter and the directory in which to save the model to the `dir_path` parameter. You can also specify the name of the folder that should be created in that directory to store the model using the parameter `folder_name.`
 
 ```{r, include = TRUE, eval = TRUE}
 save_to_disk(
@@ -1281,9 +949,7 @@ save_to_disk(
 )
 ```
 
-In this example the model is saved in a folder at the location
-`examples/robertxml_te_model`. If you want to load your model
-you can call `load_from_disk`.
+In this example, the model is saved in the folder `"examples/eurobert_te_model"`. To load your model, call the `load_from_disk` function.
 
 ```{r, include = TRUE, eval = TRUE}
 tem <- load_from_disk("examples/eurobert_te_model")
@@ -1291,16 +957,11 @@ tem <- load_from_disk("examples/eurobert_te_model")
 
 ## 4.6 Sustainability
 
-In case the underlying model was trained with an active sustainability
-tracker (section 3.2 and 3.3) you can receive a table showing you the
-energy consumption, CO2 emissions, and hardware used during training by
-calling `BaseModel$get_sustainability_data("training")`. For our example this
-would be `tem$BaseModel$get_sustainability_data("training")`.
+If the underlying model was trained with an active sustainability tracker (see sections 3.2 and 3.3), you can retrieve a table showing the energy consumption, CO₂ emissions and hardware used during training by calling `BaseModel$get_sustainability_data("training")`. In our example, this would be `tem$BaseModel$get_sustainability_data("training")`.
 
 ## 4.7 Training History
 
-If you would like to see the training history of the underlying base model you
-can call a special method.
+You can call a special method to view the training history of the underlying base model.
 
 ```{r, include = TRUE, eval = FALSE}
 tem$BaseModel$plot_training_history(
@@ -1308,15 +969,12 @@ tem$BaseModel$plot_training_history(
 )
 ```
 
-Please note that this plot is not available for this example since the necessary
-data is not directly available for this model on Hugging Face. If you train a 
-model with this package the training history is always saved.
+Please note that this plot is unavailable for this example, as the necessary data is not directly accessible for this model on Hugging Face. However, if you train a model with this package, the training history is always saved.
 
 # 5 Overview Classifiers
 
 Classifiers are built on top of a `TextEmbeddingModel`. They use the embedded texts
-produced by these models and predict classes/categories. You can build your classifier
-with the help of two components. 
+produced by these models and predict classes/categories. You can build your own classifier with the help of two components.
 
 First, you choose a core model. It determines
 where different layers are located and how the outputs of the different layers are
@@ -1454,9 +1112,7 @@ estimation phase are used in the final training phase.
 
 ## 6.1 Creation
 
-To show you how to create a classifier we use a classifier of class `TEClassifierSequential`
-as an example. With the sample data from section 2.3 and the text embeddings from
-section 4.3, the creation of a new classifier may look like:
+To demonstrate how to create a classifier, we will use an example of a `TEClassifierSequential` classifier. Using the sample data from Section 2.3 and the text embeddings from Section 4.3, creating a new classifier might look like this:
 
 ```{r, include = TRUE, eval = TRUE}
 classifier <- TEClassifierSequential$new()
@@ -1470,6 +1126,7 @@ classifier$configure(
   cls_pooling_type = "WeightedAverageTimes",
   cls_head_type = "Regular",
   cls_input_normalize="PowerNorm",
+  final_normalization_type="PowerNorm",
   feat_act_fct = "None",
   feat_size = 384,
   feat_bias = FALSE,
@@ -1477,7 +1134,7 @@ classifier$configure(
   feat_parametrizations = "None",
   feat_normalization_type = "PowerNorm",
   ng_conv_act_fct = "GELU",
-  ng_conv_n_layers = 1,
+  ng_conv_n_layers = 0,
   ng_conv_ks_min = 1,
   ng_conv_ks_max = 2,
   ng_conv_bias = FALSE,
@@ -1485,8 +1142,8 @@ classifier$configure(
   ng_conv_parametrizations = "None",
   ng_conv_normalization_type = "PowerNorm",
   ng_conv_residual_type = "ResidualGate",
-  dense_act_fct = "None",
-  dense_n_layers = 1,
+  dense_act_fct = "GELU",
+  dense_n_layers = 3,
   dense_dropout = 0.40,
   dense_bias = FALSE,
   dense_parametrizations = "None",
@@ -1517,74 +1174,42 @@ classifier$configure(
 )
 ```
 
-Similarly to the text embedding model, you should provide a label (`label`) for your new classifier. 
-With `text_embeddings` you have to provide a `LargeDataSetForTextEmbeddings`.
-The data set is created with a `TextEmbeddingModel` as described in
-section 4. We here continue our example and use the embeddings produced
-by our BERT model.
+As with the text embedding model, you should provide a label (`label` ) for your new classifier. 
+For the text embeddings, you must provide a `LargeDataSetForTextEmbeddings`.
+This data set is created using a `TextEmbeddingModel`, as described in section 4. Here, we continue our example by using the embeddings produced by our BERT model.
 
-`target_levels` take the categories/classes you classifier should
-predict. This can be numbers or even words.
+The `target_levels` take the categories/classes that your classifier should predict. These can be numbers or words.
 
-> In case you would like to use ordinal data, it is very important that
-> you provide the classes/categories in the correct order. That is,
-> classes/categories rePostsenting a "higher" level must be stated after
-> categories/classes with a "lower" level. If you provide the wrong order,
-> the performance indices are not valid. In case of nominal data the
-> order does not matter.
+>If you would like to use ordinal data, it is very important that you provide the classes/categories in the correct order. In other words, categories/classes representing a 'higher' level must be stated after those representing a 'lower' level. If you provide the wrong order, the performance indices will be invalid. The order does not matter for nominal data.
 
-With `feature_extractor` you can add a feature extractor that tries to
-reduce the number of features of your text embeddings before passing the
-embeddings to the classifier. You can read more on this in section 8.
+Using the `feature_extractor`, you can reduce the number of features in your text embeddings before passing them to the classifier. You can read more about this in Section 7.
 
-With the help of the other parameters you can define the complexity and abilities of your model.
-A description of the different models can be found in [A01 Layers and Stack of Layers](https://fberding.github.io/aifeducation/articles/a01_layers_and_stack_layers.html). 
+You can use the other parameters to define the complexity and capabilities of your model.
+Descriptions of the different models can be found in [A01 Layers and Stack of Layers](https://fberding.github.io/aifeducation/articles/a01_layers_and_stack_layers.html). 
 
-Please note that you have to choose the parameter `feat_size` depending on the 
-number of features of the underlying text embedding model. You can request this number by 
-calling the method `get_n_features` of the used text embedding model. In our example
-this would be:
+Please note that you must choose the parameter `feat_size` depending on the number of features of the underlying text embedding model. You can obtain this number by calling the `get_n_features` method of the text embedding model used. In our example, this would be:
 
 ```{r, include = TRUE, eval = TRUE}
 tem$get_n_features()
 ```
 
-The number for `feat_size` should be equal to or less than this value, since this layer
-tries to comPostss the text embeddings into fewer dimensions. While this reduces the number of
-of parameters for all subsequent layers and decreases training and usage time, it may result in information loss.
+The value of `feat_size` should be equal to or less than this value since this layer tries to compress the text embeddings into fewer dimensions. While this reduces the number of parameters for all subsequent layers and decreases training and usage time, it may result in information loss.
 You can experiment with this value to strike a balance between speed and performance. 
-A study by Takeshita et al. (2025) shows that randomly dropping 50% of the dimensions
-leads only to a minor drop in performance in classification tasks. Thus, this value can serve as
-a rule of thumb for determining this parameter. 
+A study by Takeshita et al. (2025) shows that randomly dropping 50% of the dimensions leads only to a minor decrease in performance in classification tasks. Thus, this value can serve as a rule of thumb for determining this parameter. 
 
-In our example we have only a
-very limited number of samples. Thus, we decrease the number of features further.
+In our example, we only have a very limited number of samples. Therefore, we reduce the number of features even further.
 
-In addition, the parameter `cls_pooling_features` should be equal or less the number you used
-for `feat_size`. With `cls_pooling_features` you determine how many of the resulting features should be used
-for classification. Thus, this value acts as a filter.
+In addition, the value of the parameter `cls_pooling_features` should be equal to or less than the value of feat_size. The value of `cls_pooling_features` determines how many of the resulting features are used for classification. Therefore, this value acts as a filter. This value is only relevant if your pooling method does not include the word 'Times'.
 
 > The vignette [04 Model configuration and training](model_configuration.html)
 > provides details on how to configure a classifier.
 
-In our example we use only two n-gram layers (`ng_conv_n_layers = 0`) and 
-two dense layers (`dense_n_layers = 1`). All other layers are omitted from the model
-by setting the number of layers to zero (`tf_n_layers = 0`,`rec_n_layers = 0`).
+Since we have a small data set and a short sequence, we set all layers to 0 (`tf_n_layers`,`rec_n_layers`,`ng_conv_n_layers`), except the dense layers. Here, we use 3 (`dense_n_layers = 3`).
 
-As pooling method we use minimum and maximum over time (`cls_pooling_type="MinMaxTimes"`). 
-That is, the highest and the lowest features within every feature dimension are used for calculating
-the classes/labels. The `cls_pooling_features` is only relevant if you set `cls_pooling_type` to
-`"Min"`, `"Max"` or `"MinMax"`. These three options request an additional pooling
-over features which in most times leads to a lose of information. They are
-useful only if your classifier has to predict two classes/categories.
+As pooling method we use weighted average over time (`cls_pooling_type="WeightedAverageTimes"`). In other words, the values of a specific feature dimension are averaged over all tokens and chunks, and the weights are learnt during training. 
 
-In this example we use a regular classification head (`cls_head_type = "Regular"`) 
-where all neurons of the Postvious layer are connected all classes. 
-Li et al. (2020)[https://doi.org/10.1109/TIP.2020.2990277] proposed a special 
-classification head (`cls_head_type = "PairwiseOrthogonal"`). This layer allows every neuron only
-to establish a connection to a single class. For this special layer you can add 
-a dense layer before the classification head (`cls_head_type = "PairwiseOrthogonalDense"`) in 
-order to improve performance with high rates for dropout in the Postvious layers.
+In this example, we use a regular classification head (`cls_head_type = "Regular"`), where all neurons in the previous layer are connected to all classes. 
+Li et al. [(2020)](https://doi.org/10.1109/TIP.2020.2990277) proposed a special classification head (`cls_head_type = "PairwiseOrthogonal"`). This layer enables each neuron to establish a connection with only one class. To improve performance with high rates of dropout in the previous layers, you can add a dense layer before the classification head (`cls_head_type = "PairwiseOrthogonalDense"`).
 
 You receive a short summary of the classifier by calling `print`.
 
@@ -1592,8 +1217,8 @@ You receive a short summary of the classifier by calling `print`.
 print(classifier)
 ```
 
-After you have created a new classifier, you can begin training. 
-You can see the number of learnable parameters of your model with:
+Once you have created a new classifier, you can start the training process. 
+You can view the number of learnable parameters of your model using the following method:
 
 ```{r, include = TRUE, eval = TRUE}
 classifier$count_parameter()
@@ -1601,13 +1226,7 @@ classifier$count_parameter()
 
 ## 6.2 Training
 
-To start the training of your classifier, you have to call the `train`
-method. Similarly, for the creation of the classifier, you must provide
-the text embeddings to `data_embeddings` and the categories/classes as
-target data to `data_targets`. Please remember that `data_targets`
-expects a **named** factor where the names correspond to the IDs of the
-corresponding text embeddings. Text embeddings and target data that
-cannot be matched are omitted from training.
+To start training your classifier, call the `train` method and provide the text embeddings to `data_embeddings` and the categories/classes as target data to `data_targets`. Please note that data_targets expects a *named* `factor` where the names correspond to the IDs of the corresponding text embeddings. Text embeddings and target data that cannot be matched are omitted from training.
 
 ```{r classifier$train, include = TRUE, eval = TRUE}
 classifier$train(
@@ -1651,74 +1270,34 @@ classifier$train(
 )
 ```
 
-You can further modify the training process with different arguments.
-With `loss_balance_class_weights=TRUE` the absolute frequencies of the
-classes/categories are adjusted according to the 'Inverse Class
-Frequency' method. This option should be activated if you have to deal
-with imbalanced data.
+You can modify the training process further by using different arguments.
+Setting `loss_balance_class_weights` to TRUE adjusts the weights of the classes/categories according to the 'Inverse Class Frequency' method. This option should be activated if you are dealing with imbalanced data.
 
-With `loss_balance_sequence_length=TRUE` you can increase performance if you
-have to deal with texts that differ in their lengths and have an
-imbalanced frequency. If this option is enabled, the loss is adjusted to
-the absolute frequencies of length of your texts according to the
-'Inverse Class Frequency' method.
+Enabling the `loss_balance_sequence_length` option can improve performance when dealing with texts of different lengths with imbalanced frequencies. When this option is enabled, the loss is adjusted according to the 'Inverse Class Frequency' method, based on the absolute frequencies of the lengths of your texts.
 
-`epochs` determines the maximal number of epochs. During training, the
-model with the best balanced accuracy is saved and used.
+The parameter `epochs` determines the maximum number of epochs. During training, the model with the most balanced accuracy is saved and used.
 
-`batch_size` sets the number of cases to be processed
-simultaneously. It is a very important parameter with a significant impact
-on the model's performance due to the generalisation gap (Keskar et al., 2017 p. 2).
-The generalisation gap describes the observation that large batch sizes tend
-to poor generalisation performance on test datasets compared to models trained
-with a small batch size (Keskar et al., 2017 p. 3). 
-A study conducted by Masters and Luschi (2018) suggests ways to achieve good
-batch size for using `"SGD"` as optimizer. Their study shows that smaller batch sizes
-offer more stable and reliable training and at the same time achieve better
-generalisation performance. Batch sizes between 4 and 32 lead to the best performance.
+The value of the parameter `batch_size` determines the number of cases to be processed simultaneously. It is a very important parameter that significantly impacts the model's performance due to the generalisation gap (Keskar et al. 2017, p. 2). This describes the observation that models trained with a large batch size tend to perform poorly on test data sets compared to those trained with a small batch size (Keskar et al. 2017, p. 3). 
+A study by Masters and Luschi (2018) suggests how to determine an optimal batch size when using SGD as an optimizer. Their study shows that smaller batch sizes offer more stable and reliable training, while also achieving better generalisation performance. Batch sizes between 4 and 32 lead to the best performance. In practice, however, we need large batch sizes to efficiently use computer hardware and save time and energy. Therefore, the aim is to use the largest possible batch size while achieving good generalisation performance. To achieve this, use large batch sizes and large dropout values. Please note that there are exceptions to this rule. In the context of contrastive learning, for example, higher batch sizes tend to generate better generalisation performance (Chen et al. 2020).For more details please refer to the vignette [04 Model configuration and training](model_configuration.html)
 
-We set `lr_rate = 0.0` and `lr_min = 0.0` to request an automatic calculation
-for a good learning rate.
+We set `lr_rate` and `lr_min` to `0.0` to request an automatic calculation of a suitable learning rate.
 
-To speed up computations we activate automatic mixed Precision (amp) 
-with gradient scaling by setting `amp = TRUE`. In general we recommend to activate
-mixed Postcision. If you encounter any problems turn this option off.
+To speed up computations, we activate Automatic Mixed Precision (AMP) with gradient scaling by setting `amp = TRUE`. In general, we recommend activating mixed precision. If you encounter any problems, turn this option off.
 
-Please note that there are 
-exceptions to this rule. In the context of contrastive
-learning, higher batch sizes tend to generate better generalisation performance 
-(Chen et al., 2020). For more details please refer to the vignette [04 Model configuration and training](model_configuration.html)
+Since training a neural net is energy-consuming, *aifeducation*
+allows you to estimate its ecological impact with the help of the Python library 'codecarbon.' Thus, the `sustain_track` parameter is set to `TRUE` by default.
+If you use the sustainability tracker, you must provide the three-letter code for the country in which your computer is located (e.g. "CAN" for Canada, "DEU" for Germany). You can find a list of these codes on
+[Wikipedia](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3). This is because different countries use different sources and techniques for generating energy, resulting in a specific impact on CO₂ emissions. For the USA and Canada, you can also specify a region by setting `sustain_region`. Please refer to the 'codecarbon' documentation for more information.
 
-Since training a neural net is energy consuming, *aifeducation* allows
-you to estimate its ecological impact with the help of the python
-library `codecarbon`. Thus, `sustain_track` is set to `TRUE` by default.
-If you use the sustainability tracker you must provide the alpha-3 code
-for the country where your computer is located (e.g., "CAN"="Canada",
-"DEU"="Germany"). A list with the codes can be found on
-[Wikipedia](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3). The
-reason is that different countries use different sources and techniques
-for generating their energy resulting in a specific impact on CO2
-emissions. For the USA and Canada, you can additionally specify a region
-by setting `sustain_region`. Please refer to the documentation of
-'codecarbon' for more information.
-
-Finally, `trace` and `ml_trace` allow you to control how much
-information about the training progress is printed to the console.
+Finally, the `trace` and `ml_trace` options allow you to control how much information about the training process is printed to the console.
 
 Please note that training the classifier can take some time. 
-In case options like the generation of synthetic cases (`use_sc`) or
-pseudo-labeling (`use_pl`) are disabled, the training process is
-shorter.
+If options such as generating synthetic cases (`use_sc`) or pseudo-labelling (`use_pl`) are disabled, the training process is shorter.
 
-Please note that after performance estimation, the final training of the
-classifier makes use of all data available. That is, the test sample is
-left empty.
+After performance estimation, the final training of the classifier uses all available data. In other words, the test sample is left empty.
 
-In order to visualize the progress of training you can request a plot 
-which shows how important performance measures develop over epochs.
-You can choose between classifier's loss (`"loss"`), accuracy (`"accuracy"`),  
-balanced accuracy (`"balanced_accuracy"`), and average iota(`"avg_iota"`). Set 
-`final_training=FALSE` to request mean values of all folds used during the performance estimation phase.
+To visualise the progress of the training, you can request a plot showing how important performance measures develop over epochs.
+You can choose from the following measures: classifier's loss (`"loss"`), accuracy (`"accuracy"`), balanced accuracy (`"balanced_accuracy"`), and average iota (`"avg_iota"`). Set `final_training=FALSE` to request the mean values of all the folds used during the performance estimation phase.
 
 ```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier during Performance Estimation Stage (loss)"),fig.align="center"}
 classifier$plot_training_history(
@@ -1740,13 +1319,11 @@ classifier$plot_training_history(
 running_num_figures <- running_num_figures + 1
 ```
 
-Figure `r running_num_figures-1` shows the development of the loss as a mean of all folds. In general
-the curve for training should decrease to zero. The curves for the validation and
-test sample should decrease and start increasing after a certain point. The 
-rectangles indicate the state of the model that was selected as the best state during a fold.
 
-Since the there are some measures which provide a better interPosttation as the loss you can request further plots.
-The following plot shows the development of average iota for all categories/classes. 
+
+Figure `r running_num_figures-1` shows the development of the loss averaged across all folds. In general, the training curve should decrease to zero. The curves for the validation and test samples should also decrease, but then start to increase after a certain point. The rectangles indicate the state of the model selected as the best during a fold.
+
+Since there are some measures that provide a better post-hoc analysis than the loss, you can request further plots. The following plot shows the development of the average iota for all categories/classes.
 
 ```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier during Performance Estimation Stage (iota)"),fig.align="center"}
 classifier$plot_training_history(
@@ -1768,11 +1345,7 @@ classifier$plot_training_history(
 running_num_figures <- running_num_figures + 1
 ```
 
-Average iota ranges between `0`and `1` and indicates how good the 
-Predictions represent the true values. Higher values indicate a better performance.
-
-Since measures such as average iota are measures for discrete values that can heavily fluctuate
-you can plot a smoothed version of average iota which is more Postcise.
+The average iota ranges between 0 and 1 and indicates how well the predictions represent the true values. Higher values indicate better performance. Since measures such as average iota are based on discrete values that can fluctuate significantly, you can plot a smoothed version of average iota, which is more precise.
 
 ```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier during Performance Estimation Stage (smoothed iota)"),fig.align="center"}
 classifier$plot_training_history(
@@ -1794,8 +1367,7 @@ classifier$plot_training_history(
 running_num_figures <- running_num_figures + 1
 ```
 
-To see the training process of the final training stage you have to set 
-`final_training=TRUE` as shown in the following Figures. 
+To view the final training stage, set `final_training` to `TRUE`, as shown in the following figures. 
 
 ```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier during Final Training Stage (loss)"),fig.align="center"}
 classifier$plot_training_history(
@@ -1817,11 +1389,7 @@ classifier$plot_training_history(
 running_num_figures <- running_num_figures + 1
 ```
 
-The dotted line indicates the final model state. Please note that in many times
-this state is not the state with the lowest value on the validation loss because
-the best model is selected by applying several criteria in a hierarchical order. 
-The first criterion is model's performance on average iota, the second it`s performance
-on balanced accuracy, and the third critertion is the loss.
+The dotted line indicates the final model state. Please note that this state is not always the one with the lowest validation loss value, because the best model is selected by applying several criteria in a hierarchical order. The first criterion is the model's performance in terms of the smoothed average iota The second criterion is the loss.
 
 ```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier during Final Training Stage (iota)"),fig.align="center"}
 classifier$plot_training_history(
@@ -1863,23 +1431,16 @@ classifier$plot_training_history(
 running_num_figures <- running_num_figures + 1
 ```
 
-In order to have a deeper insight into training you can request a plot that
-visualizes the calculation of the learning rate. Please note that this plot is only
-available if you have set `lr_rate = 0.0` or `lr_min = 0.0`.
+To gain a deeper insight into the training process, you can request a plot visualising the learning rate calculation. Please note that this plot is only available if you have set either `lr_rate` or `lr_min` to `0.0`.
 
 ```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Analysis of Different Learning Rates"),fig.align="center"}
 classifier$plot_learning_rate()
 ```
 
-The bars of the plot shows how much the loss increases or decreases compared
-to the initial loss. The values exPostss the degree in percentage to the initial loss.
-A decrease is desired.The points of the plot show a smoothed distribution of the loss. 
-All calculations for selecting a good maximum and minimum learning rate are based on
-the smoothed data. 
-The automatic calculation selects the learning rate from the longest range of learning rates 
-that lead to a decreased loss. The maximum learning rate is set as the learning 
-rate where the decrease in the loss has a turning point. The minimum is set to 
-the learning rate that has the smallest reduction of the loss. 
+The bars in the plot show the percentage increase or decrease in loss compared to the initial loss. The values express the percentage change from the initial loss.
+A decrease is desirable. The points on the plot show a smoothed distribution of the loss. 
+All calculations for selecting good maximum and minimum learning rates are based on the smoothed data. 
+The automatic calculation selects the learning rate from the range of learning rates that leads to the greatest decrease in loss. The maximum learning rate is set at the point where the decrease in loss turns. The minimum learning rate is set to the rate that results in the smallest reduction in loss. Depending on the learning rate scheduler, other points may be chosen.
 
 
 ```{r, include = FALSE}
@@ -1888,15 +1449,10 @@ running_num_figures <- running_num_figures + 1
 
 ## 6.3 Performance Evaluation
 
-After finishing training, you can evaluate the performance of the
-classifier. For every fold, the classifier is applied to the test sample
-and the results are compared to the true categories/classes. Since the
-test sample is never part of the training, all performance measures
-provide a more realistic idea of the classifier's performance.
+Once training is complete, you can evaluate the performance of the classifier. For each fold, the classifier is applied to the test sample and the results are compared to the true categories/classes. As the test sample is never part of the training set, all performance measures provide a more realistic idea of the classifier's performance.
 
-To support researchers in judging the quality of the Predictions,
-*aifeducation* utilizes several measures and concepts from content
-analysis. These are
+To help researchers judge the quality of the predictions,
+*aifeducation* uses several measures and concepts from content analysis. These are:
 
 -   Iota Concept of the Second Generation (Berding & Pargmann 2022).
 -   Krippendorff's Alpha (Krippendorff 2019).
@@ -1908,8 +1464,7 @@ analysis. These are
 -   Cohen's Kappa with squared weights (Cohen 1968).
 -   Fleiss' Kappa for multiple raters without exact estimation (Fleiss 1971).
 
-You can access the concrete values as mean values across all folds 
-via `reliability$test_metric_mean`. In our example this would be:
+You can access the mean values across all folds via `reliability$test_metric_mean`. In our example, this would be:
 
 ```{r, include = TRUE, eval = TRUE}
 classifier$reliability$test_metric_mean
@@ -1928,8 +1483,7 @@ You can access these values as follows:
 classifier$reliability$standard_measures_mean
 ```
 
-In order to analysis the quality of training over all folds you can additionally request a
-box plot. The Figure below shows which performance the classifier reached. 
+To analyse the quality of the training across all folds, you can request an additional box plot. The figure below shows the performance that the classifier achieved. 
 
 ```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Box Plot of Performance Measures"),fig.align="center"}
 classifier$plot_reliability_distribution(measures="all")
@@ -1939,8 +1493,7 @@ classifier$plot_reliability_distribution(measures="all")
 running_num_figures <- running_num_figures + 1
 ```
 
-Finally, you can plot a coding stream scheme showing how the cases of
-different classes are labeled. 
+Finally, you can plot a coding stream scheme to show how cases in different classes are labelled. 
 
 ```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Coding Stream of the Classifier"),fig.align="center"}
 classifier$plot_coding_stream()
@@ -1950,15 +1503,11 @@ classifier$plot_coding_stream()
 running_num_figures <- running_num_figures + 1
 ```
 
-Evaluating the performance of a classifier is a complex task and and
-beyond the scope of this vignette. Instead, we would like to refer to
-the cited literature of content analysis and machine learning if you
-would like to dive deeper into this topic.
+Evaluating the performance of a classifier is a complex task that goes beyond the scope of this vignette. If you would like to delve deeper into this topic, we recommend consulting the cited literature on content analysis and machine learning.
 
 ## 6.4 Sustainability
 
-In case the classifier was trained with an active sustainability
-tracker, you can receive information on sustainability by calling
+If the classifier was trained with an active sustainability tracker, you can retrieve sustainability information by calling 
 `classifier$get_sustainability_data()`.
 
 ```{r, include = TRUE, eval = TRUE}
@@ -1968,9 +1517,9 @@ t(classifier$get_sustainability_data())
 
 ## 6.5 Saving and Loading a Classifier
 
-Saving and loading follows the same pattern as for the other objects in
-*aifeducation*. You can save the classifier by calling `save_to_disk`.
-In our example this may be:
+The saving and loading process follows the same pattern as for the other objects.
+*aifeducation*. You can save the classifier by calling the `save_to_disk` function.
+In our example, this might look like this:
 
 ```{r, include = TRUE, eval = TRUE}
 save_to_disk(
@@ -1989,11 +1538,7 @@ classifier <- load_from_disk("examples/cls_imdb_movie_reviews")
 
 ## 6.6 Predicting New Data
 
-If you would like to apply your classifier to new data, two steps are
-necessary. You must first transform the raw text into a numerical
-representation by using *exactly* the same text embedding model that was
-used to train your classifier (see section 4). In the case of our
-example classifier, we use our BERT model.
+If you would like to apply your classifier to new data, two steps are necessary. First, you must transform the raw text into a numerical representation using *exactly* the same text embedding model that was used to train your classifier (see Section 4). In the case of our example classifier, we use our BERT model.
 
 ```{r, include = TRUE, eval = TRUE}
 # If our model is not loaded
@@ -2006,14 +1551,9 @@ review_embeddings <- tem$embed_large(
 )
 ```
 
-To transform raw texts into a numeric representation just pass the raw
-texts to the method `embed_large` of the loaded model. The raw texts
-should be an object of class `LargeDataSetForText`. To create such a
-data set, please refer to section 2.
+To transform raw text into a numeric representation, simply pass the text to the `embed_large` method of the loaded model. The raw text should be an object of the class `LargeDataSetForText`. To create such a data set, please refer to Section 2.
 
-The resulting object can then be passed to the method `predict` of our
-classifier and you will get the Predictions together with an estimate of
-certainty for each class/category.
+The resulting object can then be passed to the `predict` method of our classifier to obtain predictions together with an estimate of certainty for each class/category.
 
 ```{r, include = TRUE, eval = TRUE}
 # If your classifier is not loaded
@@ -2032,37 +1572,19 @@ head(predicted_categories)
 table(predicted_categories$expected_category)
 ```
 
-After the classifier finishes the prediction, the estimated
-categories/classes are stored as `predicted_categories`. This object is
-a `data.frame` containing texts' IDs in the rows and the probabilities
-of the different categories/classes in the columns. The last column with
-the name `expected_category` rePostsents the category which is assigned
-to a text due the highest probability.
+Once the prediction has been made by the classifier, the estimated categories/classes are stored as 'predicted_categories'. This object is a `data.frame` containing text IDs in the rows and the probabilities of the different categories/classes in the columns. The final column, named 'expected_category', represents the category assigned to a text with the highest probability.
 
-The estimates can be used in further analysis with common methods of the
-educational and social sciences such as correlation analysis, regression
-analysis, structural equation modeling, latent class analysis or
-analysis of variance.
+These estimates can be used in further analyses employing common methods from the educational and social sciences, such as correlation analysis, regression analysis, structural equation modelling, latent class analysis, and analysis of variance.
 
-Now you are ready to to use *aifeducation*. In section 7 we describe
-further models for classification tasks and for improving model
-performance.
+Now you are ready to to use *aifeducation*. 
 
 # 7 Feature Extractors
 
 ## 7.1 Introduction
 
-Another option to increase a model's performance and/or to increase
-computational speed is to apply a feature extractor. For example, the
-work by Ganesan et al. (2021) indicates that a reduction of the hidden
-size can increase a model's accuracy. In *aifeducation,* a feature
-extractor is a model that tries to reduce the number of features of
-given text embeddings before feeding the embeddings as input to a
-classifier.
+Another way to improve a model's performance and/or computational speed is to apply a feature extractor. For example, the work of Ganesan et al. (2021) suggests that reducing the hidden size can improve a model's accuracy. In *aifeducation*, a feature extractor is a model that reduces the number of features of given text embeddings before feeding the embeddings as input to a classifier.
 
-The feature extractors implemented in *aifeducation* are auto-encoders
-that support sequential data and sequences of different length. The
-basic architecture of all extractors is shown in the following figure.
+The feature extractors implemented in *aifeducation* are auto-encoders that support sequential data and sequences of different lengths. The basic architecture of all the extractors is shown in the following figure.
 
 ```{r, include = FALSE}
 running_num_figures <- running_num_figures + 1
@@ -2070,81 +1592,52 @@ running_num_figures <- running_num_figures + 1
 
 ![Figure `r running_num_figures`: Basic architecture of feature extractors](classif_feature_extractor.png){width="100%"}
 
-The learning objective of the feature extractors is first to comPostss
-information by reducing the number of features to the number of features
-of the latent space (Frochte 2019, p.281). In the figure above, this
-would mean to reduce the number of features from 8 to 4 and to store as
-much information as possible from the 8 dimensions in only 4 dimensions.
-In the next step, the extractor tries to reconstruct the original
-information from the compressed information of the latent space (Frochte
-2019, pp.280-281). The information is extended from 4 dimensions to 8.
-After training, the hidden representation of the latent space is used as
-a comPostssion of the original input.
+The learning objective of the feature extractors is to compress information by reducing the number of features to that of the latent space (Frochte 2019, p. 281). In the figure above, this would mean reducing the number of features from eight to four and storing as much information as possible from eight dimensions in four dimensions.
+Next, the extractor attempts to reconstruct the original information from the compressed latent space information (Frochte 2019, pp. 280–281). The information is then extended from four dimensions to eight.
+After training, the hidden representation of the latent space is used as a pre-processing of the original input.
 
 ## 7.2 Creation
 
-You can create a feature extractor as follows. In this example we use the
-text embeddings from section 4.
+In this example, we use the text embeddings from Section 4. You can create a feature extractor as follows: 
 
 ```{r, include = TRUE, eval=TRUE}
 feature_extractor <- TEFeatureExtractor$new()
 feature_extractor$configure(
-  name = "feature_extractor_bert_movie_reviews",
   label = "Feature extractor for Text Embeddings",
   text_embeddings = review_embeddings,
   features = 384,
+  te_n_layers=4,
   method = "Dense",
   orthogonal_method = "matrix_exp",
   noise_factor = 1e-4
 )
 ```
 
-Similarly to the other models, you can use  `label` for the model's label. 
-The argument `text_embeddings` takes
-an object of class `EmbeddedText` or `LargeDataSetForTextEmbeddings`.
-With this object you connect your feature extractor with a specific
-TextEmbeddingModel. That is, the feature extractor works only with
-embeddings from exactly the same `TextEmbeddingModel`.
+As with the other models, you can use the `label` for the model's label. 
+The argument `text_embeddings` takes an object of class `EmbeddedText` or `LargeDataSetForTextEmbeddings.`
+This object connects your feature extractor to a specific `TextEmbeddingModel.` In other words, the feature extractor only works with embeddings from the same `TextEmbeddingModel.`
 
-`features` determines the number of features for the compressed
-representation The lower the number, the higher the requested
-comPostssion. This value corresponds to the features of the latent space
-in the figure above.
+The value of the `features` argument determines the number of features for the compressed representation. The lower the number, the higher the requested compression. This value corresponds to the features of the latent space in the above figure. The `te_n_layers` parameter allows you you to specify the number of layers in the encoder and decoder parts of the model. 
 
-You should use this value depending on the number of features of the underlying text
-embedding model. You can request this value by calling the method `get_n_features` like this:
+Use this value depending on the number of features of the underlying text embedding model. You can request this value by calling the method `get_n_features` as follows:
 
 ```{r, include = TRUE, eval = TRUE}
 tem$get_n_features()
 ```
 
-A study by Takeshita et al. (2025) shows that randomly dropping 50% of the dimensions
-leads only to a minor drop in performance in classification tasks. Thus, this value can serve as
-a rule of thumb for determining this parameter. Thus we reduce the number of features
-to 50 % or to `r floor(tem$get_n_features()/2)`.
+A study by Takeshita et al. (2025) shows that randomly dropping 50% of the dimensions leads only to a minor decrease in the performance of classification tasks. Therefore, this value can be used as a rule of thumb when determining this parameter. We therefore reduce the number of features to 50% to `r floor(tem$get_n_features()/2)`.
 
-With `method` you determine the type of layer the feature extractor
-should use. If set `method="LSTM"`, all layers of the model are long
-short-term memory layers. If set `method="Dense"` all layers are
-standard dense layers. 
+The type of layer that the feature extractor should use is determined by `method`. If you set the method to "LSTM", all layers of the model are long short-term memory layers. If you set the method to "Dense", all layers are standard dense layers.
 
-Independently from your choice, all models try to generate the latent
-space such that the co-variance of the features to be zero. Thus, all
-features rePostsent unique information. In addition, all methods except
-`"LSTM"` use an orthogonal parameterization to Postvent over-fitting and
-apply parameter sharing. The opposite layers use the same parameters.
-For more details please refer to Ranjan (2019).
+Regardless of your choice, all models aim to generate a latent space in which the correlation of the features is zero. Thus, all features represent unique information. In addition, all methods except "LSTM" use an orthogonal parameterisation to prevent overfitting and apply parameter sharing. The opposite layers use the same parameters.
+For more details, please refer to Ranjan (2019).
 
-With `noise_factor` you can add some noise during training making the
-feature extractor perform a denoising auto-encoder, which can provide
-more robust generalizations.
+You can use the `noise_factor` to add noise during training, causing the feature extractor to perform as a denoising auto-encoder. This can provide more robust generalisations. Since we work with high batch sizes, we set this value to 1e-4.
 
 ## 7.3 Training
 
-Training the extractor is identical to the other models in
-*aifeducation*. Please note that the text embeddings provided to
-`data_embeddings` must be generated with the same `TextEmbeddingModel` as
-the embeddings provided during the configuration of your model.
+Training the extractor is identical to that for the other models.
+*aifeducation*. Please note that the text embeddings provided to `data_embeddings` must be generated using the same `TextEmbeddingModel` as the embeddings provided when configuring your model.
 
 ```{r feature_extractor$train, include = TRUE, eval=TRUE, results='hide'}
 feature_extractor$train(
@@ -2171,9 +1664,8 @@ feature_extractor$train(
 )
 ```
 
-> In this example we use the same text embeddings as we use to train the classifier.
-> It can be beneficial if you use a larger sample of texts for training a `TEFeatureExtractor`
-> to improve performance and/or to allow a broad application of the feature extractor. 
+>In this example, we use the same text embeddings that we use to train the classifier.
+>It can be beneficial to use a larger sample of texts when training a `TEFeatureExtractor` to improve performance and/or allow broader application of the feature extractor.
 
 ```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Analysis of Different Learning Rates"),fig.align="center"}
 feature_extractor$plot_learning_rate()
@@ -2183,7 +1675,7 @@ feature_extractor$plot_learning_rate()
 running_num_figures <- running_num_figures + 1
 ```
 
-You can plot the training history of the model with:
+You can plot the model's training history using:
 
 ```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Training History of a Feature Extractor.")}
 feature_extractor$plot_training_history(
@@ -2196,7 +1688,7 @@ feature_extractor$plot_training_history(
 running_num_figures <- running_num_figures + 1
 ```
 
-You receive a short summary of the extractor by calling `print`.
+Calling `print` gives you a short summary of the extractor.
 
 ```{r, include = TRUE, eval = TRUE}
 print(feature_extractor)
@@ -2204,28 +1696,22 @@ print(feature_extractor)
 
 ## 7.4 Application
 
-After you have trained your feature extractor, you can use it for every
-classifier. Just pass the feature extractor to `feature_extractor`
-during configuration of the classifier. Please note that you now have to set the 
-values for `feat_size` and `cls_pooling_features` depending on the number of features
-of the feature extractor and *not* depending on the number of features of the text embedding
-model since the aim of the feature extractor is to reduce this number. `feat_size`
-should be equal or less the number for features of the feature extractor and
-`cls_pooling_features` should be equal or less the value for `feat_size`. 
-For the classifier described in section 6 this would look like:
+Once you have trained your feature extractor, you can use it with any classifier. Simply pass the feature extractor to the `feature_extractor` parameter during the classifier configuration process. Please note that you now have to set the values for `feat_size` and `cls_pooling_features` depending on the number of features of the feature extractor, and *not* depending on the number of features of the text embedding model, since the aim of the feature extractor is to reduce this number. `feat_size` should be equal to or less than the number of features of the feature extractor, and `cls_pooling_features` should be equal to or less than `feat_size`. 
+For the classifier described in Section 6, this would look like this:
 
 ```{r, include = TRUE, eval=TRUE}
 classifier_with_fe <- TEClassifierSequential$new()
 classifier_with_fe$configure(
   label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
   text_embeddings = review_embeddings,
-  feature_extractor = NULL,
+  feature_extractor = feature_extractor,
   target_levels = c("neg", "pos"),
   skip_connection_type = "ResidualGate",
   cls_pooling_features = 20,
   cls_pooling_type = "WeightedAverageTimes",
   cls_head_type = "Regular",
   cls_input_normalize="PowerNorm",
+  final_normalization_type="PowerNorm",
   feat_act_fct = "None",
   feat_size = 384,
   feat_bias = FALSE,
@@ -2233,7 +1719,7 @@ classifier_with_fe$configure(
   feat_parametrizations = "None",
   feat_normalization_type = "PowerNorm",
   ng_conv_act_fct = "GELU",
-  ng_conv_n_layers = 1,
+  ng_conv_n_layers = 0,
   ng_conv_ks_min = 1,
   ng_conv_ks_max = 2,
   ng_conv_bias = FALSE,
@@ -2241,8 +1727,8 @@ classifier_with_fe$configure(
   ng_conv_parametrizations = "None",
   ng_conv_normalization_type = "PowerNorm",
   ng_conv_residual_type = "ResidualGate",
-  dense_act_fct = "None",
-  dense_n_layers = 1,
+  dense_act_fct = "GELU",
+  dense_n_layers = 3,
   dense_dropout = 0.40,
   dense_bias = FALSE,
   dense_parametrizations = "None",
@@ -2273,9 +1759,7 @@ classifier_with_fe$configure(
 )
 ```
 
-That is all. Now you can use and train the classifier in the same way as
-you did without a feature extractor. You even do not need to save and load the 
-feature extractor manually. This is done automatically for all classifiers.
+That's all. You can now use and train the classifier in the same way as before, without a feature extractor. You don't even need to save and load the feature extractor manually. This is done automatically for all classifiers.
 
 ```{r classifier_with_fe$train, include = TRUE, eval=TRUE}
 classifier_with_fe$train(
@@ -2319,7 +1803,7 @@ classifier_with_fe$train(
 )
 ```
 
-First we can analyze the training history of the performance estimation stage.
+First, we can analyse the training history of the performance estimation stage.
 
 ```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Feature Extractor during Performance Estimation Stage (loss)"),fig.align="center"}
 classifier_with_fe$plot_training_history(
@@ -2381,8 +1865,7 @@ classifier_with_fe$plot_training_history(
 running_num_figures <- running_num_figures + 1
 ```
 
-The training history of the final training stage is displayed in the following
-two Figures.
+The training history of the final stage is displayed in the following two Figures.
 
 ```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Feature Extractor during Final Training Stage (loss)"),fig.align="center"}
 classifier_with_fe$plot_training_history(
@@ -2444,7 +1927,7 @@ classifier_with_fe$plot_training_history(
 running_num_figures <- running_num_figures + 1
 ```
 
-For example, let us explore the performance of the classifier.
+Let us now explore the performance of the classifier, for example.
 
 ```{r, include = TRUE, eval=TRUE}
 classifier_with_fe$reliability$test_metric_mean
@@ -2456,27 +1939,19 @@ classifier_with_fe$reliability$standard_measures_mean
 
 ## 7.5. Saving and Loading
 
-If you would like to save and load a `TEFeatureExtractor` independently from a classifier
-you can use the function pair `save_to_disk` and `load_from_disk` as with the other objects
-of this package. This is useful if you would like to use the `TEFeatureExtractor`
-at a later time point in combination with other models. 
+If you would like to save and load a `TEFeatureExtractor` independently of a classifier, you can use the `save_to_disk` and `load_from_disk` functions, as with the other objects of this package. This is useful if you want to use the `TEFeatureExtractor` at a later point in time in combination with other models.
 
 # 8 Plots for Training History
 
 ## 8.1 BaseModels
 
-BaseModels, TEFeatureExtractors, and classifiers allow you to create plots showing 
-your model's training process. The process of requesting these plots is similar for all objects. 
-However, classifiers offer the greatest degree of customization of graphics. 
-This chapter shows you how to use the plots. We refer to the models from Postvious 
-chapters to provide some examples.
+You can use `BaseModels`, `TEFeatureExtractors` and classifiers to create plots showing your model's training process. The process of requesting these plots is similar for all objects. 
+However, classifiers offer the greatest degree of customisation of graphics. 
+This chapter demonstrates how to use the plots. We refer to models from previous chapters to provide examples.
 
-We start with the base models. The`x_min`, `x_max`, `y_min`, and `y_max` arguments 
-allow you to zoom in or out. If you set these arguments to `NULL`, the values will be determined automatically.
+We start with the base models. The `x_min`, `x_max`, `y_min` and `y_max` arguments allow you to zoom in or out. If you set these arguments to `NULL`, the values will be determined automatically.
 
-The `ind_best_model` argument allows you to emphasise the epoch with the smallest 
-loss for the validation sample. In general, this is the state of the model with the
-best generalization abilities. Unlike the classifiers, this is also the final state of the model after training.
+The `ind_best_model` argument allows you to emphasise the epoch with the lowest loss for the validation sample. In general, this is the state of the model with the best generalisation abilities. Unlike the classifiers, this is also the final state of the model after training.
 The `text_size` argument allows you to increase or decrease the size of the text within the graphic.
 
 ```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Example of a Training History for a BaseModel emphasizing the Best Model State.")}
@@ -2496,10 +1971,8 @@ running_num_figures <- running_num_figures + 1
 
 ## 8.2 Classifiers
 
-Classifiers offer a greater variety of options. With the `x_min`, `x_max`, `y_min` and `y_max` arguments, 
-you can define the area that the plot should show. Setting these arguments to `NULL` 
-will generate adequate values automatically. With `measure`, you can select the metric you would like to see.
-For example, the following plot shows the loss.
+Classifiers offer a greater variety of options. Using the `x_min`, `x_max`, `y_min` and `y_max` arguments, you can specify the area to be plotted. Setting these arguments to `NULL` will generate adequate values automatically. With the `measure` argument, you can select the metric you would like to see.
+For example, the following plot shows loss.
 
 ```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Example of a Training History for a Classifier emphasizing the Loss.")}
 classifier$plot_training_history(
@@ -2521,7 +1994,7 @@ classifier$plot_training_history(
 running_num_figures <- running_num_figures + 1
 ```
 
-The following plot illustrates how the average iota values developed during the training process.
+The following plot shows how the average iota values changed over the course of the training process.
 
 ```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Example of a Training History for a Classifier emphasizing the Average Iota.")}
 classifier$plot_training_history(
@@ -2544,7 +2017,7 @@ running_num_figures <- running_num_figures + 1
 ```
 
 Setting `ind_best_model` to `TRUE` will display additional points in the graphic.
-These points rePostsent the epochs and their corresponding values according to the chosen metric 
+These points represents the epochs and their corresponding values according to the chosen metric 
 at which the model performed best. For metrics such as loss, the values should be close to 0, 
 while for metrics such as accuracy, balanced accuracy and average iota, the best 
 values are close to 1. You can see one point for every fold during training.
@@ -2589,16 +2062,9 @@ classifier$plot_training_history(
 running_num_figures <- running_num_figures + 1
 ```
 
-Please note that these points indicate the optimal state of the model according 
-to the chosen metric for each fold.
-However, these values do not necessarily correspond to the final state of the model. 
-This is because the best state of a model during each training loop is determined 
-by the best average iota value. If there are multiple states of a model 
-with the same average iota value, the states with the best average iota value is selected, 
-and then the state with the best balanced accuracy value. If there are still multiple states, 
-the loss is taken into account. In other words, possible best states are all states with the best average iota value. 
-These states are then reduced to those with the best balanced accuracy value, and these states are then 
-reduced again to those with the best loss value. The state with the highest number of epochs is finally used.
+Please note that these points indicate the model's optimal state according to the chosen metric for each fold.
+However, these values do not necessarily reflect the final state of the model. 
+This is because the best state of a model during each training loop is determined by the best smoothed average iota value. If there are multiple models with the same smoothed average iota value, the model with the best loss is taken into account. Finally, the state with the highest number of epochs is used.
 
 Set `ind_selected_model` to `TRUE` to add the final states of the model for every fold.
 
@@ -2755,11 +2221,6 @@ Islam, A., Belhaouari, S. B., Rehman, A. U. & Bensmail, H. (2022).
 KNNOR: An oversampling technique for imbalanced datasets. 
 Applied Soft Computing, 115, 108288. <https://doi.org/10.1016/j.asoc.2021.108288>
 
-Jadon, S., & Garg, A. (2020). Hands-On One-shot Learning with Python:
-Learn to Implement Fast and Accurate Deep Learning Models with Fewer
-Training Samples Using Pytorch. Packt Publishing Limited.
-<https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=6175328>
-
 Kaplan, J., McCandlish, S., Henighan, T., Brown, T. B., Chess, B., Child, R., Gray, S., 
 Radford, A., Wu, J. & Amodei, D. (2020). Scaling Laws for Neural Language Models. 
 <https://doi.org/10.48550/arXiv.2001.08361>
@@ -2821,10 +2282,6 @@ Meng, Y., Krishnan, J., Wang, S., Wang, Q., Mao, Y., Fang, H., Ghazvininejad, M.
 Han, J., & Zettlemoyer, L. (2023). Representation Deficiency in Masked Language Modeling. arXiv. 
 <https://doi.org/10.48550/ARXIV.2302.02060>
 
-Oreshkin, B. N., Rodriguez, P., & Lacoste, A. (2018). TADAM: Task
-dependent adaptive metric for improved few-shot learning. Advance online
-publication. <https://doi.org/10.48550/arXiv.1805.10123>
-
 Papilloud, C., & Hinneburg, A. (2018). Qualitative Textanalyse mit
 Topic-Modellen: Eine Einführung für Sozialwissenschaftler. Wiesbaden:
 Springer. <https://doi.org/10.1007/978-3-658-21980-2>
@@ -2878,22 +2335,13 @@ H., . . . Dean, J. (2016). Google's Neural Machine Translation System:
 Bridging the Gap between Human and Machine Translation.
 <https://doi.org/10.48550/arXiv.1609.08144>
 
-Zhang, X., Nie, J., Zong, L., Yu, H., & Liang, W. (2019). One Shot
-Learning with Margin. In Q. Yang, Z.-H. Zhou, Z. Gong, M.-L. Zhang, &
-S.-J. Huang (Eds.), Lecture Notes in Computer Science. Advances in
-Knowledge Discovery and Data Mining (Vol. 11440, pp. 305–317). Springer
-International Publishing. <https://doi.org/10.1007/978-3-030-16145-3_24>
-
-Zou, L. (2023). Meta-Learning: Theory, Algorithms and Applications.
-Elsevier Science & Technology.
-<https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=7134465>
 
 # Script runtime
 
-```{r, include = TRUE}
-cat(paste("script runtime:", format(Sys.time() - script_time_start, digits = 3L)))
+```{r, eval =TRUE, include = FALSE}
+Total_time =format(Sys.time() - script_time_start, digits = 3L)
 ```
-
+The total running time of this script is: `r Total_time`
 
 
 

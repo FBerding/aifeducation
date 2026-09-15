@@ -1,0 +1,572 @@
+---
+title: "06 Prototype Based Classifiers"
+author: "Florian Berding"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{06 Prototype Based Classifiers}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+running_num_figures <- 1
+script_time_start <- Sys.time()
+```
+
+# 1 Introduction
+
+The classifier introduced in the vignette [03 Using R syntax](https://fberding.github.io/aifeducation/articles/classification_tasks.html) 
+is a regular classifier which comes with the traditional challenges of deep learning. These include the need for a large amount of training data and expensive hardware, as well as limited possibilities for adjusting the model's parameters (Jadon & Garg 2020, pp. 13–14). Since data is a bottleneck in the educational and social sciences, a classifier that can work with small data sets would be preferable. These types of models are discussed in the literature using terms such as 'meta-learning' (Zou 2023) and 'few-shot learning' (Jadon & Garg 2020). The basic idea behind these approaches is that the model learns to use supporting data to predict the output for a query data set (e.g. Zou, 2023, pp. 2–3). However, the model is not explicitly trained for the query data set.
+
+One type of model in this area is the prototypical network (ProtoNet), which was initially proposed by Snell, Swersky and Zemel (2017). These networks were developed to create classifiers that can generalise to new classes that the model did not encounter during training, using only a few examples of each class provided to the network (support data set). To achieve this, the networks learn to create a prototype for every class in the support data set with the help of the examples for each class. The network then compares the new data with these prototypes and assigns the class of the nearest prototype to the new data. As the network calculates the distance of each new case to each prototype, it belongs to the metric-based meta-learning approaches (Zhou 2023, p. 48).
+
+ProtoNet is a simple and easy-to-understand approach that provides good performance. Several extensions have been suggested: The *aifeducation* extension replaces the original loss function with the one suggested by Zhang et al. (2019) and adds the learnable metric described by Oreshkin, Rodriguez and Lacoste (2019) to improve performance.
+
+In this vignette we use the same text embedding model and data as introduced
+in the vignette [03 Using R syntax](https://fberding.github.io/aifeducation/articles/classification_tasks.html).
+Please refer to the aforementioned vignette for more details.
+
+```{r, include = TRUE, eval = TRUE}
+#Prepare Data
+example_data <- imdb_movie_reviews
+example_data$label <- as.character(example_data$label)
+example_data$label[c(76:100)] <- NA
+example_data$label[c(201:250)] <- NA
+table(example_data$label)
+example_data$bib_entry <- NA
+example_data$license <- NA
+colnames(example_data)
+data_set_reviews_text <- LargeDataSetForText$new()
+data_set_reviews_text$add_from_data.frame(example_data)
+print(data_set_reviews_text)
+
+#Prepare Labels
+review_labels <- as.factor(example_data$label)
+names(review_labels) <- example_data$id
+
+# Load a BaseModel
+base_model_eurobert <- BaseModelEuroBert$new()
+base_model_eurobert$create_from_hf(
+  model_dir = "examples/EuroBERT-210m",
+  tokenizer_dir = "examples/EuroBERT-210m"
+)
+
+# Get information about the model and 
+# set configuration for the TextEmbeddingModel
+total_max_seq_len <- base_model_eurobert$get_max_seq_len()
+total_max_seq_len
+chunk_quantile <- base_model_eurobert$Tokenizer$calc_quantiles(
+  text_dataset = data_set_reviews_text,
+  batch_size = 32L,
+  seq_len_tokens = 512L,
+  token_overlap = 128L,
+  trace = FALSE
+)
+print(chunk_quantile)
+max_chunks <- chunk_quantile["99.9%"]
+num_layers <- base_model_eurobert$get_n_layers()
+num_layers
+eurobert_min_layer <- floor(0.5 * num_layers)
+eurobert_min_layer
+
+eurobert_max_layer <- ceiling(2 / 3 * num_layers)
+eurobert_max_layer
+
+#Create TextEmbeddingModel
+tem <- TextEmbeddingModel$new()
+tem$configure(
+  model_label = "Text Embedding via EuroBert - 210m",
+  model_language = "english",
+  max_length = 512,
+  chunks = max_chunks,
+  overlap = 128,
+  emb_layer_min = eurobert_min_layer,
+  emb_layer_max = eurobert_max_layer,
+  emb_pool_type = "Average",
+  base_model = base_model_eurobert,
+  emb_insert_mask_tokens = 0.15
+)
+
+# Create text embeddings
+review_embeddings <- tem$embed_large(
+  text_dataset = data_set_reviews_text,
+  trace = TRUE
+)
+```
+
+# 2 Workflow
+
+## 2.1 Creation
+
+The application of a ProtoNet-based classifier is similar to that of regular classifiers. The only difference is the embedding dimension. A ProtoNet classifier uses a network to project the similarities and differences between individual cases and all prototypes into an n-dimensional space.
+Similar cases are located near each other, while different cases are located further away. The number of dimensions in this space is determined by the value of `embedding_dim`. If `embedding_dim` is set to 1, 2 or 3, the position of each case and prototype can easily be visualised. First, let us create and configure the new classifier.
+
+```{r, include = TRUE, eval=TRUE}
+classifier_prototype <- TEClassifierSequentialPrototype$new()
+classifier_prototype$configure(
+  label = "ProtoNet classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+  text_embeddings = review_embeddings,
+  feature_extractor = NULL,
+  target_levels = c("neg", "pos"),
+  skip_connection_type = "ResidualGate",
+  cls_input_normalize="PowerNorm",
+  cls_pooling_features = 20,
+  cls_pooling_type = "WeightedAverageTimes",
+  final_normalization_type="PowerNorm",
+  projection_type = "Regular",
+  metric_type = "Euclidean",
+  feat_act_fct = "None",
+  feat_size = 192,
+  feat_bias = FALSE,
+  feat_dropout = 0.05,
+  feat_parametrizations = "None",
+  feat_normalization_type = "PowerNorm",
+  ng_conv_act_fct = "GELU",
+  ng_conv_n_layers = 0,
+  ng_conv_ks_min = 1,
+  ng_conv_ks_max = 2,
+  ng_conv_bias = FALSE,
+  ng_conv_dropout = 0.05,
+  ng_conv_parametrizations = "None",
+  ng_conv_normalization_type = "PowerNorm",
+  ng_conv_residual_type = "ResidualGate",
+  dense_act_fct = "GELU",
+  dense_n_layers = 3,
+  dense_dropout = 0.40,
+  dense_bias = FALSE,
+  dense_parametrizations = "None",
+  dense_normalization_type = "PowerNorm",
+  dense_residual_type = "ResidualGate",
+  rec_act_fct = "Tanh",
+  rec_n_layers = 0,
+  rec_type = "GRU",
+  rec_bidirectional = FALSE,
+  rec_dropout = 0.2,
+  rec_bias = FALSE,
+  rec_parametrizations = "None",
+  rec_normalization_type = "PowerNorm",
+  rec_residual_type = "ResidualGate",
+  tf_act_fct = "SwiGLU",
+  tf_dense_dim = ceiling(2.67 * 192),
+  tf_n_layers = 0,
+  tf_dropout_rate_1 = 0.1,
+  tf_dropout_rate_2 = 0.3,
+  tf_attention_type = "MultiHead",
+  tf_positional_type = "absolute",
+  tf_num_heads = 4,
+  tf_bias = FALSE,
+  tf_parametrizations = "None",
+  tf_normalization_type = "PowerNorm",
+  tf_normalization_position = "Post",
+  tf_residual_type = "ResidualGate",
+  embedding_dim = 2
+)
+```
+
+We can now plot how the untrained classifiers embed the different cases and prototypes. To create the corresponding plot, call the method `plot_embeddings`. The argument `embeddings_q` uses the embeddings of the different cases as input for the classifier. If you have the true classes for all or some of the cases, you can add them to the plot using the argument `classes_q`. The resulting plot is shown in the following Figure.
+
+```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Embeddings of an untrained classifier of type 'ProtoNet'")}
+plot_untrained <- classifier_prototype$plot_embeddings(
+  embeddings_q = review_embeddings,
+  classes_q = review_labels,
+  inc_margin = FALSE
+)
+plot_untrained
+```
+
+The large triangles represent the prototypes for each class, while the dots refer to the labelled cases in the dataset. The colour of these represents their true class. For unlabelled cases, a square is used.
+Here, the colour indicates the estimated class. As you can see, all cases are located very similarly, and there seems to be no clear structure. Let us see how this changes when we train the model.
+
+## 2.2 Training
+
+```{r classifier_prototype$train, include = TRUE, eval=TRUE}
+classifier_prototype$train(
+  data_embeddings = review_embeddings,
+  data_targets = review_labels,
+  data_folds = 10,
+  data_val_size = 0.25,
+  loss_pt_fct_name = "MultiWayContrastiveLoss",
+  use_sc = FALSE,
+  sc_method = "knnor",
+  sc_min_k = 1,
+  sc_max_k = 10,
+  use_pl = FALSE,
+  pl_max_steps = 3,
+  pl_max = 1.00,
+  pl_anchor = 1.00,
+  pl_min = 0.00,
+  sustain_track = TRUE,
+  sustain_iso_code = "DEU",
+  sustain_region = NULL,
+  sustain_interval = 15,
+  sustain_log_level = "error",
+  epochs = 2000,
+  batch_size = 16,
+  Ns = 20,
+  Nq = 5,
+  loss_alpha = 0.50,
+  loss_margin = 0.05,
+  sampling_separate = FALSE,
+  sampling_shuffle = TRUE,
+  trace = TRUE,
+  ml_trace = 1,
+  log_dir = NULL,
+  log_write_interval = 10,
+  n_cores = auto_n_cores(),
+  lr_rate = 0.0,
+  lr_min = 0.0,
+  lr_epochs = 20,
+  lr_scheduler = "Linear",
+  lr_warm_up_ratio = 0.10,
+  optimizer = "AdamW",
+  amp = TRUE,
+  comp_use=TRUE,
+  comp_mode="reduce-overhead"
+)
+```
+
+While there are no arguments for requesting a balance of the class
+weights (`loss_balance_class_weights`) or balancing the sequence length
+(`loss_balance_sequence_length`), four new arguments are available. With `Ns`
+you determine how many examples of *every* class should be used during
+training within the support sample. These examples are used to calculate
+the prototypes for every class. With `Nq` you determine how many
+examples of *every* class should be part of the query sample. During
+training the network tries to predict the correct classes of query sample.
+
+The arguments `loss_alpha` and `loss_margin` refer to the configuration
+of the loss function describes by Zhang et al. (2019). `loss_margin`
+refers to the minimal distance all examples of the query sample should
+have to all prototypes that do *not* represent their class. `loss_alpha`
+determines if the loss should pay more attention to minimize the
+distance between the examples to their corresponding prototype or if it
+should pay more attention to maximize the distance to the prototypes
+that do not represents their class. If you set `loss_alpha=1,` the loss
+tries to minimize the distance of the examples to their corresponding
+prototype. If you set `loss_alpha=0,` loss tries to maximize the
+distance of all examples to all prototypes that do not reflect their
+class.
+
+The next two important arguments refer to the sampling strategies during
+training. With `sampling_separate=TRUE`, cases for sample and query a
+drawn from the same pool of cases. Thus, a specific case can be a sample
+case in one epoch and a query case in another epoch. However, it is
+ensured that a specific cases never occurs as a sample **and** a query case
+during the same training step. In addition, it is ensured that every
+case exists only once during a training step. If you set
+`sampling_separate=FALSE`, the training data set is split into one data
+pool for sample and one data pool for query. Thus, a case can only be a
+sample case **or** query case. With `shuffle` you can request that for
+every training step a random sample is chosen from the training data
+set, resulting in different combinations of sample and query cases. For
+the training we highly recommend to set `shuffle=TRUE`, since this will
+result in better performing classifiers.
+
+>During training, the model generates prototypes based on all the available data and classes in the training dataset (both sample and query). These classes and prototypes are used in cases where no sample data is provided.
+
+First we plot the analysis of learning rates.
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Analysis of Different Learning Rates"),fig.align="center"}
+classifier_prototype$plot_learning_rate()
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+Second we plot the training history for the loss and average iota during 
+performance estimation stage. 
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Prototypes during Performance Estimation Stage (loss)"),fig.align="center"}
+classifier_prototype$plot_training_history(
+  final_training = FALSE,
+  pl_step = NULL,
+  measure = "loss",
+  ind_best_model = FALSE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = NULL,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Prototypes during Performance Estimation Stage (iota)"),fig.align="center"}
+classifier_prototype$plot_training_history(
+  final_training = FALSE,
+  pl_step = NULL,
+  measure = "avg_iota",
+  ind_best_model = FALSE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = NULL,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Prototypes during Performance Estimation Stage (smoothed iota)"),fig.align="center"}
+classifier_prototype$plot_training_history(
+  final_training = FALSE,
+  pl_step = NULL,
+  measure = "s_avg_iota",
+  ind_best_model = FALSE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = NULL,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+The training history of the final training stage is displayed in the following 
+Figures.
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Prototypes during Final Training Stage (loss)"),fig.align="center"}
+classifier_prototype$plot_training_history(
+  final_training = TRUE,
+  pl_step = NULL,
+  measure = "loss",
+  ind_best_model = TRUE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = NULL,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Prototypes during Final Training Stage (iota)"),fig.align="center"}
+classifier_prototype$plot_training_history(
+  final_training = TRUE,
+  pl_step = NULL,
+  measure = "avg_iota",
+  ind_best_model = FALSE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = NULL,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Prototypes during Final Training Stage (smoothed iota)"),fig.align="center"}
+classifier_prototype$plot_training_history(
+  final_training = TRUE,
+  pl_step = NULL,
+  measure = "s_avg_iota",
+  ind_best_model = FALSE,
+  ind_selected_model = TRUE,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = NULL,
+  add_min_max = FALSE,
+  text_size = 10
+)
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+After training, we can request a visualisation of the data again. First, we omit all unlabelled cases by setting `inc_unlabelled=FALSE` in order to assess the quality of the training.
+
+```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Embeddings of a trained classifier of type 'ProtoNet' without unlabeled cases")}
+plot_trained_1 <- classifier_prototype$plot_embeddings(
+  embeddings_q = review_embeddings,
+  classes_q = review_labels,
+  inc_unlabeled = FALSE
+)
+plot_trained_1
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+As shown in the Figure, all cases are now sorted. Cases of the "neg" class are located close to the "neg" prototype, while cases of the "pos" class are located near the "pos" prototype. The black circle around the prototypes represents the margin used during training (`loss_margin`). 
+Since we are using the same data as during training, this result is to be expected. Only a small number of cases are located near the wrong prototype. This can be seen when a red dot is close to the "pos" prototype and a blue dot is close to the "neg" prototype.
+
+Now let us add the unlabelled cases to the plot by setting `inc_unlabelled = TRUE`.
+
+As the following Figure shows, the model estimates the class of these cases according to their distance from the two prototypes. Cases close to the "pos" prototype are assigned to "pos", while those near the "neg" prototype are assigned to "neg".
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Embedding of a trained classifier of type 'ProtoNet' including unlabeled cases")}
+plot_trained_2 <- classifier_prototype$plot_embeddings(
+  embeddings_q = review_embeddings,
+  classes_q = review_labels,
+  inc_unlabeled = TRUE
+)
+plot_trained_2
+```
+
+## 2.3 Performance Evaluation
+
+Finally, we will assess the reliability of this classifier.
+
+```{r, include = TRUE, eval=TRUE}
+classifier_prototype$reliability$test_metric_mean
+```
+
+```{r, include = TRUE, eval=TRUE}
+classifier_prototype$reliability$standard_measures_mean
+```
+
+### 2.4 Application with Sample Data
+
+Until now, we have not provided sample data. Consequently, the model used the available classes and prototypes during training. This is not the usual case for this type of model. Typically, a query and sample data are provided to the classifier. We will describe how this works in the following sections.
+
+To illustrate this process, we modify the data. Some of the positive reviews are labelled as 'very positive' and some of the negative reviews as 'very negative'. This increases the number of classes/categories from two to four.
+
+``` {r, include =TRUE, eval=TRUE }
+example_data <- imdb_movie_reviews
+example_data$label <- as.character(example_data$label)
+example_data$label[c(1:15)] <- "very negative"
+example_data$label[c(76:100)] <- NA
+example_data$label[c(201:250)] <- NA
+example_data$label[c(251:260)] <- "very positive"
+example_data$label <- factor(example_data$label)
+table(example_data$label, useNA = "ifany")
+```
+
+Our aim is now to predict the 75 unlabelled cases using our trained model, even though it was only trained on two different classes. First, we must therefore split the data.
+The cases with classes/categories will form the sample set, and the cases without any classes/categories will form the query set.
+
+``` {r, include =TRUE, eval=TRUE }
+sample_set_raw <- subset(example_data, !is.na(example_data$label))
+sample_classes <- sample_set_raw$label
+table(sample_classes, useNA = "ifany")
+
+sample_texts <- LargeDataSetForText$new()
+sample_texts$add_from_data.frame(sample_set_raw)
+```
+
+``` {r, include =TRUE, eval=TRUE }
+query_set_raw <- subset(example_data, is.na(example_data$label))
+table(query_set_raw$label, useNA = "ifany")
+
+query_texts <- LargeDataSetForText$new()
+query_texts$add_from_data.frame(query_set_raw)
+```
+
+Now, we need to generate text embeddings for both the query and the sample dataset. We must use the same embedding model that we used to train the classifier.
+
+``` {r, include =TRUE, eval=TRUE }
+sample_embeddings <- tem$embed_large(
+  text_dataset = sample_texts,
+  trace = TRUE
+)
+``` 
+
+``` {r, include =TRUE, eval=TRUE }
+query_embeddings <- tem$embed_large(
+  text_dataset = query_texts,
+  trace = TRUE
+)
+```
+
+We are now ready to use our classifier. First, we predict the classes of the query sample.
+
+``` {r, include =TRUE, eval=TRUE }
+new_Postdictions <- classifier_prototype$predict_with_samples(
+  newdata = query_embeddings,
+  embeddings_s = sample_embeddings,
+  classes_s = sample_classes
+)
+head(new_Postdictions)
+table(new_Postdictions$expected_category)
+```
+
+Although we trained our classifier for two classes, we can now use it to predict other classes. Next, we plot the results.
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+``` {r, include =TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Embeddings of a trained classifier of type 'ProtoNet' trained for two classes and applied for a sample set with four classes.")}
+plot_with_samples <- classifier_prototype$plot_embeddings(
+  embeddings_q = query_embeddings,
+  embeddings_s = sample_embeddings,
+  classes_s = sample_classes,
+  inc_unlabeled = TRUE,
+  inc_margin = FALSE
+)
+plot_with_samples
+```
+
+
+# References
+
+
+Jadon, S., & Garg, A. (2020). Hands-On One-shot Learning with Python:
+Learn to Implement Fast and Accurate Deep Learning Models with Fewer
+Training Samples Using Pytorch. Packt Publishing Limited.
+<https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=6175328>
+
+Oreshkin, B. N., Rodriguez, P., & Lacoste, A. (2018). TADAM: Task
+dependent adaptive metric for improved few-shot learning. Advance online
+publication. <https://doi.org/10.48550/arXiv.1805.10123>
+
+Zhang, X., Nie, J., Zong, L., Yu, H., & Liang, W. (2019). One Shot
+Learning with Margin. In Q. Yang, Z.-H. Zhou, Z. Gong, M.-L. Zhang, &
+S.-J. Huang (Eds.), Lecture Notes in Computer Science. Advances in
+Knowledge Discovery and Data Mining (Vol. 11440, pp. 305–317). Springer
+International Publishing. <https://doi.org/10.1007/978-3-030-16145-3_24>
+
+Zou, L. (2023). Meta-Learning: Theory, Algorithms and Applications.
+Elsevier Science & Technology.
+<https://ebookcentral.proquest.com/lib/kxp/detail.action?docID=7134465>
+
+
+# Script runtime
+
+```{r, eval =TRUE, include = FALSE}
+Total_time =format(Sys.time() - script_time_start, digits = 3L)
+```
+The total running time of this script is: `r Total_time`
+
+
+
+
