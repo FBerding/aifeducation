@@ -27,100 +27,24 @@ import sys
 import importlib.util
 import inspect 
 
-class ModelTrainerManager():
-  def __init__(self, model_type,ddp_use,train_args,tmp_dir,aife_dir):
-    self.model_type=model_type
-    self.tmp_dir=tmp_dir
-    self.aife_dir=aife_dir
-    self.ddp_use=ddp_use
-    self.train_args=train_args
-    self.backend_ddp="nccl"
-    self.world_size=torch.cuda.device_count()
+from Logger import (
+  LogWriter,
+  ProgressLogger
+)
 
-  @staticmethod
-  def init_trainer(model_type,ddp_use,train_args):
-    #Init Trainer
-    trainer=ModelTrainer(model_type,ddp_use)
-    #Add cnfig Information
-    if model_type=="ClassifierStandard":
-      trainer.config_for_StandardClassifier(**train_args)
-    elif model_type=="ClassifierPrototype":
-      trainer.config_for_ClassifierPrototype(**train_args)
-    elif model_type=="TEFeatureExtractor":
-      trainer.config_for_TEFeatureExtractor(**train_args)
-    return trainer 
-  
-  def calc_lr_rate(self,epochs):
-      #Disable ddp
-      self.ddp_use
-      #Init Trainer
-      trainer=self.init_trainer(self.model_type,self.ddp_use,self.train_args)
-      #Start Estimation
-      estimates=trainer.calc_lr_rate(epochs)
-      return estimates
-  
-  def do_training(self):
-    #If no ddp should be used
-    if self.ddp_use==False:
-      trainer=self.init_trainer(self.model_type,self.ddp_use,self.train_args)
-      #Start Training
-      trainer.do_training()
-      #Return training history
-      return trainer.metric_storage
-    #If ddp should be used
-    else:
-      # Write config and weights
-      self.train_args["model"].save_config(self.tmp_dir+"/nn_configs.json")
-      torch.save(self.train_args["model"].state_dict(),self.tmp_dir+"/nn_weights.pt")
-      self.train_args["train_data"].save_to_disk(self.tmp_dir+"train_data")
-      self.train_args["val_data"].save_to_disk(self.tmp_dir+"val_data")
-      
-      reduced_args=self.train_args.copy()
-      if "class_weights" in reduced_args:
-        reduced_args["class_weights"]=reduced_args["class_weights"].numpy().tolist()
-      
-      reduced_args= {
-        k: v
-        for k, v in  reduced_args.items()
-          if isinstance(v, (int, str, float, bool, list)) or v is None
-      }
-      
-      if self.train_args["test_data"] is not None:
-        self.train_args["test_data"].save_to_disk(self.tmp_dir+"test_data")
-      
-      #mp.spawn(
-      # self.do_training_ddp,
-      # args=(self.world_size,self.model_type,self.ddp_use,reduced_args,self.backend_ddp,self.tmp_dir,self.aife_dir),
-      # nprocs=self.world_size,
-      # join=True
-      #)
-      do_training_ddp(
-        rank=0, 
-        world_size=1,
-        model_type=self.model_type,
-        ddp_use=self.ddp_use,
-        train_args=reduced_args,
-        backend_ddp=self.backend_ddp,
-        tmp_dir=self.tmp_dir,
-        aife_dir=self.aife_dir
-      )
-  
+from Activations import get_act_fct
 
-  
-  @staticmethod
-  def setup_ddp(self,rank,world_size,backend_ddp):
-    os.environ["MASTER_ADDR"] = "localhost"
-    os.environ["MASTER_PORT"] = "12355" # Freier Port auf dem System
-    if dist.is_initialized():
-       dist.destroy_process_group()
-    dist.init_process_group(
-        backend=backend_ddp,
-        init_method="env://",
-        world_size=world_size,
-        rank=rank
-    )
-    #torch.cuda.set_device(rank)  
-    
+from Losses import(
+  feature_extractor_loss,
+  get_loss_cls_pt_fct,
+  get_loss_cls_fct
+)
+
+from Optimizer import (
+  get_Optimizer,
+  get_lr_scheduler
+)
+
 class ModelTrainer():
   def __init__(self,model_type,ddp_use):
     self.model_type=model_type
@@ -128,8 +52,6 @@ class ModelTrainer():
     self.amp_dtype=torch.bfloat16
     self.device_type = self.get_device_type()
     self.device = self.get_device()
-    #self.device_type = "cpu"
-    #self.device = "cpu"
     self.dtype = self.get_dtype()
     self.world_size=1
   #--------------  
@@ -259,6 +181,73 @@ class ModelTrainer():
       current_dtype=torch.float
     else:
       current_dtype=torch.float
+
+  def get_sampler(dataset,ddp_use=False,rank=0,world_size=1):
+    if ddp_use:
+      return torch.utils.data.distributed.DistributedSampler(
+      dataset, 
+      num_replicas=world_size, 
+      rank=rank, 
+      shuffle=True, 
+      seed=0, 
+      drop_last=True)
+    else:
+      return None
+
+
+  def create_metric_storage(metric_names,epochs,inc_test):
+    storage={}
+    for metric in metric_names:
+      if inc_test:
+        tmp_metric_storage=np.ones((3,epochs))*-100
+      else:
+        tmp_metric_storage=np.ones((2,epochs))*-100
+      storage[metric]=  tmp_metric_storage
+    storage["checkpoints"]=np.zeros((epochs))
+    return storage
+
+  def create_p_confusion_matrix(prob,label_idx,num_classes):
+    with torch.no_grad():
+      one_hot=torch.nn.functional.one_hot(label_idx, num_classes=num_classes) # B,T
+      one_hot=torch.unsqueeze(one_hot,dim=2) # B, T, 1
+      one_hot=one_hot.expand((one_hot.size(0),one_hot.size(1),one_hot.size(1))) #B,T,A
+  
+      prob_exp=torch.unsqueeze(prob,dim=1) # B,1,A
+      prob_exp=prob_exp.expand(one_hot.size()) #B,T,A
+      
+      confusion_matrix=torch.sum(one_hot*prob_exp,dim=0) # T, A
+    return confusion_matrix
+
+  def calc_cls_performance_measures(confusion_matrix,prob_confusion_matrix,n_classes):
+    with torch.no_grad():
+      diagonal=torch.diagonal(confusion_matrix) #(n_classes)
+      total_sum=torch.sum(confusion_matrix) #()
+      true_classes=torch.sum(confusion_matrix,dim=1) #(n_classes)
+      col_sum=torch.sum(confusion_matrix,dim=0) #(n_classes)
+    
+      acc=torch.sum(diagonal)/total_sum
+      bacc=torch.sum(diagonal/true_classes)/n_classes
+      avg_iota=diagonal/(col_sum+true_classes-diagonal)
+      avg_iota=torch.sum(avg_iota)/n_classes
+      
+      diagonal_p=torch.diagonal(prob_confusion_matrix) #(n_classes)
+      true_classes_p=torch.sum(prob_confusion_matrix,dim=1) #(n_classes)
+      col_sum_p=torch.sum(prob_confusion_matrix,dim=0) #(n_classes)
+      
+      avg_iota_p=diagonal_p/(col_sum_p+true_classes_p-diagonal_p)
+      avg_iota_p=torch.sum(avg_iota_p)/n_classes
+      
+    return {"accuracy":acc, "balanced_accuracy":bacc, "avg_iota":avg_iota, "s_avg_iota":avg_iota_p}
+
+  def add_metrics(metrics,storage,cblock,epoch):
+    if cblock=="train":
+      idx=0
+    elif cblock=="val":
+      idx=1
+    elif cblock=="test":
+      idx=2
+    for key in metrics.keys():
+      storage[key][idx,epoch]=metrics[key]  
       
   def prepare_dataloader(self):
     if self.model_type=="ClassifierStandard":
@@ -299,7 +288,7 @@ class ModelTrainer():
       drop_last =True,
       num_workers=0,
       persistent_workers=False,
-      sampler=get_sampler(train_data,ddp_use=ddp_use,rank=self.device,world_size=self.world_size),
+      sampler=self.get_sampler(train_data,ddp_use=ddp_use,rank=self.device,world_size=self.world_size),
       shuffle=not ddp_use)
     if not (val_data is None):
       valloader=torch.utils.data.DataLoader(
@@ -309,7 +298,7 @@ class ModelTrainer():
         persistent_workers=False,
         drop_last =True,
         num_workers=0,
-        sampler=get_sampler(val_data,ddp_use=ddp_use,rank=self.device,world_size=self.world_size),
+        sampler=self.get_sampler(val_data,ddp_use=ddp_use,rank=self.device,world_size=self.world_size),
         shuffle=not ddp_use)
     else:
       valloader=None
@@ -321,7 +310,7 @@ class ModelTrainer():
         persistent_workers=False,
         drop_last =True,
         num_workers=0,
-        sampler=get_sampler(test_data,ddp_use=ddp_use,rank=self.device,world_size=self.world_size),
+        sampler=self.get_sampler(test_data,ddp_use=ddp_use,rank=self.device,world_size=self.world_size),
         shuffle= not ddp_use)
     else:
       testloader=None
@@ -402,7 +391,7 @@ class ModelTrainer():
     self.elc=0
     if self.model_type=="ClassifierStandard" or self.model_type=="ClassifierPrototype":
         #Numpys for Saving Training History
-        self.metric_storage=create_metric_storage(
+        self.metric_storage=self.create_metric_storage(
           metric_names=["loss","accuracy","balanced_accuracy","avg_iota","s_avg_iota"],
           epochs=self.epochs,
           inc_test=True if not (self.test_data is None) else False
@@ -414,7 +403,7 @@ class ModelTrainer():
         self.best_val_avg_iota=float('-inf')
     elif self.model_type=="TEFeatureExtractor":
       #Numpys for Saving Training History
-      self.metric_storage=create_metric_storage(
+      self.metric_storage=self.create_metric_storage(
         metric_names=["loss"],
         epochs=self.epochs,
         inc_test=True if not (self.test_data is None) else False
@@ -520,20 +509,20 @@ class ModelTrainer():
         total_loss +=loss
         label_idx=labels.max(dim=1).indices
         confusion_matrix+=multiclass_confusion_matrix(input=output,target=label_idx,num_classes=self.n_classes,normalize = None)
-        prob_confusion_matrix+=create_p_confusion_matrix(torch.nn.Softmax(dim=1)(output),label_idx=label_idx,num_classes=self.n_classes)
+        prob_confusion_matrix+=self.create_p_confusion_matrix(torch.nn.Softmax(dim=1)(output),label_idx=label_idx,num_classes=self.n_classes)
       #Update log file
       self.logger.inc_value("bottom")
       self.logger.write_log()
       self.logger.write_history_log(self.metric_storage["loss"])
     #Calc final metrics for epoch
-    results=calc_cls_performance_measures(
+    results=self.calc_cls_performance_measures(
       confusion_matrix=confusion_matrix,
       prob_confusion_matrix=prob_confusion_matrix,
       n_classes=self.n_classes
     )
     results.update({"loss":total_loss/len(dataloader)})
     #Save metrics
-    add_metrics(
+    self.add_metrics(
       metrics=results,
       storage=self.metric_storage,
       cblock=cblock,
@@ -626,7 +615,7 @@ class ModelTrainer():
           label_idx=outputs[2].detach().to(dtype=torch.long,device=self.device)
           
         confusion_matrix+=multiclass_confusion_matrix(input=pred_idx,target=label_idx,num_classes=self.n_classes,normalize = None)
-        prob_confusion_matrix+=create_p_confusion_matrix(torch.nn.Softmax(dim=1)(outputs[0].detach()),label_idx=label_idx,num_classes=self.n_classes)
+        prob_confusion_matrix+=self.create_p_confusion_matrix(torch.nn.Softmax(dim=1)(outputs[0].detach()),label_idx=label_idx,num_classes=self.n_classes)
       
       #Update log file
       self.logger.inc_value("bottom")
@@ -649,14 +638,14 @@ class ModelTrainer():
           class_lables=class_label
           )
     #Calc final metrics for epoch
-    results=calc_cls_performance_measures(
+    results=self.calc_cls_performance_measures(
       confusion_matrix=confusion_matrix,
       prob_confusion_matrix=prob_confusion_matrix,
       n_classes=self.n_classes
     )
     results.update({"loss":total_loss/len(dataloader)})
     #Save metrics
-    add_metrics(
+    self.add_metrics(
       metrics=results,
       storage=self.metric_storage,
       cblock=cblock,
@@ -701,7 +690,7 @@ class ModelTrainer():
     #Calc final metrics for epoch
     results={"loss":total_loss/len(dataloader)}
     #Save metrics
-    add_metrics(
+    self.add_metrics(
       metrics=results,
       storage=self.metric_storage,
       cblock=cblock,
@@ -943,160 +932,25 @@ class ModelTrainer():
       
       
     
-#------------------------------------------------------------------------------
 
 
-#Functions that are part of the training loop
-def get_device():
-  return 'cuda' if torch.cuda.is_available() else 'cpu'
-
-def get_dtype(device):
-  if device=="cpu":
-    current_dtype=torch.float
-  else:
-    current_dtype=torch.float
-    
-def get_loss_cls_fct(name,class_weights):
-  if name =="CrossEntropyLoss":
-    loss_fct=torch.nn.CrossEntropyLoss(
-        reduction="none",
-        weight = class_weights)
-  elif name =="FocalLoss":
-    loss_fct=focal_loss(
-      gamma=2,
-      class_weights = class_weights,
-      scale_level = "nominal"
-    )
-  elif name =="FocalLossOrdinal":
-    loss_fct=focal_loss(
-      gamma=2,
-      class_weights = class_weights,
-      scale_level = "ordinal"
-    ) 
-  elif name =="AEMLoss":
-    loss_fct=aem_loss(
-      eps=1e-6
-    )    
-  return loss_fct
-
-def get_loss_cls_pt_fct(name,margin,alpha):
-  if name=="MultiWayContrastiveLoss":
-    fct=multi_way_contrastive_loss(
-      alpha=alpha,
-      margin=margin)
-  elif name=="MultiWayContrastiveLossFC":
-    fct=multi_way_contrastive_loss_fc(
-      alpha=alpha,
-      margin=margin,
-      scale_level="nominal")
-  elif name=="MultiWayContrastiveLossFCOrdinal":
-    fct=multi_way_contrastive_loss_fc(
-      alpha=alpha,
-      margin=margin,
-      scale_level="ordinal")    
-  elif name=="FocalLoss":
-    fct=focal_loss_pt(
-      class_weights=None,
-      gamma=2,
-      scale_level="nominal"
-    )
-  elif name=="FocalLossOrdinal":
-    fct=focal_loss_pt(
-      class_weights=None,
-      gamma=2,
-      scale_level="ordinal"
-    )
-  elif name =="AEMLoss":
-    fct=aem_loss_pt(
-      eps=1e-6
-    )      
-  return fct
-
-def get_sampler(dataset,ddp_use=False,rank=0,world_size=1):
-  if ddp_use:
-    return torch.utils.data.distributed.DistributedSampler(
-    dataset, 
-    num_replicas=world_size, 
-    rank=rank, 
-    shuffle=True, 
-    seed=0, 
-    drop_last=True)
-  else:
-    return None
-
-
-def create_metric_storage(metric_names,epochs,inc_test):
-  storage={}
-  for metric in metric_names:
-    if inc_test:
-      tmp_metric_storage=np.ones((3,epochs))*-100
-    else:
-      tmp_metric_storage=np.ones((2,epochs))*-100
-    storage[metric]=  tmp_metric_storage
-  storage["checkpoints"]=np.zeros((epochs))
-  return storage
-
-prob=torch.from_numpy(np.array([[1,2,3],[2,3,4],[3,4,5],[4,5,6],[5,6,7]]))
-
-def create_p_confusion_matrix(prob,label_idx,num_classes):
-  with torch.no_grad():
-    one_hot=torch.nn.functional.one_hot(label_idx, num_classes=num_classes) # B,T
-    one_hot=torch.unsqueeze(one_hot,dim=2) # B, T, 1
-    one_hot=one_hot.expand((one_hot.size(0),one_hot.size(1),one_hot.size(1))) #B,T,A
-
-    prob_exp=torch.unsqueeze(prob,dim=1) # B,1,A
-    prob_exp=prob_exp.expand(one_hot.size()) #B,T,A
-    
-    confusion_matrix=torch.sum(one_hot*prob_exp,dim=0) # T, A
-  return confusion_matrix
-
-def calc_cls_performance_measures(confusion_matrix,prob_confusion_matrix,n_classes):
-  with torch.no_grad():
-    diagonal=torch.diagonal(confusion_matrix) #(n_classes)
-    total_sum=torch.sum(confusion_matrix) #()
-    true_classes=torch.sum(confusion_matrix,dim=1) #(n_classes)
-    col_sum=torch.sum(confusion_matrix,dim=0) #(n_classes)
-  
-    acc=torch.sum(diagonal)/total_sum
-    bacc=torch.sum(diagonal/true_classes)/n_classes
-    avg_iota=diagonal/(col_sum+true_classes-diagonal)
-    avg_iota=torch.sum(avg_iota)/n_classes
-    
-    diagonal_p=torch.diagonal(prob_confusion_matrix) #(n_classes)
-    true_classes_p=torch.sum(prob_confusion_matrix,dim=1) #(n_classes)
-    col_sum_p=torch.sum(prob_confusion_matrix,dim=0) #(n_classes)
-    
-    avg_iota_p=diagonal_p/(col_sum_p+true_classes_p-diagonal_p)
-    avg_iota_p=torch.sum(avg_iota_p)/n_classes
-    
-  return {"accuracy":acc, "balanced_accuracy":bacc, "avg_iota":avg_iota, "s_avg_iota":avg_iota_p}
-
-def add_metrics(metrics,storage,cblock,epoch):
-  if cblock=="train":
-    idx=0
-  elif cblock=="val":
-    idx=1
-  elif cblock=="test":
-    idx=2
-  for key in metrics.keys():
-    storage[key][idx,epoch]=metrics[key]
 
 #=============================================================
-def check_and_set_checkpoints_cls(use_callback,model,filepath,epoch,metric_storage,best_val_avg_iota,best_val_loss,best_acc,best_bacc,acc_val,bacc_val,avg_iota_val,val_loss,elc):
-  if use_callback==True:
-      if (avg_iota_val>best_val_avg_iota) or (avg_iota_val==best_val_avg_iota and acc_val>best_acc) or (avg_iota_val==best_val_avg_iota and acc_val==best_acc and val_loss<best_val_loss):
-        if isinstance(model, torch._dynamo.eval_frame.OptimizedModule):
-          print("model is compiled")
-          torch.save(model._orig_mod.state_dict(),filepath)
-        else:
-          torch.save(model.state_dict(),filepath)
-        best_bacc=bacc_val
-        best_val_avg_iota=avg_iota_val
-        best_acc=acc_val
-        best_val_loss=val_loss
-        metric_storage["checkpoints"][epoch]=1
-        elc=epoch+1
-  return best_val_loss, best_acc,best_bacc,best_val_avg_iota,elc  
+#def check_and_set_checkpoints_cls(use_callback,model,filepath,epoch,metric_storage,best_val_avg_iota,best_val_loss,best_acc,best_bacc,acc_val,bacc_val,avg_iota_val,val_loss,elc):
+#  if use_callback==True:
+#      if (avg_iota_val>best_val_avg_iota) or (avg_iota_val==best_val_avg_iota and acc_val>best_acc) or (avg_iota_val==best_val_avg_iota and acc_val==best_acc and val_loss<best_val_loss):
+#        if isinstance(model, torch._dynamo.eval_frame.OptimizedModule):
+#          print("model is compiled")
+#          torch.save(model._orig_mod.state_dict(),filepath)
+#        else:
+#          torch.save(model.state_dict(),filepath)
+#        best_bacc=bacc_val
+#        best_val_avg_iota=avg_iota_val
+#        best_acc=acc_val
+#        best_val_loss=val_loss
+#        metric_storage["checkpoints"][epoch]=1
+#        elc=epoch+1
+#  return best_val_loss, best_acc,best_bacc,best_val_avg_iota,elc  
 
 class ModelWithLoss(torch.nn.Module):
   def __init__(self,model,loss_fct,model_type):
@@ -1132,6 +986,7 @@ class ModelWithLoss(torch.nn.Module):
         logits=outputs[0]
     )    
     return loss, outputs
+  
   def train_and_eval_feature_extractor(self,static_input,static_target):
     output=self.model(static_input,encoder_mode=False)
     predictions=output[0]
@@ -1140,18 +995,18 @@ class ModelWithLoss(torch.nn.Module):
     return loss, output
 
 
-def prepare_model(model):
-  device=get_device()
-  current_dtype=get_dtype(device)
-  model.to(device=device,dtype=current_dtype)
-  return model, device, current_dtype
+#def prepare_model(model):
+#  device=get_device()
+#  current_dtype=get_dtype(device)
+#  model.to(device=device,dtype=current_dtype)
+#  return model, device, current_dtype
 
-def prepare_loss_function(loss_cls_fct_name,class_weights,device,current_dtype,type="prob_classification"):
-  class_weights=class_weights.clone()
-  class_weights=class_weights.to(device)
-  loss_fct=get_loss_cls_fct(name=loss_cls_fct_name,class_weights=class_weights)
-  loss_fct.to(device=device,dtype=current_dtype)
-  return loss_fct
+#def prepare_loss_function(loss_cls_fct_name,class_weights,device,current_dtype,type="prob_classification"):
+#  class_weights=class_weights.clone()
+#  class_weights=class_weights.to(device)
+#  loss_fct=get_loss_cls_fct(name=loss_cls_fct_name,class_weights=class_weights)
+#  loss_fct.to(device=device,dtype=current_dtype)
+#  return loss_fct
   
 
 def calc_trained_prototypes_batch(n_classes,model,data_loader,device,dtype):

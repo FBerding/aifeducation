@@ -53,7 +53,7 @@ class FocalLoss(torch.nn.Module):
         focal = focal_factor * ce + penality
         return focal
     
-class MultiWayContrastiveLoss(torch.nn.Module):
+class multi_way_contrastive_loss(torch.nn.Module):
     def __init__(self, alpha=0.2, margin=0.5):
         super().__init__()
         self.alpha = alpha
@@ -148,7 +148,7 @@ class aem_loss(torch.nn.Module):
         loss_scalar = 1.0 - avg_iota_p
         
         loss_val = loss_scalar / batch_size
-        avg_iota_p = torch.full((batch_size, 1), loss_val, dtype=prob.dtype, device=prob.device)
+        avg_iota_p = torch.unsqueeze(loss_val,dim=0).expand((batch_size))
         
         return avg_iota_p
 
@@ -175,3 +175,59 @@ class feature_extractor_loss(torch.nn.Module):
     target_n=torch.nn.functional.normalize(target, p=2.0, dim=2, eps=1e-12, out=None)
     loss=torch.sqrt(self.mse_loss(input_n,target_n)).mean()+self.cov_loss(latent_space)
     return(loss)
+
+def get_loss_cls_fct(name,class_weights):
+  if name =="CrossEntropyLoss":
+    loss_fct=torch.nn.CrossEntropyLoss(
+        reduction="none",
+        weight = class_weights)
+  elif name =="FocalLoss":
+    loss_fct=focal_loss(
+      gamma=2,
+      class_weights = class_weights,
+      scale_level = "nominal"
+    )
+  elif name =="FocalLossOrdinal":
+    loss_fct=focal_loss(
+      gamma=2,
+      class_weights = class_weights,
+      scale_level = "ordinal"
+    ) 
+  elif name =="AEMLoss":
+    loss_fct=aem_loss(
+      eps=1e-6
+    )    
+  return loss_fct
+
+def get_loss_cls_pt_fct(name,margin,alpha):
+  if name=="MultiWayContrastiveLoss":
+    fct=multi_way_contrastive_loss(
+      alpha=alpha,
+      margin=margin)
+  elif name=="MultiWayContrastiveLossFC":
+    fct=multi_way_contrastive_loss_fc(
+      alpha=alpha,
+      margin=margin,
+      scale_level="nominal")
+  elif name=="MultiWayContrastiveLossFCOrdinal":
+    fct=multi_way_contrastive_loss_fc(
+      alpha=alpha,
+      margin=margin,
+      scale_level="ordinal")    
+  elif name=="FocalLoss":
+    fct=focal_loss_pt(
+      class_weights=None,
+      gamma=2,
+      scale_level="nominal"
+    )
+  elif name=="FocalLossOrdinal":
+    fct=focal_loss_pt(
+      class_weights=None,
+      gamma=2,
+      scale_level="ordinal"
+    )
+  elif name =="AEMLoss":
+    fct=aem_loss_pt(
+      eps=1e-6
+    )      
+  return fct

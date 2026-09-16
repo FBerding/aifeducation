@@ -121,7 +121,7 @@ def apply_weights_pair_orth_dense(x, weights):
 #Li, X., Chang, D., Ma, Z., Tan, Z.‑H., Xue, J.‑H., Cao, J., Yu, J. & Guo, J. (2020). 
 #OSLNet: Deep Small-Sample Classification With an Orthogonal Softmax Layer. 
 #IEEE Transactions on Image Processing, 29, 6482–6495. https://doi.org/10.1109/TIP.2020.2990277
-class pairwise_orthogonal_dense(nn.Module):
+class pairwise_orthogonal_dense(torch.nn.Module):
     def __init__(self, input_size, output_size, bias=False, pre_dense=False, device=None, dtype=None):
         super().__init__()
         self.input_size = input_size

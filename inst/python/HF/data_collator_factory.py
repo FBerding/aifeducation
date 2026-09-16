@@ -14,7 +14,7 @@
 
 from typing import Any, Literal
 
-from data_collators import (
+from HF.data_collators import (
     DataCollatorForTokenMLM,
     DataCollatorForTokenMLMAndWordPLM,
     DataCollatorForTokenMPLM,

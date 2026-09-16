@@ -59,8 +59,6 @@ class layer_switch_pad_values(torch.nn.Module):
     
     mask=torch.reshape(torch.repeat_interleave(mask,repeats=features,dim=1),(x.size(dim=0),x.size(dim=1),features))
     
-    #y=torch.clone(x)
-    #y[mask]=self.pad_value_new
     z=torch.where(condition=mask, input=self.pad_value_new, other=x)
     return z
 

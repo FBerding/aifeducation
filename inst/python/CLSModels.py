@@ -19,31 +19,30 @@ import safetensors
 import types
 import json
 
-def save_config(args):
-  arguments=args
-  arguments.pop("self")
-  arguments.pop("__class__", None)
-  arguments.pop("device")
-  arguments.pop("dtype")
-  return arguments
+from Layers import (
+  masking_layer,
+  layer_dropout_with_mask,
+  identity_layer,
+  exreme_pooling_over_time,
+  pairwise_orthogonal_dense,
+  dense_layer_with_mask,
+  layer_adaptive_extreme_pooling_1d
+)
 
-def write_config_to_json(self,filepath):
-  tmp_config=self.config
-  tmp_config["class_name"]=self.__class__.__name__
-  try:
-    with open(filepath, "w", encoding="utf-8") as file:
-        # indent=4 formatiert das JSON lesbar mit Einrückungen
-        json.dump(self.config, file, ensure_ascii=False, indent=4)
-  except IOError as e:
-    print(f"Error during saving config: {e}")
-  
+from Stacks import (
+  stack_tf_encoder_layer,
+  stack_recurrent_layers,
+  stack_n_gram_convolution,
+  stack_dense_layer
+)
 
-def init_weights_orthogonal(m):
-    # Check if the layer type has a weight attribute
-    if isinstance(m, (torch.nn.Linear, torch.nn.Conv2d, torch.nn.Conv3d)):
-        nn.init.orthogonal_(m.weight, gain=1.0)
-        if m.bias is not None:
-            nn.init.constant_(m.bias, 0.0)
+from CLSUtils import(
+  save_config,
+  write_config_to_json
+)
+
+from Normalizers import get_layer_normalization
+
 
 class TEClassifierSequential(torch.nn.Module):
   def __init__(self,times, features, cls_pooling_features, pad_value,n_target_levels,inc_cls_head=True,cls_input_normalize="None",skip_connection_type="ResidualGate",cls_type="Regular",cls_pooling_type="MinMax", 

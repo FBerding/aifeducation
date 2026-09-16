@@ -17,6 +17,16 @@ import numpy as np
 import math
 import safetensors
 
+from Layers import (
+  dense_layer_with_mask,
+  layer_pack_and_masking,
+  layer_unpack_and_masking,
+  layer_residual_connection,
+  layer_abs_positional_embedding,
+  layer_tf_encoder,
+  layer_mutiple_n_gram_convolution
+)
+
 #DenseLayer_stack_with_mask-----------------------------------------------------  
 #Layer for creating a stack of dense layers with masking ability
 # Returns a list with the following tensors
@@ -39,10 +49,8 @@ class stack_dense_layer(torch.nn.Module):
     self.normalization_type=normalization_type
     self.times=times
     if isinstance(pad_value, torch.Tensor):
-      #self.pad_value = pad_value.detach().float()
       self.register_buffer("pad_value",pad_value.clone().float())
     else:
-      #self.pad_value = torch.tensor(pad_value,dtype=torch.float)
       self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
     
     self.residual_type=residual_type
@@ -165,10 +173,8 @@ class stack_tf_encoder_layer(torch.nn.Module):
     self.dropout_rate_2=dropout_rate_2
     
     if isinstance(pad_value, torch.Tensor):
-      #self.pad_value = pad_value.detach().float()
       self.register_buffer("pad_value",pad_value.clone().float())
     else:
-      #self.pad_value = torch.tensor(pad_value,dtype=torch.float)
       self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
       
     self.bias=bias
@@ -234,10 +240,8 @@ class stack_n_gram_convolution(torch.nn.Module):
     self.ks_max=ks_max
     
     if isinstance(pad_value, torch.Tensor):
-      #self.pad_value = pad_value.detach().float()
       self.register_buffer("pad_value",pad_value.clone().float())
     else:
-      #self.pad_value = torch.tensor(pad_value,dtype=torch.float)
       self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
     
     self.layer_list=torch.nn.ModuleList()
