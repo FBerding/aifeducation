@@ -178,7 +178,7 @@ class feature_extractor_loss(torch.nn.Module):
   def __init__(self):
     super().__init__()
     self.mse_loss=torch.nn.MSELoss()
-    self.cov_loss=calc_SquaredCovSum
+    self.cov_loss=calc_Correlation
   def forward(self,input,target,latent_space):
     input_n=torch.nn.functional.normalize(input, p=2.0, dim=2, eps=1e-12, out=None)
     target_n=torch.nn.functional.normalize(target, p=2.0, dim=2, eps=1e-12, out=None)

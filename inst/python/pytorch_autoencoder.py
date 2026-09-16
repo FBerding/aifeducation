@@ -16,7 +16,7 @@ import torch
 import numpy as np
 import math
 
-def calc_SquaredCovSum(x):
+def calc_Correlation(x):
     batch_size, times, features = x.shape
     x_flat = x.reshape(batch_size * times, features) #(B*T,F)
     valid_mask = (torch.sum(x_flat, dim=1, keepdim=True) != 0).to(x_flat.dtype) #(B*T,1)
