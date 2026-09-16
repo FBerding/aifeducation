@@ -45,33 +45,41 @@ class LayerNorm_with_Mask(torch.nn.Module):
       self.gamma = torch.nn.Parameter(torch.ones(1, 1, self.features))
 
     def forward(self, x,mask_times):
-      #Set padding value to zero for correct sum
-      mask_features=get_FeatureMask_from_mask(mask_times,x.size(2))
-      x_zeros=x*(~mask_features)
-      #Calculate mean 
-      #Create the sum for every timestep and case. These sum has the
-      #shape (Batch, Times)
-      mean=torch.sum(x_zeros,dim=2)/self.features
-      
-      #Calculate variance
-      #Reshape mean to allow substraction shape (Batch, Times, Features)
-      mean_long=torch.unsqueeze(mean,dim=2)
-      mean_long=mean_long.expand(-1,-1,self.features)
-      
-      #Calculate variance which has shape (Batch, Times)
-      var=torch.sum(torch.square((x_zeros-mean_long)),dim=2)/self.features
-      var=torch.sqrt(var+self.eps)
-      
-      var_long=torch.unsqueeze(var,dim=2)
-      var_long=var_long.expand(-1,-1,self.features)
-
-      #Calculate normalized output
-      gamma_long=self.gamma.expand(x.size(0),self.times,-1)
-      normalized=gamma_long*(x_zeros-mean_long)/var_long
-      
-      #Insert padding values
-      normalized=torch.where(mask_features,self.pad_value,normalized)
-
+      if x.dim()==3:
+        if mask_times is None:
+          mask_times = torch.zeros(
+            (x.size(0), x.size(1)), dtype=torch.bool, device=x.device
+          )      
+        #Set padding value to zero for correct sum
+        mask_features=get_FeatureMask_from_mask(mask_times,x.size(2))
+        x_zeros=x*(~mask_features)
+        #Calculate mean 
+        #Create the sum for every timestep and case. These sum has the
+        #shape (Batch, Times)
+        mean=torch.sum(x_zeros,dim=2)/self.features
+        #Calculate variance
+        #Reshape mean to allow substraction shape (Batch, Times, Features)
+        mean_long=torch.unsqueeze(mean,dim=2)
+        mean_long=mean_long.expand(-1,-1,self.features)
+        #Calculate variance which has shape (Batch, Times)
+        var=torch.sum(torch.square((x_zeros-mean_long)),dim=2)/self.features
+        var=torch.sqrt(var+self.eps)
+        var_long=torch.unsqueeze(var,dim=2)
+        var_long=var_long.expand(-1,-1,self.features)
+        #Calculate normalized output
+        gamma_long=self.gamma.expand(x.size(0),self.times,-1)
+        normalized=gamma_long*(x_zeros-mean_long)/var_long
+        #Insert padding values
+        normalized=torch.where(mask_features,self.pad_value,normalized)
+      elif x.dim()==2:
+        x_zeros=x
+        #Calculate mean 
+        mean=torch.sum(x_zeros,dim=1, keepdim=True)/self.features #(B,1)
+        #Calculate variance
+        var=torch.sum(torch.square((x_zeros-mean)),dim=1,keepdim=True)/self.features #(B,1)
+        var=torch.sqrt(var+self.eps)
+        #Calculate normalized output
+        normalized=self.gamma*(x_zeros-mean)/var
       return normalized, mask_times
 
 # BatchNorm_with_Mask------------------------------------------------------------
@@ -249,14 +257,29 @@ class RMSNorm_with_Mask(nn.Module):
         """
         x: (..., features)
         """
-        mask_features = get_FeatureMask_from_mask(mask_times, self.features)
-        rms = x * (~mask_features)
-        rms = torch.pow(rms, 2)
-        rms = torch.sum(rms, dim=2, keepdim=True) / self.features
-        rms = torch.sqrt(rms + self.eps)  # eps for numeric stability
-        x_norm = x / (rms + self.eps)
-        x_norm = x_norm * self.gamma
-        x_norm = torch.where(mask_features, self.pad_value,x_norm)
+        if x.dim() == 3:
+          if mask_times is None:
+            mask_times = torch.zeros(
+              (x.size(0), x.size(1)), dtype=torch.bool, device=x.device
+            )
+          mask_features = get_FeatureMask_from_mask(mask_times, self.features)
+          rms = x * (~mask_features)
+          rms = torch.pow(rms, 2)
+          rms = torch.sum(rms, dim=2, keepdim=True) / self.features
+          rms = torch.sqrt(rms + self.eps)  # eps for numeric stability
+          x_norm = x / (rms + self.eps)
+          x_norm = x_norm * self.gamma
+          x_norm = torch.where(mask_features, self.pad_value,x_norm)
+        elif x.dim()==2:
+          #mask_features = get_FeatureMask_from_mask(mask_times, self.features)
+          #rms = x * (~mask_features)
+          rms=x
+          rms = torch.pow(rms, 2)
+          rms = torch.sum(rms, dim=1, keepdim=True) / self.features
+          rms = torch.sqrt(rms + self.eps)  # eps for numeric stability
+          x_norm = x / (rms + self.eps)
+          x_norm = x_norm * self.gamma
+          #x_norm = torch.where(mask_features, self.pad_value,x_norm)
         return x_norm, mask_times
 
 # PowerNorm with mask-----------------------------------------------------------
