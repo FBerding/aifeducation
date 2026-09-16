@@ -191,7 +191,7 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
             for name in self.encoder_layer_names:
                 w = getattr(self, name)
                 y = torch.nn.functional.linear(y, weight=w)
-                y=y*~self.get_mask(y,self.features_out)
+            y=y*~self.get_mask(y,self.features_out)
             # Switch padding value back if necessary
             if self.switch_pad_value_start is not None:
                 y = self.switch_pad_value_final(y)
