@@ -1126,9 +1126,9 @@ classifier$configure(
   cls_pooling_type = "WeightedAverageTimes",
   cls_head_type = "Regular",
   cls_input_normalize="PowerNorm",
-  final_normalization_type="PowerNorm",
+  final_normalization_type="RMSNorm",
   feat_act_fct = "None",
-  feat_size = 384,
+  feat_size = 256,
   feat_bias = FALSE,
   feat_dropout = 0.05,
   feat_parametrizations = "None",
@@ -1196,7 +1196,6 @@ tem$get_n_features()
 The value of `feat_size` should be equal to or less than this value since this layer tries to compress the text embeddings into fewer dimensions. While this reduces the number of parameters for all subsequent layers and decreases training and usage time, it may result in information loss.
 You can experiment with this value to strike a balance between speed and performance. 
 A study by Takeshita et al. (2025) shows that randomly dropping 50% of the dimensions leads only to a minor decrease in performance in classification tasks. Thus, this value can serve as a rule of thumb for determining this parameter. 
-
 In our example, we only have a very limited number of samples. Therefore, we reduce the number of features even further.
 
 In addition, the value of the parameter `cls_pooling_features` should be equal to or less than the value of feat_size. The value of `cls_pooling_features` determines how many of the resulting features are used for classification. Therefore, this value acts as a filter. This value is only relevant if your pooling method does not include the word 'Times'.
@@ -1711,9 +1710,9 @@ classifier_with_fe$configure(
   cls_pooling_type = "WeightedAverageTimes",
   cls_head_type = "Regular",
   cls_input_normalize="PowerNorm",
-  final_normalization_type="PowerNorm",
+  final_normalization_type="RMSNorm",
   feat_act_fct = "None",
-  feat_size = 384,
+  feat_size = 256,
   feat_bias = FALSE,
   feat_dropout = 0.05,
   feat_parametrizations = "None",
@@ -1815,7 +1814,7 @@ classifier_with_fe$plot_training_history(
   x_min = NULL,
   x_max = NULL,
   y_min = NULL,
-  y_max = 1,
+  y_max = NULL,
   add_min_max = FALSE,
   text_size = 10
 )
@@ -1877,7 +1876,7 @@ classifier_with_fe$plot_training_history(
   x_min = NULL,
   x_max = NULL,
   y_min = NULL,
-  y_max = 1,
+  y_max = NULL,
   add_min_max = FALSE,
   text_size = 10
 )
@@ -1940,6 +1939,14 @@ classifier_with_fe$reliability$standard_measures_mean
 ## 7.5. Saving and Loading
 
 If you would like to save and load a `TEFeatureExtractor` independently of a classifier, you can use the `save_to_disk` and `load_from_disk` functions, as with the other objects of this package. This is useful if you want to use the `TEFeatureExtractor` at a later point in time in combination with other models.
+
+```{r, include = TRUE, eval=TRUE}
+save_to_disk(
+  object = feature_extractor,
+  dir_path = "examples",
+  folder_name = "feature_extractor"
+)
+```
 
 # 8 Plots for Training History
 

@@ -99,11 +99,14 @@ review_embeddings <- tem$embed_large(
   text_dataset = data_set_reviews_text,
   trace = TRUE
 )
+
+# Load feature extractor (optional)
+feature_extractor=load_from_disk(
+  dir_path = file.path("examples","feature_extractor")
+)
 ```
 
-# 2 Workflow
-
-## 2.1 Creation
+# 2 Creation
 
 The application of a ProtoNet-based classifier is similar to that of regular classifiers. The only difference is the embedding dimension. A ProtoNet classifier uses a network to project the similarities and differences between individual cases and all prototypes into an n-dimensional space.
 Similar cases are located near each other, while different cases are located further away. The number of dimensions in this space is determined by the value of `embedding_dim`. If `embedding_dim` is set to 1, 2 or 3, the position of each case and prototype can easily be visualised. First, let us create and configure the new classifier.
@@ -113,17 +116,17 @@ classifier_prototype <- TEClassifierSequentialPrototype$new()
 classifier_prototype$configure(
   label = "ProtoNet classifier for Estimating a Postive or Negative Rating of Movie Reviews",
   text_embeddings = review_embeddings,
-  feature_extractor = NULL,
+  feature_extractor = feature_extractor,
   target_levels = c("neg", "pos"),
   skip_connection_type = "ResidualGate",
   cls_input_normalize="PowerNorm",
   cls_pooling_features = 20,
   cls_pooling_type = "WeightedAverageTimes",
-  final_normalization_type="PowerNorm",
+  final_normalization_type="RMSNorm",
   projection_type = "Regular",
   metric_type = "Euclidean",
   feat_act_fct = "None",
-  feat_size = 192,
+  feat_size = 384,
   feat_bias = FALSE,
   feat_dropout = 0.05,
   feat_parametrizations = "None",
@@ -138,11 +141,11 @@ classifier_prototype$configure(
   ng_conv_normalization_type = "PowerNorm",
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "GELU",
-  dense_n_layers = 3,
+  dense_n_layers = 4,
   dense_dropout = 0.40,
   dense_bias = FALSE,
   dense_parametrizations = "None",
-  dense_normalization_type = "PowerNorm",
+  dense_normalization_type = "RMSNorm",
   dense_residual_type = "ResidualGate",
   rec_act_fct = "Tanh",
   rec_n_layers = 0,
@@ -184,7 +187,7 @@ plot_untrained
 The large triangles represent the prototypes for each class, while the dots refer to the labelled cases in the dataset. The colour of these represents their true class. For unlabelled cases, a square is used.
 Here, the colour indicates the estimated class. As you can see, all cases are located very similarly, and there seems to be no clear structure. Let us see how this changes when we train the model.
 
-## 2.2 Training
+# 3 Training
 
 ```{r classifier_prototype$train, include = TRUE, eval=TRUE}
 classifier_prototype$train(
@@ -192,7 +195,7 @@ classifier_prototype$train(
   data_targets = review_labels,
   data_folds = 10,
   data_val_size = 0.25,
-  loss_pt_fct_name = "MultiWayContrastiveLoss",
+  loss_pt_fct_name = "MultiWayContrastiveLossFC",
   use_sc = FALSE,
   sc_method = "knnor",
   sc_min_k = 1,
@@ -442,7 +445,7 @@ plot_trained_2 <- classifier_prototype$plot_embeddings(
 plot_trained_2
 ```
 
-## 2.3 Performance Evaluation
+# 4 Performance Evaluation
 
 Finally, we will assess the reliability of this classifier.
 
@@ -454,7 +457,7 @@ classifier_prototype$reliability$test_metric_mean
 classifier_prototype$reliability$standard_measures_mean
 ```
 
-### 2.4 Application with Sample Data
+# 5 Application with Sample Data
 
 Until now, we have not provided sample data. Consequently, the model used the available classes and prototypes during training. This is not the usual case for this type of model. Typically, a query and sample data are provided to the classifier. We will describe how this works in the following sections.
 
