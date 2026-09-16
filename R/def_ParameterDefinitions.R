@@ -1649,7 +1649,7 @@ get_param_dict <- function() {
   param$cls_n_ref_points=list(
     type = "int",
     min = 2,
-    max = NULL,
+    max = Inf,
     allow_null = FALSE,
     allowed_values = NULL,
     values_desc = NULL,
