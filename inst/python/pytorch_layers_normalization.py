@@ -30,57 +30,29 @@ import safetensors
 # of further computations
 # Layer Norm is applied to the last dimensio as described in the paper
 # Layer Normalization in equation 4.
-class LayerNorm_with_Mask(torch.nn.Module):
-    def __init__(self, times, features,pad_value,eps=1e-5):
-      super().__init__()
-      self.eps=eps
-      self.times=times
-      self.features = features
-      if isinstance(pad_value, torch.Tensor):
-          #self.pad_value = pad_value.detach().float()
-          self.register_buffer("pad_value",pad_value.clone().float())
-      else:
-          #self.pad_value = torch.tensor(pad_value,dtype=torch.float)
-          self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
-      self.gamma = torch.nn.Parameter(torch.ones(1, 1, self.features))
+class LayerNorm_with_Mask(nn.Module):
+    def __init__(self, times, features, pad_value, eps=1e-5):
+        super().__init__()
+        self.eps = eps
+        self.times = times
+        self.features = features
+        if isinstance(pad_value, torch.Tensor):
+            self.register_buffer("pad_value", pad_value.clone().float())
+        else:
+            self.register_buffer("pad_value", torch.tensor(pad_value, dtype=torch.float))
+        self.gamma = nn.Parameter(torch.ones(1, self.features))
 
-    def forward(self, x,mask_times):
-      if x.dim()==3:
+    def forward(self, x, mask_times=None):
         if mask_times is None:
-          mask_times = torch.zeros(
-            (x.size(0), x.size(1)), dtype=torch.bool, device=x.device
-          )      
-        #Set padding value to zero for correct sum
-        mask_features=get_FeatureMask_from_mask(mask_times,x.size(2))
-        x_zeros=x*(~mask_features)
-        #Calculate mean 
-        #Create the sum for every timestep and case. These sum has the
-        #shape (Batch, Times)
-        mean=torch.sum(x_zeros,dim=2)/self.features
-        #Calculate variance
-        #Reshape mean to allow substraction shape (Batch, Times, Features)
-        mean_long=torch.unsqueeze(mean,dim=2)
-        mean_long=mean_long.expand(-1,-1,self.features)
-        #Calculate variance which has shape (Batch, Times)
-        var=torch.sum(torch.square((x_zeros-mean_long)),dim=2)/self.features
-        var=torch.sqrt(var+self.eps)
-        var_long=torch.unsqueeze(var,dim=2)
-        var_long=var_long.expand(-1,-1,self.features)
-        #Calculate normalized output
-        gamma_long=self.gamma.expand(x.size(0),self.times,-1)
-        normalized=gamma_long*(x_zeros-mean_long)/var_long
-        #Insert padding values
-        normalized=torch.where(mask_features,self.pad_value,normalized)
-      elif x.dim()==2:
-        x_zeros=x
-        #Calculate mean 
-        mean=torch.sum(x_zeros,dim=1, keepdim=True)/self.features #(B,1)
-        #Calculate variance
-        var=torch.sum(torch.square((x_zeros-mean)),dim=1,keepdim=True)/self.features #(B,1)
-        var=torch.sqrt(var+self.eps)
-        #Calculate normalized output
-        normalized=self.gamma*(x_zeros-mean)/var
-      return normalized, mask_times
+            mask_times = torch.zeros(x.shape[:-1], dtype=torch.bool, device=x.device)      
+        mask_features = mask_times.unsqueeze(-1)
+        x_zeros = torch.where(mask_features, 0.0, x)
+        mean = torch.sum(x_zeros, dim=-1, keepdim=True) / self.features
+        var = torch.sum(torch.square(x_zeros - mean), dim=-1, keepdim=True) / self.features
+        var = torch.sqrt(var + self.eps)
+        normalized = self.gamma * (x_zeros - mean) / var
+        normalized = torch.where(mask_features, self.pad_value, normalized)
+        return normalized, mask_times
 
 # BatchNorm_with_Mask------------------------------------------------------------
 # Layer generating the Batch Norm for sequential data.
@@ -235,51 +207,31 @@ class RMSNorm_with_Mask(nn.Module):
     def __init__(
         self,
         features: int,
-        pad_value: torch.LongTensor | int,
+        pad_value: torch.Tensor | int,
         eps: float = 1e-8,
     ):
         super().__init__()
         self.eps = eps
-        self.gamma = nn.Parameter(torch.ones(features))  # Multiplied
         self.features = features
+        self.gamma = nn.Parameter(torch.ones(1, features))
         if isinstance(pad_value, torch.Tensor):
-            #self.pad_value = pad_value.detach().float()
-            self.register_buffer("pad_value",pad_value.clone().float())
+            self.register_buffer("pad_value", pad_value.clone().float())
         else:
-            #self.pad_value = torch.tensor(pad_value,dtype=torch.float)
-            self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
+            self.register_buffer("pad_value", torch.tensor(pad_value, dtype=torch.float))
 
     def forward(
         self,
-        x: torch.FloatTensor,  # (B, T, F)
-        mask_times: torch.BoolTensor,  # (B, T)
+        x: torch.Tensor,        # (B, F) oder (B, T, F)
+        mask_times: torch.Tensor = None,  # (B,) oder (B, T)
     ) -> tuple:
-        """
-        x: (..., features)
-        """
-        if x.dim() == 3:
-          if mask_times is None:
-            mask_times = torch.zeros(
-              (x.size(0), x.size(1)), dtype=torch.bool, device=x.device
-            )
-          mask_features = get_FeatureMask_from_mask(mask_times, self.features)
-          rms = x * (~mask_features)
-          rms = torch.pow(rms, 2)
-          rms = torch.sum(rms, dim=2, keepdim=True) / self.features
-          rms = torch.sqrt(rms + self.eps)  # eps for numeric stability
-          x_norm = x / (rms + self.eps)
-          x_norm = x_norm * self.gamma
-          x_norm = torch.where(mask_features, self.pad_value,x_norm)
-        elif x.dim()==2:
-          #mask_features = get_FeatureMask_from_mask(mask_times, self.features)
-          #rms = x * (~mask_features)
-          rms=x
-          rms = torch.pow(rms, 2)
-          rms = torch.sum(rms, dim=1, keepdim=True) / self.features
-          rms = torch.sqrt(rms + self.eps)  # eps for numeric stability
-          x_norm = x / (rms + self.eps)
-          x_norm = x_norm * self.gamma
-          #x_norm = torch.where(mask_features, self.pad_value,x_norm)
+        if mask_times is None:
+            mask_times = torch.zeros(x.shape[:-1], dtype=torch.bool, device=x.device)
+        mask_features = mask_times.unsqueeze(-1)
+        x_zeros = torch.where(mask_features, 0.0, x)
+        rms = torch.sum(torch.square(x_zeros), dim=-1, keepdim=True) / self.features
+        rms = torch.sqrt(rms + self.eps)
+        x_norm = (x_zeros / rms) * self.gamma
+        x_norm = torch.where(mask_features, self.pad_value, x_norm)
         return x_norm, mask_times
 
 # PowerNorm with mask-----------------------------------------------------------
