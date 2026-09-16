@@ -789,7 +789,7 @@ class layer_tf_encoder(torch.nn.Module):
 
 #Merge Leyer
 class merge_layer(torch.nn.Module):
-  def __init__(self,times,features,n_extracted_features,n_input_streams,pad_value,pooling_type="Max",normalization_type="None",final_normalization_type="PowerNorm",attention_type="MultiHead",num_heads=1,device=None,dtype=None):
+  def __init__(self,times,features,n_extracted_features,n_input_streams,pad_value,pooling_type="Max",normalization_type="None",final_normalization_type="RMSNorm",attention_type="MultiHead",num_heads=1,device=None,dtype=None):
     super().__init__()
     
     self.times=times
