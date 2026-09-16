@@ -217,7 +217,7 @@ classifier_prototype$configure(
   tf_normalization_type = "PowerNorm",
   tf_normalization_position = "Post",
   tf_residual_type = "ResidualGate",
-  final_normalization_type="PowerNorm",
+  final_normalization_type="RMSNorm",
   embedding_dim = 2
 )
 

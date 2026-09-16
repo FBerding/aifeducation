@@ -26,9 +26,9 @@ cls$configure(
   shared_feat_layer = FALSE,
   merge_attention_type = "MultiHead",
   merge_num_heads = 4L,
-  merge_normalization_type = "LayerNorm",
+  merge_normalization_type = "RMSNorm",
   merge_pooling_features = 0.25*192,
-  merge_pooling_type = "MinMaxTimes",
+  merge_pooling_type = "WeightedAverageTimes",
 
   label = "ProtoNet classifier for Estimating a Postive or Negative Rating of Movie Reviews",
   text_embeddings = embeddings,
@@ -44,7 +44,7 @@ cls$configure(
   projection_type = "PairwiseOrthogonal",
   metric_type = "CosineDistance",
 
-  feat_act_fct = "ELU",
+  feat_act_fct = "None",
   feat_size = 0.5*192,
   feat_bias = FALSE,
   feat_dropout = 0.33,
