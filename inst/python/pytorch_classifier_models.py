@@ -52,7 +52,7 @@ class TEClassifierSequential(torch.nn.Module):
               dense_act_fct="ELU",dense_n_layers=0,dense_dropout=0.0,dense_bias=False,dense_parametrizations="None", dense_residual_type="ResidualGate",dense_normalization_type="LayerNorm",
               rec_act_fct="Tanh",rec_n_layers=0,rec_type="GRU",rec_bidirectional=False,rec_dropout=0.0,rec_bias=False,rec_parametrizations="None",rec_residual_type="ResidualGate",rec_normalization_type="LayerNorm", 
               tf_act_fct="ELU",tf_dense_dim=50,tf_n_layers=0,tf_dropout_rate_1=0.0,tf_dropout_rate_2=0.0,tf_attention_type="MultiHead",tf_positional_type ="absolute",tf_num_heads=1,tf_bias=False,tf_parametrizations="None",tf_residual_type="ResidualGate",tf_normalization_type="LayerNorm", tf_normalization_position="pre",
-              final_normalization_type="PowerNorm",
+              final_normalization_type="RMSNorm",
               device=None, dtype=None):
       super().__init__()
       #Save configuration to dict
@@ -269,7 +269,7 @@ class TEClassifierParallel(torch.nn.Module):
               rec_act_fct="Tanh",rec_n_layers=0,rec_type="GRU",rec_bidirectional=False,rec_dropout=0.0,rec_bias=False,rec_parametrizations="None", rec_residual_type="ResidualGate",rec_normalization_type="LayerNorm",
               tf_act_fct="ELU",tf_dense_dim=50,tf_n_layers=0,tf_dropout_rate_1=0.0,tf_dropout_rate_2=0.0,tf_attention_type="MultiHead",tf_positional_type ="absolute",tf_num_heads=1,tf_bias=False,tf_parametrizations="None",tf_residual_type="ResidualGate",tf_normalization_type="LayerNorm", tf_normalization_position="pre",
               merge_attention_type="MultiHead",merge_num_heads=1,merge_normalization_type="LayerNorm",merge_pooling_type="MinMax",merge_pooling_features=2,
-              final_normalization_type="PowerNorm",
+              final_normalization_type="RMSNorm",
               device=None, dtype=None):
       super().__init__()
       #Save configuration to dict
@@ -589,7 +589,7 @@ class TEClassifierReferencePoint(torch.nn.Module):
               cls_times_pooling_type="MinMax",
               merge_times_pooling_type="MinMax",
               metric_type="Euclidean",
-              final_normalization_type="PowerNorm",
+              final_normalization_type="RMSNorm",
               device=None, dtype=None):
     super().__init__()
     #Save configuration to dict
@@ -815,7 +815,7 @@ class TEClassifierPrototype(torch.nn.Module):
               merge_attention_type="MultiHead",merge_num_heads=1,merge_normalization_type="LayerNorm",merge_pooling_features=2,merge_pooling_type="MinMax",
               cls_pooling_features=2,cls_pooling_type="MinMax",
               metric_type="Euclidean",
-              final_normalization_type="PowerNorm",
+              final_normalization_type="RMSNorm",
               device=None, dtype=None):
     super().__init__()
     #Save configuration to dict
