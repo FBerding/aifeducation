@@ -493,19 +493,14 @@ class ModelTrainer():
         if cblock=="train":
           self.optimizer.zero_grad(set_to_none=True)
         #Prepare Data
-        inputs=batch["input"]
-        labels=batch["labels"]
-        inputs = inputs.to(device=self.device,dtype=self.dtype,non_blocking=True)
-        labels = labels.to(device=self.device,dtype=self.dtype,non_blocking=True)
-        self.static_input.copy_(inputs)
-        self.static_label.copy_(labels)
+        self.static_input.copy_(batch["input"],non_blocking=True)
+        self.static_label.copy_(batch["labels"],non_blocking=True)
         # If in batch.keys load the weights if not use the standard weights which
         #are one for every case
         if "sample_weights" in batch.keys():
           sample_weights=batch["sample_weights"]
           sample_weights=torch.reshape(input=sample_weights,shape=(sample_weights.size(dim=0),1))
-          sample_weights=sample_weights.to(device=self.device,dtype=self.dtype)
-          self.static_sample_weights.copy_(sample_weights) 
+          self.static_sample_weights.copy_(sample_weights,non_blocking=True) 
         #Forward
         with torch.autocast(device_type=self.device_type, dtype=self.amp_dtype, enabled=self.amp):
           loss,output=self.trainer(self.static_input,self.static_label,self.static_sample_weights)
@@ -679,12 +674,8 @@ class ModelTrainer():
       ctx=torch.no_grad()
     for batch in dataloader:
       with ctx:
-        inputs=batch["input"]
-        labels=batch["labels"]
-        inputs = inputs.to(self.device,dtype=self.dtype)
-        labels=labels.to(self.device,dtype=self.dtype)
-        self.static_input.copy_(inputs,non_blocking=True)
-        self.static_label.copy_(labels,non_blocking=True)
+        self.static_input.copy_(batch["input"],non_blocking=True)
+        self.static_label.copy_(batch["labels"],non_blocking=True)
         #Forward
         with torch.autocast(device_type=self.device_type, dtype=self.amp_dtype, enabled=self.amp):
           loss,output=self.trainer.train_and_eval_feature_extractor(self.static_input,self.static_label)
