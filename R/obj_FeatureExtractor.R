@@ -61,7 +61,7 @@ TEFeatureExtractor <- R6::R6Class(
                          te_n_layers=3,
                          method = "dense",
                          orthogonal_method = "matrix_exp",
-                         noise_factor = 0.2) {
+                         noise_factor = 1e-4) {
       tmp_args <- get_called_args(n = 1L)
       private$check_config_for_FALSE()
 
@@ -141,7 +141,7 @@ TEFeatureExtractor <- R6::R6Class(
                      sustain_interval = 15L,
                      sustain_log_level = "warning",
                      epochs = 40L,
-                     batch_size = 32L,
+                     batch_size = 512L,
                      trace = TRUE,
                      ml_trace = 1L,
                      log_dir = NULL,
