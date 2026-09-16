@@ -298,7 +298,7 @@ class ModelTrainer():
       pin_memory=pin_memory,
       drop_last =True,
       num_workers=0,
-      persistent_workers=True,
+      persistent_workers=False,
       sampler=get_sampler(train_data,ddp_use=ddp_use,rank=self.device,world_size=self.world_size),
       shuffle=not ddp_use)
     if not (val_data is None):
@@ -306,7 +306,7 @@ class ModelTrainer():
         val_data,
         batch_size=batch_size,
         pin_memory=pin_memory,
-        persistent_workers=True,
+        persistent_workers=False,
         drop_last =True,
         num_workers=0,
         sampler=get_sampler(val_data,ddp_use=ddp_use,rank=self.device,world_size=self.world_size),
@@ -318,7 +318,7 @@ class ModelTrainer():
         test_data,
         batch_size=batch_size,
         pin_memory=pin_memory,
-        persistent_workers=True,
+        persistent_workers=False,
         drop_last =True,
         num_workers=0,
         sampler=get_sampler(test_data,ddp_use=ddp_use,rank=self.device,world_size=self.world_size),
@@ -338,13 +338,13 @@ class ModelTrainer():
     trainloader=torch.utils.data.DataLoader(
       train_data,
       pin_memory = pin_memory,
-      persistent_workers=True,
+      persistent_workers=False,
       batch_sampler=ProtoNetSampler_Train)
     if not (val_data is None):
       valloader=torch.utils.data.DataLoader(
         val_data,
         pin_memory = pin_memory,
-        persistent_workers=True,
+        persistent_workers=False,
         batch_size=Ns+Nq,
         drop_last=True,
         shuffle=False)
@@ -354,7 +354,7 @@ class ModelTrainer():
       testloader=torch.utils.data.DataLoader(
         test_data,
         pin_memory =pin_memory,
-        persistent_workers=True,
+        persistent_workers=False,
         batch_size=Ns+Nq,
         drop_last=True,
         shuffle=False)
