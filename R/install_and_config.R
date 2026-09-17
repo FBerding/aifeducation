@@ -612,8 +612,6 @@ prepare_session <- function(env_type = "auto",
     }
   }
 
-  message("Load all python objects and functions.")
-  load_all_py_scripts()
   # Set logger level of python packages
   if (set_logger_level) {
     message("Set logger level of python packages.")
