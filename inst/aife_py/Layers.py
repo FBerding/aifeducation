@@ -17,13 +17,15 @@ import numpy as np
 import math
 import safetensors
 
-def get_SeqLen_from_mask(mask):
-  seq_len = torch.sum(~mask,dim=1,keepdim=False)
-  return seq_len.detach()
+from .Normalizers import get_layer_normalization
+from .Normalizers import identity_layer
 
-def get_FeatureMask_from_mask(mask,num_features):
-  mask = torch.unsqueeze(mask,dim=2).expand((mask.size(0),mask.size(1),num_features))
-  return mask.detach()
+from .DistanceFunctions import CosineDistance
+
+from .Activations import get_act_fct
+from .CLSUtils import get_SeqLen_from_mask, get_FeatureMask_from_mask
+
+
 
 # Masking Layer------------------------------------------------------------------
 # Layer for generating masking tensors
@@ -94,21 +96,7 @@ class layer_residual_connection(torch.nn.Module):
         z = torch.where(mask_features, self.pad_value, z)
         return z, mask_times
 
-class identity_layer(torch.nn.Module):
-  def __init__(self,pad_value=None,apply_masking=True):
-    super().__init__()
-    if not pad_value==None:
-      if isinstance(pad_value, torch.Tensor):
-          self.register_buffer("pad_value",pad_value.clone().float())
-      else:
-          self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
-    self.apply_masking=apply_masking
-  def forward(self,x,mask_times):
-    if self.apply_masking:
-      y=torch.where(get_FeatureMask_from_mask(mask_times,x.size(2)),self.pad_value,x)
-    else:
-      y=x
-    return y,mask_times
+
 
 #Blockwise orthogonal dense layer----------------------------------------------
 #Function required for block_orth_dense to speed up comutations via vmap
@@ -133,13 +121,13 @@ class pairwise_orthogonal_dense(torch.nn.Module):
         self.n_params_residual = self.input_size - (self.n_params_ratio * self.output_size)
         self.n_params = self.input_size  
 
-        self.weight = nn.Parameter(torch.rand(self.n_params, device=device, dtype=dtype))
+        self.weight = torch.nn.Parameter(torch.rand(self.n_params, device=device, dtype=dtype))
         
         if self.bias:
-            self.beta = nn.Parameter(torch.zeros(self.output_size, device=device, dtype=dtype))
+            self.beta = torch.nn.Parameter(torch.zeros(self.output_size, device=device, dtype=dtype))
         
         if self.pre_dense:
-            self.dense_layer = nn.Linear(
+            self.dense_layer = torch.nn.Linear(
                 in_features=self.input_size, 
                 out_features=self.input_size, 
                 bias=self.bias, 
@@ -212,7 +200,7 @@ class flatten_layer_with_mask(torch.nn.Module):
 # True indicates that the sequence or is padded. If True these values should not be part 
 # of further computations. mask_features is adapted to the new output size
 class dense_layer_with_mask(torch.nn.Module):
-  def __init__(self,input_size,output_size,times,pad_value,connection_type="Regular",act_fct="ELU",normalization_type="LayerNorm",dropout=0.0,bias=True,parametrizations="None",device=None, dtype=None,residual_type="None"):
+  def __init__(self,input_size,output_size,times,pad_value,connection_type="Regular",act_fct="ELU",normalization_type="LayerNorm",dropout=0.0,bias=True,parametrizations="None",device=None, dtype=None,residual_type="None",identity_mode=False):
     super().__init__()
     
     self.input_size=input_size
@@ -234,22 +222,25 @@ class dense_layer_with_mask(torch.nn.Module):
       pad_value= self.pad_value,
       eps=1e-5)
     
-    if self.connection_type=="Regular":
-      self.dense=torch.nn.Linear(
-              in_features=self.input_size,
-              out_features=self.output_size,
-              bias=self.bias,
-              device=device, 
-              dtype=dtype
-              )
-    elif self.connection_type=="PairwiseOrthogonal":
-      self.dense=pairwise_orthogonal_dense(
-        input_size=self.input_size,
-        output_size=self.output_size,
-        bias=self.bias,
-        device=device, 
-        dtype=dtype
-        )
+    if identity_mode:
+      self.dense=torch.nn.Identity()
+    else:  
+      if self.connection_type=="Regular":
+        self.dense=torch.nn.Linear(
+                in_features=self.input_size,
+                out_features=self.output_size,
+                bias=self.bias,
+                device=device, 
+                dtype=dtype
+                )
+      elif self.connection_type=="PairwiseOrthogonal":
+        self.dense=pairwise_orthogonal_dense(
+          input_size=self.input_size,
+          output_size=self.output_size,
+          bias=self.bias,
+          device=device, 
+          dtype=dtype
+          )
     if self.parametrizations=="OrthogonalWeights":
       torch.nn.utils.parametrizations.orthogonal(module=self.dense, name='weight',orthogonal_map="matrix_exp")
     elif self.parametrizations=="WeightNorm":
@@ -721,8 +712,8 @@ class layer_tf_encoder(torch.nn.Module):
         )
         
         #Residual
-        self.residual_connection_1 = LayerResidualConnection(residual_type, self.pad_value)
-        self.residual_connection_2 = LayerResidualConnection(residual_type, self.pad_value)
+        self.residual_connection_1 = layer_residual_connection(residual_type, self.pad_value)
+        self.residual_connection_2 = layer_residual_connection(residual_type, self.pad_value)
 
     def forward(self, x, mask_times):
         mask_features = mask_times.unsqueeze(-1)
@@ -833,9 +824,11 @@ class merge_layer(torch.nn.Module):
       self.pooling_over_features=layer_adaptive_extreme_pooling_1d(
         output_size=self.n_extracted_features,
         pooling_type=self.pooling_type
-        )  
+        )
+      final_dim=self.n_extracted_features
     else:
       self.pooling_over_features=torch.nn.Identity()
+      final_dim=self.n_pooling_features
       
     if self.attention_type=="MultiHead":
       self.attention_layer=torch.nn.MultiheadAttention(
@@ -865,7 +858,7 @@ class merge_layer(torch.nn.Module):
     self.final_normalization=get_layer_normalization(
         name=final_normalization_type,
         times=1, 
-        features=self.n_input_streams,
+        features=final_dim,
         pad_value=self.pad_value,
         eps=1e-6
       )
@@ -1023,7 +1016,7 @@ class turning_layer(torch.nn.Module):
             self.dropout = identity_layer(pad_value=self.pad_value, apply_masking=True)
             
         # Residual-Verbindung
-        self.residual_connection = LayerResidualConnection(residual_type, self.pad_value)    
+        self.residual_connection = layer_residual_connection(residual_type, self.pad_value)    
   
     def forward(self, x, mask_times):
         x_proj = self.projection(x)  # (B, T, F)

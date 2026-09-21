@@ -210,25 +210,25 @@ class ProgressLogger:
             end=end_string
         )
   def print_final_performance(self,trace,metric_storage,elc):
-
-    if metric_storage["loss"].shape[0]==3:
-      index=2
-      dataset_type="Test"
-    else:
-      index=1
-      dataset_type="Validation"
-    loss=metric_storage["loss"][index,elc-1]
-    acc=metric_storage["accuracy"][index,elc-1]
-    bacc=metric_storage["balanced_accuracy"][index,elc-1]
-    avg_iota=metric_storage["avg_iota"][index,elc-1]
-    s_avg_iota=metric_storage["s_avg_iota"][index,elc-1]
-    print("Data Set Type: {} | ELC: {} | Loss {:.4f} | ACC: {:.4f} | BACC: {:.4f} | Avg. Iota: {:.4f} | Smoothed Avg. Iota: {:.4f}".format(
-      dataset_type,
-      elc,
-      loss,
-      acc,
-      bacc,
-      avg_iota,
-      s_avg_iota
+    if trace:
+      if metric_storage["loss"].shape[0]==3:
+        index=2
+        dataset_type="Test"
+      else:
+        index=1
+        dataset_type="Validation"
+      loss=metric_storage["loss"][index,elc-1]
+      acc=metric_storage["accuracy"][index,elc-1]
+      bacc=metric_storage["balanced_accuracy"][index,elc-1]
+      avg_iota=metric_storage["avg_iota"][index,elc-1]
+      s_avg_iota=metric_storage["s_avg_iota"][index,elc-1]
+      print("Data Set Type: {} | ELC: {} | Loss {:.4f} | ACC: {:.4f} | BACC: {:.4f} | Avg. Iota: {:.4f} | Smoothed Avg. Iota: {:.4f}".format(
+        dataset_type,
+        elc,
+        loss,
+        acc,
+        bacc,
+        avg_iota,
+        s_avg_iota
+        )
       )
-    )

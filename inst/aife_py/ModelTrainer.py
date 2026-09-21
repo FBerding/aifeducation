@@ -27,23 +27,25 @@ import sys
 import importlib.util
 import inspect 
 
-from Logger import (
+from .Logger import (
   LogWriter,
   ProgressLogger
 )
 
-from Activations import get_act_fct
+from .Activations import get_act_fct
 
-from Losses import(
+from .Losses import(
   feature_extractor_loss,
   get_loss_cls_pt_fct,
   get_loss_cls_fct
 )
 
-from Optimizer import (
+from .Optimizer import (
   get_Optimizer,
   get_lr_scheduler
 )
+
+from .CLSDataCollators import MetaLernerBatchSampler
 
 class ModelTrainer():
   def __init__(self,model_type,ddp_use):
@@ -182,7 +184,7 @@ class ModelTrainer():
     else:
       current_dtype=torch.float
 
-  def get_sampler(dataset,ddp_use=False,rank=0,world_size=1):
+  def get_sampler(self,dataset,ddp_use=False,rank=0,world_size=1):
     if ddp_use:
       return torch.utils.data.distributed.DistributedSampler(
       dataset, 
@@ -195,7 +197,7 @@ class ModelTrainer():
       return None
 
 
-  def create_metric_storage(metric_names,epochs,inc_test):
+  def create_metric_storage(self,metric_names,epochs,inc_test):
     storage={}
     for metric in metric_names:
       if inc_test:
@@ -206,7 +208,7 @@ class ModelTrainer():
     storage["checkpoints"]=np.zeros((epochs))
     return storage
 
-  def create_p_confusion_matrix(prob,label_idx,num_classes):
+  def create_p_confusion_matrix(self,prob,label_idx,num_classes):
     with torch.no_grad():
       one_hot=torch.nn.functional.one_hot(label_idx, num_classes=num_classes) # B,T
       one_hot=torch.unsqueeze(one_hot,dim=2) # B, T, 1
@@ -218,7 +220,7 @@ class ModelTrainer():
       confusion_matrix=torch.sum(one_hot*prob_exp,dim=0) # T, A
     return confusion_matrix
 
-  def calc_cls_performance_measures(confusion_matrix,prob_confusion_matrix,n_classes):
+  def calc_cls_performance_measures(self,confusion_matrix,prob_confusion_matrix,n_classes):
     with torch.no_grad():
       diagonal=torch.diagonal(confusion_matrix) #(n_classes)
       total_sum=torch.sum(confusion_matrix) #()
@@ -239,7 +241,7 @@ class ModelTrainer():
       
     return {"accuracy":acc, "balanced_accuracy":bacc, "avg_iota":avg_iota, "s_avg_iota":avg_iota_p}
 
-  def add_metrics(metrics,storage,cblock,epoch):
+  def add_metrics(self,metrics,storage,cblock,epoch):
     if cblock=="train":
       idx=0
     elif cblock=="val":
@@ -507,7 +509,7 @@ class ModelTrainer():
         assert torch.isnan(loss).any, "NANs in loss detected."
         output=output.detach()
         total_loss +=loss
-        label_idx=labels.max(dim=1).indices
+        label_idx=self.static_label.max(dim=1).indices
         confusion_matrix+=multiclass_confusion_matrix(input=output,target=label_idx,num_classes=self.n_classes,normalize = None)
         prob_confusion_matrix+=self.create_p_confusion_matrix(torch.nn.Softmax(dim=1)(output),label_idx=label_idx,num_classes=self.n_classes)
       #Update log file

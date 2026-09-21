@@ -27,7 +27,7 @@ import sys
 import importlib.util
 import inspect 
 
-from ModelTrainer import ModelTrainer
+from .ModelTrainer import ModelTrainer
 
 class ModelTrainerManager():
   def __init__(self, model_type,ddp_use,train_args,tmp_dir,aife_dir):

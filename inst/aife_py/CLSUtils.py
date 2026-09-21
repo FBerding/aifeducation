@@ -1,3 +1,5 @@
+import torch
+
 def save_config(args):
   arguments=args
   arguments.pop("self")
@@ -15,3 +17,11 @@ def write_config_to_json(self,filepath):
         json.dump(self.config, file, ensure_ascii=False, indent=4)
   except IOError as e:
     print(f"Error during saving config: {e}")
+
+def get_SeqLen_from_mask(mask):
+  seq_len = torch.sum(~mask,dim=1,keepdim=False)
+  return seq_len.detach()
+
+def get_FeatureMask_from_mask(mask,num_features):
+  mask = torch.unsqueeze(mask,dim=2).expand((mask.size(0),mask.size(1),num_features))
+  return mask.detach()

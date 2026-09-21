@@ -19,6 +19,25 @@ import numpy as np
 import math
 import safetensors
 
+from .CLSUtils import get_SeqLen_from_mask, get_FeatureMask_from_mask
+
+class identity_layer(torch.nn.Module):
+  def __init__(self,pad_value=None,apply_masking=True):
+    super().__init__()
+    if not pad_value==None:
+      if isinstance(pad_value, torch.Tensor):
+          self.register_buffer("pad_value",pad_value.clone().float())
+      else:
+          self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
+    self.apply_masking=apply_masking
+  def forward(self,x,mask_times):
+    if self.apply_masking:
+      y=torch.where(get_FeatureMask_from_mask(mask_times,x.size(2)),self.pad_value,x)
+    else:
+      y=x
+    return y,mask_times
+
+
 #LayerNorm_with_Mask------------------------------------------------------------
 #Layer generating the Layer Norm for sequential data.
 # Returns a list with the following tensors
@@ -30,6 +49,29 @@ import safetensors
 # of further computations
 # Layer Norm is applied to the last dimensio as described in the paper
 # Layer Normalization in equation 4.
+class identity_layer(nn.Module):
+    def __init__(self, pad_value=None, apply_masking=True):
+        super().__init__()
+        if pad_value is not None:
+          if isinstance(pad_value, torch.Tensor):
+              self.register_buffer("pad_value", pad_value.clone().float())
+          else:
+              self.register_buffer("pad_value", torch.tensor(pad_value, dtype=torch.float))
+        else:
+            self.register_buffer("pad_value", torch.tensor(0.0, dtype=torch.float))
+            
+        self.apply_masking = apply_masking
+
+    def forward(self, x, mask_times=None):
+        if not self.apply_masking:
+            return x, mask_times
+        else:
+          if mask_times is None:
+              mask_times = torch.zeros(x.shape[:-1], dtype=torch.bool, device=x.device)      
+          mask_features = mask_times.unsqueeze(-1)
+          y = torch.where(mask_features, self.pad_value, x)
+          return y, mask_times
+
 class LayerNorm_with_Mask(nn.Module):
     def __init__(self, times, features, pad_value, eps=1e-5):
         super().__init__()
@@ -213,7 +255,7 @@ class RMSNorm_with_Mask(nn.Module):
         super().__init__()
         self.eps = eps
         self.features = features
-        self.gamma = nn.Parameter(torch.ones(1, features))
+        self.gamma = torch.nn.Parameter(torch.ones(1, features))
         if isinstance(pad_value, torch.Tensor):
             self.register_buffer("pad_value", pad_value.clone().float())
         else:

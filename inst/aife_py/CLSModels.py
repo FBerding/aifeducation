@@ -19,29 +19,37 @@ import safetensors
 import types
 import json
 
-from Layers import (
+from .Layers import (
   masking_layer,
   layer_dropout_with_mask,
-  identity_layer,
   exreme_pooling_over_time,
   pairwise_orthogonal_dense,
   dense_layer_with_mask,
-  layer_adaptive_extreme_pooling_1d
+  layer_adaptive_extreme_pooling_1d,
+  merge_layer,
+  layer_class_mean,
+  layer_protonet_metric,
+  layer_residual_connection
 )
 
-from Stacks import (
+from .Stacks import (
   stack_tf_encoder_layer,
   stack_recurrent_layers,
   stack_n_gram_convolution,
   stack_dense_layer
 )
 
-from CLSUtils import(
+from .CLSUtils import(
   save_config,
   write_config_to_json
 )
 
-from Normalizers import get_layer_normalization
+from .Normalizers import (
+  get_layer_normalization, 
+  identity_layer,
+  get_FeatureMask_from_mask,
+  get_SeqLen_from_mask
+)
 
 
 class TEClassifierSequential(torch.nn.Module):
@@ -87,10 +95,7 @@ class TEClassifierSequential(torch.nn.Module):
         eps=1e-6
       )
       
-      if features==feat_size:
-        self.features_resize_layer=layer_dropout_with_mask(p=feat_dropout, pad_value=pad_value)
-      else:
-        self.features_resize_layer=dense_layer_with_mask(
+      self.features_resize_layer=dense_layer_with_mask(
           input_size=features,
           pad_value=pad_value,
           times=times,
@@ -102,7 +107,8 @@ class TEClassifierSequential(torch.nn.Module):
           device=device, 
           dtype=dtype,
           residual_type="None",
-          normalization_type=feat_normalization_type
+          normalization_type=feat_normalization_type,
+          identity_mode=(feat_size==features)
       )
       
       if tf_n_layers >0:
@@ -299,10 +305,8 @@ class TEClassifierParallel(torch.nn.Module):
         eps=1e-6
       )
       
-      if features==feat_size:
-        self.features_resize_layer=layer_dropout_with_mask(p=feat_dropout, pad_value=pad_value)
-      else:
-        self.features_resize_layer=dense_layer_with_mask(
+
+      self.features_resize_layer=dense_layer_with_mask(
           input_size=features,
           pad_value=pad_value,
           output_size=feat_size,
@@ -314,7 +318,8 @@ class TEClassifierParallel(torch.nn.Module):
           device=device, 
           dtype=dtype,
           residual_type="None",
-          normalization_type=feat_normalization_type
+          normalization_type=feat_normalization_type,
+          identity_mode=(feat_size==features)
       )
 
       if tf_n_layers >0:
@@ -340,10 +345,7 @@ class TEClassifierParallel(torch.nn.Module):
           residual_type=tf_residual_type
         )
         if self.shared_feat_layer==False:
-          if features==feat_size:
-            self.features_resize_layer_tf=layer_dropout_with_mask(p=feat_dropout, pad_value=pad_value)
-          else:
-            self.features_resize_layer_tf=dense_layer_with_mask(
+          self.features_resize_layer_tf=dense_layer_with_mask(
               input_size=features,
               output_size=feat_size,
               times=times,
@@ -355,7 +357,8 @@ class TEClassifierParallel(torch.nn.Module):
               device=device, 
               dtype=dtype,
               residual_type="None",
-              normalization_type=feat_normalization_type
+              normalization_type=feat_normalization_type,
+              identity_mode=(feat_size==features)
           )        
         else:
           self.features_resize_layer_tf=None
@@ -382,10 +385,7 @@ class TEClassifierParallel(torch.nn.Module):
           normalization_type=rec_normalization_type
         )
         if self.shared_feat_layer==False:
-          if features==feat_size:
-            self.features_resize_layer_rec=layer_dropout_with_mask(p=feat_dropout, pad_value=pad_value)
-          else:
-            self.features_resize_layer_rec=dense_layer_with_mask(
+          self.features_resize_layer_rec=dense_layer_with_mask(
               input_size=features,
               output_size=feat_size,
               times=times,
@@ -397,8 +397,9 @@ class TEClassifierParallel(torch.nn.Module):
               device=device, 
               dtype=dtype,
               residual_type="None",
-              normalization_type=feat_normalization_type
-              )   
+              normalization_type=feat_normalization_type,
+              identity_mode=(feat_size==features)
+          )   
         else:
           self.features_resize_layer_rec=None
       else:
@@ -425,10 +426,7 @@ class TEClassifierParallel(torch.nn.Module):
         )
 
         if self.shared_feat_layer==False:        
-          if features==feat_size:
-            self.features_resize_layer_conv=layer_dropout_with_mask(p=feat_dropout, pad_value=pad_value)
-          else:
-            self.features_resize_layer_conv=dense_layer_with_mask(
+          self.features_resize_layer_conv=dense_layer_with_mask(
               input_size=features,
               output_size=feat_size,
               times=times,
@@ -440,7 +438,8 @@ class TEClassifierParallel(torch.nn.Module):
               dtype=dtype,
               pad_value=pad_value,
               residual_type="None",
-              normalization_type=feat_normalization_type
+              normalization_type=feat_normalization_type,
+              identity_mode=(feat_size==features)
           )        
         else:
           self.features_resize_layer_conv=None
@@ -466,10 +465,7 @@ class TEClassifierParallel(torch.nn.Module):
             )
 
         if self.shared_feat_layer==False:            
-          if features==feat_size:
-            self.features_resize_layer_dense=layer_dropout_with_mask(p=feat_dropout, pad_value=pad_value)
-          else:
-            self.features_resize_layer_dense=dense_layer_with_mask(
+          self.features_resize_layer_dense=dense_layer_with_mask(
               input_size=features,
               output_size=feat_size,
               times=times,
@@ -481,7 +477,8 @@ class TEClassifierParallel(torch.nn.Module):
               device=device, 
               dtype=dtype,
               residual_type="None",
-              normalization_type=feat_normalization_type
+              normalization_type=feat_normalization_type,
+              identity_mode=(feat_size==features)
           )
         else:
           self.features_resize_layer_dense=None
@@ -496,7 +493,7 @@ class TEClassifierParallel(torch.nn.Module):
         n_input_streams=self.n_streams,
         pooling_type=merge_pooling_type,
         normalization_type=merge_normalization_type,
-        final_normalization_type=final_normalization,
+        final_normalization_type=final_normalization_type,
         pad_value=pad_value,
         attention_type=merge_attention_type,
         num_heads=merge_num_heads,
@@ -770,7 +767,7 @@ class TEClassifierReferencePoint(torch.nn.Module):
       scale_grad_by_freq=False, 
       sparse=False
     )
-    nn.init.orthogonal_(self.ref_points.weight)
+    torch.nn.init.orthogonal_(self.ref_points.weight)
     self.logit_builder=torch.nn.Linear(
         in_features=self.cls_n_ref_points,
         out_features=self.n_target_levels,

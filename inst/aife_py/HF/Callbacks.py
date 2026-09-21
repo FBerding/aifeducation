@@ -12,8 +12,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
+import sys
 import transformers
 import csv
+from pathlib import Path
+parent_dir = str(Path(__file__).resolve().parent.parent)
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
+
+from Logger import write_log_py, write_log_performance_py
 
 def create_AIFETransformerCSVLogger_PT(loss_file,
                                        log_file, value_top, total_top, message_top, min_step,

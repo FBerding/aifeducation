@@ -15,6 +15,14 @@
 import transformers
 import datetime
 
+import sys
+from pathlib import Path
+parent_dir = str(Path(__file__).resolve().parent.parent)
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
+
+from Logger import write_log_py
+
 global current_batch
 current_batch = 0
 last_log = None

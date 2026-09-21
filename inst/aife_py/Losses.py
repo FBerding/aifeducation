@@ -22,12 +22,13 @@ def create_ordinal_weights(targets):
     class_idx = torch.argmax(targets, dim=1).detach()
     index_matrix = torch.arange(n_classes, dtype=class_idx.dtype, device=class_idx.device)
     weights = torch.abs(index_matrix.unsqueeze(0) - class_idx.unsqueeze(1))
-    n_factors = torch.sum(weights, dim=1, keepdim=True)
-    weights = weights / n_factors
+    weights=weights*weights
+    #n_factors = torch.sum(weights, dim=1, keepdim=True)
+    #weights = weights / n_factors
     return weights.detach()
     
 
-class FocalLoss(torch.nn.Module):
+class focal_loss(torch.nn.Module):
     def __init__(self, class_weights, gamma, scale_level="nominal"):
         super().__init__()
         self.class_weights = class_weights
@@ -164,6 +165,26 @@ class aem_loss_pt(torch.nn.Module):
       target=targets.float()
     ).mean()
     return loss    
+
+def calc_Correlation(x):
+    batch_size, times, features = x.shape
+    x_flat = x.reshape(batch_size * times, features) #(B*T,F)
+    valid_mask = (torch.sum(x_flat, dim=1, keepdim=True) != 0).to(x_flat.dtype) #(B*T,1)
+    n_cases = torch.sum(valid_mask) #()
+    sum_x = torch.sum(x_flat, dim=0, keepdim=True) #(1,F)
+    mean_x = sum_x / n_cases
+    x_centered = (x_flat - mean_x) * valid_mask
+    cov_matrix = torch.mm(x_centered.transpose(0, 1), x_centered)/(n_cases-1)
+    
+    std_dev = torch.sqrt(torch.diag(cov_matrix))
+    std_matrix = torch.outer(std_dev, std_dev) + 1e-8
+    corr_matrix = cov_matrix / std_matrix
+    
+    corr_squared = torch.square(corr_matrix)
+    total_sum = torch.sum(corr_squared)-torch.sum(torch.diag(corr_squared, diagonal=0))
+    valid_mask_final = (n_cases > 1).to(x.dtype)
+    cov_sum = total_sum * valid_mask_final/features
+    return cov_sum
 
 class feature_extractor_loss(torch.nn.Module):
   def __init__(self):

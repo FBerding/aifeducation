@@ -17,7 +17,7 @@ import numpy as np
 import math
 import safetensors
 
-from Layers import (
+from .Layers import (
   dense_layer_with_mask,
   layer_pack_and_masking,
   layer_unpack_and_masking,
@@ -26,6 +26,8 @@ from Layers import (
   layer_tf_encoder,
   layer_mutiple_n_gram_convolution
 )
+
+from .CLSUtils import get_FeatureMask_from_mask, get_SeqLen_from_mask
 
 #DenseLayer_stack_with_mask-----------------------------------------------------  
 #Layer for creating a stack of dense layers with masking ability

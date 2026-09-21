@@ -12,6 +12,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>
 
+import sys
+from pathlib import Path
+parent_dir = str(Path(__file__).resolve().parent.parent)
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
+
+from Logger import write_log_py
+
 def batch_iterator(dataset, batch_size = 200,
                    log_file = None, write_interval = 2,
                    value_top = 0, total_top = 1, message_top = "NA"):
