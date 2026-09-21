@@ -13,14 +13,12 @@
 tokenize_dataset <- function(dataset, tokenizer, max_length, add_special_tokens = TRUE,
                              log_file = NULL, write_interval = 2,
                              value_top = 0, total_top = 1, message_top = "NA") {
-  run_py_file("datasets_transformer_prepare_data.py")
-
   batch_size <- 2L
 
   id <- as.character(generate_id(16))
 
   tokenized_texts_raw <- dataset$map(
-    py$tokenize_raw_text,
+    aife$HF$PrepareData$tokenize_raw_text,
     batched = TRUE,
     batch_size = batch_size,
     load_from_cache_file = FALSE,

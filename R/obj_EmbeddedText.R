@@ -342,7 +342,11 @@ EmbeddedText <- R6::R6Class(
     #' @description Number of chunks/times of the text embeddings.
     #' @return Returns an `int` describing the number of chunks/times of the text embeddings.
     get_times = function() {
-      return(private$param_chunks)
+      if (self$is_compressed()) {
+        return(private$feature_extractor$times)
+      } else {
+        return(private$param_chunks)
+      }
     },
 
     #--------------------------------------------------------------------------
@@ -402,6 +406,7 @@ EmbeddedText <- R6::R6Class(
     add_feature_extractor_info = function(model_name,
                                           model_label = NA,
                                           features = NA,
+                                          times=NA,
                                           method = NA,
                                           noise_factor = NA,
                                           optimizer = NA) {
@@ -409,6 +414,7 @@ EmbeddedText <- R6::R6Class(
         model_name = model_name,
         model_label = model_label,
         features = features,
+        times=times,
         method = method,
         noise_factor = noise_factor,
         optimizer = optimizer
@@ -537,9 +543,59 @@ EmbeddedText <- R6::R6Class(
         padded_rows[4L], self$get_features(), "\n",
         padded_rows[5L], self$get_pad_value(), "\n"
       )
+    },
+    #' @description Calculates the correlation between the features across
+    #' times and cases.
+    #' @return Returns a `list` that shows statistics concerning the correlation
+    #' of the features. The filed 'effect_size' uses the absolute values of the correlation while
+    #' 'statistics' uses the raw estimates.
+    calc_feature_correlation=function(){
+      pad_value=self$get_pad_value()
+      n=dim(self$embeddings)[1L]
+      times=dim(self$embeddings)[2L]
+      features=dim(self$embeddings)[3L]
+
+      matrix_view=matrix(nrow=n*times,ncol=features,data=NA)
+      counter=1L
+      for(i in seq.int(n)){
+        for(j in seq.int(times)){
+          matrix_view[counter,]=self$embeddings[i,j,]
+          counter=counter+1L
+        }
+      }
+
+      condition=(rowSums(matrix_view)!=features*pad_value)
+      matrix_view=subset(matrix_view,condition)
+      cor_matrix=cor(matrix_view)
+      relevant=cor_matrix[upper.tri(cor_matrix,diag = FALSE)]
+      relevant_abs=sqrt(relevant*relevant)
+      summary=summary(relevant)
+      summary_abs=summary(relevant_abs)
+      result=list(
+        statistics=list(
+          min=summary["Min."],
+          q1=summary["1st Qu."],
+          median=summary["Median"],
+          mean=summary["Mean"],
+          sd=sd(relevant),
+          q3=summary["3rd Qu."],
+          max=summary["Max."]
+        ),
+        effect_sizes=list(
+          min=summary_abs["Min."],
+          q1=summary_abs["1st Qu."],
+          median=summary_abs["Median"],
+          mean=summary_abs["Mean"],
+          sd=sd(relevant_abs),
+          q3=summary_abs["3rd Qu."],
+          max=summary_abs["Max."]
+        )
+      )
     }
   )
 )
 
 # Add the model to the user list
 DataSetsIndex$EmbeddedText <- ("EmbeddedText")
+
+

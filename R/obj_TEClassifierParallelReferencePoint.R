@@ -160,7 +160,7 @@ TEClassifierParallelReferencePoint <- R6::R6Class(
     init_model = function() {
       private$check_config_for_TRUE()
 
-      private$model <- py$TEClassifierReferencePoint(
+      private$model <-aife$CLSModels$TEClassifierReferencePoint(
         features = as.integer(private$model_config$features),
         times = as.integer(private$model_config$times),
         target_levels = private$model_config$target_levels,

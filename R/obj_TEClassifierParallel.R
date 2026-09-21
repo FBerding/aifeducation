@@ -152,7 +152,7 @@ TEClassifierParallel <- R6::R6Class(
     #--------------------------------------------------------------------------
     init_model = function() {
       private$check_config_for_TRUE()
-      private$model <- py$TEClassifierParallel(
+      private$model <-aife$CLSModels$TEClassifierParallel(
         features = as.integer(private$model_config$features),
         times = as.integer(private$model_config$times),
         n_target_levels = as.integer(length(private$model_config$target_levels)),

@@ -366,7 +366,7 @@ TextEmbeddingModel <- R6::R6Class(
       sequence_mode <- self$BaseModel$get_private()$sequence_mode
 
       # Create a model for embedding
-      pytorch_embedding_model <- py$TextEmbeddingModel(
+      pytorch_embedding_model <-aife$TEM$TextEmbeddingModel(
         base_model = self$BaseModel$get_model(),
         chunks = as.integer(private$model_config$chunks),
         emb_layer_min = as.integer(private$model_config$emb_layer_min),
@@ -404,7 +404,7 @@ TextEmbeddingModel <- R6::R6Class(
 
         if (private$model_config$emb_insert_mask_tokens > 0.0) {
           special_tokens <- self$BaseModel$Tokenizer$get_special_tokens()
-          input_ids <- py$inject_mask_tokens(
+          input_ids <-aife$TEM$inject_mask_tokens(
             input_ids = tokens["input_ids"],
             mask_freq = ceiling(1 / private$model_config$emb_insert_mask_tokens),
             mask_id = as.integer(special_tokens["mask_token", "id"]),

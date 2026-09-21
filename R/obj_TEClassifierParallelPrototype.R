@@ -166,7 +166,7 @@ TEClassifierParallelPrototype <- R6::R6Class(
     # Private--------------------------------------------------------------------------
     init_model = function() {
       private$check_config_for_TRUE()
-      private$model <- py$TEClassifierPrototype(
+      private$model <-aife$CLSModels$TEClassifierPrototype(
         features = as.integer(private$model_config$features),
         times = as.integer(private$model_config$times),
         target_levels = reticulate::np_array(seq(from = 0L, to = (length(private$model_config$target_levels) - 1L))),

@@ -517,7 +517,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         prediction_data <- private$prepare_embeddings_as_dataset(embeddings_q)
         prediction_data$set_format("torch")
 
-        results <- py$TeProtoNetClassifierBatchPredict(
+        results <-aife$CLSPredictFct$TeProtoNetClassifierBatchPredict(
           model = private$model,
           dataset = prediction_data,
           batch_size = as.integer(batch_size),
@@ -707,7 +707,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         log_top_total = log_top_total,
         log_top_message = log_top_message
       )
-      trainer_manager=py$ModelTrainerManager(
+      trainer_manager=aife$ModelTrainerManager$ModelTrainerManager(
         model_type="ClassifierPrototype",
         ddp_use=self$last_training$config$ddp_use,
         train_args=train_args,

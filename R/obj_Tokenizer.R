@@ -585,10 +585,8 @@ WordPieceTokenizer <- R6::R6Class(
       )
 
       # calculate the model
-      run_py_file("datasets_transformer_compute_vocabulary.py")
-
       tok_new$train_from_iterator(
-        iterator = py$batch_iterator(
+        aife$HF$Vocabulary$batch_iterator(
           batch_size = 200L,
           dataset = text_dataset$get_dataset(),
           log_file = NULL,

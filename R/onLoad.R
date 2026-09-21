@@ -28,11 +28,7 @@ aife<-NULL
   pandas <<- reticulate::import("pandas", delay_load = TRUE)
   pyarrow <<- reticulate::import("pyarrow", delay_load = TRUE)
   calflops <<- reticulate::import("calflops", delay_load = TRUE)
-  aife<<-reticulate::import_from_path(
-    "python",
-    path = system.file(".",package = "aifeducation"),
-    delay_load = TRUE
-  )
+  aife<<-reticulate::import_from_path("aife_py",path = system.file(".",package = "aifeducation"),delay_load = TRUE)
 }
 
 

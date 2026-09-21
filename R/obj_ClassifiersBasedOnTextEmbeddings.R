@@ -131,7 +131,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         prediction_data <- private$prepare_embeddings_as_dataset(newdata)
 
         prediction_data$set_format("torch")
-        predictions_prob <- py$TeClassifierBatchPredict(
+        predictions_prob <- aife$CLSPredictFct$TeClassifierBatchPredict(
           model = private$model,
           dataset = prediction_data,
           batch_size = as.integer(batch_size)
@@ -433,7 +433,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
     #' @param measures `vector` of `strings` Names of the measures to plot.
     #' @return Returns a plot of class `ggplot` visualizing the training process.
     plot_reliability_distribution=function(measures="all"){
-      available_measures_names=colnames(classifier$reliability$test_metric)
+      available_measures_names=colnames(self$reliability$test_metric)
       if(measures=="all"){
         measures=available_measures_names
       }
@@ -1097,7 +1097,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         log_top_total = log_top_total,
         log_top_message = log_top_message
       )
-      trainer_manager=py$ModelTrainerManager(
+      trainer_manager=aife$ModelTrainerManager$ModelTrainerManager(
         model_type="ClassifierStandard",
         ddp_use=self$last_training$config$ddp_use,
         train_args=train_args,
@@ -1216,10 +1216,12 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
 
         private$model_config$use_fe <- TRUE
         private$model_config$features <- feature_extractor$get_model_config()$features
+        private$model_config$times <- feature_extractor$get_model_config()$times
         self$feature_extractor <- feature_extractor$clone(deep = TRUE)
       } else {
         private$model_config$use_fe <- FALSE
         private$model_config$features <- private$text_embedding_model[["features"]]
+        private$model_config$times <- private$text_embedding_model[["times"]]
       }
     },
     #--------------------------------------------------------------------------

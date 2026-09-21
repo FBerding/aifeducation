@@ -146,7 +146,7 @@ TEClassifierSequential <- R6::R6Class(
     init_model = function() {
       private$check_config_for_TRUE()
 
-      private$model <- py$TEClassifierSequential(
+      private$model <-aife$CLSModels$TEClassifierSequential(
         features = as.integer(private$model_config$features),
         times = as.integer(private$model_config$times),
         n_target_levels = as.integer(length(private$model_config$target_levels)),

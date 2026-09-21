@@ -46,18 +46,20 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param label `r get_param_doc_desc("label")`
     #' @param text_embeddings `r get_param_doc_desc("text_embeddings")`
     #' @param features `r get_param_doc_desc("features")`
+    #' @param features `r get_param_doc_desc("times")`
     #' @param te_n_layers `r get_param_doc_desc("te_n_layers")`
     #' @param method `r get_param_doc_desc("method")`
     #' @param orthogonal_method `r get_param_doc_desc("orthogonal_method")`
     #' @param noise_factor `r get_param_doc_desc("noise_factor")`
     #' @note `features` refers to the number of features for the compressed text embeddings.
-    #' @note This model requires `pad_value=0`. If this condition is not met the
-    #' padding value is switched automatically.
+    #' @note `times` refers to the number of times for the compressed text embeddings. Only relevant
+    #' if `method="Conv".`
     #' @return Returns an object of class [TEFeatureExtractor] which is ready for training.
     configure = function(name = NULL,
                          label = NULL,
                          text_embeddings = NULL,
                          features = 128L,
+                         times=2L,
                          te_n_layers=3,
                          method = "dense",
                          orthogonal_method = "matrix_exp",
@@ -196,7 +198,7 @@ TEFeatureExtractor <- R6::R6Class(
 
       # Copy input as label for training
       extractor_dataset <- tmp_data$map(
-        py$map_input_to_labels,
+        aife$HF$py_functions$map_input_to_labels,
         load_from_cache_file = FALSE,
         keep_in_memory = FALSE,
         cache_file_name = create_py_dataset_cache_file_path(
@@ -304,7 +306,7 @@ TEFeatureExtractor <- R6::R6Class(
         prepared_embeddings <- private$prepare_embeddings_as_dataset(data_embeddings)
 
         prepared_embeddings$set_format("torch")
-        reduced_tensors <- py$TeFeatureExtractorBatchExtract(
+        reduced_tensors <- aife$Autoencoder$TeFeatureExtractorBatchExtract(
           model = private$model,
           dataset = prepared_embeddings,
           batch_size = as.integer(batch_size)
@@ -352,7 +354,7 @@ TEFeatureExtractor <- R6::R6Class(
         model_language = model_info$model$model_language,
         param_seq_length = model_info$model$param_seq_length,
         param_features = dim(reduced_embeddings)[3L],
-        param_chunks = model_info$model$param_chunks,
+        param_chunks = dim(reduced_embeddings)[2L],
         param_overlap = model_info$model$param_overlap,
         param_emb_layer_min = model_info$model$param_emb_layer_min,
         param_emb_layer_max = model_info$model$param_emb_layer_max,
@@ -366,6 +368,7 @@ TEFeatureExtractor <- R6::R6Class(
         model_name = private$model_info$model_name,
         model_label = private$model_info$model_label,
         features = private$model_config$features,
+        times = private$model_config$times,
         method = private$model_config$method,
         noise_factor = private$model_config$noise_factor,
         optimizer = private$model_config$optimizer
@@ -424,7 +427,7 @@ TEFeatureExtractor <- R6::R6Class(
             model_language = model_info$model_language,
             param_seq_length = model_info$param_seq_length,
             param_features = dim(embeddings)[3L],
-            param_chunks = model_info$model$param_chunks,
+            param_chunks = dim(embeddings)[2L],
             param_overlap = model_info$model$param_overlap,
             param_emb_layer_min = model_info$model$param_emb_layer_min,
             param_emb_layer_max = model_info$model$param_emb_layer_max,
@@ -436,6 +439,7 @@ TEFeatureExtractor <- R6::R6Class(
             model_name = private$model_info$model_name,
             model_label = private$model_info$model_label,
             features = private$model_config$features,
+            times = private$model_config$times,
             method = private$model_config$method,
             noise_factor = private$model_config$noise_factor,
             optimizer = private$model_config$optimizer
@@ -486,7 +490,7 @@ TEFeatureExtractor <- R6::R6Class(
     #' @description Print method for classifiers.
     #' @return Prints a short description of the object.
     print = function() {
-      rows <- c("Object", "ID", "Label", "Configured", "Trained", "Times", "Features In", "Features Out", "Parameter")
+      rows <- c("Object", "ID", "Label", "Configured", "Trained", "Times In","Times Out", "Features In", "Features Out", "Parameter")
       padded_rows <- pad_str(rows, width = NULL, pad = " ", end = ": ")
       message(
         appendLF = FALSE,
@@ -496,9 +500,10 @@ TEFeatureExtractor <- R6::R6Class(
         padded_rows[4L], self$is_configured(), "\n",
         padded_rows[5L], self$is_trained(), "\n",
         padded_rows[6L], self$get_text_embedding_model()$times, "\n",
-        padded_rows[7L], self$get_text_embedding_model()$features, "\n",
-        padded_rows[8L], self$get_model_config()$features, "\n",
-        padded_rows[9L], self$count_parameter(), "\n"
+        padded_rows[7L], self$get_model_config()$times, "\n",
+        padded_rows[8L], self$get_text_embedding_model()$features, "\n",
+        padded_rows[9L], self$get_model_config()$features, "\n",
+        padded_rows[10L], self$count_parameter(), "\n"
       )
     }
   ),
@@ -508,17 +513,8 @@ TEFeatureExtractor <- R6::R6Class(
     init_model = function() {
       private$check_config_for_TRUE()
 
-      if (private$model_config$method == "LSTM") {
-        private$model <- py$LSTMAutoencoder_with_Mask_PT(
-          times = as.integer(private$text_embedding_model["times"]),
-          features_in = as.integer(private$text_embedding_model["features"]),
-          features_out = as.integer(private$model_config$features),
-          te_n_layers= as.integer(private$model_config$te_n_layers),
-          noise_factor = private$model_config$noise_factor,
-          pad_value = private$text_embedding_model$pad_value
-        )
-      } else if (private$model_config$method == "Dense") {
-        private$model <- feature_extractor <- py$DenseAutoencoder_with_Mask_PT(
+  if (private$model_config$method == "Dense") {
+        private$model <- aife$Autoencoder$DenseAutoencoder_with_Mask_PT(
           features_in = as.integer(private$text_embedding_model["features"]),
           features_out = as.integer(private$model_config$features),
           te_n_layers= as.integer(private$model_config$te_n_layers),
@@ -526,7 +522,19 @@ TEFeatureExtractor <- R6::R6Class(
           pad_value = private$text_embedding_model$pad_value,
           orthogonal_method = private$model_config$orthogonal_method
         )
-      }
+  }  else if(private$model_config$method == "Conv"){
+      private$model <- aife$Autoencoder$ConvAutoencoder_with_Mask_PT(
+        features_in = as.integer(private$text_embedding_model["features"]),
+        features_out = as.integer(private$model_config$features),
+        time_in = as.integer(private$text_embedding_model["times"]),
+        time_out = as.integer(private$model_config$times),
+        te_n_layers= as.integer(private$model_config$te_n_layers),
+        noise_factor = private$model_config$noise_factor,
+        pad_value = private$text_embedding_model$pad_value,
+        orthogonal_method = private$model_config$orthogonal_method
+      )
+
+    }
     },
     #--------------------------------------------------------------------------
     generate_model_id = function(name) {
@@ -578,7 +586,7 @@ TEFeatureExtractor <- R6::R6Class(
         log_top_message = log_top_message
       )
 
-      trainer_manager=py$ModelTrainerManager(
+      trainer_manager=aife$ModelTrainerManager$ModelTrainerManager(
         model_type="TEFeatureExtractor",
         ddp_use=self$last_training$config$ddp_use,
         train_args=train_args,

@@ -100,7 +100,7 @@ BaseModelCore <- R6::R6Class(
     update_logger = function(message) {
       private$log_state$value_top <- private$log_state$value_top + 1L
 
-      private$log_state$last_log <- py$write_log_py(
+      private$log_state$last_log <- aife$Logger$write_log_py(
         log_file = private$log_config$log_state_file,
         value_top = private$log_state$value_top,
         total_top = private$log_state$total_top,
@@ -171,16 +171,8 @@ BaseModelCore <- R6::R6Class(
         trace = self$last_training$config$trace
       )
       if (self$last_training$config$whole_word) {
-        run_py_file("data_collator_factory.py")
 
-        # tmp_data_collator <- py$AifeDataCollatorForWholeWordMask(
-        #   tokenizer = self$Tokenizer$get_tokenizer(),
-        #   mlm_probability = self$last_training$config$p_mask,
-        #   pad_input = FALSE
-        # )
-        # TODO: pad_input = FALSE?
-
-        tmp_data_collator <- py$make_collator(
+        tmp_data_collator <- aife$HF$DataCollatorFactor$make_collator(
           "WordMLM",
           tokenizer = self$Tokenizer$get_tokenizer(),
           mlm_probability = self$last_training$config$p_mask,
@@ -189,14 +181,14 @@ BaseModelCore <- R6::R6Class(
         )
       } else {
 
-        tmp_data_collator <- py$make_collator(
+        tmp_data_collator <- aife$HF$DataCollatorFactor$make_collator(
           "TokenMLM",
           tokenizer = self$Tokenizer$get_tokenizer(),
           mlm_probability = self$last_training$config$p_mask,
           mlm = TRUE,
           masking_strategy = "bert"
         )
-        
+
         # if (
         #   check_versions(a = get_py_package_version("transformers"), operator = "<", b = "4.49.0")
         # ) {
@@ -252,7 +244,7 @@ BaseModelCore <- R6::R6Class(
       msg <- ifelse(self$last_training$config$whole_word, "Using Whole Word Masking", "Using Token Masking")
       print_message(msg, self$last_training$config$trace)
 
-      create_logger <- py$create_AIFETransformerCSVLogger_PT
+      create_logger <- aife$HF$Callbacks$create_AIFETransformerCSVLogger_PT
       logger_args <- list(
         loss_file = private$log_config$log_loss_file,
         log_file = private$log_config$log_state_file,
@@ -740,8 +732,7 @@ BaseModelCore <- R6::R6Class(
       private$model$eval()
 
       if (private$model_type != "mpnet") {
-        run_py_file("FillMaskForMPLM.py")
-        fill_mask_pipeline_class <- py$FillMaskPipelineForMPLM
+        fill_mask_pipeline_class <- aife$HF$FillMaskForMPLM$FillMaskPipelineForMPLM
       } else {
         fill_mask_pipeline_class <- transformers$FillMaskPipeline
       }

@@ -627,7 +627,7 @@ DataManagerClassifier <- R6::R6Class(
     #--------------------------------------------------------------------------
     add_matrix_form = function(dataset) {
       if (!is.null(dataset)) {
-        dataset <- dataset$map(py$map_input_to_matrix_form,
+        dataset <- dataset$map(aife$HF$py_functions$map_input_to_matrix_form,
           fn_kwargs = list(
             times = as.integer(self$config$times),
             features = as.integer(self$config$features)
@@ -643,7 +643,7 @@ DataManagerClassifier <- R6::R6Class(
     },
     add_one_hot_encoding = function(dataset) {
       if (!is.null(dataset)) {
-        dataset <- dataset$map(py$map_labels_to_one_hot,
+        dataset <- dataset$map(aife$HF$py_functions$map_labels_to_one_hot,
           fn_kwargs = reticulate::dict(list(num_classes = as.integer(self$config$n_classes))),
           load_from_cache_file = FALSE,
           keep_in_memory = FALSE,

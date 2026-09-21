@@ -317,6 +317,7 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
     add_feature_extractor_info = function(model_name,
                                           model_label = NA,
                                           features = NA,
+                                          times=NA,
                                           method = NA,
                                           noise_factor = NA,
                                           optimizer = NA) {
@@ -324,6 +325,7 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
         model_name = model_name,
         model_label = model_label,
         features = features,
+        times=times,
         method = method,
         noise_factor = noise_factor,
         optimizer = optimizer
@@ -354,7 +356,11 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
     #' @description Number of chunks/times of the text embeddings.
     #' @return Returns an `int` describing the number of chunks/times of the text embeddings.
     get_times = function() {
-      return(private$param_chunks)
+      if (self$is_compressed()) {
+        return(private$feature_extractor$times)
+      } else {
+        return(private$param_chunks)
+      }
     },
 
     #--------------------------------------------------------------------------
