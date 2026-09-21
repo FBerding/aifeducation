@@ -1495,12 +1495,24 @@ get_param_dict <- function() {
     default_value = 64L,
     test_values = 12L
   )
+  param$times <- list(
+    type = "int",
+    allow_null = FALSE,
+    min = 2L,
+    max = Inf,
+    allowed_values = NULL,
+    desc = "Number of times the model should use.",
+    gui_box = "General Settings",
+    gui_label = "Number of Times",
+    default_value = 2L,
+    test_values = 3L
+  )
   param$method <- list(
     type = "string",
     allow_null = FALSE,
     min = NULL,
     max = NULL,
-    allowed_values = c("Dense"),
+    allowed_values = c("Conv", "Dense"),
     desc = "Method to use for the feature extraction.",
     default_value = "Dense",
     gui_box = "General Settings",
