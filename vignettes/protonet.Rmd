@@ -126,11 +126,11 @@ classifier_prototype$configure(
   projection_type = "Regular",
   metric_type = "Euclidean",
   feat_act_fct = "None",
-  feat_size = 384,
+  feat_size = 128,
   feat_bias = FALSE,
   feat_dropout = 0.05,
   feat_parametrizations = "None",
-  feat_normalization_type = "PowerNorm",
+  feat_normalization_type = "None",
   ng_conv_act_fct = "GELU",
   ng_conv_n_layers = 1,
   ng_conv_ks_min = 1,
@@ -195,7 +195,7 @@ classifier_prototype$train(
   data_targets = review_labels,
   data_folds = 10,
   data_val_size = 0.25,
-  loss_pt_fct_name = "MultiWayContrastiveLoss",
+  loss_pt_fct_name = "MultiWayContrastiveLossFC",
   use_sc = FALSE,
   sc_method = "knnor",
   sc_min_k = 1,
@@ -210,12 +210,12 @@ classifier_prototype$train(
   sustain_region = NULL,
   sustain_interval = 15,
   sustain_log_level = "error",
-  epochs = 2000,
+  epochs = 4000,
   batch_size = 16,
   Ns = 20,
   Nq = 5,
   loss_alpha = 0.50,
-  loss_margin = 1.00,
+  loss_margin = 0.05,
   sampling_separate = FALSE,
   sampling_shuffle = TRUE,
   trace = TRUE,
@@ -457,6 +457,14 @@ classifier_prototype$reliability$test_metric_mean
 classifier_prototype$reliability$standard_measures_mean
 ```
 
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Box Plot of Performance Measures"),fig.align="center"}
+classifier_prototype$plot_reliability_distribution(measures="all")
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
 # 5 Application with Sample Data
 
 Until now, we have not provided sample data. Consequently, the model used the available classes and prototypes during training. This is not the usual case for this type of model. Typically, a query and sample data are provided to the classifier. We will describe how this works in the following sections.
@@ -541,7 +549,6 @@ plot_with_samples
 
 
 # References
-
 
 Jadon, S., & Garg, A. (2020). Hands-On One-shot Learning with Python:
 Learn to Implement Fast and Accurate Deep Learning Models with Fewer

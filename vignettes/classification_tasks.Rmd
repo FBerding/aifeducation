@@ -1128,11 +1128,11 @@ classifier$configure(
   cls_input_normalize="PowerNorm",
   final_normalization_type="RMSNorm",
   feat_act_fct = "None",
-  feat_size = 256,
+  feat_size = 128,
   feat_bias = FALSE,
   feat_dropout = 0.05,
   feat_parametrizations = "None",
-  feat_normalization_type = "PowerNorm",
+  feat_normalization_type = "RMSNorm",
   ng_conv_act_fct = "GELU",
   ng_conv_n_layers = 0,
   ng_conv_ks_min = 1,
@@ -1140,14 +1140,14 @@ classifier$configure(
   ng_conv_bias = FALSE,
   ng_conv_dropout = 0.40,
   ng_conv_parametrizations = "None",
-  ng_conv_normalization_type = "PowerNorm",
+  ng_conv_normalization_type = "RMSNorm",
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "GELU",
   dense_n_layers = 3,
   dense_dropout = 0.40,
   dense_bias = FALSE,
   dense_parametrizations = "None",
-  dense_normalization_type = "PowerNorm",
+  dense_normalization_type = "RMSNorm",
   dense_residual_type = "ResidualGate",
   rec_act_fct = "Tanh",
   rec_n_layers = 0,
@@ -1156,7 +1156,7 @@ classifier$configure(
   rec_dropout = 0.2,
   rec_bias = FALSE,
   rec_parametrizations = "None",
-  rec_normalization_type = "PowerNorm",
+  rec_normalization_type = "RMSNorm",
   rec_residual_type = "ResidualGate",
   tf_act_fct = "SwiGLU",
   tf_dense_dim = ceiling(2.67 * 384),
@@ -1168,7 +1168,7 @@ classifier$configure(
   tf_num_heads = 4,
   tf_bias = FALSE,
   tf_parametrizations = "None",
-  tf_normalization_type = "PowerNorm",
+  tf_normalization_type = "RMSNorm",
   tf_normalization_position = "Post",
   tf_residual_type = "ResidualGate"
 )
@@ -1236,6 +1236,7 @@ classifier$train(
   loss_balance_class_weights = TRUE,
   loss_balance_sequence_length = TRUE,
   loss_cls_fct_name = "AEMLoss",
+  #loss_cls_fct_name = "FocalLoss",
   use_sc = TRUE,
   sc_method = "knnor",
   sc_min_k = 1,
@@ -1253,7 +1254,7 @@ classifier$train(
   epochs = 2000,
   batch_size = 128,
   trace = TRUE,
-  ml_trace = 0,
+  ml_trace = 1,
   log_dir = NULL,
   log_write_interval = 10,
   n_cores = auto_n_cores(),
@@ -1334,7 +1335,7 @@ classifier$plot_training_history(
   x_min = NULL,
   x_max = NULL,
   y_min = NULL,
-  y_max = 1L,
+  y_max = NULL,
   add_min_max = FALSE,
   text_size = 10
 )
@@ -1356,7 +1357,7 @@ classifier$plot_training_history(
   x_min = NULL,
   x_max = NULL,
   y_min = NULL,
-  y_max = 1L,
+  y_max = NULL,
   add_min_max = FALSE,
   text_size = 10
 )
@@ -1400,7 +1401,7 @@ classifier$plot_training_history(
   x_min = NULL,
   x_max = NULL,
   y_min = NULL,
-  y_max = 1L,
+  y_max = NULL,
   add_min_max = FALSE,
   text_size = 10
 )
@@ -1420,7 +1421,7 @@ classifier$plot_training_history(
   x_min = NULL,
   x_max = NULL,
   y_min = NULL,
-  y_max = 1L,
+  y_max = NULL,
   add_min_max = FALSE,
   text_size = 10
 )
@@ -1647,14 +1648,14 @@ feature_extractor$train(
   sustain_region = NULL,
   sustain_interval = 15,
   sustain_log_level = "error",
-  epochs = 3000,
-  batch_size = 256,
+  epochs = 8000,
+  batch_size = 128,
   lr_rate = 0.0,
   lr_min = 0.0,
   lr_epochs = 30,
   lr_scheduler = "Linear",
   trace = TRUE,
-  ml_trace = 0,
+  ml_trace = 1,
   optimizer = "AdamW",
   amp = TRUE,
   lr_warm_up_ratio = 0.10,
@@ -1693,6 +1694,35 @@ Calling `print` gives you a short summary of the extractor.
 print(feature_extractor)
 ```
 
+Let us investigate how the feature extractor decreased the correlation between the features.
+First we calculate the correlations of the uncompressed embeddings.
+
+```{r, include = TRUE, eval = TRUE}
+embeddings_converted=review_embeddings$convert_to_EmbeddedText()
+correlations=embeddings_converted$calc_feature_correlation()
+
+correlations$effect_sizes$mean
+correlations$effect_sizes$sd
+```
+
+Now we calculate the compressed embeddings and estimate the correlation
+```{r, include = TRUE, eval = TRUE}
+embeddings_compressed=feature_extractor$extract_features_large(
+  review_embeddings,
+  batch_size = 32L
+  )
+
+embeddings_compressed_converted=embeddings_compressed$convert_to_EmbeddedText()
+correlations_compressed=embeddings_compressed_converted$calc_feature_correlation()
+
+correlations_compressed$effect_sizes$mean
+correlations_compressed$effect_sizes$sd
+```
+
+As you can see the correlation significantly decreased. That is, the feature dimension
+contain less overlapping information which may lead to a faster and/or better
+performance of a classifier. Lets try how training change in the following section. 
+
 ## 7.4 Application
 
 Once you have trained your feature extractor, you can use it with any classifier. Simply pass the feature extractor to the `feature_extractor` parameter during the classifier configuration process. Please note that you now have to set the values for `feat_size` and `cls_pooling_features` depending on the number of features of the feature extractor, and *not* depending on the number of features of the text embedding model, since the aim of the feature extractor is to reduce this number. `feat_size` should be equal to or less than the number of features of the feature extractor, and `cls_pooling_features` should be equal to or less than `feat_size`. 
@@ -1712,11 +1742,11 @@ classifier_with_fe$configure(
   cls_input_normalize="PowerNorm",
   final_normalization_type="RMSNorm",
   feat_act_fct = "None",
-  feat_size = 256,
+  feat_size = 128,
   feat_bias = FALSE,
   feat_dropout = 0.05,
   feat_parametrizations = "None",
-  feat_normalization_type = "PowerNorm",
+  feat_normalization_type = "RMSNorm",
   ng_conv_act_fct = "GELU",
   ng_conv_n_layers = 0,
   ng_conv_ks_min = 1,
@@ -1724,14 +1754,14 @@ classifier_with_fe$configure(
   ng_conv_bias = FALSE,
   ng_conv_dropout = 0.40,
   ng_conv_parametrizations = "None",
-  ng_conv_normalization_type = "PowerNorm",
+  ng_conv_normalization_type = "RMSNorm",
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "GELU",
   dense_n_layers = 3,
   dense_dropout = 0.40,
   dense_bias = FALSE,
   dense_parametrizations = "None",
-  dense_normalization_type = "PowerNorm",
+  dense_normalization_type = "RMSNorm",
   dense_residual_type = "ResidualGate",
   rec_act_fct = "Tanh",
   rec_n_layers = 0,
@@ -1740,7 +1770,7 @@ classifier_with_fe$configure(
   rec_dropout = 0.2,
   rec_bias = FALSE,
   rec_parametrizations = "None",
-  rec_normalization_type = "PowerNorm",
+  rec_normalization_type = "RMSNorm",
   rec_residual_type = "ResidualGate",
   tf_act_fct = "SwiGLU",
   tf_dense_dim = ceiling(2.67 * 384),
@@ -1752,7 +1782,7 @@ classifier_with_fe$configure(
   tf_num_heads = 4,
   tf_bias = FALSE,
   tf_parametrizations = "None",
-  tf_normalization_type = "PowerNorm",
+  tf_normalization_type = "RMSNorm",
   tf_normalization_position = "Post",
   tf_residual_type = "ResidualGate"
 )
@@ -1769,6 +1799,7 @@ classifier_with_fe$train(
   loss_balance_class_weights = TRUE,
   loss_balance_sequence_length = TRUE,
   loss_cls_fct_name = "AEMLoss",
+  #loss_cls_fct_name = "FocalLoss",
   use_sc = TRUE,
   sc_method = "knnor",
   sc_min_k = 1,
@@ -1786,7 +1817,7 @@ classifier_with_fe$train(
   epochs = 2000,
   batch_size = 128,
   trace = TRUE,
-  ml_trace = 0,
+  ml_trace = 1,
   log_dir = NULL,
   log_write_interval = 10,
   n_cores = auto_n_cores(),
