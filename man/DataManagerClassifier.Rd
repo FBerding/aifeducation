@@ -426,7 +426,7 @@ a call of this method will override an existing data set in the corresponding fi
 \if{latex}{\out{\hypertarget{method-DataManagerClassifier-get_min_n}{}}}
 \subsection{\code{DataManagerClassifier$get_min_n()}}{
   Method for requesting the minimal number of cases over all folds
-and over training, validation, and test data set.
+and over training and validation. Test data is excluded.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
     \preformatted{DataManagerClassifier$get_min_n()}

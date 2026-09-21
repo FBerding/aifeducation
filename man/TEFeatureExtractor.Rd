@@ -95,6 +95,7 @@ Other Text Embedding:
   label = NULL,
   text_embeddings = NULL,
   features = 128L,
+  te_n_layers = 3,
   method = "dense",
   orthogonal_method = "matrix_exp",
   noise_factor = 0.2
@@ -114,6 +115,9 @@ any}
 any}
       \item{\code{text_embeddings}}{\verb{EmbeddedText, LargeDataSetForTextEmbeddings} Object of class \link{EmbeddedText} or \link{LargeDataSetForTextEmbeddings}.}
       \item{\code{features}}{\code{int} Number of features the model should use. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
+      \item{\code{te_n_layers}}{\code{int} Number of layers. Allowed values:
 
 \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
       \item{\code{method}}{\code{string} Method to use for the feature extraction. \code{'lstm'} for an extractor based on LSTM-layers or \code{'Dense'} for dense layers. Allowed values:

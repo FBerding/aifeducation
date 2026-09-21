@@ -172,31 +172,33 @@ Other Classification:
   text_embeddings = NULL,
   feature_extractor = NULL,
   target_levels = NULL,
+  cls_n_ref_points = 3,
+  embedding_dim = 2,
   skip_connection_type = "ResidualGate",
   metric_type = "Euclidean",
   shared_feat_layer = TRUE,
   cls_input_normalize = "BatchNorm",
-  feat_act_fct = "ELU",
+  feat_act_fct = "None",
   feat_size = 50L,
   feat_bias = TRUE,
   feat_dropout = 0,
   feat_parametrizations = "None",
-  feat_normalization_type = "LayerNorm",
+  feat_normalization_type = "PowerNorm",
   ng_conv_act_fct = "ELU",
-  ng_conv_n_layers = 1L,
+  ng_conv_n_layers = 0L,
   ng_conv_ks_min = 2L,
   ng_conv_ks_max = 4L,
   ng_conv_bias = FALSE,
-  ng_conv_dropout = 0.1,
+  ng_conv_dropout = 0.4,
   ng_conv_parametrizations = "None",
-  ng_conv_normalization_type = "LayerNorm",
+  ng_conv_normalization_type = "RMSNorm",
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "ELU",
   dense_n_layers = 1,
   dense_dropout = 0.5,
   dense_bias = FALSE,
   dense_parametrizations = "None",
-  dense_normalization_type = "LayerNorm",
+  dense_normalization_type = "RMSNorm",
   dense_residual_type = "ResidualGate",
   rec_act_fct = "Tanh",
   rec_n_layers = 1L,
@@ -205,11 +207,11 @@ Other Classification:
   rec_dropout = 0.2,
   rec_bias = FALSE,
   rec_parametrizations = "None",
-  rec_normalization_type = "LayerNorm",
+  rec_normalization_type = "RMSNorm",
   rec_residual_type = "ResidualGate",
   tf_act_fct = "ELU",
   tf_dense_dim = 50L,
-  tf_n_layers = 1L,
+  tf_n_layers = 0L,
   tf_dropout_rate_1 = 0.1,
   tf_dropout_rate_2 = 0.5,
   tf_attention_type = "MultiHead",
@@ -217,13 +219,14 @@ Other Classification:
   tf_num_heads = 1,
   tf_bias = FALSE,
   tf_parametrizations = "None",
-  tf_normalization_type = "LayerNorm",
+  tf_normalization_type = "RMSNorm",
   tf_normalization_position = "Pre",
   tf_residual_type = "ResidualGate",
   merge_attention_type = "MultiHead",
   merge_num_heads = 2L,
-  merge_normalization_type = "LayerNorm",
-  merge_times_pooling_type = "MinMax"
+  merge_normalization_type = "RMSNorm",
+  merge_times_pooling_type = "MinMax",
+  final_normalization_type = "PowerNorm"
 )}
     \if{html}{\out{</div>}}
   }
@@ -244,6 +247,12 @@ the number of dimensions of the text embeddings. If no feature extractor should 
       \item{\code{target_levels}}{\code{vector} containing the levels (categories or classes) within the target data. Please
 note that order matters. For ordinal data please ensure that the levels are sorted correctly with later levels
 indicating a higher category/class. For nominal data the order does not matter.}
+      \item{\code{cls_n_ref_points}}{\code{int} Number of reference points for classification Allowed values:
+
+\ifelse{latex}{$2 <= x $}{\ifelse{html}{\eqn{2 <= x }}{`2 <= x `}}}
+      \item{\code{embedding_dim}}{\code{int}  determining the number of dimensions for the embedding. Allowed values:
+
+\ifelse{latex}{$2 <= x $}{\ifelse{html}{\eqn{2 <= x }}{`2 <= x `}}}
       \item{\code{skip_connection_type}}{\code{string} Type of residual connenction for all layers and stack of layers. Allowed values:
 \itemize{
 \item 'ResidualGate'
@@ -499,6 +508,14 @@ indicating a higher category/class. For nominal data the order does not matter.}
 \item 'Max'
 \item 'Average'
 \item 'WeightedAverage'
+}}
+      \item{\code{final_normalization_type}}{\code{string} Type of normalization applied to all layers and stack layers. Allowed values:
+\itemize{
+\item 'LayerNorm'
+\item 'BatchNorm'
+\item 'PowerNorm'
+\item 'RMSNorm'
+\item 'None'
 }}
     }
     \if{html}{\out{</div>}}
