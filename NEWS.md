@@ -11,7 +11,10 @@ editor_options:
 - Refactoring of all python layers to allow compilation without graph breaks. We organized 
   training loops for classifiers and TEFeatureExtractors new to improve maintenance.
 - Learning rate calculation starts now with a learning rate of 1e-3.
-- Logger now prints the total number of steps/batches within each epoch. 
+- Logger now prints the total number of steps/batches within each epoch.
+- We removed the calculation of statistics for the test data set during training to speed
+  up progress.
+- Vignettes are re-structured.
 
 **Classifiers**
 
@@ -26,22 +29,28 @@ editor_options:
 - All classifiers now support compilation to speed up training.
 - Added a new method to plot classification performance across folds.
 - Added a final normalization layer to all models.
+- Rewrite DataCollator for TEClassifierPrototype to speed up learning.
+
 
 **TEFeatureExtractor**
 
 - NANs in loss now raise an error.
+- FeatureExtractor now allow to choose the number of layers.
 - The number of epochs for learning rate calculation can now be determined by the user.
 - TEFeatureExtractors now support compilation to speed up training.
+- Removed LSTM method.
+- Added new method 'DenseTimes' that reduces the embeddings on both features and times.
 
 **DataManager**
 
 - Added a new method for requesting the smallest number of cases over all folds and
-  the different kind of data sets (train, validation, test).
+  the different kind of data sets (train and validation).
 
 **Minor Issues**
 
 - Fixed a unnecessary print during training.
 - Improved stability of SwiGLU.
+- Reorganised python scripts as a python package.
 
 # aifeducation 1.1.6
 
