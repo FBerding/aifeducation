@@ -120,11 +120,18 @@ created with the same TextEmbeddingModel as for training."></head><body>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><h6 class="dropdown-header" data-toc-skip>For users</h6></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Part I: Introduction</h6></li>
     <li><a class="dropdown-item" href="../articles/aifeducation.html">01 Get started</a></li>
     <li><a class="dropdown-item" href="../articles/gui_aife_studio.html">02 Aifeducation Studio</a></li>
     <li><a class="dropdown-item" href="../articles/classification_tasks.html">03 Using the Package without Studio</a></li>
     <li><a class="dropdown-item" href="../articles/model_configuration.html">04 Model configuration</a></li>
     <li><a class="dropdown-item" href="../articles/sharing_and_publishing.html">05 Sharing and Using Trained AI/Models</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Part II: Extensions</h6></li>
+    <li><a class="dropdown-item" href="../articles/protonet.html">06 ProtoNet</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Appendix</h6></li>
     <li><a class="dropdown-item" href="../articles/a01_layers_stacks.html">Appendix 01 Layers and Stacks</a></li>
     <li><a class="dropdown-item" href="../articles/a02_base_model_types.html">Appendix 02 Supported Base Models</a></li>
   </ul></li>
@@ -141,7 +148,7 @@ created with the same TextEmbeddingModel as for training."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Text embedding classifier with a neural net</h1>
-      <small class="dont-index">Source: <a href="https://github.com/FBerding/aifeducation/blob/HEAD/R/obj_TEClassifierReferencePoint.R" class="external-link"><code>R/obj_TEClassifierReferencePoint.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/FBerding/aifeducation/blob/HEAD/R/obj_TEClassifierSequentialReferencePoint.R" class="external-link"><code>R/obj_TEClassifierSequentialReferencePoint.R</code></a></small>
       <div class="d-none name"><code>TEClassifierSequentialReferencePoint.Rd</code></div>
     </div>
 
@@ -210,6 +217,7 @@ a saved classifier.</p>
     <div class="dont-index"><p>Other Classification:
 <code><a href="TEClassifierParallel.html">TEClassifierParallel</a></code>,
 <code><a href="TEClassifierParallelPrototype.html">TEClassifierParallelPrototype</a></code>,
+<code><a href="TEClassifierParallelReferencePoint.html">TEClassifierParallelReferencePoint</a></code>,
 <code><a href="TEClassifierProtoNet.html">TEClassifierProtoNet</a></code>,
 <code><a href="TEClassifierRegular.html">TEClassifierRegular</a></code>,
 <code><a href="TEClassifierSequential.html">TEClassifierSequential</a></code>,
@@ -253,6 +261,7 @@ a saved classifier.</p>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="check_feature_extractor_object_type"><a href="../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-check_feature_extractor_object_type"><code>ClassifiersBasedOnTextEmbeddings$check_feature_extractor_object_type()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="load_from_disk"><a href="../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-load_from_disk"><code>ClassifiersBasedOnTextEmbeddings$load_from_disk()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="plot_coding_stream"><a href="../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-plot_coding_stream"><code>ClassifiersBasedOnTextEmbeddings$plot_coding_stream()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="plot_reliability_distribution"><a href="../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-plot_reliability_distribution"><code>ClassifiersBasedOnTextEmbeddings$plot_reliability_distribution()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="plot_training_history"><a href="../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-plot_training_history"><code>ClassifiersBasedOnTextEmbeddings$plot_training_history()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="predict"><a href="../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-predict"><code>ClassifiersBasedOnTextEmbeddings$predict()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="print"><a href="../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-print"><code>ClassifiersBasedOnTextEmbeddings$print()</code></a></span></li>
@@ -270,29 +279,32 @@ a saved classifier.</p>
 <span>  feature_extractor <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  target_levels <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  skip_connection_type <span class="op">=</span> <span class="st">"ResidualGate"</span>,</span>
+<span>  cls_n_ref_points <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  embedding_dim <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  cls_times_pooling_type <span class="op">=</span> <span class="st">"MinMaxTimes"</span>,</span>
+<span>  cls_input_normalize <span class="op">=</span> <span class="st">"BatchNorm"</span>,</span>
 <span>  metric_type <span class="op">=</span> <span class="st">"Euclidean"</span>,</span>
-<span>  feat_act_fct <span class="op">=</span> <span class="st">"ELU"</span>,</span>
+<span>  feat_act_fct <span class="op">=</span> <span class="st">"None"</span>,</span>
 <span>  feat_size <span class="op">=</span> <span class="fl">50L</span>,</span>
 <span>  feat_bias <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  feat_dropout <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  feat_parametrizations <span class="op">=</span> <span class="st">"None"</span>,</span>
-<span>  feat_normalization_type <span class="op">=</span> <span class="st">"LayerNorm"</span>,</span>
+<span>  feat_normalization_type <span class="op">=</span> <span class="st">"PowerNorm"</span>,</span>
 <span>  ng_conv_act_fct <span class="op">=</span> <span class="st">"ELU"</span>,</span>
-<span>  ng_conv_n_layers <span class="op">=</span> <span class="fl">1L</span>,</span>
+<span>  ng_conv_n_layers <span class="op">=</span> <span class="fl">0L</span>,</span>
 <span>  ng_conv_ks_min <span class="op">=</span> <span class="fl">2L</span>,</span>
 <span>  ng_conv_ks_max <span class="op">=</span> <span class="fl">4L</span>,</span>
 <span>  ng_conv_bias <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  ng_conv_dropout <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  ng_conv_dropout <span class="op">=</span> <span class="fl">0.4</span>,</span>
 <span>  ng_conv_parametrizations <span class="op">=</span> <span class="st">"None"</span>,</span>
-<span>  ng_conv_normalization_type <span class="op">=</span> <span class="st">"LayerNorm"</span>,</span>
+<span>  ng_conv_normalization_type <span class="op">=</span> <span class="st">"RMSNorm"</span>,</span>
 <span>  ng_conv_residual_type <span class="op">=</span> <span class="st">"ResidualGate"</span>,</span>
 <span>  dense_act_fct <span class="op">=</span> <span class="st">"ELU"</span>,</span>
 <span>  dense_n_layers <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  dense_dropout <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  dense_bias <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  dense_parametrizations <span class="op">=</span> <span class="st">"None"</span>,</span>
-<span>  dense_normalization_type <span class="op">=</span> <span class="st">"LayerNorm"</span>,</span>
+<span>  dense_normalization_type <span class="op">=</span> <span class="st">"RMSNorm"</span>,</span>
 <span>  dense_residual_type <span class="op">=</span> <span class="st">"ResidualGate"</span>,</span>
 <span>  rec_act_fct <span class="op">=</span> <span class="st">"Tanh"</span>,</span>
 <span>  rec_n_layers <span class="op">=</span> <span class="fl">1L</span>,</span>
@@ -301,11 +313,11 @@ a saved classifier.</p>
 <span>  rec_dropout <span class="op">=</span> <span class="fl">0.2</span>,</span>
 <span>  rec_bias <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  rec_parametrizations <span class="op">=</span> <span class="st">"None"</span>,</span>
-<span>  rec_normalization_type <span class="op">=</span> <span class="st">"LayerNorm"</span>,</span>
+<span>  rec_normalization_type <span class="op">=</span> <span class="st">"RMSNorm"</span>,</span>
 <span>  rec_residual_type <span class="op">=</span> <span class="st">"ResidualGate"</span>,</span>
 <span>  tf_act_fct <span class="op">=</span> <span class="st">"ELU"</span>,</span>
 <span>  tf_dense_dim <span class="op">=</span> <span class="fl">50L</span>,</span>
-<span>  tf_n_layers <span class="op">=</span> <span class="fl">1L</span>,</span>
+<span>  tf_n_layers <span class="op">=</span> <span class="fl">0L</span>,</span>
 <span>  tf_dropout_rate_1 <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  tf_dropout_rate_2 <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  tf_attention_type <span class="op">=</span> <span class="st">"MultiHead"</span>,</span>
@@ -313,9 +325,10 @@ a saved classifier.</p>
 <span>  tf_num_heads <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  tf_bias <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  tf_parametrizations <span class="op">=</span> <span class="st">"None"</span>,</span>
-<span>  tf_normalization_type <span class="op">=</span> <span class="st">"LayerNorm"</span>,</span>
+<span>  tf_normalization_type <span class="op">=</span> <span class="st">"RMSNorm"</span>,</span>
 <span>  tf_normalization_position <span class="op">=</span> <span class="st">"Pre"</span>,</span>
-<span>  tf_residual_type <span class="op">=</span> <span class="st">"ResidualGate"</span></span>
+<span>  tf_residual_type <span class="op">=</span> <span class="st">"ResidualGate"</span>,</span>
+<span>  final_normalization_type <span class="op">=</span> <span class="st">"PowerNorm"</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
@@ -347,11 +360,24 @@ indicating a higher category/class. For nominal data the order does not matter.<
 <li><p>'None'</p></li>
 </ul></dd>
 
+      <dt><code>cls_n_ref_points</code></dt>
+<dd><p><code>int</code> Number of reference points for classification Allowed values:</p>
+<p>\(2 &lt;= x \)</p></dd>
+
+      <dt><code>embedding_dim</code></dt>
+<dd><p><code>int</code>  determining the number of dimensions for the embedding. Allowed values:</p>
+<p>\(2 &lt;= x \)</p></dd>
+
       <dt><code>cls_times_pooling_type</code></dt>
 <dd><p><code>string</code> Type of extracting intermediate features. Allowed values:</p><ul><li><p>'Max'</p></li>
-<li><p>'MinMax'</p></li>
 <li><p>'Average'</p></li>
 <li><p>'WeightedAverage'</p></li>
+</ul></dd>
+
+      <dt><code>cls_input_normalize</code></dt>
+<dd><p><code>string</code> Type of normalization applied to data before passing to any layers of the net. Allowed values:</p><ul><li><p>'BatchNorm'</p></li>
+<li><p>'PowerNorm'</p></li>
+<li><p>'None'</p></li>
 </ul></dd>
 
       <dt><code>metric_type</code></dt>
@@ -599,6 +625,14 @@ indicating a higher category/class. For nominal data the order does not matter.<
       <dt><code>tf_residual_type</code></dt>
 <dd><p><code>string</code> Type of residual connenction for all layers and stack of layers. Allowed values:</p><ul><li><p>'ResidualGate'</p></li>
 <li><p>'Addition'</p></li>
+<li><p>'None'</p></li>
+</ul></dd>
+
+      <dt><code>final_normalization_type</code></dt>
+<dd><p><code>string</code> Type of normalization applied to all layers and stack layers. Allowed values:</p><ul><li><p>'LayerNorm'</p></li>
+<li><p>'BatchNorm'</p></li>
+<li><p>'PowerNorm'</p></li>
+<li><p>'RMSNorm'</p></li>
 <li><p>'None'</p></li>
 </ul></dd>
 

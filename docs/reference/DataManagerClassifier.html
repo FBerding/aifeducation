@@ -22,11 +22,18 @@ used with all classifiers based on text embeddings."></head><body>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><h6 class="dropdown-header" data-toc-skip>For users</h6></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Part I: Introduction</h6></li>
     <li><a class="dropdown-item" href="../articles/aifeducation.html">01 Get started</a></li>
     <li><a class="dropdown-item" href="../articles/gui_aife_studio.html">02 Aifeducation Studio</a></li>
     <li><a class="dropdown-item" href="../articles/classification_tasks.html">03 Using the Package without Studio</a></li>
     <li><a class="dropdown-item" href="../articles/model_configuration.html">04 Model configuration</a></li>
     <li><a class="dropdown-item" href="../articles/sharing_and_publishing.html">05 Sharing and Using Trained AI/Models</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Part II: Extensions</h6></li>
+    <li><a class="dropdown-item" href="../articles/protonet.html">06 ProtoNet</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Appendix</h6></li>
     <li><a class="dropdown-item" href="../articles/a01_layers_stacks.html">Appendix 01 Layers and Stacks</a></li>
     <li><a class="dropdown-item" href="../articles/a02_base_model_types.html">Appendix 02 Supported Base Models</a></li>
   </ul></li>
@@ -130,6 +137,7 @@ the final training can be requested with <code>i+1</code>.</p></dd>
 <li><p><a href="#method-DataManagerClassifier-get_test_dataset"><code>DataManagerClassifier$get_test_dataset()</code></a></p></li>
 <li><p><a href="#method-DataManagerClassifier-create_synthetic"><code>DataManagerClassifier$create_synthetic()</code></a></p></li>
 <li><p><a href="#method-DataManagerClassifier-add_replace_pseudo_data"><code>DataManagerClassifier$add_replace_pseudo_data()</code></a></p></li>
+<li><p><a href="#method-DataManagerClassifier-get_min_n"><code>DataManagerClassifier$get_min_n()</code></a></p></li>
 <li><p><a href="#method-DataManagerClassifier-clone"><code>DataManagerClassifier$clone()</code></a></p></li>
 </ul></div><p></p><hr><a id="method-DataManagerClassifier-initialize"></a><div class="section">
 <h3 id="datamanagerclassifier-new-"><code>DataManagerClassifier$new()</code><a class="anchor" aria-label="anchor" href="#datamanagerclassifier-new-"></a></h3>
@@ -452,7 +460,20 @@ that a call of this method will override an existing data set in the correspondi
 <h4 id="returns-14">Returns<a class="anchor" aria-label="anchor" href="#returns-14"></a></h4>
 <p>This method does nothing return. It generates a new data set for synthetic cases which are stored as an
 object of class <code>datasets.arrow_dataset.Dataset</code> in the field <code>datasets$data_labeled_pseudo</code>. Please note that
-a call of this method will override an existing data set in the corresponding field.
+a call of this method will override an existing data set in the corresponding field.</p>
+</div>
+
+</div>
+
+<p></p><hr><a id="method-DataManagerClassifier-get_min_n"></a><div class="section">
+<h3 id="datamanagerclassifier-get-min-n-"><code>DataManagerClassifier$get_min_n()</code><a class="anchor" aria-label="anchor" href="#datamanagerclassifier-get-min-n-"></a></h3>
+<p>Method for requesting the minimal number of cases over all folds
+and over training and validation. Test data is excluded.</p><div class="section">
+<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DataManagerClassifier</span><span class="op">$</span><span class="fu">get_min_n</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
+<h4 id="returns-15">Returns<a class="anchor" aria-label="anchor" href="#returns-15"></a></h4>
+<p>Returns an integer.
 title Create cross-validation samples
 description Function creates cross-validation samples and ensures that the relative frequency for every
 category/label within a fold equals the relative frequency of the category/label within the initial data.</p>
@@ -472,7 +493,7 @@ these cases are ignored for creating the different folds. Their names are saved 
 <p></p><hr><a id="method-DataManagerClassifier-clone"></a><div class="section">
 <h3 id="datamanagerclassifier-clone-"><code>DataManagerClassifier$clone()</code><a class="anchor" aria-label="anchor" href="#datamanagerclassifier-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
+<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DataManagerClassifier</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>

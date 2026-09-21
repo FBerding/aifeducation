@@ -26,11 +26,18 @@ This class is not designed for a direct application and should only be used by d
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><h6 class="dropdown-header" data-toc-skip>For users</h6></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Part I: Introduction</h6></li>
     <li><a class="dropdown-item" href="../articles/aifeducation.html">01 Get started</a></li>
     <li><a class="dropdown-item" href="../articles/gui_aife_studio.html">02 Aifeducation Studio</a></li>
     <li><a class="dropdown-item" href="../articles/classification_tasks.html">03 Using the Package without Studio</a></li>
     <li><a class="dropdown-item" href="../articles/model_configuration.html">04 Model configuration</a></li>
     <li><a class="dropdown-item" href="../articles/sharing_and_publishing.html">05 Sharing and Using Trained AI/Models</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Part II: Extensions</h6></li>
+    <li><a class="dropdown-item" href="../articles/protonet.html">06 ProtoNet</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Appendix</h6></li>
     <li><a class="dropdown-item" href="../articles/a01_layers_stacks.html">Appendix 01 Layers and Stacks</a></li>
     <li><a class="dropdown-item" href="../articles/a02_base_model_types.html">Appendix 02 Supported Base Models</a></li>
   </ul></li>
@@ -118,6 +125,7 @@ which use the architecture of Protonets and its corresponding training technique
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="check_feature_extractor_object_type"><a href="../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-check_feature_extractor_object_type"><code>ClassifiersBasedOnTextEmbeddings$check_feature_extractor_object_type()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="load_from_disk"><a href="../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-load_from_disk"><code>ClassifiersBasedOnTextEmbeddings$load_from_disk()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="plot_coding_stream"><a href="../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-plot_coding_stream"><code>ClassifiersBasedOnTextEmbeddings$plot_coding_stream()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="plot_reliability_distribution"><a href="../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-plot_reliability_distribution"><code>ClassifiersBasedOnTextEmbeddings$plot_reliability_distribution()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="plot_training_history"><a href="../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-plot_training_history"><code>ClassifiersBasedOnTextEmbeddings$plot_training_history()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="predict"><a href="../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-predict"><code>ClassifiersBasedOnTextEmbeddings$predict()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="aifeducation" data-topic="ClassifiersBasedOnTextEmbeddings" data-id="print"><a href="../../aifeducation/html/ClassifiersBasedOnTextEmbeddings.html#method-ClassifiersBasedOnTextEmbeddings-print"><code>ClassifiersBasedOnTextEmbeddings$print()</code></a></span></li>
@@ -168,8 +176,12 @@ on the validation data set is used as the final model.</p><div class="section">
 <span>  lr_min <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  lr_scheduler <span class="op">=</span> <span class="st">"None"</span>,</span>
 <span>  lr_warm_up_ratio <span class="op">=</span> <span class="fl">0.02</span>,</span>
+<span>  lr_epochs <span class="op">=</span> <span class="fl">50L</span>,</span>
 <span>  optimizer <span class="op">=</span> <span class="st">"AdamW"</span>,</span>
-<span>  amp <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  amp <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  comp_use <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  comp_mode <span class="op">=</span> <span class="st">"reduce-overhead"</span>,</span>
+<span>  ddp_use <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
@@ -193,7 +205,10 @@ The remaining cases are part of the training data. Allowed values:</p>
       <dt><code>loss_pt_fct_name</code></dt>
 <dd><p><code>string</code> Name of the loss function to use during training. Allowed values:</p><ul><li><p>'MultiWayContrastiveLoss'</p></li>
 <li><p>'MultiWayContrastiveLossFC'</p></li>
+<li><p>'MultiWayContrastiveLossFCOrdinal'</p></li>
 <li><p>'FocalLoss'</p></li>
+<li><p>'FocalLossOrdinal'</p></li>
+<li><p>'AEMLoss'</p></li>
 </ul></dd>
 
       <dt><code>use_sc</code></dt>
@@ -336,6 +351,10 @@ Set this value to <code>0.0</code> requests an automatic search for a good learn
 <dd><p><code>double</code> Number of epochs used for warm up. To disable warm up set this value to 0.0. Allowed values:</p>
 <p>\(0 &lt; x &lt; 0.5\)</p></dd>
 
+      <dt><code>lr_epochs</code></dt>
+<dd><p><code>int</code> Number of epochs used for calculating the learning rate. Allowed values:</p>
+<p>\(1 &lt;= x \)</p></dd>
+
       <dt><code>optimizer</code></dt>
 <dd><p><code>string</code> determining the optimizer used for training. Allowed values:</p><ul><li><p>'Adam'</p></li>
 <li><p>'RMSprop'</p></li>
@@ -348,6 +367,20 @@ Set this value to <code>0.0</code> requests an automatic search for a good learn
 recommended to set this parameter to <code>TRUE</code>. If you encounter problems set to <code>FALSE</code>.
 * <code>FALSE</code>: Use full precision.
 * <code>TRUE</code>: Use automatic mixed precision (amp) with gradient scaling.</p></dd>
+
+      <dt><code>comp_use</code></dt>
+<dd><p><code>bool</code> If <code>TRUE</code> model and loss are compiled to speed up training.</p></dd>
+
+      <dt><code>comp_mode</code></dt>
+<dd><p><code>string</code> Determines the mode for compilation. Different modes are only available if
+the compilation backend is 'triton.'. Allowed values:</p><ul><li><p>'default'</p></li>
+<li><p>'reduce-overhead'</p></li>
+<li><p>'max-autotune'</p></li>
+<li><p>'max-autotune-no-cudagraphs'</p></li>
+</ul></dd>
+
+      <dt><code>ddp_use</code></dt>
+<dd><p><code>bool</code> If <code>TRUE</code> model uses all available gpus for training.</p></dd>
 
       <dt><code>loss_balance_class_weights</code></dt>
 <dd><p><code>bool</code> If <code>TRUE</code> class weights are generated based on the frequencies of the

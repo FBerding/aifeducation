@@ -20,11 +20,18 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><h6 class="dropdown-header" data-toc-skip>For users</h6></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Part I: Introduction</h6></li>
     <li><a class="dropdown-item" href="../articles/aifeducation.html">01 Get started</a></li>
     <li><a class="dropdown-item" href="../articles/gui_aife_studio.html">02 Aifeducation Studio</a></li>
     <li><a class="dropdown-item" href="../articles/classification_tasks.html">03 Using the Package without Studio</a></li>
     <li><a class="dropdown-item" href="../articles/model_configuration.html">04 Model configuration</a></li>
     <li><a class="dropdown-item" href="../articles/sharing_and_publishing.html">05 Sharing and Using Trained AI/Models</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Part II: Extensions</h6></li>
+    <li><a class="dropdown-item" href="../articles/protonet.html">06 ProtoNet</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Appendix</h6></li>
     <li><a class="dropdown-item" href="../articles/a01_layers_stacks.html">Appendix 01 Layers and Stacks</a></li>
     <li><a class="dropdown-item" href="../articles/a02_base_model_types.html">Appendix 02 Supported Base Models</a></li>
   </ul></li>
@@ -45,8 +52,33 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="1.1.7" id="aifeducation-117">aifeducation 1.1.7<a class="anchor" aria-label="anchor" href="#aifeducation-117"></a></h2>
-<p><strong>Minor Issues</strong></p>
+<h2 class="pkg-version" data-toc-text="1.2.0" id="aifeducation-120---performance-update">aifeducation 1.2.0 - Performance Update<a class="anchor" aria-label="anchor" href="#aifeducation-120---performance-update"></a></h2>
+<p><strong>General</strong></p>
+<ul><li>Refactoring of all python layers to allow compilation without graph breaks. We organized training loops for classifiers and TEFeatureExtractors new to improve maintenance.</li>
+<li>Learning rate calculation starts now with a learning rate of 1e-3.</li>
+<li>Logger now prints the total number of steps/batches within each epoch.</li>
+<li>We removed the calculation of statistics for the test data set during training to speed up progress.</li>
+<li>Vignettes are re-structured.</li>
+</ul><p><strong>Classifiers</strong></p>
+<ul><li>Added an new type of classifiers which are a combination of classical and prototypical classifiers. (‘TEClassifierSequentialReferencePoint’ and ‘TEClassifierParallelReferencePoint’).</li>
+<li>Added ‘FocalLossOrdinal’ and ‘MultiWayContrastiveLossFCOrdinal’ as new losses for ordinal scales.</li>
+<li>Added a new <em>experimental</em> Assignment-Error-Loss (AEMLoss) based on Berding and Pargmann (2022).</li>
+<li>NANs in loss now raise an error.</li>
+<li>The number of epochs for learning rate calculation can now be determined by the user.</li>
+<li>Added gradient clipping to training loops.</li>
+<li>Added options for data normalization before any data is passed to the net.</li>
+<li>All classifiers now support compilation to speed up training.</li>
+<li>Added a new method to plot classification performance across folds.</li>
+<li>Added a final normalization layer to all models.</li>
+<li>Rewrite DataCollator for TEClassifierPrototype to speed up learning.</li>
+</ul><p><strong>TEFeatureExtractor</strong></p>
+<ul><li>NANs in loss now raise an error.</li>
+<li>The number of epochs for learning rate calculation can now be determined by the user.</li>
+<li>TEFeatureExtractors now support compilation to speed up training.</li>
+<li>Removed LSTM method.</li>
+</ul><p><strong>DataManager</strong></p>
+<ul><li>Added a new method for requesting the smallest number of cases over all folds and the different kind of data sets (train, validation, test).</li>
+</ul><p><strong>Minor Issues</strong></p>
 <ul><li>Fixed a unnecessary print during training.</li>
 <li>Improved stability of SwiGLU.</li>
 </ul></div>
