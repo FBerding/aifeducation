@@ -7,9 +7,6 @@ testthat::skip_if_not(
 # Start time
 test_time_start <- Sys.time()
 
-# Load python scripts
-load_all_py_scripts()
-
 test_that("CosineDistance", {
   device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
   base_tensor <- torch$from_numpy(
@@ -29,7 +26,7 @@ test_that("CosineDistance", {
   )
 
   distance <- tensor_to_numpy(
-    py$CosineDistance(
+   aife$DistanceFunctions$CosineDistance(
       x = base_tensor$to(device),
       y = base_tensor$to(device)
     )

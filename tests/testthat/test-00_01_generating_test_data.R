@@ -12,8 +12,6 @@ testthat::skip_if_not(
 # Start time
 test_time_start <- Sys.time()
 
-load_all_py_scripts()
-
 # Config transformer library
 transformers$utils$logging$set_verbosity_error()
 os$environ$setdefault("TOKENIZERS_PARALLELISM", "false")
@@ -23,8 +21,7 @@ transformers$logging$disable_progress_bar()
 datasets$disable_progress_bars()
 
 # ignore warnings
-run_py_file("py_ignore_warnings.py")
-py$ignore_data_collator_warnings()
+aife$HF$py_ignore_warnings$ignore_data_collator_warnings()
 
 # config trace
 trace <- FALSE

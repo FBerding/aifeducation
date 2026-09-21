@@ -12,7 +12,6 @@ test_time_start <- Sys.time()
 
 test_that("Setup Classifier Data", {
   # Config-------------------------------------------------------------------------
-  load_all_py_scripts()
   root_path_data <- testthat::test_path("test_data/Embeddings")
   create_dir(root_path_data, FALSE)
 
@@ -24,7 +23,7 @@ test_that("Setup Classifier Data", {
   ml_frameworks <- c("pytorch")
   trace <- FALSE
 
-  method_list <- "LSTM"
+  method_list <- "Dense"
 
   imdb_embeddings <- load_from_disk(paste0(root_path_data, "/imdb_embeddings"))
 

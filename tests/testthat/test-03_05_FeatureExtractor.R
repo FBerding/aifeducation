@@ -3,7 +3,6 @@ testthat::skip_if_not(
   condition = check_aif_py_modules(trace = FALSE),
   message = "Necessary python modules not available"
 )
-load_all_py_scripts()
 
 # Start time
 test_time_start <- Sys.time()
@@ -35,7 +34,7 @@ dataset_list <- list(
 ml_frameworks <- c("pytorch")
 
 method_list <- list(
-  "pytorch" = c("LSTM", "Dense")
+  "pytorch" = c("Conv")
 )
 
 # Start tests--------------------------------------------------------------------
@@ -71,6 +70,8 @@ for (framework in ml_frameworks) {
         features = 128,
         method = method,
         orthogonal_method = "matrix_exp",
+        te_n_layers=2,
+        times=3,
         noise_factor = 0.2
       )
 

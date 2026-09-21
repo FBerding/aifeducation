@@ -3,13 +3,9 @@ testthat::skip_if_not(
   condition = check_aif_py_modules(trace = FALSE),
   message = "Necessary python modules not available"
 )
-load_all_py_scripts()
 
 # Start time
 test_time_start <- Sys.time()
-
-# Load python scripts
-load_all_py_scripts()
 
 test_that("Focal Loss", {
   # Test correct computation for gamma = 0
@@ -19,7 +15,7 @@ test_that("Focal Loss", {
   targets <- targets$to(dtype = output$dtype)
   class_weights <- torch$ones(5L)
 
-  focal_loss_fct <- py$focal_loss(
+  focal_loss_fct <- aife$Losses$focal_loss(
     gamma = 0,
     class_weights = class_weights
   )
@@ -35,7 +31,7 @@ test_that("Focal Loss", {
   # Test for class weights
   class_weights <- torch$rand(5L)
 
-  focal_loss_fct <- py$focal_loss(
+  focal_loss_fct <- aife$Losses$focal_loss(
     gamma = 0,
     class_weights = class_weights
   )
@@ -51,7 +47,7 @@ test_that("Focal Loss", {
 
 # Multi-way contrastive loss----------------------------------------------------
 test_that("Multi-way contrastive loss", {
-  layer <- py$multi_way_contrastive_loss(alpha = 0.2, margin = 0.9)
+  layer <- aife$Losses$multi_way_contrastive_loss(alpha = 0.2, margin = 0.9)
   np_array <- reticulate::np_array(c(0, 0, 0, 1, 1, 1, 2, 2, 2))
   test_classes <- torch$from_numpy(np_array$copy())
 

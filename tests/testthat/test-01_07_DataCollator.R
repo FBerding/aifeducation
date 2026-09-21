@@ -4,7 +4,7 @@ testthat::skip_if_not(
   condition = check_aif_py_modules(trace = FALSE),
   message = "Necessary python modules not available"
 )
-load_all_py_scripts()
+
 
 # Start time
 test_time_start <- Sys.time()
@@ -16,10 +16,6 @@ os$environ$setdefault("TOKENIZERS_PARALLELISM", "false")
 # Disable tqdm progressbar
 transformers$logging$disable_progress_bar()
 datasets$disable_progress_bars()
-
-# Load python scripts
-load_all_py_scripts()
-run_py_file("data_collator_factory.py")
 
 # Path Management
 test_art_path <- testthat::test_path("test_artefacts")
@@ -59,8 +55,8 @@ Tokenizer$train(
 mlm_prob <- 0.5
 
 tokenizer <- Tokenizer$get_tokenizer()
-# collator <- py$AifeDataCollatorForWholeWordMask(tokenizer, mlm_probability = mlm_prob)
-collator <- py$make_collator(
+
+collator <- aife$HF$DataCollatorFactor$make_collator(
   "WordMLM",
   tokenizer = tokenizer,
   mlm_probability = mlm_prob,

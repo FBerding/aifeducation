@@ -7,9 +7,6 @@ testthat::skip_if_not(
 # Start time
 test_time_start <- Sys.time()
 
-# Load python scripts
-load_all_py_scripts()
-
 # stack_dense_layer----------------------------------------------------
 test_that("stack_dense_layer", {
   device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
@@ -25,7 +22,7 @@ test_that("stack_dense_layer", {
     seq_len = sequence_length,
     pad_value = pad_value
   )$to(device)
-  masking_layer <- py$masking_layer(pad_value)
+  masking_layer <- aife$Layers$masking_layer(pad_value)
   values <- masking_layer(example_tensor)
 
   # Test for equal, more, and fewer features as input size
@@ -35,7 +32,7 @@ test_that("stack_dense_layer", {
     sample(x = seq(from = (features + 1), to = 2 * features), size = 1)
   )
 
-  layer <- py$stack_dense_layer(
+  layer <- aife$Stacks$stack_dense_layer(
     times = as.integer(times),
     hidden_size = as.integer(features),
     n_layers = 3L,
@@ -91,7 +88,7 @@ test_that("stack_rec_layers", {
     seq_len = sequence_length,
     pad_value = pad_value
   )$to(device)
-  masking_layer <- py$masking_layer(pad_value)
+  masking_layer <- aife$Layers$masking_layer(pad_value)
   values <- masking_layer(example_tensor)
 
   # Test for equal, more, and fewer features as input size
@@ -103,7 +100,7 @@ test_that("stack_rec_layers", {
 
   for (rec_type in rec_types) {
     for (bidirectional in bidirectional_types) {
-      layer <- py$stack_recurrent_layers(
+      layer <- aife$Stacks$stack_recurrent_layers(
         times = as.integer(times),
         hidden_size = as.integer(features),
         n_layers = 3L,
@@ -161,7 +158,7 @@ test_that("stack_tf_encoder_layer", {
     seq_len = sequence_length,
     pad_value = pad_value
   )$to(device)
-  masking_layer <- py$masking_layer(pad_value)
+  masking_layer <- aife$Layers$masking_layer(pad_value)
   values <- masking_layer(example_tensor)
 
   normalization_positions <- c("Post", "Pre")
@@ -177,7 +174,7 @@ test_that("stack_tf_encoder_layer", {
   for (attention_type in attention_types) {
     for (normalization_position in normalization_positions) {
       for (residual_type in residual_types) {
-        layer <- py$stack_tf_encoder_layer(
+        layer <- aife$Stacks$stack_tf_encoder_layer(
           dense_dim = as.integer(4 * features),
           attention_type = attention_type,
           num_heads = 2L,
@@ -238,7 +235,7 @@ test_that("stack_n_gram_convolution", {
     seq_len = sequence_length,
     pad_value = pad_value
   )$to(device)
-  masking_layer <- py$masking_layer(pad_value)
+  masking_layer <- aife$Layers$masking_layer(pad_value)
   values <- masking_layer(example_tensor)
 
   # Test for equal, more, and fewer features as input size
@@ -249,7 +246,7 @@ test_that("stack_n_gram_convolution", {
   )
 
   for (max_n_gram in 3:times) {
-    layer <- py$stack_n_gram_convolution(
+    layer <- aife$Stacks$stack_n_gram_convolution(
       ks_min = 2L,
       ks_max = as.integer(max_n_gram),
       times = as.integer(times),

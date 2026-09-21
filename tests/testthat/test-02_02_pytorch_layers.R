@@ -7,13 +7,10 @@ testthat::skip_if_not(
 # Start time
 test_time_start <- Sys.time()
 
-# Load python scripts
-load_all_py_scripts()
-
 # Prototyp Metric---------------------------------------------------------------
 test_that("Prototype Metric", {
   device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
-  layer <- py$layer_protonet_metric()$to(device)
+  layer <-aife$Layers$layer_protonet_metric()$to(device)
 
   samples <- matrix(
     data = c(
@@ -91,20 +88,20 @@ test_that("Masking Layer", {
     pad_value = pad_value
   )$to(device)
 
-  layer <- py$masking_layer(pad_value)$to(device)
+  layer <- aife$Layers$masking_layer(pad_value)$to(device)
   y <- layer(example_tensor)
 
   # Check if input is the same as the output
   expect_equal(tensor_to_numpy(y[[1]]), tensor_to_numpy(example_tensor))
 
   # Check sequence length
-  expect_equal(as.numeric(tensor_to_numpy(py$get_SeqLen_from_mask(y[[2]]))), sequence_length)
+  expect_equal(as.numeric(tensor_to_numpy(aife$CLSUtils$get_SeqLen_from_mask(y[[2]]))), sequence_length)
 
   # Check Masking times
   expect_equal(rowSums(tensor_to_numpy(y[[2]])), times - sequence_length)
 
   # Check Masking Features
-  expect_equal(rowSums(tensor_to_numpy(py$get_FeatureMask_from_mask(y[[2]], as.integer(features)))), (times - sequence_length) * features)
+  expect_equal(rowSums(tensor_to_numpy(aife$CLSUtils$get_FeatureMask_from_mask(y[[2]], as.integer(features)))), (times - sequence_length) * features)
 })
 
 # Identity Layer----------------------------------------------------------------
@@ -120,10 +117,10 @@ test_that("identity layer", {
     seq_len = sequence_length,
     pad_value = pad_value
   )$to(device)
-  masking_layer <- py$masking_layer(pad_value)$to(device)
+  masking_layer <- aife$Layers$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 
-  layer <- py$identity_layer(apply_masking = FALSE)$to(device)
+  layer <- aife$Layers$identity_layer(apply_masking = FALSE)$to(device)
   y <- layer(
     x = values[[1]],
     mask_times = values[[2]],
@@ -152,11 +149,11 @@ test_that("residual connection with Mask", {
     pad_value = pad_value
   )$to(device)
   types <- c("None", "Addition", "ResidualGate")
-  masking_layer <- py$masking_layer(pad_value)$to(device)
+  masking_layer <- aife$Layers$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 
   for (type in types) {
-    layer <- py$layer_residual_connection(
+    layer <- aife$Layers$layer_residual_connection(
       type = type,
       pad_value = as.integer(pad_value)
     )$to(device)
@@ -202,10 +199,10 @@ test_that("LayerNorm with Mask", {
     seq_len = sequence_length,
     pad_value = pad_value
   )$to(device)
-  masking_layer <- py$masking_layer(pad_value)$to(device)
+  masking_layer <- aife$Layers$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 
-  layer <- py$LayerNorm_with_Mask(
+  layer <- aife$Normalizers$LayerNorm_with_Mask(
     times = as.integer(times),
     features = as.integer(features),
     pad_value = as.integer(pad_value)
@@ -260,10 +257,10 @@ test_that("BatchNorm with Mask", {
     seq_len = sequence_length,
     pad_value = pad_value
   )$to(device)
-  masking_layer <- py$masking_layer(pad_value)$to(device)
+  masking_layer <- aife$Layers$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 
-  layer <- py$BatchNorm_with_Mask(
+  layer <- aife$Normalizers$BatchNorm_with_Mask(
     features = as.integer(features),
     pad_value = as.integer(pad_value),
     alpha = 0.1,
@@ -331,10 +328,10 @@ test_that("RMSNorm with Mask", {
     seq_len = sequence_length,
     pad_value = pad_value
   )$to(device)
-  masking_layer <- py$masking_layer(pad_value)$to(device)
+  masking_layer <- aife$Layers$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 
-  layer <- py$RMSNorm_with_Mask(
+  layer <- aife$Normalizers$RMSNorm_with_Mask(
     features = as.integer(features),
     pad_value = as.integer(pad_value)
   )$to(device)
@@ -390,10 +387,10 @@ test_that("PowerNorm with Mask", {
     seq_len = sequence_length,
     pad_value = pad_value
   )$to(device)
-  masking_layer <- py$masking_layer(pad_value)$to(device)
+  masking_layer <- aife$Layers$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 
-  layer <- py$PowerNorm_with_Mask(
+  layer <- aife$Normalizers$PowerNorm_with_Mask(
     features = as.integer(features),
     pad_value = as.integer(pad_value),
     alpha = 0.9,
@@ -429,7 +426,7 @@ test_that("DenseLayer with Mask", {
     seq_len = sequence_length,
     pad_value = pad_value
   )$to(device,torch$float)
-  masking_layer <- py$masking_layer(pad_value)$to(device)
+  masking_layer <- aife$Layers$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 
   # Test for equal, more, and fewer features as input size
@@ -443,7 +440,7 @@ test_that("DenseLayer with Mask", {
       for (res_types in residual_types) {
         for (target_features in features_output) {
           # Create layer
-          layer <- py$dense_layer_with_mask(
+          layer <- aife$Layers$dense_layer_with_mask(
             input_size = as.integer(features),
             output_size = as.integer(target_features),
             times = as.integer(times),
@@ -504,7 +501,7 @@ test_that("layer_tf_encoder", {
     seq_len = sequence_length,
     pad_value = pad_value
   )$to(device)
-  masking_layer <- py$masking_layer(pad_value)$to(device)
+  masking_layer <- aife$Layers$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 
   # Test for equal, more, and fewer features as input size
@@ -518,7 +515,7 @@ test_that("layer_tf_encoder", {
     for (normalization_type in normalization_types) {
       for (normalization_position in normalization_positions) {
         # Create layer
-        layer <- py$layer_tf_encoder(
+        layer <- aife$Layers$layer_tf_encoder(
           dense_dim = 38L,
           times = as.integer(times),
           pad_value = as.integer(pad_value),
@@ -577,17 +574,17 @@ test_that("exreme_pooling_over_time", {
     seq_len = sequence_length,
     pad_value = pad_value
   )$to(device)
-  masking_layer <- py$masking_layer(pad_value)$to(device)
+  masking_layer <- aife$Layers$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 
   for (pooling_type in c("Max", "Min", "MinMax")) {
-    layer <- py$exreme_pooling_over_time(
+    layer <- aife$Layers$exreme_pooling_over_time(
       times = as.integer(times),
       features = as.integer(features),
       pad_value = as.integer(pad_value),
       pooling_type = pooling_type
     )$to(device)
-    y_1 <- layer(values[[1]], py$get_FeatureMask_from_mask(values[[2]], as.integer(features)))
+    y_1 <- layer(values[[1]], aife$CLSUtils$get_FeatureMask_from_mask(values[[2]], as.integer(features)))
     if (pooling_type != "MinMax") {
       expect_equal(dim(tensor_to_numpy(y_1)), c(length(sequence_length), features))
     } else {
@@ -603,7 +600,7 @@ test_that("layer_adaptive_extreme_pooling_1d", {
   output_size <- 10
 
   for (pooling_type in c("Max", "Min", "MinMax")) {
-    layer <- py$layer_adaptive_extreme_pooling_1d(
+    layer <- aife$Layers$layer_adaptive_extreme_pooling_1d(
       output_size = as.integer(output_size),
       pooling_type = pooling_type
     )$to(device)
@@ -656,11 +653,11 @@ test_that("layer_n_gram_convolution", {
     seq_len = sequence_length,
     pad_value = pad_value
   )$to(device)
-  masking_layer <- py$masking_layer(pad_value)$to(device)
+  masking_layer <- aife$Layers$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 
   n_filter <- sample(x = seq(from = 2, to = features, by = 1), size = 1)
-  layer <- py$layer_n_gram_convolution(
+  layer <- aife$Layers$layer_n_gram_convolution(
     kernel_size_times = as.integer(2),
     times = as.integer(times),
     features = as.integer(features),
@@ -713,11 +710,11 @@ test_that("layer_mutiple_n_gram_convolution", {
     seq_len = sequence_length,
     pad_value = pad_value
   )$to(device)
-  masking_layer <- py$masking_layer(pad_value)$to(device)
+  masking_layer <- aife$Layers$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 
   for (max_n_gram in 3:times) {
-    layer <- py$layer_mutiple_n_gram_convolution(
+    layer <- aife$Layers$layer_mutiple_n_gram_convolution(
       ks_min = 2L,
       ks_max = as.integer(max_n_gram),
       times = as.integer(times),
@@ -774,12 +771,12 @@ test_that("merge_layer", {
   )$to(device)
   n_input_streams <- sample(seq(from = 2, to = 10, by = 1), size = 1)
   n_extracted_features <- sample(seq(from = 2, to = features, by = 1), size = 1)
-  masking_layer <- py$masking_layer(pad_value)$to(device)
+  masking_layer <- aife$Layers$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 
   for (attention_type in c("MultiHead", "Fourier")) {
     for (pooling_type in c("Max", "Min", "MinMax")) {
-      layer <- py$merge_layer(
+      layer <- aife$Layers$merge_layer(
         times = as.integer(times),
         features = as.integer(features),
         n_extracted_features = as.integer(n_extracted_features),
@@ -817,14 +814,14 @@ test_that("rnn_preparation", {
     seq_len = sequence_length,
     pad_value = pad_value
   )$to(device)
-  masking_layer <- py$masking_layer(pad_value)$to(device)
+  masking_layer <- aife$Layers$masking_layer(pad_value)$to(device)
   values <- masking_layer(example_tensor)
 
 
-  layer_do <- py$layer_pack_and_masking()$to(device)
+  layer_do <- aife$Layers$layer_pack_and_masking()$to(device)
   layer_do$eval()
 
-  layer_undo <- py$layer_unpack_and_masking(
+  layer_undo <- aife$Layers$layer_unpack_and_masking(
     sequence_length = as.integer(times),
     pad_value = pad_value
   )$to(device)
@@ -849,7 +846,7 @@ test_that("rnn_preparation", {
 
 test_that("layer_class_mean", {
   device <- ifelse(torch$cuda$is_available(), "cuda", "cpu")
-  layer <- py$layer_class_mean()$to(device)
+  layer <- aife$Layers$layer_class_mean()$to(device)
 
 
   test_tensor <- matrix(
