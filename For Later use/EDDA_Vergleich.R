@@ -41,8 +41,8 @@ chunk_quantile = base_model_eurobert$Tokenizer$calc_quantiles(
 )
 print(chunk_quantile)
 
-chunks=chunk_quantile["99%"]
-chunks=4
+chunks=chunk_quantile["90%"]
+
 num_layers=base_model_eurobert$get_n_layers()
 num_layers
 eurobert_min_layer=floor(0.5*num_layers)
@@ -69,29 +69,161 @@ embeddings <- tem$embed_large(
   trace = TRUE
 )
 
+save_to_disk(embeddings,dir_path = "For Later use",folder_name = "embeddings_test")
+embeddings=load_from_disk(file.path("For Later use","embeddings_test"))
 
+feature_extractor <- TEFeatureExtractor$new()
+feature_extractor$configure(
+  label = "Feature extractor for Text Embeddings",
+  text_embeddings = embeddings,
+  method="Conv",
+  features = 128,
+  te_n_layers=8,
+  times=4,
+  orthogonal_method = "matrix_exp",
+  noise_factor = 1e-4
+)
+feature_extractor$train(
+  data_embeddings = embeddings,
+  data_val_size = 0.25,
+  sustain_track = TRUE,
+  sustain_iso_code = "DEU",
+  sustain_region = NULL,
+  sustain_interval = 15,
+  sustain_log_level = "error",
+  epochs = 8000,
+  batch_size = 2048,
+  lr_rate = 1e-6,
+  lr_min = 1e-6,
+  lr_epochs = 30,
+  lr_scheduler = "Linear",
+  trace = TRUE,
+  ml_trace = 1,
+  optimizer = "AdamW",
+  amp = TRUE,
+  lr_warm_up_ratio = 0.10,
+  comp_use=TRUE,
+  comp_mode="reduce-overhead"
+)
+save_to_disk(feature_extractor,dir_path = "For Later use",folder_name = "feext_test")
+feature_extractor=load_from_disk(file.path("For Later use","feext_test"))
 
-devtools::load_all()
-load_all_py_scripts()
-batch_size=64
-losses=c("FocalLossOrdinal")
-results=list()
+classifier <- TEClassifierSequential$new()
+classifier$configure(
+  label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
+  text_embeddings = embeddings,
+  feature_extractor = feature_extractor,
+  target_levels = cat_levels,
+  skip_connection_type = "ResidualGate",
+  cls_pooling_features = 20,
+  cls_pooling_type = "WeightedAverageTimes",
+  cls_head_type = "Regular",
+  cls_input_normalize="PowerNorm",
+  final_normalization_type="RMSNorm",
+  feat_act_fct = "None",
+  feat_size = 128,
+  feat_bias = FALSE,
+  feat_dropout = 0.05,
+  feat_parametrizations = "None",
+  feat_normalization_type = "RMSNorm",
+  ng_conv_act_fct = "GELU",
+  ng_conv_n_layers = 4,
+  ng_conv_ks_min = 1,
+  ng_conv_ks_max = 3,
+  ng_conv_bias = FALSE,
+  ng_conv_dropout = 0.40,
+  ng_conv_parametrizations = "None",
+  ng_conv_normalization_type = "RMSNorm",
+  ng_conv_residual_type = "ResidualGate",
+  dense_act_fct = "GELU",
+  dense_n_layers = 0,
+  dense_dropout = 0.40,
+  dense_bias = FALSE,
+  dense_parametrizations = "None",
+  dense_normalization_type = "RMSNorm",
+  dense_residual_type = "ResidualGate",
+  rec_act_fct = "Tanh",
+  rec_n_layers = 0,
+  rec_type = "GRU",
+  rec_bidirectional = FALSE,
+  rec_dropout = 0.2,
+  rec_bias = FALSE,
+  rec_parametrizations = "None",
+  rec_normalization_type = "RMSNorm",
+  rec_residual_type = "ResidualGate",
+  tf_act_fct = "SwiGLU",
+  tf_dense_dim = ceiling(2.67 * 128),
+  tf_n_layers = 4,
+  tf_dropout_rate_1 = 0.1,
+  tf_dropout_rate_2 = 0.3,
+  tf_attention_type = "MultiHead",
+  tf_positional_type = "absolute",
+  tf_num_heads = 2,
+  tf_bias = FALSE,
+  tf_parametrizations = "None",
+  tf_normalization_type = "RMSNorm",
+  tf_normalization_position = "Post",
+  tf_residual_type = "ResidualGate"
+)
 
-feat_size=384
-loss="AEMLoss"
+classifier$train(
+  data_embeddings = embeddings,
+  data_targets = cat_codings,
+  data_folds = 10,
+  data_val_size = 0.25,
+  loss_balance_class_weights = TRUE,
+  loss_balance_sequence_length = TRUE,
+  loss_cls_fct_name = "FocalLossOrdinal",
+  use_sc = FALSE,
+  sc_method = "knnor",
+  sc_min_k = 1,
+  sc_max_k = 10,
+  use_pl = FALSE,
+  pl_max_steps = 3,
+  pl_max = 1.00,
+  pl_anchor = 1.00,
+  pl_min = 0.00,
+  sustain_track = TRUE,
+  sustain_iso_code = "DEU",
+  sustain_region = NULL,
+  sustain_interval = 15,
+  sustain_log_level = "error",
+  epochs = 1000,
+  batch_size = 1024,
+  trace = TRUE,
+  ml_trace = 1,
+  log_dir = NULL,
+  log_write_interval = 10,
+  n_cores = auto_n_cores(),
+  lr_rate = 0.0,
+  lr_min = 0.0,
+  lr_scheduler = "Linear",
+  lr_epochs = 30,
+  lr_warm_up_ratio = 0.10,
+  optimizer = "AdamW",
+  amp = TRUE,
+  comp_use=TRUE,
+  comp_mode="reduce-overhead"
+)
+classifier$reliability$test_metric_mean
+
+loss="FocalLossOrdinal"
 classifier <- TEClassifierParallelReferencePoint$new()
 classifier$configure(
   label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
   text_embeddings = embeddings,
+  embedding_dim = 384,
+  cls_n_ref_points=6,
+  final_normalization_type="RMSNorm",
   feature_extractor = NULL,
   target_levels = cat_levels,
   skip_connection_type = "ResidualGate",
   metric_type = "CosineDistance",
   cls_input_normalize="PowerNorm",
   shared_feat_layer = FALSE,
-  feat_act_fct = "Tanh",
-  feat_size = feat_size,
-  feat_bias = TRUE,
+  feat_act_fct = "None",
+  feat_size = 384,
+  feat_bias = FALSE,
   feat_dropout = 0.00,
   feat_parametrizations = "None",
   feat_normalization_type = "PowerNorm",
@@ -100,16 +232,16 @@ classifier$configure(
   ng_conv_ks_min = 2,
   ng_conv_ks_max = 3,
   ng_conv_bias = FALSE,
-  ng_conv_dropout = .10,
+  ng_conv_dropout = .15,
   ng_conv_parametrizations = "None",
   ng_conv_normalization_type = "PowerNorm",
   ng_conv_residual_type = "ResidualGate",
-  dense_act_fct = "GELU",
-  dense_n_layers = 0,
+  dense_act_fct = "None",
+  dense_n_layers = 5,
   dense_dropout = .20,
   dense_bias = FALSE,
   dense_parametrizations = "None",
-  dense_normalization_type = "PowerNorm",
+  dense_normalization_type = "RMSNorm",
   dense_residual_type = "ResidualGate",
   rec_act_fct = "Tanh",
   rec_n_layers = 0,
@@ -121,7 +253,7 @@ classifier$configure(
   rec_normalization_type = "PowerNorm",
   rec_residual_type = "ResidualGate",
   tf_act_fct = "SwiGLU",
-  tf_dense_dim = ceiling(2.67 * feat_size),
+  tf_dense_dim = ceiling(2.67 * 384),
   tf_n_layers = 1,
   tf_dropout_rate_1 = 0.1,
   tf_dropout_rate_2 = .30,
@@ -161,16 +293,16 @@ classifier$train(
   sustain_region = NULL,
   sustain_interval = 15,
   sustain_log_level = "error",
-  epochs = 5000,
-  batch_size = 1024,
+  epochs = 2000,
+  batch_size = 1024*3,
   trace = TRUE,
   ml_trace = 1,
   log_dir = NULL,
   log_write_interval = 10,
   n_cores = auto_n_cores(),
-  lr_rate = 1e-1,
-  lr_min = 1e-3,
-  lr_scheduler = "None",
+  lr_rate = 1e-3,
+  lr_min = 1e-4,
+  lr_scheduler = "Linear",
   lr_warm_up_ratio = 0.05,
   lr_epochs = 5L,
   optimizer = "AdamW",

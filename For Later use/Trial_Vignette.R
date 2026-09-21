@@ -160,7 +160,6 @@ classifier$train(
 classifier$reliability$test_metric_mean
 
 devtools::load_all()
-load_all_py_scripts()
 classifier_prototype <- TEClassifierSequentialPrototype$new()
 classifier_prototype$configure(
   label = "ProtoNet classifier for Estimating a Postive or Negative Rating of Movie Reviews",

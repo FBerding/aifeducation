@@ -21,7 +21,7 @@ BPETokenizer <- R6::R6Class(
                          add_prefix_space = TRUE,
                          trim_offsets = FALSE,
                          vocab_do_lower_case = FALSE) {
-      
+
       private$check_config_for_FALSE()
 
       private$save_all_args(
@@ -122,7 +122,7 @@ BPETokenizer <- R6::R6Class(
       run_py_file("datasets_transformer_compute_vocabulary.py")
 
       tok_new$train_from_iterator(
-        iterator = py$batch_iterator(
+        iterator =aife$HF$Vocabulary$batch_iterator(
           batch_size = 200L,
           dataset = text_dataset$get_dataset(),
           log_file = NULL,

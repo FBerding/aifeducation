@@ -19,7 +19,6 @@ embeddings=te_model$embed_large(
   trace = TRUE,
   batch_size = 64L
 )
-load_all_py_scripts()
 #cls=TEClassifierSequential$new()
 cls=TEClassifierParallelPrototype$new()
 cls$configure(

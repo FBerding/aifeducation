@@ -3,6 +3,70 @@ devtools::load_all()
 #Sys.setenv(CUDA_LAUNCH_BLOCKING = "1")
 #Sys.setenv(TORCH_USE_CUDA_DSA = "1")
 prepare_session()
+
+
+# SetUp-------------------------------------------------------------------------
+# Set paths
+root_path_data <- testthat::test_path("test_data/FeatureExtractor")
+root_path_general_data <- testthat::test_path("test_data/Embeddings")
+create_dir(testthat::test_path("test_artefacts"), FALSE)
+root_path_results <- testthat::test_path("test_artefacts/FeatureExtractor")
+create_dir(root_path_results, FALSE)
+tolerance <- 1e-5
+
+# load data for test
+# object is imdb_embeddings
+imdb_embeddings <- load_from_disk(paste0(root_path_general_data, "/imdb_embeddings"))
+
+dataset_list <- list(
+  "EmbeddedText" = imdb_embeddings,
+  "LargeDataSetForTextEmbeddings" = imdb_embeddings$convert_to_LargeDataSetForTextEmbeddings()
+)
+
+data_type="EmbeddedText"
+method="Conv"
+
+extractor <- TEFeatureExtractor$new()
+extractor$configure(
+  name = "Test_extractor",
+  label = "Test Extractor",
+  text_embeddings = dataset_list[[data_type]],
+  features = 128,
+  method = method,
+  orthogonal_method = "matrix_exp",
+  te_n_layers=10,
+  times=2,
+  noise_factor = 0.2
+)
+extractor$train(
+  data_embeddings = dataset_list[[data_type]],
+  data_val_size = 0.25,
+  sustain_track = TRUE,
+  sustain_iso_code = "DEU",
+  sustain_region = NULL,
+  sustain_interval = 15,
+  sustain_log_level = "error",
+  epochs = 2,
+  batch_size = 100,
+  optimizer = "Adam",
+  amp = TRUE,
+  trace = random_bool_on_CI(),
+  ml_trace = 1
+)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 os=reticulate::import("os")
 #os$environ$setdefault("CUDA_LAUNCH_BLOCKING","1")
 example_data <- imdb_movie_reviews
@@ -68,7 +132,7 @@ review_embeddings <- tem$embed_large(
 
 
 devtools::load_all()
-load_all_py_scripts()
+
 gc()
 #prepare_session()
 classifier <- TEClassifierSequentialReferencePoint$new()
@@ -323,7 +387,6 @@ classifier$reliability$test_metric_mean
 
 #--------------------------------------------------------------------------------------
 devtools::load_all()
-load_all_py_scripts()
 classifier_prototype <- TEClassifierSequentialPrototype$new()
 classifier_prototype$configure(
   label = "ProtoNet classifier for Estimating a Postive or Negative Rating of Movie Reviews",
@@ -431,7 +494,6 @@ classifier_prototype$plot_learning_rate()
 #-----------------------------------------------------------------------------
 #--------------------------------------------------------------------------------------
 devtools::load_all()
-load_all_py_scripts()
 feature_extractor <- TEFeatureExtractor$new()
 feature_extractor$configure(
   name = "feature_extractor_bert_movie_reviews",
