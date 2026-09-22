@@ -105,8 +105,13 @@ feature_extractor$train(
   comp_use=TRUE,
   comp_mode="reduce-overhead"
 )
-save_to_disk(feature_extractor,dir_path = "For Later use",folder_name = "feext_test")
-feature_extractor=load_from_disk(file.path("For Later use","feext_test"))
+save_to_disk(feature_extractor,dir_path = "For Later use",folder_name = "feext_test_times")
+feature_extractor=load_from_disk(file.path("For Later use","feext_test_times"))
+
+abc=feature_extractor$extract_features_large(embeddings,batch_size = 1024L,trace = TRUE)
+abcc=abc$convert_to_EmbeddedText()
+cor_test=abcc$calc_feature_correlation()
+cor_test$effect_sizes$mean
 
 classifier <- TEClassifierSequential$new()
 classifier$configure(
@@ -125,21 +130,21 @@ classifier$configure(
   feat_bias = FALSE,
   feat_dropout = 0.05,
   feat_parametrizations = "None",
-  feat_normalization_type = "RMSNorm",
+  feat_normalization_type = "None",
   ng_conv_act_fct = "GELU",
   ng_conv_n_layers = 4,
   ng_conv_ks_min = 1,
   ng_conv_ks_max = 3,
   ng_conv_bias = FALSE,
   ng_conv_dropout = 0.40,
-  ng_conv_parametrizations = "None",
+  ng_conv_parametrizations = "WeightNorm",
   ng_conv_normalization_type = "RMSNorm",
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "GELU",
   dense_n_layers = 0,
   dense_dropout = 0.40,
   dense_bias = FALSE,
-  dense_parametrizations = "None",
+  dense_parametrizations = "WeightNorm",
   dense_normalization_type = "RMSNorm",
   dense_residual_type = "ResidualGate",
   rec_act_fct = "Tanh",
@@ -155,12 +160,12 @@ classifier$configure(
   tf_dense_dim = ceiling(2.67 * 128),
   tf_n_layers = 4,
   tf_dropout_rate_1 = 0.1,
-  tf_dropout_rate_2 = 0.3,
+  tf_dropout_rate_2 = 0.30,
   tf_attention_type = "MultiHead",
   tf_positional_type = "absolute",
   tf_num_heads = 2,
   tf_bias = FALSE,
-  tf_parametrizations = "None",
+  tf_parametrizations = "WeightNorm",
   tf_normalization_type = "RMSNorm",
   tf_normalization_position = "Post",
   tf_residual_type = "ResidualGate"
@@ -188,7 +193,7 @@ classifier$train(
   sustain_region = NULL,
   sustain_interval = 15,
   sustain_log_level = "error",
-  epochs = 1000,
+  epochs = 3000,
   batch_size = 1024,
   trace = TRUE,
   ml_trace = 1,
@@ -207,6 +212,8 @@ classifier$train(
 )
 classifier$reliability$test_metric_mean
 
+
+#-------------------------------------------------------------------------------
 loss="FocalLossOrdinal"
 classifier <- TEClassifierParallelReferencePoint$new()
 classifier$configure(
