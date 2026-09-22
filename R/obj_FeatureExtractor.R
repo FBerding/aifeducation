@@ -53,7 +53,7 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param noise_factor `r get_param_doc_desc("noise_factor")`
     #' @note `features` refers to the number of features for the compressed text embeddings.
     #' @note `times` refers to the number of times for the compressed text embeddings. Only relevant
-    #' if `method="Conv".`
+    #' if `method="DenseTimes".`
     #' @return Returns an object of class [TEFeatureExtractor] which is ready for training.
     configure = function(name = NULL,
                          label = NULL,
@@ -522,8 +522,8 @@ TEFeatureExtractor <- R6::R6Class(
           pad_value = private$text_embedding_model$pad_value,
           orthogonal_method = private$model_config$orthogonal_method
         )
-  }  else if(private$model_config$method == "Conv"){
-      private$model <- aife$Autoencoder$ConvAutoencoder_with_Mask_PT(
+  }  else if(private$model_config$method == "DenseTimes"){
+      private$model <- aife$Autoencoder$DenseAutoencoder_with_Mask_PT_Times(
         features_in = as.integer(private$text_embedding_model["features"]),
         features_out = as.integer(private$model_config$features),
         time_in = as.integer(private$text_embedding_model["times"]),

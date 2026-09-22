@@ -34,9 +34,7 @@ class layer_switch_pad_values(torch.nn.Module):
     features=x.size(2)
     time_sums=torch.sum(x,dim=2)
     mask=(time_sums==features*self.pad_value_old)
-    
     mask=torch.reshape(torch.repeat_interleave(mask,repeats=features,dim=1),(x.size(dim=0),x.size(dim=1),features))
-    
     z=torch.where(condition=mask, input=self.pad_value_new, other=x)
     return z
 
@@ -121,163 +119,11 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
       noise = self.noise_factor * torch.rand(size=x.size(),device=x.device,dtype=x.dtype)
       return noise.detach()
     
-import torch
-import math
 
-import torch
-import math
-
-class ConvAutoencoder_with_Mask_PT2(torch.nn.Module):
+class DenseAutoencoder_with_Mask_PT_Times(torch.nn.Module):
     def __init__(self, features_in, features_out, time_in, time_out, noise_factor, pad_value, orthogonal_method, te_n_layers=3):
         super().__init__()
-        self.injection_value = torch.nn.parameter.Parameter(data=torch.ones((1)))
-        if isinstance(pad_value, torch.Tensor):
-            self.pad_value = pad_value.detach()
-        else:
-            self.pad_value = torch.tensor(pad_value)
-            
-        self.features_in = features_in
-        self.features_out = features_out
-        self.time_in = time_in
-        self.time_out = time_out
-        self.noise_factor = noise_factor
-        self.n_layers = te_n_layers
-        
-        # Calculate featurs per layer (Height H)
-        self.feature_diff = self.features_in - self.features_out
-        f_dims = []
-        for i in range(self.n_layers + 1):
-            fraction = i / self.n_layers
-            dim = math.ceil(self.features_in - self.feature_diff * fraction)
-            f_dims.append(dim)
-            
-        # Calculate timepoints per feature (Width W)
-        self.time_diff = self.time_in - self.time_out
-        t_dims = []
-        for i in range(self.n_layers + 1):
-            fraction = i / self.n_layers
-            dim = math.ceil(self.time_in - self.time_diff * fraction)
-            t_dims.append(dim)
-            
-        # Kernel, Strides und Output-Paddings
-        self.layer_strides_h = []
-        self.layer_kernels_h = []
-        self.layer_strides_w = []
-        self.layer_kernels_w = []
-        
-        self.decoder_output_paddings_h = []
-        self.decoder_output_paddings_w = []
-        
-        self.encoder_layer_names = []
-        
-        for i in range(self.n_layers):
-            # Feature-Dimension (H)
-            in_f = f_dims[i]
-            out_f = f_dims[i+1]
-            stride_h = max(1, math.floor(in_f / out_f))
-            kernel_h = in_f - (out_f - 1) * stride_h
-            
-            # Time-Dimension (W)
-            in_t = t_dims[i]
-            out_t = t_dims[i+1]
-            stride_t = max(1, math.floor(in_t / out_t))
-            kernel_t = in_t - (out_t - 1) * stride_t
-            
-            self.layer_strides_h.append(stride_h)
-            self.layer_kernels_h.append(kernel_h)
-            self.layer_strides_w.append(stride_t)
-            self.layer_kernels_w.append(kernel_t)
-            
-            # Output Paddings 
-            out_pad_h = in_f - ((out_f - 1) * stride_h + kernel_h)
-            out_pad_w = in_t - ((out_t - 1) * stride_t + kernel_t)
-            self.decoder_output_paddings_h.append(out_pad_h)
-            self.decoder_output_paddings_w.append(out_pad_w)
-            
-            # Weights 
-            # (out_channels=1, in_channels=1, kernel_size_h, kernel_size_w)
-            name = f"param_w{i+1}"
-            param = torch.nn.Parameter(torch.randn(1, 1, kernel_h, kernel_t))
-            self.register_parameter(name, param)
-            self.encoder_layer_names.append(name)
-            
-            if orthogonal_method != "None":
-                torch.nn.utils.parametrizations.orthogonal(module=self, name=name, orthogonal_map=orthogonal_method)
-
-    def forward(self, x, encoder_mode=False):
-        # Input: (B, T, F)
-        # Calculate Mask
-        time_sums = torch.sum(x, dim=2)
-        mask = (time_sums == self.features_in * self.pad_value)
-        mask_features = torch.unsqueeze(mask, dim=2).expand(x.size()).detach()
-        
-        y = torch.where(mask_features, self.pad_value, x)
-        
-        if not encoder_mode:
-            if self.training:
-                y = y + self.add_noise(y)
-            
-            # Sort: (B, T, F) -> (B, F, T) -> (B, 1, F, T)
-            # F = Heigth (H), T = Width (W)
-            y = y.transpose(1, 2).unsqueeze(1)
-            
-            # encoder
-            for idx, name in enumerate(self.encoder_layer_names):
-                w = getattr(self, name)
-                y = torch.nn.functional.conv2d(
-                    y, weight=w, 
-                    stride=(self.layer_strides_h[idx], self.layer_strides_w[idx]), 
-                    padding=0
-                )
-            
-            # Latent Space  (B, T, F) 
-            y = y.squeeze(1) (B, F_out, T_out)
-            latent_space = y.transpose(1, 2) (B, T_out, F_out)
-            
-            # decoder
-            y = latent_space.transpose(1, 2).unsqueeze(1) # (B, 1, F_out, T_out)
-            for idx in reversed(range(self.n_layers)):
-                name = self.encoder_layer_names[idx]
-                w = getattr(self, name)
-                w_dec = w.transpose(0, 1)
-                y = torch.nn.functional.conv_transpose2d(
-                    y, weight=w_dec, 
-                    stride=(self.layer_strides_h[idx], self.layer_strides_w[idx]), 
-                    padding=0,
-                    output_padding=(self.decoder_output_paddings_h[idx], self.decoder_output_paddings_w[idx])
-                )
-                
-            # (B, T, F)
-            y = y.squeeze(1).transpose(1, 2)
-            y = torch.where(mask_features, self.pad_value, y)
-            return y, latent_space
-            
-        else:
-            y = x.transpose(1, 2).unsqueeze(1)
-            for idx, name in enumerate(self.encoder_layer_names):
-                w = getattr(self, name)
-                y = torch.nn.functional.conv2d(
-                    y, weight=w, 
-                    stride=(self.layer_strides_h[idx], self.layer_strides_w[idx]), 
-                    padding=0
-                )
-            y = y.squeeze(1).transpose(1, 2)
-            return y
-
-    def add_noise(self, x):
-        noise = self.noise_factor * torch.rand(size=x.size(), device=x.device, dtype=x.dtype)
-        return noise.detach()
-
-import torch
-import math
-
-import torch
-import math
-
-class ConvAutoencoder_with_Mask_PT(torch.nn.Module):
-    def __init__(self, features_in, features_out, time_in, time_out, noise_factor, pad_value, orthogonal_method, te_n_layers=3):
-        super().__init__()
-        self.injection_value = torch.nn.parameter.Parameter(data=torch.ones((1)))
+        #self.injection_value = torch.nn.parameter.Parameter(data=torch.ones((1)))
         if isinstance(pad_value, torch.Tensor):
             self.pad_value = pad_value.detach()
         else:
@@ -340,6 +186,13 @@ class ConvAutoencoder_with_Mask_PT(torch.nn.Module):
             if orthogonal_method != "None":
                 torch.nn.utils.parametrizations.orthogonal(module=self, name=df_w_name, orthogonal_map=orthogonal_method)
                 torch.nn.utils.parametrizations.orthogonal(module=self, name=dt_w_name, orthogonal_map=orthogonal_method)
+              #Add Padding Layer
+        if pad_value != 0:
+            self.switch_pad_value_start = layer_switch_pad_values(pad_value_old=pad_value, pad_value_new=0.0)
+            self.switch_pad_value_final = layer_switch_pad_values(pad_value_old=0.0, pad_value_new=pad_value)
+        else:
+            self.switch_pad_value_start = None
+            self.switch_pad_value_final = None
 
     def forward(self, x, encoder_mode=False):
         # Input-Form: (B, T, F)
@@ -347,12 +200,17 @@ class ConvAutoencoder_with_Mask_PT(torch.nn.Module):
         mask = (time_sums == self.features_in * self.pad_value)
         mask_features = torch.unsqueeze(mask, dim=2).expand(x.size()).detach()
         
-        y = torch.where(mask_features, self.injection_value, x)
+        # Switch padding value if necessary
+        if self.switch_pad_value_start is not None:
+            x = self.switch_pad_value_start(x)
         
         if not encoder_mode:
             if self.training:
-                y = y + self.add_noise(y)
-            
+              y = x + self.add_noise(x)
+            else:
+              y=x
+            #y = torch.where(mask_features, self.injection_value, y)
+            y = torch.where(mask_features, 0.0, y)
             # ---- ENCODER ----
             for idx in range(self.n_layers):
                 # A) Feature-Reduktion via Dense (B, T, F_in) -> (B, T, F_out)
@@ -383,18 +241,25 @@ class ConvAutoencoder_with_Mask_PT(torch.nn.Module):
                 y = torch.nn.functional.linear(y, weight=getattr(self, df_w).t())
                 
             y = torch.where(mask_features, self.pad_value, y)
+            if self.switch_pad_value_start is not None:
+              y = self.switch_pad_value_final(y)
             return y, latent_space
             
         else:
             # Reiner Encoder-Mode
+            y = torch.where(mask_features, 0.0, x)
             for idx in range(self.n_layers):
                 df_w, df_b = self.encoder_dense_f_names[idx]
                 y = torch.nn.functional.linear(y, weight=getattr(self, df_w), bias=getattr(self, df_b))
-                
+      
                 y = y.transpose(1, 2)
                 dt_w, dt_b = self.encoder_dense_t_names[idx]
                 y = torch.nn.functional.linear(y, weight=getattr(self, dt_w), bias=getattr(self, dt_b))
                 y = y.transpose(1, 2)
+                
+                # Switch padding value back if necessary
+                if self.switch_pad_value_start is not None:
+                  y = self.switch_pad_value_final(y)
             return y
 
     def add_noise(self, x):

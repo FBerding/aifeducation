@@ -1512,7 +1512,7 @@ get_param_dict <- function() {
     allow_null = FALSE,
     min = NULL,
     max = NULL,
-    allowed_values = c("Conv", "Dense"),
+    allowed_values = c("Dense","DenseTimes"),
     desc = "Method to use for the feature extraction.",
     default_value = "Dense",
     gui_box = "General Settings",
