@@ -31,7 +31,6 @@ editor_options:
 - Added a final normalization layer to all models.
 - Rewrite DataCollator for TEClassifierPrototype to speed up learning.
 
-
 **TEFeatureExtractor**
 
 - NANs in loss now raise an error.
@@ -40,6 +39,11 @@ editor_options:
 - TEFeatureExtractors now support compilation to speed up training.
 - Removed LSTM method.
 - Added new method 'DenseTimes' that reduces the embeddings on both features and times.
+
+**EmbeddedText**
+
+- Added a method that allows to request the correlations between the features of
+  a given set of text embeddings. 
 
 **DataManager**
 
