@@ -579,7 +579,8 @@ EmbeddedText <- R6::R6Class(
           mean=summary["Mean"],
           sd=sd(relevant),
           q3=summary["3rd Qu."],
-          max=summary["Max."]
+          max=summary["Max."],
+          matrix=cor_matrix
         ),
         effect_sizes=list(
           min=summary_abs["Min."],
