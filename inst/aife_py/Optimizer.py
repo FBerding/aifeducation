@@ -29,10 +29,14 @@ def get_Optimizer(optimizer_method,params,lr_rate):
 def get_lr_scheduler(optimizer,scheduler_type,lr_warm_up_ratio,total_epochs,batches_per_epoch,max_lr,min_lr):
   warm_up_steps=math.floor(total_epochs*lr_warm_up_ratio)
   main_steps=total_epochs-warm_up_steps
+  warm_up_steps=warm_up_steps*batches_per_epoch
+  main_steps=main_steps*batches_per_epoch
   if scheduler_type=="Linear":
     scheduler_main=torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1,end_factor=min_lr/max_lr, total_iters=main_steps)
   elif scheduler_type=="Cyclic":
     scheduler_main=torch.optim.lr_scheduler.CyclicLR(optimizer, base_lr=min_lr, max_lr=max_lr, step_size_up=5*batches_per_epoch)
+  elif =="CosineAnnealing"
+    scheduler_main=torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=main_steps, eta_min=0.0, last_epoch=-1)
   elif scheduler_type=="None":
     return None
   

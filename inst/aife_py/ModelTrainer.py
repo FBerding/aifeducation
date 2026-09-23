@@ -782,7 +782,9 @@ class ModelTrainer():
           #Check if there are furhter information for training-----------------------
           # If there are no addtiononal information. Stop training and continue
           if self.check_convergence(train_results):
+            self.metric_storage["checkpoints"][epoch]=2
             break
+          self.metric_storage["checkpoints"][epoch]=2
     elif self.model_type=="ClassifierPrototype":
       for epoch in range(self.epochs):
         train_results=self.run_epoch_cls_pt(cblock="train",epoch=epoch,dataloader=self.trainloader)
@@ -818,7 +820,9 @@ class ModelTrainer():
           #Check if there are furhter information for training-----------------------
           # If there are no addtiononal information. Stop training and continue
           if self.check_convergence(train_results):
+            self.metric_storage["checkpoints"][epoch]=2
             break
+          self.metric_storage["checkpoints"][epoch]=2
         
     elif self.model_type=="TEFeatureExtractor":
         for epoch in range(self.epochs):
@@ -847,6 +851,7 @@ class ModelTrainer():
               best_loss=self.best_val_loss,
               elc=self.elc
             )
+        self.metric_storage["checkpoints"][epoch]=2    
     else:
       print("Error")
   
