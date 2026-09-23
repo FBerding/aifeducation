@@ -545,11 +545,11 @@ EmbeddedText <- R6::R6Class(
       )
     },
     #' @description Calculates the correlation between the features across
-    #' times and cases.
+    #' times and cases and the IsoScore (Rudman et al. 2022).
     #' @return Returns a `list` that shows statistics concerning the correlation
-    #' of the features. The filed 'effect_size' uses the absolute values of the correlation while
+    #' of the features and the IsoScore. The filed 'effect_size' uses the absolute values of the correlation while
     #' 'statistics' uses the raw estimates.
-    calc_feature_correlation=function(){
+    calc_embedding_statistics=function(){
       pad_value=self$get_pad_value()
       n=dim(self$embeddings)[1L]
       times=dim(self$embeddings)[2L]

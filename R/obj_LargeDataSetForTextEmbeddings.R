@@ -286,6 +286,7 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
           model_name = config_file$private$feature_extractor$model_name,
           model_label = config_file$private$feature_extractor$model_label,
           features = config_file$private$feature_extractor$features,
+          times= config_file$private$feature_extractor$times,
           method = config_file$private$feature_extractor$method,
           noise_factor = config_file$private$feature_extractor$noise_factor,
           optimizer = config_file$private$feature_extractor$optimizer
@@ -546,6 +547,7 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
           model_name = private$feature_extractor$model_name,
           model_label = private$feature_extractor$model_label,
           features = private$feature_extractor$features,
+          times = private$feature_extractor$times,
           method = private$feature_extractor$method,
           noise_factor = private$feature_extractor$noise_factor,
           optimizer = private$feature_extractor$optimizer
