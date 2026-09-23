@@ -84,7 +84,7 @@ TEFeatureExtractor <- R6::R6Class(
       private$save_all_args(args = tmp_args, group = "configure")
 
       # Perform additional checks and adjustments
-      # private$check_param_combinations()
+      private$check_param_combinations()
 
       # Set ML framework
       private$ml_framework <- "pytorch"
@@ -426,8 +426,8 @@ TEFeatureExtractor <- R6::R6Class(
             model_version = model_info$model_version,
             model_language = model_info$model_language,
             param_seq_length = model_info$param_seq_length,
-            param_features = dim(embeddings)[3L],
-            param_chunks = dim(embeddings)[2L],
+            param_features = embeddings$get_features(),
+            param_chunks = embeddings$get_times(),
             param_overlap = model_info$model$param_overlap,
             param_emb_layer_min = model_info$model$param_emb_layer_min,
             param_emb_layer_max = model_info$model$param_emb_layer_max,
@@ -487,6 +487,39 @@ TEFeatureExtractor <- R6::R6Class(
       )
       return(tmp_plot)
     },
+    #--------------------------------------------------------------------------
+    #' @description Compare embedding statistics.
+    #' @param data_embeddings Object of class [EmbeddedText] or [LargeDataSetForTextEmbeddings] containing the text
+    #'   embeddings which should be reduced in their dimensions.
+    #' @param batch_size `int` batch size.
+    #' @param trace `bool` If `TRUE` information about the progress is printed to the console.
+    #' @return Returns a `matrix` showing embedding statistics before and after compression.
+    #' All values refer to the absolute values of correlation between feature dimensions.
+    #' IsoScore is calculated as described by Rudman et al. (2022).
+    compare_embedding_statistics=function(data_embeddings,batch_size, trace = FALSE){
+      check_class(object = data_embeddings, object_name = "data_embeddings", classes = c("EmbeddedText", "LargeDataSetForTextEmbeddings"), allow_NULL = FALSE)
+      if(inherits(data_embeddings,"LargeDataSetForTextEmbeddings")){
+        tmp_embeddings=data_embeddings$convert_to_EmbeddedText()
+      } else {
+        tmp_embeddings=data_embeddings
+      }
+      before_statistics=tmp_embeddings$calc_embedding_statistics()
+
+      embeddings_after=self$extract_features_large(
+        data_embeddings=data_embeddings,
+        batch_size = batch_size  ,
+        trace=trace
+      )
+      embeddings_after=embeddings_after$convert_to_EmbeddedText()
+      after_statistics=embeddings_after$calc_embedding_statistics
+      result=rbind(
+        unlist(before_statistics$effect_sizes),
+        unlist(after_statistics$effect_sizes)
+      )
+      rownames(result)=c("before","compressed")
+      return(result)
+    },
+    #--------------------------------------------------------------------------
     #' @description Print method for classifiers.
     #' @return Prints a short description of the object.
     print = function() {
@@ -614,7 +647,13 @@ TEFeatureExtractor <- R6::R6Class(
         epochs=as.integer(total_epochs)
       )
       return(lr_estimation_results)
+    },
+  #----------------------------------------------------------------------------
+  check_param_combinations=function(){
+    if(private$model_config$method=="Dense"){
+      private$model_config$times=self$get_text_embedding_model()$times
     }
+  }
   )
 )
 
