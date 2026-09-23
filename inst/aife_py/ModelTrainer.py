@@ -172,7 +172,11 @@ class ModelTrainer():
     self.log_top_total=log_top_total
     self.log_top_message=log_top_message
     #Loss
-    self.loss_fct=feature_extractor_loss()
+    self.loss_fct=feature_extractor_loss(
+      batch_size=self.batch_size,
+      times=self.times,
+      features=self.features
+    )
   def get_device(self):
     return 'cuda' if torch.cuda.is_available() else 'cpu'
   def get_device_type(self):

@@ -571,6 +571,15 @@ EmbeddedText <- R6::R6Class(
       relevant_abs=sqrt(relevant*relevant)
       summary=summary(relevant)
       summary_abs=summary(relevant_abs)
+
+      matrix_view_as_array=array(matrix_view,dim=c(nrow(matrix_view),1,features))
+      iso_score_fct=aife$Losses$calc_IsoScore(
+        batch_size=nrow(matrix_view),
+        times=1L,
+        features=features
+      )
+      iso_score=iso_score_fct(torch$from_numpy(np$array(matrix_view_as_array)))
+
       result=list(
         statistics=list(
           min=summary["Min."],
@@ -589,7 +598,8 @@ EmbeddedText <- R6::R6Class(
           mean=summary_abs["Mean"],
           sd=sd(relevant_abs),
           q3=summary_abs["3rd Qu."],
-          max=summary_abs["Max."]
+          max=summary_abs["Max."],
+          iso_score=tensor_to_numpy(iso_score)
         )
       )
     }
