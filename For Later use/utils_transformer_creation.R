@@ -64,7 +64,7 @@ Bert_like.SFC.calculate_vocab <- function(self) { # nolint
   run_py_file("datasets_transformer_compute_vocabulary.py")
 
   self$temp$tok_new$train_from_iterator(
-    py$batch_iterator(
+    aife$HF$Vocabulary$batch_iterator(
       batch_size = 200L,
       dataset = self$temp$raw_text_dataset,
       log_file = self$temp$log_file,
@@ -168,7 +168,7 @@ Longformer_like.SFC.create_tokenizer_draft <- function(self) { # nolint
 Longformer_like.SFC.calculate_vocab <- function(self) { # nolint
   run_py_file("datasets_transformer_compute_vocabulary.py")
   self$temp$tok_new$train_from_iterator(
-    py$batch_iterator(
+    aife$HF$Vocabulary$batch_iterator(
       batch_size = 200L,
       dataset = self$temp$raw_text_dataset,
       log_file = self$temp$log_file,
