@@ -190,95 +190,63 @@ def calc_Correlation(x):
 
 class calc_IsoScore(torch.nn.Module):
     def __init__(self, batch_size: int, times:int, features: int, eps: float = 1e-8):
-        """
-        Für CUDA Graphs optimierter IsoScore.
-        
-        Args:
-            num_points (int): Die exakte Anzahl an Punkten (entspricht B * T).
-            features (int): Die Anzahl der Features / Raumdimensionen (n).
-            eps (float): Kleiner Wert für numerische Stabilität.
-        """
         super().__init__()
         self.eps = eps
         self.m_fixed = float(batch_size*times)
         self.n_fixed = float(features)
         
-        # Konstanten einmalig registrieren, um Graph-Aufbrüche zu verhindern
         self.register_buffer("ones_n", torch.ones(features))
         self.register_buffer("sqrt_n", torch.sqrt(torch.tensor(features, dtype=torch.float32)))
         
-        # Nenner für Delta vorbereiten: sqrt(2 * (n - sqrt(n)))
         denom_val = torch.sqrt(2 * (self.n_fixed - torch.sqrt(torch.tensor(self.n_fixed))))
-        # Schutz gegen n=1 im Init abfangen
         self.denominator_delta = denom_val if denom_val > eps else 1.0
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         #x: (B,T,F)
-        # 1. Statisches Flattening (Kein dynamisches Maskieren über x[valid_mask]!)
-        # Um CUDA Graphs zu erlauben, MÜSSEN ungültige Zeilen mathematisch neutralisiert werden.
-        # Wir flatten zu (M, N) wobei M = B * T ist.
+        #x_flat (B*T,F)
         x_flat = x.reshape(-1, int(self.n_fixed))
-        
-        # Erstelle eine Maske: 1 für gültige Zeilen, 0 für Null-Zeilen
-        # (Nutze sum auf Absolutwerten oder Quadrate, falls negative Werte möglich sind)
+        #Check for padded tokens
         valid_mask = (torch.sum(torch.abs(x_flat), dim=1, keepdim=True) != 0).to(x_flat.dtype)
-        
-        # Mathematische Filterung: Setze ungültige Zeilen auf 0
         x_selected = x_flat * valid_mask
-        
-        # Berechne die tatsächliche Anzahl gültiger Punkte (Vermeide CPU-Synchronisation)
-        # Falls m_valid gegen 0 geht, fangen wir das später via torch.where ab.
+        #Number of relevant cases
         m_valid = torch.sum(valid_mask)
         m_minus_1 = torch.clamp(m_valid - 1.0, min=self.eps)
-
-        # 2. Zentrieren der Daten
-        # Da wir ungültige Zeilen auf 0 gesetzt haben, berechnen wir den Mittelwert nur über gültige Zeilen
+        #Center data
         x_sum = torch.sum(x_selected, dim=0, keepdim=True)
         x_mean = x_sum / torch.clamp(m_valid, min=self.eps)
-        
-        # Zentrieren und ungültige Zeilen wieder explizit nullen
         x_centered = (x_selected - x_mean) * valid_mask
         
-        # 3. Kovarianz-Diagonalen-Berechnung über SVD
-        # torch.linalg.svd ist ab PyTorch 1.11+ mit CUDA Graphs kompatibel, sofern die Shapes statisch sind.
-        # full_matrices=False liefert immer min(M, N) Singulärwerte.
+        # Step 3 diagonal of the covariance matrix of x_pca
+        #returns min(M, N) values.
         _, S, _ = torch.linalg.svd(x_centered, full_matrices=False)
-        
-        # Da wir für CUDA Graphs feste Shapes brauchen, müssen wir das Auffüllen mit Nullen 
-        # ohne `torch.cat` lösen. Wir nutzen stattdessen einen vorbereiteten Null-Tensor.
+        #Fill with zeros to get a static shape
         Sigma_D = torch.zeros(int(self.n_fixed), device=x.device, dtype=x.dtype)
-        # Sicheres Zuweisen der SVD-Werte (funktioniert graph-sicher für feste Längen)
         num_svd_elements = S.shape[0]
         Sigma_D[:num_svd_elements] = (S ** 2) / m_minus_1
 
-        # 4. Normalisierung der Diagonale
+        # Step 4 
         norm_Sigma_D = torch.linalg.vector_norm(Sigma_D)
-        
-        # Ersetze `if norm_Sigma_D < eps` durch ein graph-sicheres `torch.where`
         is_norm_zero = norm_Sigma_D < self.eps
         safe_norm = torch.where(is_norm_zero, torch.tensor(1.0, device=x.device, dtype=x.dtype), norm_Sigma_D)
-        
         Sigma_D_hat = (self.sqrt_n * Sigma_D) / safe_norm
 
-        # 5. Isotropy Defect δ(x)
+        # step 5 isotropy defect
         diff_norm = torch.linalg.vector_norm(Sigma_D_hat - self.ones_n)
         delta_x = diff_norm / self.denominator_delta
 
-        # 6. Prozentuale Belegung der Dimensionen φ(x)
+        # step 6 occupation
         numerator_phi = self.n_fixed - (delta_x ** 2) * (self.n_fixed - self.sqrt_n)
         phi_x = (numerator_phi ** 2) / (self.n_fixed ** 2)
 
-        # 7. Transformation in den Bereich [0, 1] -> ι(x)
-        # Weiche Absicherung für n=1
+        # step 7 transformation
         iota_x = (self.n_fixed * phi_x - 1.0) / torch.clamp(torch.tensor(self.n_fixed - 1.0, device=x.device), min=1.0)
         
-        # Finale Zuweisung: Falls norm_Sigma_D am Anfang 0 war, gebe 0.0 zurück
-        final_score = torch.where(is_norm_zero, torch.tensor(0.0, device=x.device, dtype=x.dtype), iota_x)
+        # finalization
+        final_score = torch.where(is_norm_zero, 0.0, iota_x)
         
-        # Falls n <= 1 war, gebe 1.0 zurück
+        # If n<=1 return 1
         if self.n_fixed <= 1:
             return torch.tensor(1.0, device=x.device, dtype=x.dtype)
-
         return torch.clamp(final_score, 0.0, 1.0)
 
 
@@ -291,7 +259,7 @@ class feature_extractor_loss(torch.nn.Module):
   def forward(self,input,target,latent_space):
     input_n=torch.nn.functional.normalize(input, p=2.0, dim=2, eps=1e-12, out=None)
     target_n=torch.nn.functional.normalize(target, p=2.0, dim=2, eps=1e-12, out=None)
-    loss=torch.sqrt(self.mse_loss(input_n,target_n)).mean()+self.cov_loss(latent_space)+self.iso_score(latent_space)
+    loss=torch.sqrt(self.mse_loss(input_n,target_n)).mean()+self.cov_loss(latent_space)+(1-self.iso_score(latent_space))
     return(loss)
 
 def get_loss_cls_fct(name,class_weights):
