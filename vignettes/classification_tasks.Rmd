@@ -971,7 +971,200 @@ tem$BaseModel$plot_training_history(
 
 Please note that this plot is unavailable for this example, as the necessary data is not directly accessible for this model on Hugging Face. However, if you train a model with this package, the training history is always saved.
 
-# 5 Overview Classifiers
+Creating a `TextEmbeddingModel` enables you to generate the input required for classifiers. However, before you start training your own classification models, an intermediate step can improve performance and reduce training time. This intermediate step involves training and applying a `TEFeatureExtractor`.
+
+# 5 Feature Extractors
+
+## 5.1 Introduction
+
+Some empirical studies suggest that it is advisable to preprocess embeddings before using them in downstream tasks. This is because encoders tend to create anisotropic embeddings, which are characterised by:
+(1) mapping input data into a narrow region (i.e. they do not fully use the available space to represent the data);
+(2) high correlations between the feature dimension; and
+(3) distorted variance (Takeshita et al., 2025, p. 27707).
+
+As Takeshita et al. (2025, p. 27708) demonstrate, a decrease in anisotropy improves performance in downstream tasks. 
+Furthermore, Takeshita et al. (2025, p. 27710) demonstrate that approximately 50% of dimensions reduce performance. Therefore, dropping these dimensions improves performance. 
+Consequently, randomly dropping 50% of the dimensions leads only to a minor decrease in the performance of classification tasks.
+However, the dimensions that reduce performance vary by dataset and task (Takeshita et al., 2025, p. 27711). 
+
+In their study Ganesan et al. (2021) investigate the
+relationship between the sample size, dimension, and a dimension reduction
+method. The text representations were built by calculating the mean over
+all tokens of the second to last layer (Ganesan et al. 2021, p. 4517).
+Their central findings are
+
+-   that fine-tuning a transformer with only a few training examples
+    (10,000) results in a lower performance than using a not fine-tuned
+    transformer (Ganesan et al. 2021, p. 4519).
+-   Principal component analysis performed best, but multiple-layer
+    non-linear auto-encoders (NLAE) are also a good choice (Ganesan et
+    al. 2021, p. 4520).
+-   that the number of dimensions depends on the specific task. However,
+    a larger training sample allows for a higher number of dimension. In
+    some cases, about $1/12$ to $1/6$ of the dimensions were sufficient
+    (Ganesan et al. 2021, p. 4522).
+
+Thus, the number of features should be reduced before passing the embedding as 
+input to classifiers. This can increase performance and reduce training time. 
+
+In *aifeducation*, a feature extractor is a model that reduces the number of features 
+of given text embeddings before feeding the embeddings as input to a classifier.
+
+The feature extractors implemented in *aifeducation* are auto-encoders that support sequential data and sequences of different lengths. The basic architecture of all the extractors is shown in the following figure.
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+![Figure `r running_num_figures`: Basic architecture of feature extractors](classif_feature_extractor.png){width="100%"}
+
+The learning objective of the feature extractors is to compress information by reducing the number of features to that of the latent space (Frochte 2019, p. 281). In the figure above, this would mean reducing the number of features from eight to four and storing as much information as possible from eight dimensions in four dimensions.
+Next, the extractor attempts to reconstruct the original information from the compressed latent space information (Frochte 2019, pp. 280–281). The information is then extended from four dimensions to eight.
+After training, the hidden representation of the latent space is used as a pre-processing of the original input.
+
+In *aifeducation*, the learning objective is extended. That is, the encoder should not only find good compression, but also ensure that the feature dimensions do not correlate and that the data is distributed isotropically. The correlation between the feature dimensions is measured as the mean correlation between the features, while the degree of isotropy is measured using the IsoScore (Rudman et al., 2022). IsoScore ranges from 0 to 1 and describes the percentage of dimensions that are isotropically utilised (Rudman et al., 2022, p. 3330). 
+
+## 5.2 Creation
+
+In this example, we use the text embeddings from Section 4. You can create a feature extractor as follows: 
+
+```{r, include = TRUE, eval=TRUE}
+feature_extractor <- TEFeatureExtractor$new()
+feature_extractor$configure(
+  label = "Feature extractor for Text Embeddings",
+  text_embeddings = review_embeddings,
+  features = 384,
+  te_n_layers=4,
+  method = "Dense",
+  orthogonal_method = "matrix_exp",
+  noise_factor = 1e-4
+)
+```
+
+As with the other models, you can use the `label` for the model's label. 
+The argument `text_embeddings` takes an object of class `EmbeddedText` or `LargeDataSetForTextEmbeddings.`
+This object connects your feature extractor to a specific `TextEmbeddingModel.` In other words, the feature extractor only works with embeddings from the same `TextEmbeddingModel.`
+
+The value of the `features` argument determines the number of features for the compressed representation. The lower the number, the higher the requested compression. This value corresponds to the features of the latent space in the above figure. The `te_n_layers` parameter allows you you to specify the number of layers in the encoder and decoder parts of the model. 
+
+Use this value depending on the number of features of the underlying text embedding model. You can request this value by calling the method `get_n_features` as follows:
+
+```{r, include = TRUE, eval = TRUE}
+tem$get_n_features()
+```
+
+The study by Takeshita et al. (2025) shows that randomly dropping 50% of the dimensions leads only to a minor decrease in the performance of classification tasks. Therefore, this value can be used as a rule of thumb when determining this parameter. We reduce the number further to 192 here.
+
+Using the method "Dense", we request a feature extractor that uses dense layers
+
+Regardless of your choice, all models aim to generate a latent space in which the correlation of the features is zero. Thus, all features represent unique information. In addition, all methods use an orthogonal parameterisation to prevent overfitting and apply parameter sharing. The opposite layers use the same parameters. For more details, please refer to Ranjan (2019).
+
+You can use the `noise_factor` to add noise during training, causing the feature extractor to perform as a denoising auto-encoder. This can provide more robust generalisations. Since we work with high batch sizes, we set this value to 1e-4.
+
+## 5.3 Training
+
+Training the extractor is identical to that for the other models.
+*aifeducation*. Please note that the text embeddings provided to `data_embeddings` must be generated using the same `TextEmbeddingModel` as the embeddings provided when configuring your model.
+
+```{r feature_extractor$train, include = TRUE, eval=TRUE, results='hide'}
+feature_extractor$train(
+  data_embeddings = review_embeddings,
+  data_val_size = 0.25,
+  sustain_track = TRUE,
+  sustain_iso_code = "DEU",
+  sustain_region = NULL,
+  sustain_interval = 15,
+  sustain_log_level = "error",
+  epochs = 10000,
+  batch_size = 128,
+  lr_rate = 0.0,
+  lr_min = 0.0,
+  lr_epochs = 30,
+  lr_scheduler = "Linear",
+  trace = TRUE,
+  ml_trace = 1,
+  optimizer = "AdamW",
+  amp = TRUE,
+  lr_warm_up_ratio = 0.10,
+  comp_use=TRUE,
+  comp_mode="reduce-overhead"
+)
+```
+
+>In this example, we use the same text embeddings that we use to train the classifier.
+>It can be beneficial to use a larger sample of texts when training a `TEFeatureExtractor` to improve performance and/or allow broader application of the feature extractor.
+
+```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Analysis of Different Learning Rates"),fig.align="center"}
+feature_extractor$plot_learning_rate()
+```
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+You can plot the model's training history using:
+
+```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Training History of a Feature Extractor.")}
+feature_extractor$plot_training_history(
+  ind_best_model = TRUE
+)
+```
+
+
+```{r, include = FALSE}
+running_num_figures <- running_num_figures + 1
+```
+
+Calling `print` gives you a short summary of the extractor.
+
+```{r, include = TRUE, eval = TRUE}
+print(feature_extractor)
+```
+
+Let us investigate how the feature extractor decreased the correlation between the features.
+First we calculate the correlations of the uncompressed embeddings.
+
+```{r, include = TRUE, eval = TRUE}
+embeddings_converted=review_embeddings$convert_to_EmbeddedText()
+correlations=embeddings_converted$calc_feature_correlation()
+
+correlations$effect_sizes$mean
+correlations$effect_sizes$sd
+```
+
+Now we calculate the compressed embeddings and estimate the correlation
+```{r, include = TRUE, eval = TRUE}
+embeddings_compressed=feature_extractor$extract_features_large(
+  review_embeddings,
+  batch_size = 32L
+  )
+
+embeddings_compressed_converted=embeddings_compressed$convert_to_EmbeddedText()
+correlations_compressed=embeddings_compressed_converted$calc_feature_correlation()
+
+correlations_compressed$effect_sizes$mean
+correlations_compressed$effect_sizes$sd
+```
+
+As you can see the correlation significantly decreased. That is, the feature dimension
+contain less overlapping information which may lead to a faster and/or better
+performance of a classifier. 
+
+Once you have trained your feature extractor, you can use it with any classifier. Simply pass the feature extractor to the `feature_extractor` parameter during the classifier configuration process. 
+
+## 5.4. Saving and Loading
+
+If you would like to save and load a `TEFeatureExtractor` independently of a classifier, you can use the `save_to_disk` and `load_from_disk` functions, as with the other objects of this package. This is useful if you want to use the `TEFeatureExtractor` at a later point in time in combination with other models.
+
+```{r, include = TRUE, eval=TRUE}
+save_to_disk(
+  object = feature_extractor,
+  dir_path = "examples",
+  folder_name = "feature_extractor"
+)
+```
+
+# 6 Overview Classifiers
 
 Classifiers are built on top of a `TextEmbeddingModel`. They use the embedded texts
 produced by these models and predict classes/categories. You can build your own classifier with the help of two components.
@@ -1108,18 +1301,19 @@ estimation phase are used in the final training phase.
 > Please note that creating, training, and Predicting works for all types of classifiers 
 > as described in the chapters below.
 
-# 6 Probability Based Classifiers
+# 7 Probability Based Classifiers
 
-## 6.1 Creation
+## 7.1 Creation
 
-To demonstrate how to create a classifier, we will use an example of a `TEClassifierSequential` classifier. Using the sample data from Section 2.3 and the text embeddings from Section 4.3, creating a new classifier might look like this:
+To demonstrate how to create a classifier, we will use the example of a `TEClassifierSequential` classifier. 
+Using the sample data from Section 2.3, the `TEFeatureExtractor` from Section 5 and the text embeddings from Section 4.3, the process of creating a new classifier might look like this:
 
 ```{r, include = TRUE, eval = TRUE}
 classifier <- TEClassifierSequential$new()
 classifier$configure(
   label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
   text_embeddings = review_embeddings,
-  feature_extractor = NULL,
+  feature_extractor = feature_extractor,
   target_levels = c("neg", "pos"),
   skip_connection_type = "ResidualGate",
   cls_pooling_features = 20,
@@ -1182,12 +1376,12 @@ The `target_levels` take the categories/classes that your classifier should pred
 
 >If you would like to use ordinal data, it is very important that you provide the classes/categories in the correct order. In other words, categories/classes representing a 'higher' level must be stated after those representing a 'lower' level. If you provide the wrong order, the performance indices will be invalid. The order does not matter for nominal data.
 
-Using the `feature_extractor`, you can reduce the number of features in your text embeddings before passing them to the classifier. You can read more about this in Section 7.
+We pass our trained feature extractor from section 5 to the `feature_extractor`.
 
 You can use the other parameters to define the complexity and capabilities of your model.
 Descriptions of the different models can be found in [A01 Layers and Stack of Layers](https://fberding.github.io/aifeducation/articles/a01_layers_and_stack_layers.html). 
 
-Please note that you must choose the parameter `feat_size` depending on the number of features of the underlying text embedding model. You can obtain this number by calling the `get_n_features` method of the text embedding model used. In our example, this would be:
+Please note that, if you do **not** use a feature extractor, you must choose the parameter `feat_size` depending on the number of features of the underlying text embedding model. You can obtain this number by calling the `get_n_features` method of the text embedding model used. In our example, this would be:
 
 ```{r, include = TRUE, eval = TRUE}
 tem$get_n_features()
@@ -1195,10 +1389,10 @@ tem$get_n_features()
 
 The value of `feat_size` should be equal to or less than this value since this layer tries to compress the text embeddings into fewer dimensions. While this reduces the number of parameters for all subsequent layers and decreases training and usage time, it may result in information loss.
 You can experiment with this value to strike a balance between speed and performance. 
-A study by Takeshita et al. (2025) shows that randomly dropping 50% of the dimensions leads only to a minor decrease in performance in classification tasks. Thus, this value can serve as a rule of thumb for determining this parameter. 
-In our example, we only have a very limited number of samples. Therefore, we reduce the number of features even further.
 
 In addition, the value of the parameter `cls_pooling_features` should be equal to or less than the value of feat_size. The value of `cls_pooling_features` determines how many of the resulting features are used for classification. Therefore, this value acts as a filter. This value is only relevant if your pooling method does not include the word 'Times'.
+
+If you use a feature extractor, you need to set the values for `feat_size` and `cls_pooling_features` depending on the number of features of the feature extractor itself, rather than the text embedding model, since the feature extractor's aim is to reduce this number. `feat_size` should be equal to or less than the number of features of the feature extractor, and `cls_pooling_features` should be equal to or less than `feat_size`. 
 
 > The vignette [04 Model configuration and training](model_configuration.html)
 > provides details on how to configure a classifier.
@@ -1223,7 +1417,7 @@ You can view the number of learnable parameters of your model using the followin
 classifier$count_parameter()
 ```
 
-## 6.2 Training
+## 7.2 Training
 
 To start training your classifier, call the `train` method and provide the text embeddings to `data_embeddings` and the categories/classes as target data to `data_targets`. Please note that data_targets expects a *named* `factor` where the names correspond to the IDs of the corresponding text embeddings. Text embeddings and target data that cannot be matched are omitted from training.
 
@@ -1447,7 +1641,7 @@ The automatic calculation selects the learning rate from the range of learning r
 running_num_figures <- running_num_figures + 1
 ```
 
-## 6.3 Performance Evaluation
+## 7.3 Performance Evaluation
 
 Once training is complete, you can evaluate the performance of the classifier. For each fold, the classifier is applied to the test sample and the results are compared to the true categories/classes. As the test sample is never part of the training set, all performance measures provide a more realistic idea of the classifier's performance.
 
@@ -1505,7 +1699,7 @@ running_num_figures <- running_num_figures + 1
 
 Evaluating the performance of a classifier is a complex task that goes beyond the scope of this vignette. If you would like to delve deeper into this topic, we recommend consulting the cited literature on content analysis and machine learning.
 
-## 6.4 Sustainability
+## 7.4 Sustainability
 
 If the classifier was trained with an active sustainability tracker, you can retrieve sustainability information by calling 
 `classifier$get_sustainability_data()`.
@@ -1515,7 +1709,7 @@ If the classifier was trained with an active sustainability tracker, you can ret
 t(classifier$get_sustainability_data())
 ```
 
-## 6.5 Saving and Loading a Classifier
+## 7.5 Saving and Loading a Classifier
 
 The saving and loading process follows the same pattern as for the other objects.
 *aifeducation*. You can save the classifier by calling the `save_to_disk` function.
@@ -1536,7 +1730,7 @@ the model call `load_from_disk`.
 classifier <- load_from_disk("examples/cls_imdb_movie_reviews")
 ```
 
-## 6.6 Predicting New Data
+## 7.6 Predicting New Data
 
 If you would like to apply your classifier to new data, two steps are necessary. First, you must transform the raw text into a numerical representation using *exactly* the same text embedding model that was used to train your classifier (see Section 4). In the case of our example classifier, we use our BERT model.
 
@@ -1578,406 +1772,6 @@ These estimates can be used in further analyses employing common methods from th
 
 Now you are ready to to use *aifeducation*. 
 
-# 7 Feature Extractors
-
-## 7.1 Introduction
-
-Another way to improve a model's performance and/or computational speed is to apply a feature extractor. For example, the work of Ganesan et al. (2021) suggests that reducing the hidden size can improve a model's accuracy. In *aifeducation*, a feature extractor is a model that reduces the number of features of given text embeddings before feeding the embeddings as input to a classifier.
-
-The feature extractors implemented in *aifeducation* are auto-encoders that support sequential data and sequences of different lengths. The basic architecture of all the extractors is shown in the following figure.
-
-```{r, include = FALSE}
-running_num_figures <- running_num_figures + 1
-```
-
-![Figure `r running_num_figures`: Basic architecture of feature extractors](classif_feature_extractor.png){width="100%"}
-
-The learning objective of the feature extractors is to compress information by reducing the number of features to that of the latent space (Frochte 2019, p. 281). In the figure above, this would mean reducing the number of features from eight to four and storing as much information as possible from eight dimensions in four dimensions.
-Next, the extractor attempts to reconstruct the original information from the compressed latent space information (Frochte 2019, pp. 280–281). The information is then extended from four dimensions to eight.
-After training, the hidden representation of the latent space is used as a pre-processing of the original input.
-
-## 7.2 Creation
-
-In this example, we use the text embeddings from Section 4. You can create a feature extractor as follows: 
-
-```{r, include = TRUE, eval=TRUE}
-feature_extractor <- TEFeatureExtractor$new()
-feature_extractor$configure(
-  label = "Feature extractor for Text Embeddings",
-  text_embeddings = review_embeddings,
-  features = 384,
-  te_n_layers=4,
-  method = "Dense",
-  orthogonal_method = "matrix_exp",
-  noise_factor = 1e-4
-)
-```
-
-As with the other models, you can use the `label` for the model's label. 
-The argument `text_embeddings` takes an object of class `EmbeddedText` or `LargeDataSetForTextEmbeddings.`
-This object connects your feature extractor to a specific `TextEmbeddingModel.` In other words, the feature extractor only works with embeddings from the same `TextEmbeddingModel.`
-
-The value of the `features` argument determines the number of features for the compressed representation. The lower the number, the higher the requested compression. This value corresponds to the features of the latent space in the above figure. The `te_n_layers` parameter allows you you to specify the number of layers in the encoder and decoder parts of the model. 
-
-Use this value depending on the number of features of the underlying text embedding model. You can request this value by calling the method `get_n_features` as follows:
-
-```{r, include = TRUE, eval = TRUE}
-tem$get_n_features()
-```
-
-A study by Takeshita et al. (2025) shows that randomly dropping 50% of the dimensions leads only to a minor decrease in the performance of classification tasks. Therefore, this value can be used as a rule of thumb when determining this parameter. We therefore reduce the number of features to 50% to `r floor(tem$get_n_features()/2)`.
-
-The type of layer that the feature extractor should use is determined by `method`. If you set the method to "LSTM", all layers of the model are long short-term memory layers. If you set the method to "Dense", all layers are standard dense layers.
-
-Regardless of your choice, all models aim to generate a latent space in which the correlation of the features is zero. Thus, all features represent unique information. In addition, all methods except "LSTM" use an orthogonal parameterisation to prevent overfitting and apply parameter sharing. The opposite layers use the same parameters.
-For more details, please refer to Ranjan (2019).
-
-You can use the `noise_factor` to add noise during training, causing the feature extractor to perform as a denoising auto-encoder. This can provide more robust generalisations. Since we work with high batch sizes, we set this value to 1e-4.
-
-## 7.3 Training
-
-Training the extractor is identical to that for the other models.
-*aifeducation*. Please note that the text embeddings provided to `data_embeddings` must be generated using the same `TextEmbeddingModel` as the embeddings provided when configuring your model.
-
-```{r feature_extractor$train, include = TRUE, eval=TRUE, results='hide'}
-feature_extractor$train(
-  data_embeddings = review_embeddings,
-  data_val_size = 0.25,
-  sustain_track = TRUE,
-  sustain_iso_code = "DEU",
-  sustain_region = NULL,
-  sustain_interval = 15,
-  sustain_log_level = "error",
-  epochs = 8000,
-  batch_size = 128,
-  lr_rate = 0.0,
-  lr_min = 0.0,
-  lr_epochs = 30,
-  lr_scheduler = "Linear",
-  trace = TRUE,
-  ml_trace = 1,
-  optimizer = "AdamW",
-  amp = TRUE,
-  lr_warm_up_ratio = 0.10,
-  comp_use=TRUE,
-  comp_mode="reduce-overhead"
-)
-```
-
->In this example, we use the same text embeddings that we use to train the classifier.
->It can be beneficial to use a larger sample of texts when training a `TEFeatureExtractor` to improve performance and/or allow broader application of the feature extractor.
-
-```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Analysis of Different Learning Rates"),fig.align="center"}
-feature_extractor$plot_learning_rate()
-```
-
-```{r, include = FALSE}
-running_num_figures <- running_num_figures + 1
-```
-
-You can plot the model's training history using:
-
-```{r, include = TRUE, eval=TRUE, fig.cap=paste0("Figure ",running_num_figures,": Training History of a Feature Extractor.")}
-feature_extractor$plot_training_history(
-  ind_best_model = TRUE
-)
-```
-
-
-```{r, include = FALSE}
-running_num_figures <- running_num_figures + 1
-```
-
-Calling `print` gives you a short summary of the extractor.
-
-```{r, include = TRUE, eval = TRUE}
-print(feature_extractor)
-```
-
-Let us investigate how the feature extractor decreased the correlation between the features.
-First we calculate the correlations of the uncompressed embeddings.
-
-```{r, include = TRUE, eval = TRUE}
-embeddings_converted=review_embeddings$convert_to_EmbeddedText()
-correlations=embeddings_converted$calc_feature_correlation()
-
-correlations$effect_sizes$mean
-correlations$effect_sizes$sd
-```
-
-Now we calculate the compressed embeddings and estimate the correlation
-```{r, include = TRUE, eval = TRUE}
-embeddings_compressed=feature_extractor$extract_features_large(
-  review_embeddings,
-  batch_size = 32L
-  )
-
-embeddings_compressed_converted=embeddings_compressed$convert_to_EmbeddedText()
-correlations_compressed=embeddings_compressed_converted$calc_feature_correlation()
-
-correlations_compressed$effect_sizes$mean
-correlations_compressed$effect_sizes$sd
-```
-
-As you can see the correlation significantly decreased. That is, the feature dimension
-contain less overlapping information which may lead to a faster and/or better
-performance of a classifier. Lets try how training change in the following section. 
-
-## 7.4 Application
-
-Once you have trained your feature extractor, you can use it with any classifier. Simply pass the feature extractor to the `feature_extractor` parameter during the classifier configuration process. Please note that you now have to set the values for `feat_size` and `cls_pooling_features` depending on the number of features of the feature extractor, and *not* depending on the number of features of the text embedding model, since the aim of the feature extractor is to reduce this number. `feat_size` should be equal to or less than the number of features of the feature extractor, and `cls_pooling_features` should be equal to or less than `feat_size`. 
-For the classifier described in Section 6, this would look like this:
-
-```{r, include = TRUE, eval=TRUE}
-classifier_with_fe <- TEClassifierSequential$new()
-classifier_with_fe$configure(
-  label = "Classifier for Estimating a Postive or Negative Rating of Movie Reviews",
-  text_embeddings = review_embeddings,
-  feature_extractor = feature_extractor,
-  target_levels = c("neg", "pos"),
-  skip_connection_type = "ResidualGate",
-  cls_pooling_features = 20,
-  cls_pooling_type = "WeightedAverageTimes",
-  cls_head_type = "Regular",
-  cls_input_normalize="PowerNorm",
-  final_normalization_type="RMSNorm",
-  feat_act_fct = "None",
-  feat_size = 128,
-  feat_bias = FALSE,
-  feat_dropout = 0.05,
-  feat_parametrizations = "None",
-  feat_normalization_type = "RMSNorm",
-  ng_conv_act_fct = "GELU",
-  ng_conv_n_layers = 0,
-  ng_conv_ks_min = 1,
-  ng_conv_ks_max = 2,
-  ng_conv_bias = FALSE,
-  ng_conv_dropout = 0.40,
-  ng_conv_parametrizations = "None",
-  ng_conv_normalization_type = "RMSNorm",
-  ng_conv_residual_type = "ResidualGate",
-  dense_act_fct = "GELU",
-  dense_n_layers = 3,
-  dense_dropout = 0.40,
-  dense_bias = FALSE,
-  dense_parametrizations = "None",
-  dense_normalization_type = "RMSNorm",
-  dense_residual_type = "ResidualGate",
-  rec_act_fct = "Tanh",
-  rec_n_layers = 0,
-  rec_type = "GRU",
-  rec_bidirectional = FALSE,
-  rec_dropout = 0.2,
-  rec_bias = FALSE,
-  rec_parametrizations = "None",
-  rec_normalization_type = "RMSNorm",
-  rec_residual_type = "ResidualGate",
-  tf_act_fct = "SwiGLU",
-  tf_dense_dim = ceiling(2.67 * 384),
-  tf_n_layers = 0,
-  tf_dropout_rate_1 = 0.1,
-  tf_dropout_rate_2 = 0.3,
-  tf_attention_type = "MultiHead",
-  tf_positional_type = "absolute",
-  tf_num_heads = 4,
-  tf_bias = FALSE,
-  tf_parametrizations = "None",
-  tf_normalization_type = "RMSNorm",
-  tf_normalization_position = "Post",
-  tf_residual_type = "ResidualGate"
-)
-```
-
-That's all. You can now use and train the classifier in the same way as before, without a feature extractor. You don't even need to save and load the feature extractor manually. This is done automatically for all classifiers.
-
-```{r classifier_with_fe$train, include = TRUE, eval=TRUE}
-classifier_with_fe$train(
-  data_embeddings = review_embeddings,
-  data_targets = review_labels,
-  data_folds = 10,
-  data_val_size = 0.25,
-  loss_balance_class_weights = TRUE,
-  loss_balance_sequence_length = TRUE,
-  loss_cls_fct_name = "AEMLoss",
-  #loss_cls_fct_name = "FocalLoss",
-  use_sc = TRUE,
-  sc_method = "knnor",
-  sc_min_k = 1,
-  sc_max_k = 10,
-  use_pl = FALSE,
-  pl_max_steps = 3,
-  pl_max = 1.00,
-  pl_anchor = 1.00,
-  pl_min = 0.00,
-  sustain_track = TRUE,
-  sustain_iso_code = "DEU",
-  sustain_region = NULL,
-  sustain_interval = 15,
-  sustain_log_level = "error",
-  epochs = 2000,
-  batch_size = 128,
-  trace = TRUE,
-  ml_trace = 1,
-  log_dir = NULL,
-  log_write_interval = 10,
-  n_cores = auto_n_cores(),
-  lr_rate = 0.0,
-  lr_min = 0.0,
-  lr_epochs = 30,
-  lr_scheduler = "Linear",
-  lr_warm_up_ratio = 0.10,
-  optimizer = "AdamW",
-  amp = TRUE,
-  comp_use=TRUE,
-  comp_mode="reduce-overhead"
-)
-```
-
-First, we can analyse the training history of the performance estimation stage.
-
-```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Feature Extractor during Performance Estimation Stage (loss)"),fig.align="center"}
-classifier_with_fe$plot_training_history(
-  final_training = FALSE,
-  pl_step = NULL,
-  measure = "loss",
-  ind_best_model = FALSE,
-  ind_selected_model = TRUE,
-  x_min = NULL,
-  x_max = NULL,
-  y_min = NULL,
-  y_max = NULL,
-  add_min_max = FALSE,
-  text_size = 10
-)
-```
-
-```{r, include = FALSE}
-running_num_figures <- running_num_figures + 1
-```
-
-```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Feature Extractor during Performance Estimation Stage (iota)"),fig.align="center"}
-classifier_with_fe$plot_training_history(
-  final_training = FALSE,
-  pl_step = NULL,
-  measure = "avg_iota",
-  ind_best_model = FALSE,
-  ind_selected_model = TRUE,
-  x_min = NULL,
-  x_max = NULL,
-  y_min = NULL,
-  y_max = NULL,
-  add_min_max = FALSE,
-  text_size = 10
-)
-```
-
-```{r, include = FALSE}
-running_num_figures <- running_num_figures + 1
-```
-
-```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Feature Extractor during Performance Estimation Stage (smoothed iota)"),fig.align="center"}
-classifier_with_fe$plot_training_history(
-  final_training = FALSE,
-  pl_step = NULL,
-  measure = "s_avg_iota",
-  ind_best_model = FALSE,
-  ind_selected_model = TRUE,
-  x_min = NULL,
-  x_max = NULL,
-  y_min = NULL,
-  y_max = NULL,
-  add_min_max = FALSE,
-  text_size = 10
-)
-```
-
-```{r, include = FALSE}
-running_num_figures <- running_num_figures + 1
-```
-
-The training history of the final stage is displayed in the following two Figures.
-
-```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Feature Extractor during Final Training Stage (loss)"),fig.align="center"}
-classifier_with_fe$plot_training_history(
-  final_training = TRUE,
-  pl_step = NULL,
-  measure = "loss",
-  ind_best_model = FALSE,
-  ind_selected_model = TRUE,
-  x_min = NULL,
-  x_max = NULL,
-  y_min = NULL,
-  y_max = NULL,
-  add_min_max = FALSE,
-  text_size = 10
-)
-```
-
-```{r, include = FALSE}
-running_num_figures <- running_num_figures + 1
-```
-
-```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Feature Extractor during Final Training Stage (iota)"),fig.align="center"}
-classifier_with_fe$plot_training_history(
-  final_training = TRUE,
-  pl_step = NULL,
-  measure = "avg_iota",
-  ind_best_model = FALSE,
-  ind_selected_model = TRUE,
-  x_min = NULL,
-  x_max = NULL,
-  y_min = NULL,
-  y_max = NULL,
-  add_min_max = FALSE,
-  text_size = 10
-)
-```
-
-```{r, include = FALSE}
-running_num_figures <- running_num_figures + 1
-```
-
-```{r, include = TRUE, eval = TRUE, fig.cap = paste0("Figure ",running_num_figures,": Training History of a Classifier with Feature Extractor during Final Training Stage (smoothed iota)"),fig.align="center"}
-classifier_with_fe$plot_training_history(
-  final_training = TRUE,
-  pl_step = NULL,
-  measure = "s_avg_iota",
-  ind_best_model = FALSE,
-  ind_selected_model = TRUE,
-  x_min = NULL,
-  x_max = NULL,
-  y_min = NULL,
-  y_max = NULL,
-  add_min_max = FALSE,
-  text_size = 10
-)
-```
-
-```{r, include = FALSE}
-running_num_figures <- running_num_figures + 1
-```
-
-Let us now explore the performance of the classifier, for example.
-
-```{r, include = TRUE, eval=TRUE}
-classifier_with_fe$reliability$test_metric_mean
-```
-
-```{r, include = TRUE, eval=TRUE}
-classifier_with_fe$reliability$standard_measures_mean
-```
-
-## 7.5. Saving and Loading
-
-If you would like to save and load a `TEFeatureExtractor` independently of a classifier, you can use the `save_to_disk` and `load_from_disk` functions, as with the other objects of this package. This is useful if you want to use the `TEFeatureExtractor` at a later point in time in combination with other models.
-
-```{r, include = TRUE, eval=TRUE}
-save_to_disk(
-  object = feature_extractor,
-  dir_path = "examples",
-  folder_name = "feature_extractor"
-)
-```
 
 # 8 Plots for Training History
 
@@ -2236,6 +2030,13 @@ Association for Computational Linguistics.
 Frochte, J. (2019). Maschinelles Lernen: Grundlagen und Algorithmen in
 Python (2., aktualisierte Auflage). Hanser.
 
+Ganesan, A. V., Matero, M., Ravula, A. R., Vu, H., & Schwartz, H. A.
+(2021). Empirical Evaluation of Pre-trained Transformers for Human-Level
+NLP: The Role of Sample Size and Dimensionality. Proceedings of the
+Conference. Association for Computational Linguistics. North American
+Chapter. Meeting, 2021, 4515–4532.
+<https://doi.org/10.18653/v1/2021.naacl-main.357>
+
 Ganesh, P., Chen, Y., Lou, X., Khan, M. A., Yang, Y., Sajjad, H., Nakov,
 P., Chen, D., & Winslett, M. (2021). ComPostssing Large-Scale
 Transformer-Based Models: A Case Study on BERT. Transactions of the
@@ -2337,6 +2138,13 @@ Empirical Methods in Natural Language Processing.
 Ranjan, & Chitta. (2019). Build the right Autoencoder — Tune and
 Optimize using PCA principles.: Part I.
 <https://towardsdatascience.com/build-the-right-autoencoder-tune-and-optimize-using-pca-principles-part-i-1f01f821999b>
+
+Rudman, W., Gillman, N., Rayne, T., & Eickhoff, C. (2022). IsoScore: Measuring 
+the Uniformity of Embedding Space Utilization. In S. Muresan, P. Nakov, & A. 
+Villavicencio (Eds.), Findings of the Association for Computational 
+Linguistics: ACL 2022 (pp. 3325–3339). Association for Computational Linguistics. 
+<https://doi.org/10.18653/v1/2022.findings-acl.262>
+
 
 Schreier, M. (2012). Qualitative Content Analysis in Practice. Los
 Angeles: SAGE.
