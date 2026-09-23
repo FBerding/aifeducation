@@ -1125,25 +1125,12 @@ Let us investigate how the feature extractor decreased the correlation between t
 First we calculate the correlations of the uncompressed embeddings.
 
 ```{r, include = TRUE, eval = TRUE}
-embeddings_converted=review_embeddings$convert_to_EmbeddedText()
-correlations=embeddings_converted$calc_feature_correlation()
-
-correlations$effect_sizes$mean
-correlations$effect_sizes$sd
-```
-
-Now we calculate the compressed embeddings and estimate the correlation
-```{r, include = TRUE, eval = TRUE}
-embeddings_compressed=feature_extractor$extract_features_large(
-  review_embeddings,
-  batch_size = 32L
-  )
-
-embeddings_compressed_converted=embeddings_compressed$convert_to_EmbeddedText()
-correlations_compressed=embeddings_compressed_converted$calc_feature_correlation()
-
-correlations_compressed$effect_sizes$mean
-correlations_compressed$effect_sizes$sd
+embedding_statistics=feature_extractor$compare_embedding_statistics(
+  data_embeddings=review_embeddings,
+  batch_size=128,
+  trace=TRUE
+)
+embedding_statistics
 ```
 
 As you can see the correlation significantly decreased. That is, the feature dimension
