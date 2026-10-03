@@ -46,7 +46,7 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param label `r get_param_doc_desc("label")`
     #' @param text_embeddings `r get_param_doc_desc("text_embeddings")`
     #' @param features `r get_param_doc_desc("features")`
-    #' @param features `r get_param_doc_desc("times")`
+    #' @param times `r get_param_doc_desc("times")`
     #' @param te_n_layers `r get_param_doc_desc("te_n_layers")`
     #' @param method `r get_param_doc_desc("method")`
     #' @param orthogonal_method `r get_param_doc_desc("orthogonal_method")`
@@ -511,12 +511,13 @@ TEFeatureExtractor <- R6::R6Class(
         trace=trace
       )
       embeddings_after=embeddings_after$convert_to_EmbeddedText()
-      after_statistics=embeddings_after$calc_embedding_statistics
+      after_statistics=embeddings_after$calc_embedding_statistics()
       result=rbind(
         unlist(before_statistics$effect_sizes),
         unlist(after_statistics$effect_sizes)
       )
       rownames(result)=c("before","compressed")
+      colnames(result)=names(after_statistics$effect_sizes)
       return(result)
     },
     #--------------------------------------------------------------------------
@@ -550,6 +551,7 @@ TEFeatureExtractor <- R6::R6Class(
         private$model <- aife$Autoencoder$DenseAutoencoder_with_Mask_PT(
           features_in = as.integer(private$text_embedding_model["features"]),
           features_out = as.integer(private$model_config$features),
+          times=as.integer(private$model_config$times),
           te_n_layers= as.integer(private$model_config$te_n_layers),
           noise_factor = private$model_config$noise_factor,
           pad_value = private$text_embedding_model$pad_value,

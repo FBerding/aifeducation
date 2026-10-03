@@ -16,6 +16,8 @@ import torch
 import numpy as np
 import math
 
+from .Normalizers import get_layer_normalization
+
 class layer_switch_pad_values(torch.nn.Module):
   def __init__(self,pad_value_old,pad_value_new):
     super().__init__()
@@ -39,9 +41,10 @@ class layer_switch_pad_values(torch.nn.Module):
     return z
 
 class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
-    def __init__(self, features_in, features_out, noise_factor, pad_value, orthogonal_method, te_n_layers=3):
+    def __init__(self, features_in, features_out,times, noise_factor, pad_value, orthogonal_method, te_n_layers=3):
         super().__init__()
         self.features_in = features_in
+        self.times=times
         self.features_out = features_out
         self.noise_factor = noise_factor
         self.n_layers = te_n_layers
@@ -53,18 +56,25 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
             dim = math.ceil(self.features_in - self.difference * fraction)
             dims.append(dim)
         #Create Weights
-        self.encoder_layer_names = []
+        self.register_parameter("residual", torch.nn.Parameter(torch.rand(features_out,features_in)))
+        self.encoder_layer_names_weights = []
+        self.encoder_layer_names_bias = []
+        self.activation={}
         for i in range(self.n_layers):
-            name = f"param_w{i+1}"
+            name = f"param_{i+1}"
             out_d = dims[i+1]
             in_d = dims[i]
             # Register
-            param = torch.nn.Parameter(torch.randn(out_d, in_d))
+            param = torch.nn.Parameter(torch.nn.init.orthogonal_(torch.randn(out_d, in_d)))
             self.register_parameter(name, param)
-            self.encoder_layer_names.append(name)
+            self.encoder_layer_names_weights.append(name)
             # Apply orthogonal parametrizations
             if orthogonal_method != "None":
                 torch.nn.utils.parametrizations.orthogonal(module=self, name=name, orthogonal_map=orthogonal_method)
+            name_b = f"param_{i+1}_b"    
+            param_b = torch.nn.Parameter(torch.zeros((out_d)))
+            self.register_parameter(name_b, param_b)
+            self.encoder_layer_names_bias.append(name_b)    
         #Add Padding Layer
         if pad_value != 0:
             self.switch_pad_value_start = layer_switch_pad_values(pad_value_old=pad_value, pad_value_new=0)
@@ -77,43 +87,66 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
         # Switch padding value if necessary
         if self.switch_pad_value_start is not None:
             x = self.switch_pad_value_start(x)
-        if encoder_mode == False:
-            # Add noise
-            if self.training:
-                mask = self.get_mask(x,self.features_in)
-                y = x + self.add_noise(x)
-                y = ~mask * y
-            else:
-              y=x
-            # Encoder Part
-            for name in self.encoder_layer_names:
-                w = getattr(self, name)
-                y = torch.nn.functional.linear(y, weight=w)
-            #Latent Space
-            latent_space = y*~self.get_mask(x,self.features_out)
-            # Decoder Part
-            for name in reversed(self.encoder_layer_names):
-                w = getattr(self, name)
-                y = torch.nn.functional.linear(y, weight=torch.transpose(w, dim0=1, dim1=0))
-            # Switch padding value back if necessary
-            if self.switch_pad_value_start is not None:
-                y = self.switch_pad_value_final(y)
-            return y, latent_space    
-        elif encoder_mode == True:
-            # Encoder Part
-            y=x
-            for name in self.encoder_layer_names:
-                w = getattr(self, name)
-                y = torch.nn.functional.linear(y, weight=w)
-            y=y*~self.get_mask(y,self.features_out)
-            # Switch padding value back if necessary
-            if self.switch_pad_value_start is not None:
-                y = self.switch_pad_value_final(y)
-            return y
+        if encoder_mode:
+          latent_space=self.encoder(x)
+          if self.switch_pad_value_start is not None:
+            latent_space = self.switch_pad_value_final(latent_space)
+          return latent_space
+        else:
+          latent_space=self.encoder(x)
+          target=self.decoder(
+            output_mask=self.get_mask(x,self.features_in),
+            y=latent_space
+          )
+          if self.switch_pad_value_start is not None:
+            target = self.switch_pad_value_final(target)
+          return target, latent_space   
+    def encoder(self,x):
+      # Add noise
+      if self.training:
+          mask = self.get_mask(x,self.features_in)
+          x_noise = x + self.add_noise(x)
+          x_noise = ~mask * x_noise
+          y=x_noise
+      else:
+        x_noise=x
+        y=x
+      # Encoder Part
+      for idx, name in enumerate(self.encoder_layer_names_weights):
+          w = getattr(self, name)
+          b = getattr(self, str(name)+"_b")
+          if idx > 0 and idx < self.n_layers - 1:
+            y=torch.nn.functional.layer_norm(y,y.size())
+            y = torch.nn.functional.linear(y, weight=w,bias=b)
+            y = torch.nn.functional.gelu(y)
+          else:
+            y = torch.nn.functional.linear(y, weight=w,bias=b)
+          y = y*~self.get_mask(x,y.size(2))
+      y=torch.nn.functional.linear(x_noise,weight=self.residual)+y
+      y=torch.nn.functional.normalize(y,p=2,dim=-1)
+      y = y*~self.get_mask(x,y.size(2))
+      return y
+    def decoder(self,output_mask,y):
+      latent_space=y
+      for idx, name in enumerate(reversed(self.encoder_layer_names_weights)):
+        w = getattr(self, name)
+        b = getattr(self, str(name)+"_b")
+        if idx > 0 and idx < self.n_layers - 1:
+          y=torch.nn.functional.layer_norm(y,y.size())
+          y = y-b
+          y = torch.nn.functional.linear(y, weight=torch.transpose(w, dim0=1, dim1=0))
+          y = torch.nn.functional.gelu(y)
+        else:
+          y = y-b
+          y = torch.nn.functional.linear(y, weight=torch.transpose(w, dim0=1, dim1=0))
+        y = y*~output_mask
+      y=torch.nn.functional.linear(latent_space,weight=torch.transpose(self.residual,dim0=1,dim1=0))+y  
+      return y
+      
     def get_mask(self, x,features):
       time_sums = torch.sum(x, dim=2,keepdim=True) #(B,T,1)
       mask = (time_sums == 0)
-      mask=mask.expand((x.size(0),x.size(1),features))
+      mask=mask.expand((x.size(0),x.size(1),1))
       return mask.detach()
     def add_noise(self, x):
       noise = self.noise_factor * torch.rand(size=x.size(),device=x.device,dtype=x.dtype)
