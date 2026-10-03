@@ -17,6 +17,8 @@ import numpy as np
 import math
 import safetensors
 
+from .DistanceFunctions import CosineDistance
+
 def create_ordinal_weights(targets):
     n_classes = targets.size(1)
     class_idx = torch.argmax(targets, dim=1).detach()
@@ -166,100 +168,193 @@ class aem_loss_pt(torch.nn.Module):
     ).mean()
     return loss    
 
-def calc_Correlation(x):
-    batch_size, times, features = x.shape
-    x_flat = x.reshape(batch_size * times, features) #(B*T,F)
-    valid_mask = (torch.sum(x_flat, dim=1, keepdim=True) != 0).to(x_flat.dtype) #(B*T,1)
-    n_cases = torch.sum(valid_mask) #()
-    sum_x = torch.sum(x_flat, dim=0, keepdim=True) #(1,F)
-    mean_x = sum_x / n_cases
-    x_centered = (x_flat - mean_x) * valid_mask
-    cov_matrix = torch.mm(x_centered.transpose(0, 1), x_centered)/(n_cases-1)
+
+class NormalizedMSELoss(torch.nn.Module):
+    def __init__(self, eps=1e-8):
+        super().__init__()
+        self.eps = eps
+
+    def forward(self, predictions, targets):
+        # inputs: (B, T, F) - Shapes müssen bei CUDA Graphs statisch sein
+        B, T, F = targets.size()
+        
+        # 1. Maskierungslogik (Rein mathematisch auf der GPU)
+        max_abs_per_token = torch.max(torch.abs(targets), dim=-1, keepdim=True).values  # Shape: (B, T, 1)
+        mask_expanded = torch.where(max_abs_per_token > 1e-5, 1.0, 0.0).detach()  # Shape: (B, T, 1)
+        
+        # 2. NEU: Feature-Varianz NUR über valide (nicht-gepaddete) Tokens berechnen
+        # Summe der Features über Batch und Zeit (Shape: F)
+        targets_masked = targets * mask_expanded
+        sum_targets = torch.sum(targets_masked, dim=(0, 1))  # Shape: (F,)
+        
+        # Valide Anzahl an Tokens für den Teiler ermitteln
+        num_valid_tokens = torch.sum(mask_expanded)
+        divisor_stat = torch.clamp(num_valid_tokens, min=self.eps)
+        
+        # Mittelwert pro Feature (Shape: 1, 1, F)
+        target_mean = (sum_targets / divisor_stat).view(1, 1, F)
+        
+        # Varianz pro Feature berechnen: E[(X - E[X])^2] unter Berücksichtigung der Maske
+        diff_squared = ((targets - target_mean) * mask_expanded) ** 2
+        target_variance = torch.sum(diff_squared, dim=(0, 1)) / divisor_stat  # Shape: (F,)
+        
+        # Reshape für Broadcasting (Shape: 1, 1, F)
+        target_variance = target_variance.view(1, 1, F)
+        
+        # 3. Fehler (Zähler für MSE)
+        error = torch.abs(predictions - targets)
+        
+        # 4. Fehler durch die feature-spezifische Varianz teilen
+        nmse = error / (target_variance.detach() + self.eps)
+        
+        # 5. Maske anwenden (Gepaddete Elemente auf 0.0 setzen)
+        nmse_masked = nmse * mask_expanded
+        
+        # 6. Mean-Reduction ohne CPU-GPU-Synchronisation (CUDA-Graph safe)
+        num_valid_elements = num_valid_tokens * F
+        divisor_loss = torch.clamp(num_valid_elements, min=self.eps)
+        
+        # Finaler mittlerer Loss
+        return torch.sum(nmse_masked) / divisor_loss
+
+
+
+
+def structure_loss(latent_space, target):
+    # Entpacken mit Unterstützung für unterschiedliche Feature-Dimensionen
+    B, T, F_latent = latent_space.shape
+    _, _, F_target = target.shape
     
-    std_dev = torch.sqrt(torch.diag(cov_matrix))
-    std_matrix = torch.outer(std_dev, std_dev) + 1e-8
-    corr_matrix = cov_matrix / std_matrix
+    # 1. Zusammenfassen von Batch- und Zeitdimension zu (B * T, F)
+    N = B * T
+    latent_flat = latent_space.reshape(N, F_latent)
+    target_flat = target.reshape(N, F_target)
     
-    corr_squared = torch.square(corr_matrix)
-    total_sum = torch.sum(corr_squared)-torch.sum(torch.diag(corr_squared, diagonal=0))
-    valid_mask_final = (n_cases > 1).to(x.dtype)
-    cov_sum = total_sum * valid_mask_final/features
-    return cov_sum
+    # 2. Globale Token-Maske (CUDA-Graph-safe mit .any(dim=-1))
+    token_mask = (target_flat != 0).any(dim=-1)
+    
+    # Paarweise Maske über alle N x N Kombinationen
+    pairwise_mask = token_mask.unsqueeze(-1) & token_mask.unsqueeze(-2)
+    
+    # Obere Dreiecksmatrix
+    triu_mask = torch.triu(torch.ones(N, N, dtype=torch.bool, device=target.device), diagonal=1)
+    
+    # Finale Maske kombiniert gültige Vektoren mit der Dreiecksmaske
+    final_mask = pairwise_mask & triu_mask
+    
+    # 3. Globale paarweise Distanzen berechnen
+    cos_distance_latent = CosineDistance(latent_flat, latent_flat)
+    cos_distance_target = CosineDistance(target_flat, target_flat).detach()
+    
+    # Differenz berechnen
+    diff = torch.abs(cos_distance_latent - cos_distance_target)/2
+    
+    
+    # Maskierung auf die Differenzen anwenden
+    float_mask = final_mask.to(diff.dtype)
+    masked_diff = diff * float_mask
+    
+    # 4. Globalen Mittelwert bilden (CUDA-Graph-safe ohne if-Bedingung)
+    loss_sum = torch.sum(masked_diff)
+    valid_elements = torch.sum(float_mask)
+    
+    # torch.clamp verhindert Division durch 0, falls kein Element gültig ist.
+    # Da loss_sum in dem Fall auch 0 ist, wird mathematisch korrekt 0.0 zurückgegeben.
+    loss = loss_sum / torch.clamp(valid_elements, min=1.0).detach()
+    
+    return loss
+
+
 
 
 
 class calc_IsoScore(torch.nn.Module):
-    def __init__(self, batch_size: int, times:int, features: int, eps: float = 1e-8):
+    def __init__(self, eps: float = 1e-8):
         super().__init__()
         self.eps = eps
-        self.m_fixed = float(batch_size*times)
-        self.n_fixed = float(features)
-        
-        self.register_buffer("ones_n", torch.ones(features))
-        self.register_buffer("sqrt_n", torch.sqrt(torch.tensor(features, dtype=torch.float32)))
-        
-        denom_val = torch.sqrt(2 * (self.n_fixed - torch.sqrt(torch.tensor(self.n_fixed))))
-        self.denominator_delta = denom_val if denom_val > eps else 1.0
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        #x: (B,T,F)
-        #x_flat (B*T,F)
-        x_flat = x.reshape(-1, int(self.n_fixed))
-        #Check for padded tokens
+        # Da x (B, T, F) statisch ist, sind auch diese Werte zur Compile-Zeit konstant
+        features = x.shape[-1]
+        n_fixed = float(features)
+        
+        # 1. x auffalten zu (B*T, F)
+        x_flat = x.reshape(-1, features)
+        
+        # 2. Maskierung (rein mathematisch, keine dynamic shapes)
         valid_mask = (torch.sum(torch.abs(x_flat), dim=1, keepdim=True) != 0).to(x_flat.dtype)
         x_selected = x_flat * valid_mask
-        #Number of relevant cases
+        
         m_valid = torch.sum(valid_mask)
         m_minus_1 = torch.clamp(m_valid - 1.0, min=self.eps)
-        #Center data
+        
         x_sum = torch.sum(x_selected, dim=0, keepdim=True)
         x_mean = x_sum / torch.clamp(m_valid, min=self.eps)
         x_centered = (x_selected - x_mean) * valid_mask
         
-        # Step 3 diagonal of the covariance matrix of x_pca
-        #returns min(M, N) values.
-        _, S, _ = torch.linalg.svd(x_centered, full_matrices=False)
-        #Fill with zeros to get a static shape
-        Sigma_D = torch.zeros(int(self.n_fixed), device=x.device, dtype=x.dtype)
-        num_svd_elements = S.shape[0]
-        Sigma_D[:num_svd_elements] = (S ** 2) / m_minus_1
+        # 3. SVD liefert bei statischem Input eine exakt vorhersagbare Anzahl an Singulärwerten
+        S = torch.linalg.svdvals(x_centered)
+        
+        # WICHTIG FÜR CUDA GRAPH: Keine Slicing-Zuweisung wie `Sigma_D[:num_elements] = ...`!
+        # Da die Dimensionen von S und features feststehen, berechnen wir Sigma_D direkt 
+        # und füllen (padden) es, falls S kleiner als features ist, rein mathematisch auf.
+        Sigma_D_raw = (S ** 2) / m_minus_1
+        
+        # Sicherstellen, dass Sigma_D exakt die Länge 'features' hat
+        if Sigma_D_raw.shape[0] < features:
+            # Kommt vor, wenn B*T < F ist. Wir padden statisch mit Nullen.
+            padding = torch.zeros(features - Sigma_D_raw.shape[0], device=x.device, dtype=x.dtype)
+            Sigma_D = torch.cat([Sigma_D_raw, padding], dim=0)
+        else:
+            # Falls S größer oder gleich features ist, schneiden wir statisch ab
+            Sigma_D = Sigma_D_raw[:features]
 
-        # Step 4 
+        # 4. Normierung
         norm_Sigma_D = torch.linalg.vector_norm(Sigma_D)
         is_norm_zero = norm_Sigma_D < self.eps
         safe_norm = torch.where(is_norm_zero, torch.tensor(1.0, device=x.device, dtype=x.dtype), norm_Sigma_D)
-        Sigma_D_hat = (self.sqrt_n * Sigma_D) / safe_norm
-
-        # step 5 isotropy defect
-        diff_norm = torch.linalg.vector_norm(Sigma_D_hat - self.ones_n)
-        delta_x = diff_norm / self.denominator_delta
-
-        # step 6 occupation
-        numerator_phi = self.n_fixed - (delta_x ** 2) * (self.n_fixed - self.sqrt_n)
-        phi_x = (numerator_phi ** 2) / (self.n_fixed ** 2)
-
-        # step 7 transformation
-        iota_x = (self.n_fixed * phi_x - 1.0) / torch.clamp(torch.tensor(self.n_fixed - 1.0, device=x.device), min=1.0)
         
-        # finalization
-        final_score = torch.where(is_norm_zero, 0.0, iota_x)
-        
-        # If n<=1 return 1
-        if self.n_fixed <= 1:
-            return torch.tensor(1.0, device=x.device, dtype=x.dtype)
-        return torch.clamp(final_score, 0.0, 1.0)
+        ones_n = torch.ones(features, device=x.device, dtype=x.dtype)
+        sqrt_n = torch.sqrt(torch.tensor(n_fixed, device=x.device, dtype=x.dtype))
+        Sigma_D_hat = (sqrt_n * Sigma_D) / safe_norm
 
+        # 5. Isotropy Defect
+        denom_val = torch.sqrt(2 * (n_fixed - torch.sqrt(torch.tensor(n_fixed, device=x.device, dtype=x.dtype))))
+        denominator_delta = torch.where(denom_val > self.eps, denom_val, torch.tensor(1.0, device=x.device, dtype=x.dtype))
+        
+        diff_norm = torch.linalg.vector_norm(Sigma_D_hat - ones_n)
+        delta_x = diff_norm / denominator_delta
+
+        # 6. Occupation
+        numerator_phi = n_fixed - (delta_x ** 2) * (n_fixed - sqrt_n)
+        phi_x = (numerator_phi ** 2) / (n_fixed ** 2)
+
+        # 7. Transformation
+        denom_iota = torch.tensor(n_fixed - 1.0, device=x.device, dtype=x.dtype)
+        denom_iota = torch.where(denom_iota < 1.0, torch.tensor(1.0, device=x.device, dtype=x.dtype), denom_iota)
+        iota_x = (n_fixed * phi_x - 1.0) / denom_iota
+        
+        # 8. Finale Verzweigung (komplett in Tensor-Operationen ohne Python-if)
+        final_score = torch.where(is_norm_zero, torch.tensor(0.0, device=x.device, dtype=x.dtype), iota_x)
+        final_score_clamped = torch.clamp(final_score, 0.0, 1.0)
+        
+        # Falls n_fixed <= 1, gib 1.0 zurück
+        return torch.where(
+            torch.tensor(n_fixed <= 1.0, device=x.device), 
+            torch.tensor(1.0, device=x.device, dtype=x.dtype), 
+            final_score_clamped
+        )
 
 class feature_extractor_loss(torch.nn.Module):
-  def __init__(self,batch_size,features,times):
+  def __init__(self):
     super().__init__()
-    self.mse_loss=torch.nn.MSELoss()
-    self.cov_loss=calc_Correlation
-    self.iso_score=calc_IsoScore(batch_size,features,times)
+    self.mse_loss=NormalizedMSELoss()
+    self.structure_loss_target=structure_loss
+
   def forward(self,input,target,latent_space):
-    input_n=torch.nn.functional.normalize(input, p=2.0, dim=2, eps=1e-12, out=None)
-    target_n=torch.nn.functional.normalize(target, p=2.0, dim=2, eps=1e-12, out=None)
-    loss=torch.sqrt(self.mse_loss(input_n,target_n)).mean()+self.cov_loss(latent_space)+(1-self.iso_score(latent_space))
+    loss_structure_target=self.structure_loss_target(input,target)
+    loss_mse=self.mse_loss(input,target)
+    loss=loss_structure_target+loss_mse
     return(loss)
 
 def get_loss_cls_fct(name,class_weights):
