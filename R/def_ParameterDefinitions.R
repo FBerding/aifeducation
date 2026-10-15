@@ -768,6 +768,11 @@ get_param_dict <- function() {
   param$mlp_dropout <- param$hidden_dropout_prob
   param$mlp_dropout$desc <- "Dropout rate for the mlp layer."
 
+  param$encoder_dropout=param$hidden_dropout_prob
+  param$encoder_dropout$desc <- "Dropout rate for the encoder layer."
+  param$decoder_dropout=param$hidden_dropout_prob
+  param$decoder_dropout$desc <- "Dropout rate for the decoder layer."
+
   param$activation_dropout <- list(
     type = "double",
     allow_null = FALSE,
@@ -1277,11 +1282,12 @@ get_param_dict <- function() {
     allow_null = FALSE,
     min = NULL,
     max = NULL,
-    allowed_values = c("None", "Linear", "Cyclic"),
+    allowed_values = c("None", "Linear", "Cyclic","CosineAnnealing"),
     values_desc = list(
       None = "Uses no learning rate scheduler and no warm up phase.",
       Linear = "Decreases the learning rate linear from the maximal value (lr_rate) to its minimum (lr_min).",
-      Cyclic = "Decreases the learning rate for 5 epochs to lr_min. Thereafter the learning rate increases for 5 epochs to lr_rate."
+      Cyclic = "Decreases the learning rate for 5 epochs to lr_min. Thereafter the learning rate increases for 5 epochs to lr_rate.",
+      CosineAnnealing="Decrease of the learning rate following cosine annealing."
     ),
     desc = "Learning rate scheduler. To use a constant learning rate for the whole training set this parameter to 'None'.",
     gui_box = "Learning Rate",
@@ -1507,12 +1513,13 @@ get_param_dict <- function() {
     default_value = 2L,
     test_values = 3L
   )
-  param$method <- list(
+
+  param$fe_type <- list(
     type = "string",
     allow_null = FALSE,
     min = NULL,
     max = NULL,
-    allowed_values = c("Dense","DenseTimes"),
+    allowed_values = c("Dense","Conv"),
     desc = "Method to use for the feature extraction.",
     default_value = "Dense",
     gui_box = "General Settings",
@@ -1641,6 +1648,7 @@ get_param_dict <- function() {
       "BatchNorm",
       "PowerNorm",
       "RMSNorm",
+      "GlobalNorm",
       "None"
     ),
     values_desc = list(
@@ -1648,6 +1656,7 @@ get_param_dict <- function() {
       BatchNorm = "Applies normalization as described by [Loffe and Szegedy (2015)](https://doi.org/10.48550/arXiv.1502.03167). Implementation supports masking of sequences.",
       RMSNorm = "Applies normalization as described by  [Zhang and Sennrich (2019)](https://doi.org/10.48550/arXiv.1910.07467). Implementation supports masking of sequences.",
       PowerNorm = "Applies normalization as described by [Shen et al. (2020)](https://doi.org/10.48550/arXiv.2003.07845). Implementation supports masking of sequences.",
+      GlobalNorm="Applies normalization across batch, times, and features calculating a single running mean and variance.",
       None = "Applies no normalization."
     ),
     desc = "Type of normalization applied to all layers and stack layers.",
@@ -1706,6 +1715,9 @@ get_param_dict <- function() {
 
   param$merge_normalization_type <- param$normalization_type
   param$merge_normalization_type$gui_box <- "Merge Layer"
+
+  param$fe_normalization<- param$normalization_type
+  param$fe_normalization$desc = "Type of normalization applied to encoder and decoder layers."
 
   param$tf_normalization_position <- list(
     type = "string",
@@ -1915,6 +1927,9 @@ get_param_dict <- function() {
   param$tf_act_fct <- param$act_fct
   param$tf_act_fct$gui_box <- "Transformer Encoder Layers"
   param$tf_act_fct$allowed_values <- act_fct_allowed_values
+
+  param$fe_act_fct<- param$act_fct
+  param$fe_act_fct$allowed_values <- setdiff(x=act_fct_allowed_values,y="SwiGLU")
 
   # Recurrent Layer--------------------------------------------------------------
   param$rec_dropout <- list(
