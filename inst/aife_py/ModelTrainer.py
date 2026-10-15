@@ -143,9 +143,10 @@ class ModelTrainer():
       alpha=self.loss_alpha
     )
   def config_for_TEFeatureExtractor(self,model,optimizer_method,times,features,scheduler_type,amp, lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,batch_size,
-    train_data,val_data,filepath,use_callback,comp_use,comp_backend,comp_mode,ddp_use,
+    train_data,val_data,filepath,use_callback,comp_use,comp_backend,comp_mode,ddp_use,pad_value,
     log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
     self.model=model
+    self.pad_value=pad_value
     self.ddp_use=ddp_use
     self.optimizer_method=optimizer_method
     self.times=times
@@ -173,9 +174,7 @@ class ModelTrainer():
     self.log_top_message=log_top_message
     #Loss
     self.loss_fct=feature_extractor_loss(
-      batch_size=self.batch_size,
-      times=self.times,
-      features=self.features
+      pad_value=self.pad_value
     )
   def get_device(self):
     return 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -210,6 +209,7 @@ class ModelTrainer():
         tmp_metric_storage=np.ones((2,epochs))*-100
       storage[metric]=  tmp_metric_storage
     storage["checkpoints"]=np.zeros((epochs))
+    storage["final_epoch"]=np.zeros((1))
     return storage
 
   def create_p_confusion_matrix(self,prob,label_idx,num_classes):
@@ -445,6 +445,7 @@ class ModelTrainer():
       loss_fct=self.loss_fct,
       model_type=self.model_type
     )
+    self.model_w_loss.set_total_epochs(self.epochs)
   def prepare_ModelWithLoss(self):
     self.trainer=self.model_w_loss.to(dtype=self.dtype,device=self.device)
     #Compile
@@ -661,6 +662,7 @@ class ModelTrainer():
   
   def run_epoch_autoencoder(self,cblock,epoch,dataloader):
     total_loss=0.0
+    self.trainer.set_epoch(epoch)
     if cblock=="train":
       self.trainer.train()
       ctx=torch.enable_grad()
@@ -737,9 +739,9 @@ class ModelTrainer():
         self.metric_storage["checkpoints"][epoch]=1
         self.elc=epoch+1
 
-  def check_convergence(self,train_results):
+  def check_convergence(self,train_results,epoch):
     if self.model_type=="ClassifierStandard" or self.model_type=="ClassifierPrototype":
-      if train_results["loss"]<1e-3 and train_results["s_avg_iota"]>=.98:
+      if (train_results["loss"]<1e-3 and train_results["s_avg_iota"]>=.98) or (epoch>self.elc+500):
         if self.trace:
           print("\n")
         return True
@@ -748,6 +750,7 @@ class ModelTrainer():
     
   def run_epochs(self):
     if self.model_type=="ClassifierStandard":
+      tmp_epoch=0
       for epoch in range(self.epochs):
         train_results=self.run_epoch_cls(cblock="train",epoch=epoch,dataloader=self.trainloader)
         if self.valloader is not None:
@@ -779,13 +782,15 @@ class ModelTrainer():
             best_loss=self.best_val_loss,
             elc=self.elc
           )
+          tmp_epoch=epoch+1
           #Check if there are furhter information for training-----------------------
           # If there are no addtiononal information. Stop training and continue
-          if self.check_convergence(train_results):
-            self.metric_storage["checkpoints"][epoch]=2
+          if self.check_convergence(train_results,epoch):
+            self.metric_storage["final_epoch"]=tmp_epoch
             break
-          self.metric_storage["checkpoints"][epoch]=2
+      self.metric_storage["final_epoch"]=tmp_epoch
     elif self.model_type=="ClassifierPrototype":
+      tmp_epoch=0
       for epoch in range(self.epochs):
         train_results=self.run_epoch_cls_pt(cblock="train",epoch=epoch,dataloader=self.trainloader)
         if self.valloader is not None:
@@ -817,14 +822,16 @@ class ModelTrainer():
             best_loss=self.best_val_loss,
             elc=self.elc
           )
+          tmp_epoch=epoch+1
           #Check if there are furhter information for training-----------------------
           # If there are no addtiononal information. Stop training and continue
-          if self.check_convergence(train_results):
-            self.metric_storage["checkpoints"][epoch]=2
+          if self.check_convergence(train_results,epoch):
+            self.metric_storage["final_epoch"]=tmp_epoch
             break
-          self.metric_storage["checkpoints"][epoch]=2
+      self.metric_storage["final_epoch"]=tmp_epoch
         
     elif self.model_type=="TEFeatureExtractor":
+        tmp_epoch=0
         for epoch in range(self.epochs):
           train_results=self.run_epoch_autoencoder(cblock="train",epoch=epoch,dataloader=self.trainloader)
           if self.valloader is not None:
@@ -851,7 +858,8 @@ class ModelTrainer():
               best_loss=self.best_val_loss,
               elc=self.elc
             )
-        self.metric_storage["checkpoints"][epoch]=2    
+            tmp_epoch=epoch+1
+        self.metric_storage["final_epoch"]=tmp_epoch    
     else:
       print("Error")
   
@@ -877,7 +885,7 @@ class ModelTrainer():
     # 1. Prepare Model
     self.create_ModelWithLoss()
     self.prepare_ModelWithLoss()
-    # 2. Prepare Datasloader
+    # 2. Prepare Dataloader
     self.prepare_dataloader()
     # 3. Create Optimizer, Scheduler, and Scaler for AMP
     self.create_optimizer_scaler_scheduler()
@@ -969,6 +977,8 @@ class ModelWithLoss(torch.nn.Module):
       self.model=model
       self.loss_fct=loss_fct
       self.model_type=  model_type
+      self.epoch=0
+      self.epochs=0
       if self.model_type=="ClassifierStandard":
         self.forward=self.train_and_eval_standard
       elif self.model_type=="ClassifierPrototype":
@@ -1002,8 +1012,16 @@ class ModelWithLoss(torch.nn.Module):
     output=self.model(static_input,encoder_mode=False)
     predictions=output[0]
     latent_space=output[1]
-    loss=self.loss_fct(predictions,static_target,latent_space)
+    mu=output[2]
+    log_var=output[3]
+    mask=output[4]
+    loss=self.loss_fct(predictions,static_target,latent_space,mu,log_var,mask,beta=max(0.2,min(self.epoch/(self.epochs),1)))
     return loss, output
+  
+  def set_total_epochs(self,epochs):
+    self.epochs=epochs
+  def set_epoch(self,epoch):
+    self.epoch=epoch 
 
 
 #def prepare_model(model):
