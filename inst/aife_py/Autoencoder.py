@@ -17,6 +17,8 @@ import numpy as np
 import math
 
 from .Normalizers import get_layer_normalization
+from .Activations import get_act_fct
+
 
 class layer_switch_pad_values(torch.nn.Module):
   def __init__(self,pad_value_old,pad_value_new):
@@ -41,41 +43,132 @@ class layer_switch_pad_values(torch.nn.Module):
     return z
 
 class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
-    def __init__(self, features_in, features_out,times, noise_factor, pad_value, orthogonal_method, te_n_layers=3):
+    def __init__(self, features_in, features_out, times, encoder_dropout,decoder_dropout,noise_factor,fe_type,fe_normalization,fe_act_fct, pad_value, orthogonal_method, te_n_layers=3):
         super().__init__()
         self.features_in = features_in
-        self.times=times
+        self.times = times
         self.features_out = features_out
         self.noise_factor = noise_factor
         self.n_layers = te_n_layers
         self.difference = self.features_in - self.features_out
-        #Calculate feature sizes
+        if isinstance(pad_value, torch.Tensor):
+          self.register_buffer("pad_value",pad_value.clone().float())
+        else:
+          self.register_buffer("pad_value",torch.tensor(pad_value,dtype=torch.float))
+        
+        #Register type of model
+        self.fe_type="Dense"
+        self.is_conv=(self.fe_type=="Conv")
+        
+        # Feature-Größen berechnen
         dims = []
         for i in range(self.n_layers + 1):
             fraction = i / self.n_layers
             dim = math.ceil(self.features_in - self.difference * fraction)
             dims.append(dim)
-        #Create Weights
-        self.register_parameter("residual", torch.nn.Parameter(torch.rand(features_out,features_in)))
-        self.encoder_layer_names_weights = []
-        self.encoder_layer_names_bias = []
-        self.activation={}
+            
+        # Residual-Verbindung als Linear-Layer ohne Bias
+        self.residual_connections = torch.nn.ModuleList()
+
+        # Mu und SD
+        self.mu_layer=torch.nn.Linear(features_out, features_out, bias=False)
+        self.sd_layer=torch.nn.Linear(features_out, features_out, bias=False)
+        
+        # Decoder head
+        self.decoder_head=torch.nn.Linear(features_in, features_in, bias=False)
+
+        # Encoder Dense-Layer
+        self.encoder_layers = torch.nn.ModuleList()
+        self.encoder_lns = torch.nn.ModuleList()
+        
+        # Separate Liste für die eigenen Decoder-Biases
+        self.decoder_biases = torch.nn.ParameterList()
+        self.decoder_lns = torch.nn.ModuleList()
+        
+        #Separate list for activations
+        self.activation_encoder = torch.nn.ModuleList()
+        self.activation_decoder = torch.nn.ModuleList()
+        
+        #Separate list for dropout
+        self.dropout_encoder = torch.nn.ModuleList()
+        self.dropout_decoder = torch.nn.ModuleList()
+        
         for i in range(self.n_layers):
-            name = f"param_{i+1}"
             out_d = dims[i+1]
             in_d = dims[i]
-            # Register
-            param = torch.nn.Parameter(torch.nn.init.orthogonal_(torch.randn(out_d, in_d)))
-            self.register_parameter(name, param)
-            self.encoder_layer_names_weights.append(name)
-            # Apply orthogonal parametrizations
-            if orthogonal_method != "None":
-                torch.nn.utils.parametrizations.orthogonal(module=self, name=name, orthogonal_map=orthogonal_method)
-            name_b = f"param_{i+1}_b"    
-            param_b = torch.nn.Parameter(torch.zeros((out_d)))
-            self.register_parameter(name_b, param_b)
-            self.encoder_layer_names_bias.append(name_b)    
-        #Add Padding Layer
+            if self.fe_type=="Conv":
+                layer=torch.nn.Conv1d(
+                    in_channels=in_d, 
+                    out_channels=out_d, 
+                    kernel_size=2, 
+                    stride=1, 
+                    padding=0,
+                    bias=True
+                )
+            elif self.fe_type=="Dense":
+                layer=torch.nn.Linear(in_d, out_d, bias=True)
+            torch.nn.init.orthogonal_(layer.weight)
+            if orthogonal_method != "None" and self.fe_type=="Dense":
+                torch.nn.utils.parametrizations.orthogonal(module=layer, name="weight", orthogonal_map=orthogonal_method)
+            self.encoder_layers.append(layer)
+            
+            #Residual connection
+            if self.fe_type=="Conv":
+              res_connect=torch.nn.Conv1d(
+                    in_channels=in_d, 
+                    out_channels=out_d, 
+                    kernel_size=1, 
+                    stride=1, 
+                    padding=0,
+                    bias=False
+                )
+            elif self.fe_type=="Dense":
+              res_connect=torch.nn.Linear(in_d, out_d, bias=False)
+            self.residual_connections.append(res_connect)
+            
+            # Eigener Decoder-Bias: Da der Decoder rückwärts läuft und die Gewichte transponiert, 
+            # ist die Ausgangsdimension des entsprechenden Decoder-Schritts gleich der Eingangsdimension `in_d` des Encoders.
+            #dec_bias = torch.nn.Parameter(torch.zeros(in_d))
+            #self.decoder_biases.append(dec_bias)
+
+            #Normalizer
+            #if i > 0 and i < self.n_layers - 1:
+            self.encoder_lns.append(
+              get_layer_normalization(
+                name=fe_normalization,
+                times=self.times, 
+                features=in_d,
+                pad_value=0.0,
+                eps=1e-6
+              )
+            )
+            self.decoder_lns.append(
+              get_layer_normalization(
+                name=fe_normalization,
+                times=self.times, 
+                features=out_d,
+                pad_value=0.0,
+                eps=1e-6
+              )
+            )
+            
+            #Activations  
+            self.activation_encoder.append(
+              get_act_fct(name=fe_act_fct)
+            )
+            self.activation_decoder.append(
+              get_act_fct(name=fe_act_fct)
+            )
+            
+            #Dropout
+            self.dropout_encoder.append(
+              torch.nn.Dropout(p=encoder_dropout)
+            )
+            self.dropout_decoder.append(
+              torch.nn.Dropout(p=decoder_dropout)
+            )
+
+        # Padding Layer
         if pad_value != 0:
             self.switch_pad_value_start = layer_switch_pad_values(pad_value_old=pad_value, pad_value_new=0)
             self.switch_pad_value_final = layer_switch_pad_values(pad_value_old=0, pad_value_new=pad_value)
@@ -84,222 +177,135 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
             self.switch_pad_value_final = None
 
     def forward(self, x, encoder_mode=False):
-        # Switch padding value if necessary
+        mask = self.get_mask(x)
         if self.switch_pad_value_start is not None:
             x = self.switch_pad_value_start(x)
         if encoder_mode:
-          latent_space=self.encoder(x)
-          if self.switch_pad_value_start is not None:
-            latent_space = self.switch_pad_value_final(latent_space)
-          return latent_space
-        else:
-          latent_space=self.encoder(x)
-          target=self.decoder(
-            output_mask=self.get_mask(x,self.features_in),
-            y=latent_space
-          )
-          if self.switch_pad_value_start is not None:
-            target = self.switch_pad_value_final(target)
-          return target, latent_space   
-    def encoder(self,x):
-      # Add noise
-      if self.training:
-          mask = self.get_mask(x,self.features_in)
-          x_noise = x + self.add_noise(x)
-          x_noise = ~mask * x_noise
-          y=x_noise
-      else:
-        x_noise=x
-        y=x
-      # Encoder Part
-      for idx, name in enumerate(self.encoder_layer_names_weights):
-          w = getattr(self, name)
-          b = getattr(self, str(name)+"_b")
-          if idx > 0 and idx < self.n_layers - 1:
-            y=torch.nn.functional.layer_norm(y,y.size())
-            y = torch.nn.functional.linear(y, weight=w,bias=b)
-            y = torch.nn.functional.gelu(y)
-          else:
-            y = torch.nn.functional.linear(y, weight=w,bias=b)
-          y = y*~self.get_mask(x,y.size(2))
-      y=torch.nn.functional.linear(x_noise,weight=self.residual)+y
-      y=torch.nn.functional.normalize(y,p=2,dim=-1)
-      y = y*~self.get_mask(x,y.size(2))
-      return y
-    def decoder(self,output_mask,y):
-      latent_space=y
-      for idx, name in enumerate(reversed(self.encoder_layer_names_weights)):
-        w = getattr(self, name)
-        b = getattr(self, str(name)+"_b")
-        if idx > 0 and idx < self.n_layers - 1:
-          y=torch.nn.functional.layer_norm(y,y.size())
-          y = y-b
-          y = torch.nn.functional.linear(y, weight=torch.transpose(w, dim0=1, dim1=0))
-          y = torch.nn.functional.gelu(y)
-        else:
-          y = y-b
-          y = torch.nn.functional.linear(y, weight=torch.transpose(w, dim0=1, dim1=0))
-        y = y*~output_mask
-      y=torch.nn.functional.linear(latent_space,weight=torch.transpose(self.residual,dim0=1,dim1=0))+y  
-      return y
-      
-    def get_mask(self, x,features):
-      time_sums = torch.sum(x, dim=2,keepdim=True) #(B,T,1)
-      mask = (time_sums == 0)
-      mask=mask.expand((x.size(0),x.size(1),1))
-      return mask.detach()
-    def add_noise(self, x):
-      noise = self.noise_factor * torch.rand(size=x.size(),device=x.device,dtype=x.dtype)
-      return noise.detach()
-    
-
-class DenseAutoencoder_with_Mask_PT_Times(torch.nn.Module):
-    def __init__(self, features_in, features_out, time_in, time_out, noise_factor, pad_value, orthogonal_method, te_n_layers=3):
-        super().__init__()
-        #self.injection_value = torch.nn.parameter.Parameter(data=torch.ones((1)))
-        if isinstance(pad_value, torch.Tensor):
-            self.pad_value = pad_value.detach()
-        else:
-            self.pad_value = torch.tensor(pad_value)
-            
-        self.features_in = features_in
-        self.features_out = features_out
-        self.time_in = time_in
-        self.time_out = time_out
-        self.noise_factor = noise_factor
-        self.n_layers = te_n_layers
-        
-        # 1. Feature-Dimensionen pro Layer berechnen (Höhe)
-        self.feature_diff = self.features_in - self.features_out
-        f_dims = []
-        for i in range(self.n_layers + 1):
-            fraction = i / self.n_layers
-            dim = math.ceil(self.features_in - self.feature_diff * fraction)
-            f_dims.append(dim)
-            
-        # 2. Zeit-Dimensionen pro Layer berechnen (Breite)
-        self.time_diff = self.time_in - self.time_out
-        t_dims = []
-        for i in range(self.n_layers + 1):
-            fraction = i / self.n_layers
-            dim = math.ceil(self.time_in - self.time_diff * fraction)
-            t_dims.append(dim)
-            
-        # Parameter-Namen-Listen
-        self.encoder_dense_f_names = []
-        self.encoder_dense_t_names = []
-        
-        for i in range(self.n_layers):
-            in_f = f_dims[i]
-            out_f = f_dims[i+1]
-            
-            in_t = t_dims[i]
-            out_t = t_dims[i+1]
-            
-            # --- DENSE LAYER FÜR FEATURES ---
-            # Form: (out_features, in_features)
-            df_w_name = f"dense_f_w{i+1}"
-            df_b_name = f"dense_f_b{i+1}"
-            param_dfw = torch.nn.Parameter(torch.randn(out_f, in_f))
-            param_dfb = torch.nn.Parameter(torch.zeros(out_f))
-            self.register_parameter(df_w_name, param_dfw)
-            self.register_parameter(df_b_name, param_dfb)
-            self.encoder_dense_f_names.append((df_w_name, df_b_name))
-            
-            # --- DENSE LAYER FÜR ZEIT ---
-            # Form: (out_features, in_features) -> wirkt auf die transformierte T-Dimension
-            dt_w_name = f"dense_t_w{i+1}"
-            dt_b_name = f"dense_t_b{i+1}"
-            param_dtw = torch.nn.Parameter(torch.randn(out_t, in_t))
-            param_dtb = torch.nn.Parameter(torch.zeros(out_t))
-            self.register_parameter(dt_w_name, param_dtw)
-            self.register_parameter(dt_b_name, param_dtb)
-            self.encoder_dense_t_names.append((dt_w_name, dt_b_name))
-            
-            if orthogonal_method != "None":
-                torch.nn.utils.parametrizations.orthogonal(module=self, name=df_w_name, orthogonal_map=orthogonal_method)
-                torch.nn.utils.parametrizations.orthogonal(module=self, name=dt_w_name, orthogonal_map=orthogonal_method)
-              #Add Padding Layer
-        if pad_value != 0:
-            self.switch_pad_value_start = layer_switch_pad_values(pad_value_old=pad_value, pad_value_new=0.0)
-            self.switch_pad_value_final = layer_switch_pad_values(pad_value_old=0.0, pad_value_new=pad_value)
-        else:
-            self.switch_pad_value_start = None
-            self.switch_pad_value_final = None
-
-    def forward(self, x, encoder_mode=False):
-        # Input-Form: (B, T, F)
-        time_sums = torch.sum(x, dim=2)
-        mask = (time_sums == self.features_in * self.pad_value)
-        mask_features = torch.unsqueeze(mask, dim=2).expand(x.size()).detach()
-        
-        # Switch padding value if necessary
-        if self.switch_pad_value_start is not None:
-            x = self.switch_pad_value_start(x)
-        
-        if not encoder_mode:
-            if self.training:
-              y = x + self.add_noise(x)
-            else:
-              y=x
-            #y = torch.where(mask_features, self.injection_value, y)
-            y = torch.where(mask_features, 0.0, y)
-            # ---- ENCODER ----
-            for idx in range(self.n_layers):
-                # A) Feature-Reduktion via Dense (B, T, F_in) -> (B, T, F_out)
-                df_w, df_b = self.encoder_dense_f_names[idx]
-                y = torch.nn.functional.linear(y, weight=getattr(self, df_w), bias=getattr(self, df_b))
-                
-                # B) Zeit-Reduktion via Dense
-                # Drehen auf (B, F, T), damit T am Ende steht
-                y = y.transpose(1, 2)
-                dt_w, dt_b = self.encoder_dense_t_names[idx]
-                y = torch.nn.functional.linear(y, weight=getattr(self, dt_w), bias=getattr(self, dt_b)) # -> (B, F, T_out)
-                # Zurückdrehen auf (B, T, F)
-                y = y.transpose(1, 2)
-            
-            latent_space = y # Form: (B, T_latent, F_latent)
-            
-            # ---- DECODER ----
-            for idx in reversed(range(self.n_layers)):
-                # A) Transponierter Zeit-Schritt (T_out -> T_in)
-                y = y.transpose(1, 2) # Drehen zu (B, F, T)
-                dt_w, _ = self.encoder_dense_t_names[idx]
-                # Invertieren durch Transponieren der Gewichtsmatrix (.t())
-                y = torch.nn.functional.linear(y, weight=getattr(self, dt_w).t())
-                y = y.transpose(1, 2) # Zurück zu (B, T, F)
-                
-                # B) Transponierter Feature-Schritt (F_out -> F_in)
-                df_w, _ = self.encoder_dense_f_names[idx]
-                y = torch.nn.functional.linear(y, weight=getattr(self, df_w).t())
-                
-            y = torch.where(mask_features, self.pad_value, y)
+            hidden_states = self.encoder(x,mask)
+            mu=self.mu_layer(hidden_states)
+            latent_space=mu
             if self.switch_pad_value_start is not None:
-              y = self.switch_pad_value_final(y)
-            return y, latent_space
-            
+                latent_space = self.switch_pad_value_final(latent_space)
+            return latent_space
         else:
-            # Reiner Encoder-Mode
-            y = torch.where(mask_features, 0.0, x)
-            for idx in range(self.n_layers):
-                df_w, df_b = self.encoder_dense_f_names[idx]
-                y = torch.nn.functional.linear(y, weight=getattr(self, df_w), bias=getattr(self, df_b))
+            hidden_states = self.encoder(x,mask)
+
+            mu=self.mu_layer(hidden_states)
+            log_var=self.sd_layer(hidden_states)
+
+            std=torch.exp(0.5 * log_var)
+            eps = torch.randn_like(std)
+            
+            latent_space=mu + eps * std
+            latent_space=latent_space*~mask
+            
+            target = self.decoder(
+                output_mask=mask,
+                y=latent_space
+            )
+            if self.switch_pad_value_start is not None:
+                target = self.switch_pad_value_final(target)
+            return target, latent_space,mu,log_var,mask  
+
+    def encoder(self, x,mask):
+        if self.training:
+            x_noise = x + self.add_noise(x)
+            x_noise = ~mask * x_noise
+            y = x_noise
+        else:
+            x_noise = x
+            y = x
+            
+        for idx, layer in enumerate(self.encoder_layers):
+            y_start=y
+            y,_ =  self.encoder_lns[idx](y,torch.squeeze(mask,dim=2))
+            if self.is_conv:
+              y=torch.nn.functional.pad(y, pad=(0,0,1,0), mode='constant', value=0.0)
+              y=torch.permute(y,(0,2,1))
+              y = layer(y)
+              y=torch.permute(y,(0,2,1))
+            else:
+              y = layer(y)
+            y = self.activation_encoder[idx](y)
+            y=self.dropout_encoder[idx](y)
+            if self.is_conv:
+              y=torch.permute(y,(0,2,1))
+              y=y+self.residual_connections[idx](y)
+              y=torch.permute(y,(0,2,1))
+            else:
+              y=y+self.residual_connections[idx](y_start)
+            y = y * ~mask
+        y = y * ~mask
+        return y
+
+    def decoder(self, output_mask, y):
+        latent_space = y
+        # Umkehrung der Layer und Biases für den Decoder
+        reversed_layers = list(reversed(self.encoder_layers))
+        reversed_dec_biases = list(reversed(self.decoder_biases))
+        decoder_lns_rev=list(reversed(self.decoder_lns))
+        dropout_rev=list(reversed(self.dropout_decoder))
+        activation_rev=list(reversed(self.activation_decoder))
+        residual_connections_rev=list(reversed(self.residual_connections))
+        for idx, layer in enumerate(reversed_layers):
+            #b_dec=reversed_dec_biases[idx]
+            w=layer.weight
+            rw=residual_connections_rev[idx].weight
+            y_start=y
+            y,_ =  decoder_lns_rev[idx](y,torch.squeeze(output_mask,dim=2))
+            if self.is_conv:
+                y=torch.permute(y,(0,2,1))
+                y=torch.nn.functional.conv_transpose1d(
+                  y, 
+                  weight=w, 
+                  #bias=b_dec, 
+                  stride=1, 
+                  padding=1, 
+                  output_padding=0, 
+                  groups=1, 
+                  dilation=1
+                )
+                y=torch.permute(y,(0,2,1))
+                y=y[:,:-1,:]
+            else:
+              y=torch.nn.functional.linear(
+                y, 
+                weight=w.t()#,
+                #bias=b_dec
+              )
+            y = activation_rev[idx](y)
+            y=dropout_rev[idx](y)
+            if self.is_conv:
+              y=torch.permute(y,(0,2,1))
+              y=y+torch.nn.functional.conv_transpose1d(
+                  y_start, 
+                  weight=rw, 
+                  stride=1, 
+                  padding=0, 
+                  output_padding=0, 
+                  groups=1, 
+                  dilation=1
+                )
+              y=torch.permute(y,(0,2,1))
+            else:
+              y=y+torch.nn.functional.linear(
+                y_start, 
+                weight=rw.t()
+              )
+            y = y * ~output_mask
+        y=self.decoder_head(y)
+        y = y * ~output_mask
+        return y
       
-                y = y.transpose(1, 2)
-                dt_w, dt_b = self.encoder_dense_t_names[idx]
-                y = torch.nn.functional.linear(y, weight=getattr(self, dt_w), bias=getattr(self, dt_b))
-                y = y.transpose(1, 2)
-                
-                # Switch padding value back if necessary
-                if self.switch_pad_value_start is not None:
-                  y = self.switch_pad_value_final(y)
-            return y
+    def get_mask(self, x):
+        is_pad=(x==self.pad_value)
+        mask=torch.all(is_pad, dim=2, keepdim=True)
+        return mask.detach()
 
     def add_noise(self, x):
         noise = self.noise_factor * torch.rand(size=x.size(), device=x.device, dtype=x.dtype)
         return noise.detach()
-
-
+    
 
 
 @torch.inference_mode()
