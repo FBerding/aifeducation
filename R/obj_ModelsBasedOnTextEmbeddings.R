@@ -154,10 +154,12 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         final = final_training,
         pl_step = pl_step
       )
+
       plot_data_all <- data_prepared$aggregated
       # Select the performance measure to display
       plot_data <- plot_data_all[[measure]]
       checkpoints <- data_prepared[["checkpoints"]]
+      final_epoch <- data_prepared[["final_epoch"]]
 
       # Create Plot
       if (measure == "loss") {
@@ -177,7 +179,18 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         x_min <- 1L
       }
       if (is.null_or_na(x_max)) {
-        x_max <- nrow(plot_data)
+        if (is.list(final_epoch)) {
+          total_max <- 0L
+          for (i in seq_along(final_epoch)) {
+            tmp_max <- final_epoch[[i]]
+            if (tmp_max > total_max) {
+              total_max <- tmp_max
+            }
+          }
+          x_max <- total_max
+        } else {
+          x_max <- final_epoch
+        }
       }
       plot_data <- plot_data[x_min:x_max, ]
 
@@ -478,26 +491,26 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       }
     },
     #--------------------------------------------------------------------------
-    check_and_set_compiler_backend_mode=function(){
-      self$last_training$config$comp_backend=get_compiler_backend()
-      self$last_training$config$comp_mode=check_and_set_compiler_mode(
-        mode=self$last_training$config$comp_mode,
-        backend=self$last_training$config$comp_backend
+    check_and_set_compiler_backend_mode = function() {
+      self$last_training$config$comp_backend <- get_compiler_backend()
+      self$last_training$config$comp_mode <- check_and_set_compiler_mode(
+        mode = self$last_training$config$comp_mode,
+        backend = self$last_training$config$comp_backend
       )
     },
     #-------------------------------------------------------------------------
-    check_and_set_ddp=function(){
-      if(self$last_training$config$ddp_use){
-        if(detec_os()!="linux"){
-          self$last_training$config$ddp_use=FALSE
+    check_and_set_ddp = function() {
+      if (self$last_training$config$ddp_use) {
+        if (detec_os() != "linux") {
+          self$last_training$config$ddp_use <- FALSE
           message("DDP is currently supported only on Linux.")
         } else {
-          if(!torch$cuda$is_available()){
-            self$last_training$config$ddp_use=FALSE
+          if (!torch$cuda$is_available()) {
+            self$last_training$config$ddp_use <- FALSE
             message("DDP is disabled because cuda devices are not available.")
           } else {
-            if(torch$cuda$device_count()<=1L){
-              self$last_training$config$ddp_use=FALSE
+            if (torch$cuda$device_count() <= 1L) {
+              self$last_training$config$ddp_use <- FALSE
               message("DDP is disabled because there is only one cuda device.")
             }
           }
@@ -505,18 +518,18 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       }
     },
     #-------------------------------------------------------------------------
-    check_size_of_data=function(data_manager){
-      #Check Batch Size
-      #Ensures that at least two batches exist
-      current_batch_size=self$last_training$config$batch_size
-      if(inherits(x=data_manager,what="DataManagerClassifier")){
-        min_n=data_manager$get_min_n()
-      } else if(inherits(x=data_manager,what="datasets.dataset_dict.DatasetDict")) {
-        min_n=min(data_manager$train$num_rows,data_manager$test$num_rows)
+    check_size_of_data = function(data_manager) {
+      # Check Batch Size
+      # Ensures that at least two batches exist
+      current_batch_size <- self$last_training$config$batch_size
+      if (inherits(x = data_manager, what = "DataManagerClassifier")) {
+        min_n <- data_manager$get_min_n()
+      } else if (inherits(x = data_manager, what = "datasets.dataset_dict.DatasetDict")) {
+        min_n <- min(data_manager$train$num_rows, data_manager$test$num_rows)
       }
 
-      if(current_batch_size>=min_n){
-        batch_size_new=min_n-1L
+      if (current_batch_size >= min_n) {
+        batch_size_new <- min_n - 1L
         if (self$last_training$config$trace) {
           message(
             "Batch size is to big. Change batch size from ",
@@ -526,7 +539,7 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
             "."
           )
         }
-        self$last_training$config$batch_size=batch_size_new
+        self$last_training$config$batch_size <- batch_size_new
       }
     },
     #-------------------------------------------------------------------------
@@ -746,10 +759,6 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
                                         pl_step = NULL) {
       plot_data <- self$last_training$history
 
-      # if (length(plot_data) <= 1L) {
-      #  plot_data[[1L]] <- list(loss = plot_data[[1L]])
-      # }
-
       if (is.null_or_na(final)) {
         final <- FALSE
       }
@@ -780,18 +789,26 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
           measures <- names(plot_data[[1L]])
           n_sample_type <- nrow(plot_data[[1L]][[measures[1L]]])
           checkpoints <- list()
+          final_epoch<-list()
           for (i in seq.int(n_folds)) {
             checkpoints[i] <- list(
               plot_data[[i]][["checkpoints"]]
+            )
+            final_epoch[i] <- list(
+              plot_data[[i]][["final_epoch"]]
             )
           }
         } else {
           measures <- names(plot_data[[1L]][[1L]])
           n_sample_type <- nrow(plot_data[[1L]][[as.numeric(pl_step)]][[measures[1L]]])
           checkpoints <- list()
+          final_epoch<-list()
           for (i in seq.int(n_folds)) {
             checkpoints[i] <- list(
               plot_data[[i]][[as.numeric(pl_step)]][["checkpoints"]]
+            )
+            checkpoints[i] <- list(
+              final_epoch[[i]][[as.numeric(pl_step)]][["final_epoch"]]
             )
           }
         }
@@ -801,10 +818,12 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
           measures <- names(plot_data[[index_final]])
           n_sample_type <- nrow(plot_data[[index_final]][[measures[1L]]])
           checkpoints <- plot_data[[index_final]][["checkpoints"]]
+          final_epoch<- plot_data[[index_final]][["final_epoch"]]
         } else {
           measures <- names(plot_data[[index_final]][[1L]])
           n_sample_type <- nrow(plot_data[[index_final]][[as.numeric(pl_step)]][[measures[1L]]])
           checkpoints <- plot_data[[index_final]][[as.numeric(pl_step)]][["checkpoints"]]
+          final_epoch<-  plot_data[[index_final]][[as.numeric(pl_step)]][["final_epoch"]]
         }
       }
 
@@ -921,7 +940,8 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         list(
           aggregated = result_list,
           folds = results_folds,
-          checkpoints = checkpoints
+          checkpoints = checkpoints,
+          final_epoch=final_epoch
         )
       )
     },
@@ -1010,10 +1030,10 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
       # Smooth data distribution
       lr_estimation_results$delta <- (lr_estimation_results$final_loss - lr_estimation_results$start_loss) / lr_estimation_results$start_loss * 100
       smoothed_fct <- loess(
-        formula= delta ~ index,
+        formula = delta ~ index,
         data = lr_estimation_results,
         span = 0.85
-        )
+      )
       lr_estimation_results$smoothed_delta <- predict(smoothed_fct)
       lr_estimation_results$smoothed_delta_imp <- lr_estimation_results$smoothed_delta < 0.0
       # Calculate gradient and calculate turning point
@@ -1071,16 +1091,19 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
           best_idx <- min(which(relevant_range$smoothed_delta == min(relevant_range$smoothed_delta)))
         }
 
-          #Select learning rate with maximum increase
-          lr_idx <- min(which(relevant_range$smoothed_delta == min(relevant_range$smoothed_delta)))
+        # Select learning rate with minimum decrease
+        lr_idx <- min(which(relevant_range$smoothed_delta == max(relevant_range$smoothed_delta)))
 
 
         best <- relevant_range$lr_rate[best_idx]
         lr <- relevant_range$lr_rate[lr_idx]
 
-        if (self$last_training$config$lr_scheduler=="Linear"){
-        lr=1e-6
-          }
+        if (
+          self$last_training$config$lr_scheduler == "Linear" ||
+            self$last_training$config$lr_scheduler == "CosineAnnealing") {
+          lr <- lr/10
+          best <- relevant_range$lr_rate[max(1L,best_idx-2L)]
+        }
 
         if (best > lr) {
           self$last_training$config$lr_rate <- best
