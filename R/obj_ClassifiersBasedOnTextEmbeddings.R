@@ -1199,7 +1199,6 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       )
 
       tmp_history <-trainer_manager$do_training()
-
       # provide rownames and replace -100
       tmp_history <- private$prepare_history_data(tmp_history)
       return(tmp_history)
