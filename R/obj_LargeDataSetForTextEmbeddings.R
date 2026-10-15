@@ -310,6 +310,7 @@ LargeDataSetForTextEmbeddings <- R6::R6Class(
     #' @param model_name `string` Name of the underlying [TextEmbeddingModel].
     #' @param model_label `string` Label of the underlying [TextEmbeddingModel].
     #' @param features `int` Number of dimension (features) for the **compressed** text embeddings.
+    #' @param times `int` Number of time steps/chunks for the **compressed** text embeddings.
     #' @param method `string` Method that the [TEFeatureExtractor] applies for genereating the compressed text
     #'   embeddings.
     #' @param noise_factor `double` Noise factor of the [TEFeatureExtractor].

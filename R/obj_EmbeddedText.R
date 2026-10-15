@@ -398,6 +398,7 @@ EmbeddedText <- R6::R6Class(
     #' @param model_name `string` Name of the underlying [TextEmbeddingModel].
     #' @param model_label `string` Label of the underlying [TextEmbeddingModel].
     #' @param features `int` Number of dimension (features) for the **compressed** text embeddings.
+    #' @param times `int` Number of time steps/chunks for the **compressed** text embeddings.
     #' @param method `string` Method that the [TEFeatureExtractor] applies for genereating the compressed text
     #'   embeddings.
     #' @param noise_factor `double` Noise factor of the [TEFeatureExtractor].
@@ -573,11 +574,7 @@ EmbeddedText <- R6::R6Class(
       summary_abs=summary(relevant_abs)
 
       matrix_view_as_array=array(matrix_view,dim=c(nrow(matrix_view),1,features))
-      iso_score_fct=aife$Losses$calc_IsoScore(
-        batch_size=nrow(matrix_view),
-        times=1L,
-        features=features
-      )
+      iso_score_fct=aife$Losses$calc_IsoScore()
       iso_score=iso_score_fct(torch$from_numpy(np$array(matrix_view_as_array)))
 
       result=list(
@@ -599,7 +596,7 @@ EmbeddedText <- R6::R6Class(
           sd=sd(relevant_abs),
           q3=summary_abs["3rd Qu."],
           max=summary_abs["Max."],
-          iso_score=tensor_to_numpy(iso_score)
+          iso_score=round(tensor_to_numpy(iso_score),digits=3L)
         )
       )
     }
