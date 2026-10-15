@@ -258,10 +258,10 @@ class dense_layer_with_mask(torch.nn.Module):
     self.residual_connection=layer_residual_connection(residual_type,self.pad_value)  
 
   def forward(self,x,mask_times):
-    y=self.dense(x)
-    y,mask_times=self.normalization_layer(y,mask_times)
+    x_norm,mask_times=self.normalization_layer(x,mask_times)
+    y=self.dense(x_norm)
     if self.act_fct_name=="SwiGLU":
-      y=self.act_fct(y,x)
+      y=self.act_fct(y,x_norm)
     else:  
       y=self.act_fct(y)
     y,mask_times=self.dropout(x=y,mask_times=mask_times)
@@ -558,9 +558,11 @@ class layer_mutiple_n_gram_convolution(torch.nn.Module):
       self.residual_connection = layer_residual_connection(residual_type, self.pad_value) 
     
   def forward(self, x, mask_times):
+      x_norm, mask_times = self.normalization_layer(x=x, mask_times=mask_times) 
+      
       mask_features = mask_times.unsqueeze(-1)
       
-      x_zeros = torch.where(mask_features, 0.0, x)
+      x_zeros = torch.where(mask_features, 0.0, x_norm)
       x_transposed = x_zeros.permute(0, 2, 1)
 
       outputs = []
@@ -570,7 +572,6 @@ class layer_mutiple_n_gram_convolution(torch.nn.Module):
           y_layer = torch.where(mask_features, self.pad_value, y_layer)
           outputs.append(y_layer)
       y = torch.cat(outputs, dim=2)
-      y, mask_times = self.normalization_layer(x=y, mask_times=mask_times)    
       y = self.act_fct(y)
       y, mask_times = self.dropout(x=y, mask_times=mask_times)
       y, mask_times = self.residual_connection(x=x, y=y, mask_times=mask_times)
