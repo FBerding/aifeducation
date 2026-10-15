@@ -874,10 +874,12 @@ AIFEBaseModel <- R6::R6Class(
       # Provide rownames for the history
       for (i in seq_along(history)) {
         if (!is.null(history[[i]])) {
-          if (nrow(history[[i]]) == 2L) {
+          if(!is.null(nrow(history[[i]]))){
+                      if (nrow(history[[i]]) == 2L) {
             rownames(history[[i]]) <- c("train", "val")
           } else if (nrow(history[[i]]) == 3L) {
             rownames(history[[i]]) <- c("train", "val", "test")
+          }
           }
 
           if (is.matrix(history[[i]])) {
