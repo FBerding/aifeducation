@@ -38,6 +38,70 @@ class identity_layer(torch.nn.Module):
     return y,mask_times
 
 
+
+class GlobalNormWithMask(torch.nn.Module):
+    def __init__(self,times,features, momentum=0.1, eps=1e-5, pad_value=0.0):
+        super().__init__()
+        self.momentum = momentum
+        self.eps = eps
+        if isinstance(pad_value, torch.Tensor):
+            self.register_buffer("pad_value", pad_value.clone().float())
+        else:
+            self.register_buffer("pad_value", torch.tensor(pad_value, dtype=torch.float))
+
+        # Registrierung als 1-elementige Tensoren (Buffs werden nicht optimiert)
+        self.register_buffer('running_mean', torch.zeros(1))
+        self.register_buffer('running_var', torch.ones(1))
+        
+        # Lernbare Parameter direkt via torch.nn.Parameter initialisiert
+        self.weight = torch.nn.Parameter(torch.ones(1))
+        self.bias = torch.nn.Parameter(torch.zeros(1))
+
+    def forward(self, x,mask_times):
+        # x-Shape: [B, T, F]
+        b, t, f = x.size()
+        
+        # 1. Maske erstellen (Statische Shapes)
+        valid_mask = ~torch.unsqueeze(mask_times, dim=-1)
+        
+        if self.training:
+          # Anzahl valider Elemente (N)
+          num_valid_elements = valid_mask.sum() * f
+          
+          # 2. Mittelwert über den aktuellen Batch berechnen
+          x_masked = x * valid_mask
+          total_mean_batch = x_masked.sum() / num_valid_elements
+          
+          # 3. Varianz-Berechnung mit Bessel-Korrektur (N / (N - 1))
+          variance_elements = ((x - total_mean_batch) * valid_mask) ** 2
+          biased_variance = variance_elements.sum() / num_valid_elements
+          
+          # Bessel-Korrekturfaktor berechnen: N / max(1, N - 1)
+          bessel_correction = num_valid_elements / torch.clamp(num_valid_elements - 1.0, min=1.0)
+          total_variance_batch = biased_variance * bessel_correction
+  
+          # 5. In-Place Update der Running-Buffer (Mathematisch maskiert)
+          self.running_mean.copy_(
+              self.running_mean + self.momentum * (total_mean_batch - self.running_mean)
+          )
+          self.running_var.copy_(
+              self.running_var + self.momentum * (total_variance_batch - self.running_var)
+          )
+          total_mean=total_mean_batch
+          total_variance=total_variance_batch
+        else:
+          total_mean=self.running_mean
+          total_variance=self.running_var
+
+        # 6. Normalisierung und Affine Transformation
+        x_norm = (x - total_mean) / torch.sqrt(total_variance + self.eps)
+        x_transformed = x_norm * self.weight + self.bias
+
+        # 7. Padding im Ausgabe-Tensor statisch wiederherstellen
+        x_final = torch.where(valid_mask.bool(), x_transformed, self.pad_value)
+
+        return x_final,mask_times
+
 #LayerNorm_with_Mask------------------------------------------------------------
 #Layer generating the Layer Norm for sequential data.
 # Returns a list with the following tensors
@@ -83,6 +147,7 @@ class LayerNorm_with_Mask(nn.Module):
         else:
             self.register_buffer("pad_value", torch.tensor(pad_value, dtype=torch.float))
         self.gamma = nn.Parameter(torch.ones(1, self.features))
+        self.beta = nn.Parameter(torch.zeros(1, self.features))
 
     def forward(self, x, mask_times=None):
         if mask_times is None:
@@ -92,7 +157,7 @@ class LayerNorm_with_Mask(nn.Module):
         mean = torch.sum(x_zeros, dim=-1, keepdim=True) / self.features
         var = torch.sum(torch.square(x_zeros - mean), dim=-1, keepdim=True) / self.features
         var = torch.sqrt(var + self.eps)
-        normalized = self.gamma * (x_zeros - mean) / var
+        normalized = self.gamma * (x_zeros - mean) / var+self.beta
         normalized = torch.where(mask_features, self.pad_value, normalized)
         return normalized, mask_times
 
@@ -413,5 +478,7 @@ def get_layer_normalization(name,times, features,pad_value,eps=1e-6):
     return RMSNorm_with_Mask(features=features,pad_value=pad_value,eps=eps)
   elif name=="PowerNorm":
     return PowerNorm_with_Mask(features=features,pad_value=pad_value,eps=eps,alpha=0.9)
+  elif name=="GlobalNorm":
+    return GlobalNormWithMask(times=times,features=features,momentum=0.25,pad_value=pad_value,eps=eps)
   elif name=="None":
     return identity_layer(pad_value=pad_value,apply_masking=True)
