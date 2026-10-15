@@ -48,8 +48,11 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param features `r get_param_doc_desc("features")`
     #' @param times `r get_param_doc_desc("times")`
     #' @param te_n_layers `r get_param_doc_desc("te_n_layers")`
-    #' @param method `r get_param_doc_desc("method")`
-    #' @param orthogonal_method `r get_param_doc_desc("orthogonal_method")`
+    #' @param fe_type `r get_param_doc_desc("fe_type")`
+    #' @param fe_act_fct `r get_param_doc_desc("fe_act_fct")`
+    #' @param fe_normalization `r get_param_doc_desc("fe_normalization")`
+    #' @param encoder_dropout `r get_param_doc_desc("encoder_dropout")`
+    #' @param decoder_dropout `r get_param_doc_desc("decoder_dropout")`
     #' @param noise_factor `r get_param_doc_desc("noise_factor")`
     #' @note `features` refers to the number of features for the compressed text embeddings.
     #' @note `times` refers to the number of times for the compressed text embeddings. Only relevant
@@ -58,10 +61,15 @@ TEFeatureExtractor <- R6::R6Class(
     configure = function(name = NULL,
                          label = NULL,
                          text_embeddings = NULL,
+                         encoder_dropout=0.05,
+                         decoder_dropout=0.05,
+                         fe_type="Dense",
+                         fe_normalization="GlobalNorm",
+                         fe_act_fct="GELU",
                          features = 128L,
                          times=2L,
                          te_n_layers=3,
-                         method = "dense",
+                         method = "Dense",
                          orthogonal_method = "matrix_exp",
                          noise_factor = 1e-4) {
       tmp_args <- get_called_args(n = 1L)
@@ -291,9 +299,6 @@ TEFeatureExtractor <- R6::R6Class(
       } else {
         private$check_embeddings_object_type(data_embeddings, strict = FALSE)
       }
-
-      # Load Custom Model Scripts
-
 
       # Check number of cases in the data
       single_prediction <- private$check_single_prediction(data_embeddings)
@@ -547,29 +552,34 @@ TEFeatureExtractor <- R6::R6Class(
     init_model = function() {
       private$check_config_for_TRUE()
 
-  if (private$model_config$method == "Dense") {
+  #if (private$model_config$method == "Dense") {
         private$model <- aife$Autoencoder$DenseAutoencoder_with_Mask_PT(
           features_in = as.integer(private$text_embedding_model["features"]),
           features_out = as.integer(private$model_config$features),
           times=as.integer(private$model_config$times),
           te_n_layers= as.integer(private$model_config$te_n_layers),
           noise_factor = private$model_config$noise_factor,
+          encoder_dropout=private$model_config$encoder_dropout,
+          decoder_dropout=private$model_config$decoder_dropout,
+          fe_type=private$model_config$fe_type,
+          fe_normalization=private$model_config$fe_normalization,
+          fe_act_fct=private$model_config$fe_act_fct,
           pad_value = private$text_embedding_model$pad_value,
           orthogonal_method = private$model_config$orthogonal_method
         )
-  }  else if(private$model_config$method == "DenseTimes"){
-      private$model <- aife$Autoencoder$DenseAutoencoder_with_Mask_PT_Times(
-        features_in = as.integer(private$text_embedding_model["features"]),
-        features_out = as.integer(private$model_config$features),
-        time_in = as.integer(private$text_embedding_model["times"]),
-        time_out = as.integer(private$model_config$times),
-        te_n_layers= as.integer(private$model_config$te_n_layers),
-        noise_factor = private$model_config$noise_factor,
-        pad_value = private$text_embedding_model$pad_value,
-        orthogonal_method = private$model_config$orthogonal_method
-      )
+  #}  else if(private$model_config$method == "DenseTimes"){
+  #    private$model <- aife$Autoencoder$DenseAutoencoder_with_Mask_PT_Times(
+  #      features_in = as.integer(private$text_embedding_model["features"]),
+  #      features_out = as.integer(private$model_config$features),
+  #      time_in = as.integer(private$text_embedding_model["times"]),
+  #      time_out = as.integer(private$model_config$times),
+  #      te_n_layers= as.integer(private$model_config$te_n_layers),
+  #      noise_factor = private$model_config$noise_factor,
+  #      pad_value = private$text_embedding_model$pad_value,
+  #      orthogonal_method = private$model_config$orthogonal_method
+   #   )
 
-    }
+    #}
     },
     #--------------------------------------------------------------------------
     generate_model_id = function(name) {
@@ -596,6 +606,7 @@ TEFeatureExtractor <- R6::R6Class(
       train_args=list(
         model = private$model,
         optimizer_method = self$last_training$config$optimizer,
+        pad_value=private$text_embedding_model$pad_value,
         features=as.integer(private$text_embedding_model["features"]),
         times=as.integer(private$text_embedding_model["times"]),
         amp = self$last_training$config$amp,
