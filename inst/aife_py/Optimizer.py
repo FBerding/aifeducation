@@ -17,7 +17,7 @@ import math
 
 def get_Optimizer(optimizer_method,params,lr_rate):
   if optimizer_method=="Adam":
-    optimizer=torch.optim.Adam(lr=lr_rate,params=params,weight_decay=lr_rate/10)
+    optimizer=torch.optim.Adam(lr=lr_rate,params=params,weight_decay=1e-2)
   elif optimizer_method=="RMSprop":
     optimizer=torch.optim.RMSprop(lr=lr_rate,params=params,momentum=0.90)
   elif optimizer_method=="AdamW":
@@ -35,14 +35,21 @@ def get_lr_scheduler(optimizer,scheduler_type,lr_warm_up_ratio,total_epochs,batc
     scheduler_main=torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1,end_factor=min_lr/max_lr, total_iters=main_steps)
   elif scheduler_type=="Cyclic":
     scheduler_main=torch.optim.lr_scheduler.CyclicLR(optimizer, base_lr=min_lr, max_lr=max_lr, step_size_up=5*batches_per_epoch)
-  elif =="CosineAnnealing"
+  elif scheduler_type=="CosineAnnealing":
     scheduler_main=torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=main_steps, eta_min=0.0, last_epoch=-1)
   elif scheduler_type=="None":
     return None
   
   if lr_warm_up_ratio>0.0 and scheduler_type!="None":
-    scheduler_warm_up = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=min_lr/max_lr,end_factor=1, total_iters=warm_up_steps)
-    scheduler = torch.optim.lr_scheduler.SequentialLR(schedulers = [scheduler_warm_up, scheduler_main], optimizer=optimizer,milestones=[warm_up_steps])
+    scheduler_warm_up = torch.optim.lr_scheduler.LinearLR(
+      optimizer, 
+      start_factor=min_lr/max_lr,
+      end_factor=1, 
+      total_iters=warm_up_steps)
+    scheduler = torch.optim.lr_scheduler.SequentialLR(
+      schedulers = [scheduler_warm_up, scheduler_main], 
+      optimizer=optimizer,
+      milestones=[warm_up_steps])
   else:
     scheduler=scheduler_main
   return scheduler
