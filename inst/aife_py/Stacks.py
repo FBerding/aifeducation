@@ -28,6 +28,7 @@ from .Layers import (
 )
 
 from .CLSUtils import get_FeatureMask_from_mask, get_SeqLen_from_mask
+from .Normalizers import get_layer_normalization
 
 #DenseLayer_stack_with_mask-----------------------------------------------------  
 #Layer for creating a stack of dense layers with masking ability
@@ -107,6 +108,13 @@ class stack_recurrent_layers(torch.nn.Module):
     
     self.pack_and_masking=layer_pack_and_masking()
 
+    self.normalization_layer=get_layer_normalization(
+      name=normalization_type,
+      times=self.times,
+      features=self.hidden_size,
+      pad_value= self.pad_value,
+      eps=1e-5)
+
     if rec_type=="GRU":
        self.rec_layers=torch.nn.GRU(
             input_size=self.hidden_size,
@@ -150,7 +158,8 @@ class stack_recurrent_layers(torch.nn.Module):
     self.residual_connection=layer_residual_connection(self.residual_type,self.pad_value)  
     
   def forward(self,x,mask_times):
-    y,mask_times=self.pack_and_masking(x,mask_times)
+    y,mask_times=self.normalization_layer(x,mask_times)
+    y,mask_times=self.pack_and_masking(y,mask_times)
     y=self.rec_layers(y)[0]
     y,mask_times=self.unpack(y,mask_times)
     if self.return_sequence==True:
