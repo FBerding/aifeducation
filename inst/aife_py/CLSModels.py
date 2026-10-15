@@ -211,6 +211,7 @@ class TEClassifierSequential(torch.nn.Module):
       elif self.cls_pooling_type == "MinMaxTimes":
           self.cls_pooling_features=2*self.feat_size
           self.summarize_layer_features=torch.nn.Identity()     
+      
       self.residual_connection=layer_residual_connection(skip_connection_type,pad_value)  
       
       self.final_normalization=get_layer_normalization(
@@ -230,7 +231,7 @@ class TEClassifierSequential(torch.nn.Module):
           self.classification_head=pairwise_orthogonal_dense(
                 input_size=self.cls_pooling_features,
                 output_size=n_target_levels,
-                bias=False,
+                bias=True,
                 pre_dense=False,
                 device=device, 
                 dtype=dtype)
@@ -238,7 +239,7 @@ class TEClassifierSequential(torch.nn.Module):
           self.classification_head=pairwise_orthogonal_dense(
                 input_size=self.cls_pooling_features,
                 output_size=n_target_levels,
-                bias=False,
+                bias=True,
                 pre_dense=True,
                 device=device, 
                 dtype=dtype)
@@ -510,7 +511,7 @@ class TEClassifierParallel(torch.nn.Module):
           self.classification_head=pairwise_orthogonal_dense(
                 input_size=self.merge_pooling_features,
                 output_size=n_target_levels,
-                bias=False,
+                bias=True,
                 pre_dense=False,
                 device=device, 
                 dtype=dtype)
@@ -518,7 +519,7 @@ class TEClassifierParallel(torch.nn.Module):
           self.classification_head=pairwise_orthogonal_dense(
                 input_size=self.merge_pooling_features,
                 output_size=n_target_levels,
-                bias=False,
+                bias=True,
                 pre_dense=True,
                 device=device, 
                 dtype=dtype)
@@ -771,7 +772,7 @@ class TEClassifierReferencePoint(torch.nn.Module):
     self.logit_builder=torch.nn.Linear(
         in_features=self.cls_n_ref_points,
         out_features=self.n_target_levels,
-        bias=False
+        bias=True
     )
     
     #ref_pointidx
