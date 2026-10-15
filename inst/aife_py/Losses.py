@@ -264,8 +264,84 @@ def structure_loss(latent_space, target):
     
     return loss
 
+class MaskedFeatureDeCorrelationLoss(torch.nn.Module):
+    def __init__(self, pad_value=0.0, eps=1e-8):
+        super(MaskedFeatureDeCorrelationLoss, self).__init__()
+        self.pad_value = pad_value
+        self.eps = eps
 
+    def forward(self, x):
+        # x-Shape erwartet: [B, T, F]
+        b, t, f = x.size()
 
+        # 1. Maske erstellen (Statische Shapes für CUDA-Graph-Kompatibilität)
+        # True (1.0) für valide Schritte, False (0.0) für gepaddete Schritte
+        is_pad = (x == self.pad_value).all(dim=-1, keepdim=True)  # [B, T, 1]
+        mask = (~is_pad).float()  # [B, T, 1]
+
+        # Anzahl valider Zeitschritte über alle Batches hinweg
+        num_valid_elements = mask.sum()  # Skalar (Anzahl der validen B,T Kombinationen)
+
+        # 2. Maskierte Features zentrieren (Mittelwert abziehen)
+        x_masked = x * mask
+        # Berechne den Mittelwert pro Feature über die Dimensionen B und T
+        mean = x_masked.sum(dim=(0, 1), keepdim=True) / (num_valid_elements + self.eps)  # [1, 1, F]
+        
+        # Zentrieren und Padding-Elemente wieder auf 0 setzen
+        x_centered = (x - mean) * mask  # [B, T, F]
+
+        # 3. Features flachklopfen zu [N_valide, F], ohne dynamische Shapes zu nutzen
+        # Wir berechnen die Kovarianzmatrix direkt über die Summe der äußeren Produkte (Matrixmultiplikation)
+        # Umformen von [B, T, F] zu [B*T, F] für effiziente Matrixalgebra
+        x_flat = x_centered.view(b * t, f)
+
+        # Kreuzprodukt-Matrix berechnen: [F, B*T] x [B*T, F] -> [F, F]
+        # Das entspricht der unskalierten Kovarianzmatrix über alle validen Zeitschritte
+        covariance_matrix = torch.matmul(x_flat.t(), x_flat) / (num_valid_elements + self.eps)
+
+        # 4. Standardabweichung für die Normalisierung (Kovarianz -> Korrelation)
+        # Extrahiere die Diagonale (Varianz pro Feature)
+        variance = torch.diagonal(covariance_matrix)  # [F]
+        std = torch.sqrt(variance + self.eps)  # [F]
+
+        # Erzeuge eine Normalisierungsmatrix über das äußere Produkt der Standardabweichungen
+        std_matrix = torch.outer(std, std)  # [F, F]
+
+        # Korrelationsmatrix berechnen (Werte liegen zwischen -1 und 1)
+        correlation_matrix = covariance_matrix / (std_matrix + self.eps)
+
+        # 5. Loss berechnen: Reduziere die Off-Diagonal-Elemente gegen 0
+        # Wir quadrieren die Matrixelemente, um sowohl positive als auch negative Korrelationen zu bestrafen
+        loss_matrix = correlation_matrix ** 2
+
+        # Erzeuge eine Identitätsmatrix, um die Diagonale (Korrelation eines Features mit sich selbst = 1) zu ignorieren
+        identity = torch.eye(f, device=x.device, dtype=x.dtype)
+        
+        # Maskiere die Diagonale aus, sodass nur die Kreuzkorrelationen übrig bleiben
+        off_diagonal_loss = loss_matrix * (1.0 - identity)
+
+        # Der finale Loss ist der Mittelwert aller Off-Diagonal-Fehler
+        # f * (f - 1) ist die exakte Anzahl der Nicht-Diagonalelemente
+        total_loss = off_diagonal_loss.sum() / torch.clamp(torch.tensor(f * (f - 1), device=x.device, dtype=x.dtype), min=1.0)
+
+        return total_loss
+
+#Kullback-Leibler-Divergenz
+def KLDLoss(mu, logvar,mask):
+    """
+    Berechnet die KL-Divergenz zwischen dem gelernten latenten Raum 
+    und einer Standardnormalverteilung N(0, 1).
+    
+    Argumente:
+    mu     -- Mittelwert-Vektor aus dem Encoder (Batch_Size, Latent_Dim)
+    logvar -- Log-Varianz-Vektor aus dem Encoder (Batch_Size, Latent_Dim)
+    """
+    # Formel: -0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
+    valid_mask=~mask
+    n_elements=torch.sum(valid_mask)*mu.size(2)
+    kld_per_element=torch.clamp((-0.5*(1 + logvar - mu.pow(2) - logvar.exp())*valid_mask),min=0.0)
+    kld=torch.sum(kld_per_element)/n_elements
+    return kld
 
 
 class calc_IsoScore(torch.nn.Module):
@@ -346,15 +422,17 @@ class calc_IsoScore(torch.nn.Module):
         )
 
 class feature_extractor_loss(torch.nn.Module):
-  def __init__(self):
+  def __init__(self,pad_value):
     super().__init__()
     self.mse_loss=NormalizedMSELoss()
-    self.structure_loss_target=structure_loss
+    #self.structure_loss_target=structure_loss
+    #self.cor_loss=MaskedFeatureDeCorrelationLoss(pad_value=0.0)
 
-  def forward(self,input,target,latent_space):
-    loss_structure_target=self.structure_loss_target(input,target)
+  def forward(self,input,target,latent_space,mu,log_var,mask,beta):
+    #loss_structure_target=self.structure_loss_target(input,target)
     loss_mse=self.mse_loss(input,target)
-    loss=loss_structure_target+loss_mse
+    kld_loss=KLDLoss(mu,log_var,mask)
+    loss=loss_mse+beta*kld_loss
     return(loss)
 
 def get_loss_cls_fct(name,class_weights):
