@@ -218,28 +218,67 @@ class NormalizedMSELoss(torch.nn.Module):
         return torch.sum(nmse_masked) / divisor_loss
 
 
-
-
-def structure_loss(latent_space, target):
-    # Entpacken mit Unterstützung für unterschiedliche Feature-Dimensionen
-    B, T, F_latent = latent_space.shape
-    _, _, F_target = target.shape
+def structure_loss(latent_space, target, mask_latent, mask_target):
+    """
+    Berechnet den Struktur-Verlust. Unterstützt identische oder unterschiedliche Sequenzlängen T.
     
-    # 1. Zusammenfassen von Batch- und Zeitdimension zu (B * T, F)
-    N = B * T
-    latent_flat = latent_space.reshape(N, F_latent)
-    target_flat = target.reshape(N, F_target)
+    Args:
+        latent_space: Tensor der Form [B, T_latent, F_latent]
+        target: Tensor der Form [B, T_target, F_target]
+        mask_latent: Tensor der Form [B, T_latent, 1] oder [B, T_latent] (True = Padding)
+        mask_target: Tensor der Form [B, T_target, 1] oder [B, T_target] (True = Padding)
+        CosineDistance: Funktion/Klasse zur Berechnung der paarweisen Cosine-Distanz
+    """
+    B, T_latent, F_latent = latent_space.shape
+    B_target, T_target, F_target = target.shape
     
-    # 2. Globale Token-Maske (CUDA-Graph-safe mit .any(dim=-1))
-    token_mask = (target_flat != 0).any(dim=-1)
+    # Validierung der Batch-Größe
+    assert B == B_target, f"Batch-Größen müssen übereinstimmen: {B} vs {B_target}"
     
-    # Paarweise Maske über alle N x N Kombinationen
-    pairwise_mask = token_mask.unsqueeze(-1) & token_mask.unsqueeze(-2)
+    # Sicherstellen, dass die Masken das Shape [B, T, 1] für Broad-Casting haben
+    if mask_latent.dim() == 2:
+        mask_latent = mask_latent.unsqueeze(-1)
+    if mask_target.dim() == 2:
+        mask_target = mask_target.unsqueeze(-1)
+        
+    # Invertieren: True soll für gültige Tokens (active) stehen
+    active_latent = ~mask_latent
+    active_target = ~mask_target
     
-    # Obere Dreiecksmatrix
+    # 1. Fallunterscheidung: Unterschiedliche Sequenzlängen T
+    if T_latent != T_target:
+        # Maskiertes Mean-Pooling über die Zeitdimension (Dim 1)
+        latent_sums = torch.sum(latent_space * active_latent, dim=1)
+        latent_counts = torch.clamp(torch.sum(active_latent, dim=1), min=1.0)
+        latent_flat = latent_sums / latent_counts  # [B, F_latent]
+        
+        target_sums = torch.sum(target * active_target, dim=1)
+        target_counts = torch.clamp(torch.sum(active_target, dim=1), min=1.0)
+        target_flat = target_sums / target_counts  # [B, F_target]
+        
+        # Bestimmen, welche Batches überhaupt gültige (Nicht-Padding) Elemente enthalten
+        batch_mask_latent = (latent_counts > 0).squeeze(-1)  # [B]
+        batch_mask_target = (target_counts > 0).squeeze(-1)  # [B]
+        global_mask = batch_mask_latent & batch_mask_target  # [B]
+        
+        N = B
+        
+    else:
+        # Standard-Fall: Identische T -> Verflachen zu (B * T, F)
+        N = B * T_latent
+        latent_flat = latent_space.reshape(N, F_latent)
+        target_flat = target.reshape(N, F_target)
+        
+        # Globale Token-Masken verflachen und kombinieren
+        active_latent_flat = active_latent.reshape(N)
+        active_target_flat = active_target.reshape(N)
+        global_mask = active_latent_flat & active_target_flat  # [N]
+    
+    # 2. Paarweise Maske über alle N x N Kombinationen erstellen
+    pairwise_mask = global_mask.unsqueeze(-1) & global_mask.unsqueeze(-2)
+    
+    # Obere Dreiecksmatrix (ohne Diagonale)
     triu_mask = torch.triu(torch.ones(N, N, dtype=torch.bool, device=target.device), diagonal=1)
-    
-    # Finale Maske kombiniert gültige Vektoren mit der Dreiecksmaske
     final_mask = pairwise_mask & triu_mask
     
     # 3. Globale paarweise Distanzen berechnen
@@ -247,52 +286,54 @@ def structure_loss(latent_space, target):
     cos_distance_target = CosineDistance(target_flat, target_flat).detach()
     
     # Differenz berechnen
-    diff = torch.abs(cos_distance_latent - cos_distance_target)/2
-    
+    diff = torch.abs(cos_distance_latent - cos_distance_target) / 2
     
     # Maskierung auf die Differenzen anwenden
     float_mask = final_mask.to(diff.dtype)
     masked_diff = diff * float_mask
     
-    # 4. Globalen Mittelwert bilden (CUDA-Graph-safe ohne if-Bedingung)
+    # 4. Globalen Mittelwert bilden (CUDA-Graph-safe)
     loss_sum = torch.sum(masked_diff)
     valid_elements = torch.sum(float_mask)
     
-    # torch.clamp verhindert Division durch 0, falls kein Element gültig ist.
-    # Da loss_sum in dem Fall auch 0 ist, wird mathematisch korrekt 0.0 zurückgegeben.
     loss = loss_sum / torch.clamp(valid_elements, min=1.0).detach()
     
     return loss
 
+
 class MaskedFeatureDeCorrelationLoss(torch.nn.Module):
-    def __init__(self, pad_value=0.0, eps=1e-8):
+    def __init__(self, eps=1e-8):
         super(MaskedFeatureDeCorrelationLoss, self).__init__()
-        self.pad_value = pad_value
         self.eps = eps
 
-    def forward(self, x):
+    def forward(self, x, mask):
+        """
+        Args:
+            x: Tensor der Form [B, T, F]
+            mask: Tensor der Form [B, T, 1] oder [B, T] (True = Padding, False = Gültig)
+        """
         # x-Shape erwartet: [B, T, F]
         b, t, f = x.size()
 
-        # 1. Maske erstellen (Statische Shapes für CUDA-Graph-Kompatibilität)
-        # True (1.0) für valide Schritte, False (0.0) für gepaddete Schritte
-        is_pad = (x == self.pad_value).all(dim=-1, keepdim=True)  # [B, T, 1]
-        mask = (~is_pad).float()  # [B, T, 1]
+        # Sicherstellen, dass die Maske das Shape [B, T, 1] für Broad-Casting hat
+        if mask.dim() == 2:
+            mask = mask.unsqueeze(-1)
+
+        # Invertieren: True (1.0) für valide Schritte, False (0.0) für gepaddete Schritte
+        valid_mask = (~mask).float()  # [B, T, 1]
 
         # Anzahl valider Zeitschritte über alle Batches hinweg
-        num_valid_elements = mask.sum()  # Skalar (Anzahl der validen B,T Kombinationen)
+        num_valid_elements = valid_mask.sum()  # Skalar (Anzahl der validen B,T Kombinationen)
 
         # 2. Maskierte Features zentrieren (Mittelwert abziehen)
-        x_masked = x * mask
+        x_masked = x * valid_mask
         # Berechne den Mittelwert pro Feature über die Dimensionen B und T
         mean = x_masked.sum(dim=(0, 1), keepdim=True) / (num_valid_elements + self.eps)  # [1, 1, F]
         
         # Zentrieren und Padding-Elemente wieder auf 0 setzen
-        x_centered = (x - mean) * mask  # [B, T, F]
+        x_centered = (x - mean) * valid_mask  # [B, T, F]
 
-        # 3. Features flachklopfen zu [N_valide, F], ohne dynamische Shapes zu nutzen
-        # Wir berechnen die Kovarianzmatrix direkt über die Summe der äußeren Produkte (Matrixmultiplikation)
-        # Umformen von [B, T, F] zu [B*T, F] für effiziente Matrixalgebra
+        # 3. Features flachklopfen zu [B*T, F] für effiziente Matrixalgebra
         x_flat = x_centered.view(b * t, f)
 
         # Kreuzprodukt-Matrix berechnen: [F, B*T] x [B*T, F] -> [F, F]
@@ -314,7 +355,7 @@ class MaskedFeatureDeCorrelationLoss(torch.nn.Module):
         # Wir quadrieren die Matrixelemente, um sowohl positive als auch negative Korrelationen zu bestrafen
         loss_matrix = correlation_matrix ** 2
 
-        # Erzeuge eine Identitätsmatrix, um die Diagonale (Korrelation eines Features mit sich selbst = 1) zu ignorieren
+        # Erzeuge eine Identitätsmatrix, um die Diagonale zu ignorieren
         identity = torch.eye(f, device=x.device, dtype=x.dtype)
         
         # Maskiere die Diagonale aus, sodass nur die Kreuzkorrelationen übrig bleiben
@@ -342,6 +383,283 @@ def KLDLoss(mu, logvar,mask):
     kld_per_element=torch.clamp((-0.5*(1 + logvar - mu.pow(2) - logvar.exp())*valid_mask),min=0.0)
     kld=torch.sum(kld_per_element)/n_elements
     return kld
+
+class InfoVAEIndividualKLLoss(torch.nn.Module):
+    def __init__(self, alpha: float):
+        super().__init__()
+        self.alpha = alpha
+
+    def forward(self, mu: torch.Tensor, logvar: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
+        """
+        Args:
+            mu, logvar: Form [Batch, SeqLen, Latent_Dim] (Unter AMP meist Float16/BFloat16)
+            mask: Form [Batch, SeqLen, 1] (True = Padding)
+        """
+        # AMP für den mathematisch kritischen Teil deaktivieren, um FP32-Präzision zu erzwingen
+        with torch.amp.autocast(device_type=mu.device.type, enabled=False):
+            # 1. UPCAST NACH FP32: Verhindert sofortige Overflows bei exp() und mu**2
+            mu_f32 = mu.float()
+            logvar_f32 = logvar.float()
+            
+            # 2. SAFETY CLAMP: Begrenzt extreme logvar-Werte nach oben (schützt exp() vor INF/NaN)
+            # log(50000) ist ca. 10.82. Das hält torch.exp() sicher unter der FP16-Grenze von 65504
+            logvar_clipped = torch.clamp(logvar_f32, max=10.5)
+            
+            # Gauß-KL-Divergenz stabil in FP32 berechnen
+            # Summe über die Latent_Dim (letzte Dimension -> dim=-1)
+            kld = -0.5 * torch.sum(1.0 + logvar_clipped - mu_f32 ** 2 - torch.exp(logvar_clipped), dim=-1)
+            
+            # Maske von [B, T, 1] auf [B, T] bringen
+            active_steps = ~mask.squeeze(-1)
+            kld_masked = kld * active_steps.to(kld.dtype)
+            
+            # Mitteln über alle validen Zeitschritte
+            n_valid_steps = active_steps.sum()
+            
+            # Falls der gesamte Batch nur aus Padding besteht
+            if n_valid_steps == 0:
+                return torch.tensor(0.0, device=mu.device, dtype=mu.dtype, requires_grad=True)
+                
+            kld_mean = kld_masked.sum() / n_valid_steps
+            
+            # InfoVAE-spezifische Gewichtung anwenden
+            loss_val = (1.0 - self.alpha) * kld_mean
+            
+        # 3. DOWNCAST: Zurückkonvertieren in den ursprünglichen AMP-Datentyp (z.B. FP16 oder BF16)
+        return loss_val.to(mu.dtype)
+
+
+class InfoVAEReconstructionLoss(torch.nn.Module):
+    def __init__(self, distribution='gaussian'):
+        """
+        distribution='gaussian' -> Reiner MSE-Verlust
+        distribution='bernoulli' -> Reiner BCE-Verlust
+        """
+        super().__init__()
+        self.distribution = distribution
+
+    def forward(self, x_recon: torch.Tensor, x: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
+        """
+        Args:
+            x_recon, x: Form [Batch, SeqLen, Features]
+            mask: Form [Batch, SeqLen, 1] (True = Padding)
+        """
+        if self.distribution == 'gaussian':
+            # Mathematischer MSE: (y_pred - y_true)^2
+            loss_elementwise = (x_recon - x) ** 2
+        elif self.distribution == 'bernoulli':
+            # Mathematischer BCE: -(y * log(p) + (1 - y) * log(1 - p))
+            eps = 1e-12
+            x_recon = torch.clamp(x_recon, eps, 1.0 - eps)
+            loss_elementwise = -(x * torch.log(x_recon) + (1.0 - x) * torch.log(1.0 - x_recon))
+        else:
+            raise ValueError(f"Unbekannte Verteilung: {self.distribution}")
+
+        active_elements = ~mask
+        # Maskieren und aufsummieren
+        loss_masked = loss_elementwise * active_elements.to(loss_elementwise.dtype)
+        
+        # Teilen durch die Anzahl der nicht-gepaddeten Elemente
+        return loss_masked.sum() / torch.clamp(active_elements.sum(), min=1.0)
+
+
+
+import torch
+
+class InfoVAEAggregatedMMDLoss_back_up(torch.nn.Module):
+    def __init__(self, alpha: float, lambd: float):
+        super().__init__()
+        self.alpha = alpha
+        self.lambd = lambd
+
+    def _compute_pairwise_distances(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+        """Berechnet paarweise quadrierte euklidische Distanzen: ||x_i - y_j||^2"""
+        x_norm = torch.sum(x ** 2, dim=-1, keepdim=True)
+        y_norm = torch.sum(y ** 2, dim=-1, keepdim=True)
+        cross_term = torch.matmul(x, y.transpose(-2, -1))
+        
+        # Absichern gegen minimale numerische Rundungsfehler unter 0.0
+        distances = x_norm + y_norm.transpose(-2, -1) - 2.0 * cross_term
+        return torch.clamp(distances, min=0.0)
+
+    def _rbf_kernel_with_median_heuristic(self, x: torch.Tensor, y: torch.Tensor, z_combined: torch.Tensor) -> torch.Tensor:
+        """Berechnet den RBF-Kernel unter Verwendung der Median-Distanz."""
+        pairwise_distances = self._compute_pairwise_distances(x, y)
+        
+        # Median-Heuristik auf Basis der kombinierten Stichproben bestimmen
+        # Wir berechnen dafür alle paarweisen Abstände der kombinierten Datenpunkte
+        with torch.no_grad():
+            combined_distances = self._compute_pairwise_distances(z_combined, z_combined)
+            # Der Median benötigt einen flachen Tensor
+            median_distance = torch.median(combined_distances.view(-1))
+            
+            # Absichern, falls alle Punkte identisch sind (Median wäre 0.0)
+            bandwidth = torch.clamp(median_distance, min=1e-6)
+            bandwidth=float(x.size(1)/2)
+            
+        # RBF-Formel: exp(-||x - y||^2 / (2 * sigma^2))
+        # In der klassischen Median-Heuristik entspricht die ermittelte Median-Distanz direkt (2 * sigma^2)
+        return torch.exp(-pairwise_distances / bandwidth)
+
+    def forward(self, z: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
+        """
+        Args:
+            z: Form [Batch, SeqLen, Latent_Dim]
+            mask: Form [Batch, SeqLen, 1] (True = Padding)
+        """
+        latent_dim = z.size(-1)
+        
+        # Filtert Padding-Vektoren via flacher Maske heraus
+        active_indices = ~mask.flatten()
+        z_flat = z.view(-1, latent_dim)
+        z_valid = z_flat[active_indices]
+        
+        # Falls der gesamte Batch nur aus Padding besteht
+        if z_valid.size(0) == 0:
+            return torch.tensor(0.0, device=z.device, requires_grad=True)
+
+        # Generiert Prior-Samples mit purem torch.randn
+        prior_samples = torch.randn(z_valid.shape, device=z.device, dtype=z.dtype)
+
+        # Kombinierte Stichprobe für eine repräsentative Median-Schätzung erzeugen
+        z_combined = torch.cat([z_valid, prior_samples], dim=0)
+
+        # Matrizen über RBF-Kernel mit dynamischer Bandbreite berechnen
+        k_zz = self._rbf_kernel_with_median_heuristic(z_valid, z_valid, z_combined)
+        k_pp = self._rbf_kernel_with_median_heuristic(prior_samples, prior_samples, z_combined)
+        k_zp = self._rbf_kernel_with_median_heuristic(z_valid, prior_samples, z_combined)
+
+        # Standard MMD-Wert berechnen
+        mmd = k_zz.mean() + k_pp.mean() - 2.0 * k_zp.mean()
+        
+        # Gewichtung laut InfoVAE-Formel anwenden
+        weight = self.alpha + self.lambd - 1.0
+        return weight * mmd
+
+
+import torch
+
+class InfoVAEAggregatedMMDLoss(torch.nn.Module):
+    def __init__(self, alpha: float, lambd: float, kernel_type: str = 'gaussian', kernel_scales: list = None):
+        super().__init__()
+        self.alpha = alpha
+        self.lambd = lambd
+        self.kernel_type = kernel_type.lower()
+        
+        if self.kernel_type not in ['gaussian', 'cosine']:
+            raise ValueError("Ungültiger kernel_type. Erlaubt sind 'gaussian' oder 'cosine'.")
+        
+        # Geometrische Skalen (wird nur für den Gauß-Kernel benötigt)
+        self.kernel_scales = kernel_scales if kernel_scales is not None else [0.05, 0.1, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0]
+
+    def _compute_pairwise_distances(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+        """Berechnet paarweise quadrierte euklidische Distanzen in FP32."""
+        x = x.float()
+        y = y.float()
+        
+        x_norm = torch.sum(x ** 2, dim=-1, keepdim=True)
+        y_norm = torch.sum(y ** 2, dim=-1, keepdim=True)
+        cross_term = torch.matmul(x, y.transpose(-2, -1))
+        
+        distances = x_norm + y_norm.transpose(-2, -1) - 2.0 * cross_term
+        return torch.clamp(distances, min=1e-6)
+
+    def _multi_scale_rbf_kernel(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+        """Berechnet den Multi-Scale RBF-Kernel stabil in FP32."""
+        pairwise_distances = self._compute_pairwise_distances(x, y)
+        
+        latent_dim = x.size(-1)
+        base_bandwidth = float(latent_dim)
+        base_bandwidth = max(base_bandwidth, 1e-6)
+
+        kernel_val = 0.0
+        for scale in self.kernel_scales:
+            current_bandwidth = base_bandwidth * scale
+            kernel_val += torch.exp(-pairwise_distances / current_bandwidth)
+            
+        return kernel_val / len(self.kernel_scales)
+
+    def _cosine_kernel(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+        """Berechnet die paarweise Cosine-Ähnlichkeit stabil in FP32."""
+        x = x.float()
+        y = y.float()
+        
+        # L2-Normen berechnen (mit Epsilon gegen Division durch Null)
+        x_norm = torch.norm(x, p=2, dim=-1, keepdim=True)
+        y_norm = torch.norm(y, p=2, dim=-1, keepdim=True)
+        
+        x_normalized = x / torch.clamp(x_norm, min=1e-6)
+        y_normalized = y / torch.clamp(y_norm, min=1e-6)
+        
+        # Paarweises Skalarprodukt (Ergebnis im Bereich [-1, 1])
+        cosine_sim = torch.matmul(x_normalized, y_normalized.transpose(-2, -1))
+        
+        # Optional, aber empfohlen für MMD: Shiften in den Bereich, 
+        # damit minimale Ähnlichkeit nicht negativ in den Schätzer einfließt.
+        return cosine_sim + 1.0
+
+    def forward(self, z: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
+        """
+        Args:
+            z: Form [Batch, SeqLen, Latent_Dim] (Latent_Dim von 32 bis zu 256)
+            mask: Form [Batch, SeqLen, 1] (True = Padding)
+        """
+        latent_dim = z.size(-1)
+        
+        # Filtert Padding-Vektoren via flacher Maske heraus
+        active_indices = ~mask.flatten()
+        z_flat = z.view(-1, latent_dim)
+        z_valid = z_flat[active_indices]
+        
+        n_samples = z_valid.size(0)
+        
+        # Falls der gesamte Batch nur aus Padding besteht
+        if n_samples == 0:
+            return torch.tensor(0.0, device=z.device, dtype=z.dtype, requires_grad=True)
+
+        # Generiert Prior-Samples mit Oversampling zur Reduzierung des stochastischen Rauschens
+        prior_multiplier = 2*z.size(-1)
+        prior_samples = torch.randn(n_samples * prior_multiplier, latent_dim, device=z.device, dtype=z.dtype)
+
+        # AMP (Autocast) für den Kernel-Block explizit deaktivieren (Stabilität für Mixed Precision)
+        with torch.amp.autocast(device_type=z.device.type, enabled=False):
+            # Dynamische Auswahl des Kernels basierend auf init-Konfiguration
+            if self.kernel_type == 'gaussian':
+                kernel_fn = self._multi_scale_rbf_kernel
+            else:
+                kernel_fn = self._cosine_kernel
+
+            k_zz = kernel_fn(z_valid, z_valid)
+            k_pp = kernel_fn(prior_samples, prior_samples)
+            k_zp = kernel_fn(z_valid, prior_samples)
+
+            # STRIKT UNBIASED SCHÄTZER: Diagonale wird komplett ausgeschlossen
+            if n_samples > 1:
+                k_zz_mean = (k_zz.sum() - torch.diag(k_zz).sum()) / (n_samples * (n_samples - 1))
+            else:
+                k_zz_mean = k_zz.mean()
+
+            n_prior = prior_samples.size(0)
+            k_pp_mean = (k_pp.sum() - torch.diag(k_pp).sum()) / (n_prior * (n_prior - 1))
+            k_zp_mean = k_zp.mean()
+
+            # Mathematische Differenz berechnen
+            mmd = k_zz_mean + k_pp_mean - 2.0 * k_zp_mean
+
+            # CLAMP: Verhindert negative Werte bei dichten Clustern
+            mmd = torch.clamp(mmd, min=0.0)
+
+        # Gewichtung laut InfoVAE-Formel anwenden
+        weight = self.alpha + self.lambd - 1.0
+        
+        # Zurückkonvertieren in den ursprünglichen AMP-Datentyp
+        return (weight * mmd).to(z.dtype)
+
+
+
+
+
+
 
 
 class calc_IsoScore(torch.nn.Module):
@@ -422,18 +740,35 @@ class calc_IsoScore(torch.nn.Module):
         )
 
 class feature_extractor_loss(torch.nn.Module):
-  def __init__(self,pad_value):
+  def __init__(self,pad_value,loss_type,alpha,p_lambda):
     super().__init__()
     self.mse_loss=NormalizedMSELoss()
-    #self.structure_loss_target=structure_loss
-    #self.cor_loss=MaskedFeatureDeCorrelationLoss(pad_value=0.0)
+    if loss_type=="InfoVAE":
+      self.is_InfoVAE=True
+      self.kld=InfoVAEIndividualKLLoss(alpha=alpha)
+      self.mmd=InfoVAEAggregatedMMDLoss(
+        alpha=alpha, 
+        lambd=p_lambda,
+        kernel_type="cosine"
+      )
+    elif loss_type=="CosineStructure":
+      self.is_InfoVAE=False
+      self.structure=structure_loss
+      self.decorr=MaskedFeatureDeCorrelationLoss()
 
-  def forward(self,input,target,latent_space,mu,log_var,mask,beta):
-    #loss_structure_target=self.structure_loss_target(input,target)
+  def forward(self,input,target,latent_space,mu,log_var,mask,mask_latent,beta):
     loss_mse=self.mse_loss(input,target)
-    kld_loss=KLDLoss(mu,log_var,mask)
-    loss=loss_mse+beta*kld_loss
-    return(loss)
+    if self.is_InfoVAE:
+      loss_kld=self.kld(mu,log_var,mask_latent)
+      loss_mmd=self.mmd(latent_space,mask_latent)
+      loss=loss_mse+beta*(loss_kld+loss_mmd)
+      diagnostic=[loss_mse.detach(),loss_kld.detach(),loss_mmd.detach(),0.0]
+    else:
+      loss_cosine=structure_loss(latent_space=latent_space, target=target, mask_latent=mask_latent, mask_target=mask)
+      loss_decor=self.decorr(latent_space,mask_latent)
+      loss=loss_mse+loss_cosine+loss_decor
+      diagnostic=[loss_mse.detach(),0.0,0.0,loss_cosine.detach()]
+    return loss, diagnostic
 
 def get_loss_cls_fct(name,class_weights):
   if name =="CrossEntropyLoss":

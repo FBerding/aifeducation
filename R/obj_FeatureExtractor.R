@@ -46,16 +46,15 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param label `r get_param_doc_desc("label")`
     #' @param text_embeddings `r get_param_doc_desc("text_embeddings")`
     #' @param features `r get_param_doc_desc("features")`
-    #' @param times `r get_param_doc_desc("times")`
     #' @param te_n_layers `r get_param_doc_desc("te_n_layers")`
     #' @param fe_type `r get_param_doc_desc("fe_type")`
     #' @param fe_act_fct `r get_param_doc_desc("fe_act_fct")`
     #' @param fe_normalization `r get_param_doc_desc("fe_normalization")`
     #' @param encoder_dropout `r get_param_doc_desc("encoder_dropout")`
     #' @param decoder_dropout `r get_param_doc_desc("decoder_dropout")`
+    #' @param decoder_share_weights `r get_param_doc_desc("decoder_share_weights")`
     #' @param noise_factor `r get_param_doc_desc("noise_factor")`
     #' @note `features` refers to the number of features for the compressed text embeddings.
-    #' @note `times` refers to the number of times for the compressed text embeddings. Only relevant
     #' if `method="DenseTimes".`
     #' @return Returns an object of class [TEFeatureExtractor] which is ready for training.
     configure = function(name = NULL,
@@ -63,14 +62,14 @@ TEFeatureExtractor <- R6::R6Class(
                          text_embeddings = NULL,
                          encoder_dropout=0.05,
                          decoder_dropout=0.05,
+                         decoder_share_weights=TRUE,
                          fe_type="Dense",
-                         fe_normalization="GlobalNorm",
+                         fe_normalization="LayerNorm",
                          fe_act_fct="GELU",
                          features = 128L,
-                         times=2L,
                          te_n_layers=3,
                          method = "Dense",
-                         orthogonal_method = "matrix_exp",
+                         orthogonal_method = "None",
                          noise_factor = 1e-4) {
       tmp_args <- get_called_args(n = 1L)
       private$check_config_for_FALSE()
@@ -119,6 +118,9 @@ TEFeatureExtractor <- R6::R6Class(
     #'
     #' @param data_embeddings `r get_param_doc_desc("data_embeddings")`
     #' @param data_val_size `r get_param_doc_desc("data_val_size")`
+    #' @param fe_loss_type `r get_param_doc_desc("fe_loss_type")`
+    #' @param fe_loss_alpha `r get_param_doc_desc("fe_loss_alpha")`
+    #' @param fe_loss_lambda `r get_param_doc_desc("fe_loss_lambda")`
     #' @param sustain_track `r get_param_doc_desc("sustain_track")`
     #' @param sustain_iso_code `r get_param_doc_desc("sustain_iso_code")`
     #' @param sustain_region `r get_param_doc_desc("sustain_region")`
@@ -145,6 +147,9 @@ TEFeatureExtractor <- R6::R6Class(
     #' @return Function does not return a value. It changes the object into a trained classifier.
     train = function(data_embeddings = NULL,
                      data_val_size = 0.25,
+                     fe_loss_type="InfoVAE",
+                     fe_loss_alpha=0.0,
+                     fe_loss_lambda=2.0,
                      sustain_track = TRUE,
                      sustain_iso_code = NULL,
                      sustain_region = NULL,
@@ -476,13 +481,13 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param ind_best_model `r get_param_doc_desc("ind_best_model")`
     #' @param text_size `r get_param_doc_desc("text_size")`
     #' @return Returns a plot of class `ggplot` visualizing the training process.
-    plot_training_history = function(x_min = NULL, x_max = NULL, y_min = NULL, y_max = NULL, ind_best_model = TRUE, text_size = 10L) {
+    plot_training_history = function(measure="loss",x_min = NULL, x_max = NULL, y_min = NULL, y_max = NULL, ind_best_model = FALSE,ind_selected_model=TRUE, text_size = 10L) {
       tmp_plot <- super$plot_training_history(
         final_training = TRUE,
         pl_step = NULL,
-        measure = "loss",
+        measure = measure,
         ind_best_model = ind_best_model,
-        ind_selected_model = FALSE,
+        ind_selected_model = ind_selected_model,
         x_min = x_min,
         x_max = x_max,
         y_min = y_min,
@@ -556,17 +561,19 @@ TEFeatureExtractor <- R6::R6Class(
         private$model <- aife$Autoencoder$DenseAutoencoder_with_Mask_PT(
           features_in = as.integer(private$text_embedding_model["features"]),
           features_out = as.integer(private$model_config$features),
-          times=as.integer(private$model_config$times),
+          times=as.integer(private$text_embedding_model["times"]),
           te_n_layers= as.integer(private$model_config$te_n_layers),
           noise_factor = private$model_config$noise_factor,
           encoder_dropout=private$model_config$encoder_dropout,
           decoder_dropout=private$model_config$decoder_dropout,
+          decoder_share_weights=private$model_config$decoder_share_weights,
           fe_type=private$model_config$fe_type,
           fe_normalization=private$model_config$fe_normalization,
           fe_act_fct=private$model_config$fe_act_fct,
           pad_value = private$text_embedding_model$pad_value,
           orthogonal_method = private$model_config$orthogonal_method
         )
+      private$model_config$times= private$model$times_out()
   #}  else if(private$model_config$method == "DenseTimes"){
   #    private$model <- aife$Autoencoder$DenseAutoencoder_with_Mask_PT_Times(
   #      features_in = as.integer(private$text_embedding_model["features"]),
@@ -607,6 +614,9 @@ TEFeatureExtractor <- R6::R6Class(
         model = private$model,
         optimizer_method = self$last_training$config$optimizer,
         pad_value=private$text_embedding_model$pad_value,
+        fe_loss_type=self$last_training$config$fe_loss_type,
+        fe_loss_alpha=self$last_training$config$fe_loss_alpha,
+        fe_loss_lambda=self$last_training$config$fe_loss_lambda,
         features=as.integer(private$text_embedding_model["features"]),
         times=as.integer(private$text_embedding_model["times"]),
         amp = self$last_training$config$amp,

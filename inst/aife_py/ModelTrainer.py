@@ -143,7 +143,7 @@ class ModelTrainer():
       alpha=self.loss_alpha
     )
   def config_for_TEFeatureExtractor(self,model,optimizer_method,times,features,scheduler_type,amp, lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,batch_size,
-    train_data,val_data,filepath,use_callback,comp_use,comp_backend,comp_mode,ddp_use,pad_value,
+    train_data,val_data,filepath,use_callback,comp_use,comp_backend,comp_mode,ddp_use,pad_value,fe_loss_type,fe_loss_alpha,fe_loss_lambda,
     log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
     self.model=model
     self.pad_value=pad_value
@@ -172,9 +172,15 @@ class ModelTrainer():
     self.log_top_value=log_top_value
     self.log_top_total=log_top_total
     self.log_top_message=log_top_message
+    self.fe_loss_type=fe_loss_type
+    self.fe_loss_alpha=fe_loss_alpha
+    self.fe_loss_lambda=fe_loss_lambda
     #Loss
     self.loss_fct=feature_extractor_loss(
-      pad_value=self.pad_value
+      pad_value=self.pad_value,
+      loss_type=self.fe_loss_type,
+      alpha=self.fe_loss_alpha,
+      p_lambda=self.fe_loss_lambda
     )
   def get_device(self):
     return 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -410,7 +416,7 @@ class ModelTrainer():
     elif self.model_type=="TEFeatureExtractor":
       #Numpys for Saving Training History
       self.metric_storage=self.create_metric_storage(
-        metric_names=["loss"],
+        metric_names=["loss","recon","kld","mmd","cosine_str"],
         epochs=self.epochs,
         inc_test=True if not (self.test_data is None) else False
       )
@@ -662,6 +668,10 @@ class ModelTrainer():
   
   def run_epoch_autoencoder(self,cblock,epoch,dataloader):
     total_loss=0.0
+    loss_recon=0.0
+    loss_kld=0.0
+    loss_mmd=0.0
+    loss_consine_str=0.0
     self.trainer.set_epoch(epoch)
     if cblock=="train":
       self.trainer.train()
@@ -675,7 +685,7 @@ class ModelTrainer():
         self.static_label.copy_(batch["labels"],non_blocking=True)
         #Forward
         with torch.autocast(device_type=self.device_type, dtype=self.amp_dtype, enabled=self.amp):
-          loss,output=self.trainer.train_and_eval_feature_extractor(self.static_input,self.static_label)
+          loss,output,diagnostic=self.trainer.train_and_eval_feature_extractor(self.static_input,self.static_label)
         #Backward
         if cblock=="train":
           self.amp_scaler.scale(loss).backward()
@@ -691,12 +701,16 @@ class ModelTrainer():
         output=output[0].detach()
         #Metrics
         total_loss +=loss.item()
+        loss_recon+=diagnostic[0]
+        loss_kld+=diagnostic[1]
+        loss_mmd+=diagnostic[2]
+        loss_consine_str+=diagnostic[3]
         #Update log file
         self.logger.inc_value("bottom")
         self.logger.write_log()
         self.logger.write_history_log(self.metric_storage["loss"])
     #Calc final metrics for epoch
-    results={"loss":total_loss/len(dataloader)}
+    results={"loss":total_loss/len(dataloader),"recon":loss_recon/len(dataloader),"kld":loss_kld/len(dataloader),"mmd":loss_mmd/len(dataloader),"cosine_str":loss_consine_str/len(dataloader)}
     #Save metrics
     self.add_metrics(
       metrics=results,
@@ -741,7 +755,14 @@ class ModelTrainer():
 
   def check_convergence(self,train_results,epoch):
     if self.model_type=="ClassifierStandard" or self.model_type=="ClassifierPrototype":
-      if (train_results["loss"]<1e-3 and train_results["s_avg_iota"]>=.98) or (epoch>self.elc+500):
+      if (train_results["loss"]<1e-3 and train_results["s_avg_iota"]>=.98) or (epoch>self.elc+250):
+        if self.trace:
+          print("\n")
+        return True
+      else:
+        return False
+    elif self.model_type=="TEFeatureExtractor":
+      if epoch>self.elc+250:
         if self.trace:
           print("\n")
         return True
@@ -859,6 +880,11 @@ class ModelTrainer():
               elc=self.elc
             )
             tmp_epoch=epoch+1
+            #Check if there are furhter information for training-----------------------
+            # If there are no addtiononal information. Stop training and continue
+            if self.check_convergence(train_results,epoch):
+              self.metric_storage["final_epoch"]=tmp_epoch
+              break    
         self.metric_storage["final_epoch"]=tmp_epoch    
     else:
       print("Error")
@@ -1015,8 +1041,11 @@ class ModelWithLoss(torch.nn.Module):
     mu=output[2]
     log_var=output[3]
     mask=output[4]
-    loss=self.loss_fct(predictions,static_target,latent_space,mu,log_var,mask,beta=max(0.2,min(self.epoch/(self.epochs),1)))
-    return loss, output
+    mask_latent=output[5]
+    loss_all=self.loss_fct(predictions,static_target,latent_space,mu,log_var,mask,mask_latent,beta=max(0.5,min(self.epoch/(1*self.epochs),1)))
+    loss=loss_all[0]
+    diagnostic=loss_all[1]
+    return loss, output,diagnostic
   
   def set_total_epochs(self,epochs):
     self.epochs=epochs
