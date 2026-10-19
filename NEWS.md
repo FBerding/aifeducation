@@ -18,6 +18,7 @@ editor_options:
 
 **Classifiers**
 
+- Changed all layer to pre-layer normalization.
 - Added an new type of classifiers which are a combination of classical and prototypical classifiers.
   ('TEClassifierSequentialReferencePoint' and 'TEClassifierParallelReferencePoint').
 - Added 'FocalLossOrdinal' and 'MultiWayContrastiveLossFCOrdinal' as new losses for ordinal scales.
