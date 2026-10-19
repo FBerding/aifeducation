@@ -172,6 +172,8 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         y_label <- "Average Iota"
       } else if (measure == "s_avg_iota") {
         y_label <- "Smoothed Average Iota"
+      } else {
+        y_label=measure
       }
 
       # set x_min and x_max if they are NULL
