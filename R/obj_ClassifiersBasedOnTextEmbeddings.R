@@ -534,6 +534,16 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
       )
 
       # Save results
+      if(self$last_training$config$trace){
+        message(
+          "Data Set Type: Test"," | ",
+          "ACC: ",round(test_res["percentage_agreement"],digits=3L)," | ",
+          "BACC: ",round(test_res["balanced_accuracy"],digits=3L)," | ",
+          "KAlphaO: ",round(test_res["kalpha_ordinal"],digits=3L)," | ",
+          "KAlphaN: ",round(test_res["kalpha_nominal"],digits=3L)," | ",
+          "Avg. Iota: ",round(test_res["avg_iota2"],digits=3L)
+        )
+      }
       self$reliability$test_metric[iteration, ] <- test_res
     },
     #--------------------------------------------------------------------------
