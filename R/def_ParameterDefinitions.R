@@ -1567,6 +1567,60 @@ get_param_dict <- function() {
     gui_label = "Noise Factor",
     test_values = NULL
   )
+
+  param$fe_loss_type <- list(
+    type = "string",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = c("InfoVAE", "CosineStructure"),
+    desc = "Loss to apply for the extractor.",
+    default_historic = "CosineStructure",
+    default_value = " CosineStructure",
+    gui_box = "Loss",
+    gui_label = "Loss",
+    test_values = NULL
+  )
+
+  param$fe_loss_alpha <- list(
+    type = "double",
+    allow_null = FALSE,
+    min = 0L,
+    max = 1L,
+    allowed_values = NULL,
+    desc = "Value between 0 and 1.",
+    default_value = 1,
+    gui_box = "Loss",
+    gui_label = "Alpha",
+    test_values = NULL
+  )
+
+  param$fe_loss_lambda <- list(
+    type = "double",
+    allow_null = FALSE,
+    min = 0L,
+    max = Inf,
+    allowed_values = NULL,
+    desc = "Value for weighting MMD.",
+    default_value = 2,
+    gui_box = "Loss",
+    gui_label = "Lambda",
+    test_values = NULL
+  )
+
+  param$decoder_share_weights<- list(
+    type = "bool",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = NULL,
+    desc = "if `TRUE` the decoder uses the weights of the encoder layers.",
+    gui_box = "General",
+    gui_label = "Share Weights",
+    default_value = TRUE,
+    test_values = NULL
+  )
+
   param$feature_extractor <- list(
     type = "TEFeatureExtractor",
     allow_null = TRUE,
