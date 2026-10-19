@@ -12,7 +12,7 @@ cat_levels=names(table(codings[category]))
 cat_codings=factor(codings[,category],levels=cat_levels)
 names(cat_codings)=codings$ID
 
-cat_codings=na.omit(cat_codings)
+#cat_codings=na.omit(cat_codings)
 
 condition=text_data_frame$id%in%names(cat_codings)
 text_subset=subset(text_data_frame,condition)
@@ -34,14 +34,14 @@ overlap=total_max_seq_len/4
 
 chunk_quantile = base_model_eurobert$Tokenizer$calc_quantiles(
   text_dataset = datasets_texts,
-  batch_size = 32L,
+  batch_size = 1024L,
   seq_len_tokens = seq_len,
   token_overlap=overlap,
   trace=TRUE
 )
 print(chunk_quantile)
 
-chunks=chunk_quantile["90%"]
+chunks=chunk_quantile["99%"]
 
 num_layers=base_model_eurobert$get_n_layers()
 num_layers
@@ -76,13 +76,17 @@ feature_extractor <- TEFeatureExtractor$new()
 feature_extractor$configure(
   label = "Feature extractor for Text Embeddings",
   text_embeddings = embeddings,
-  method="Conv",
   features = 128,
-  te_n_layers=8,
-  times=4,
-  orthogonal_method = "matrix_exp",
+  te_n_layers=4,
+  fe_type =  "Conv",
+  fe_normalization="LayerNorm",
+  fe_act_fct="GELU",
+  encoder_dropout=0.20,
+  decoder_dropout=0.20,
+  orthogonal_method = "None",
   noise_factor = 1e-4
 )
+
 feature_extractor$train(
   data_embeddings = embeddings,
   data_val_size = 0.25,
@@ -91,12 +95,12 @@ feature_extractor$train(
   sustain_region = NULL,
   sustain_interval = 15,
   sustain_log_level = "error",
-  epochs = 8000,
-  batch_size = 2048,
-  lr_rate = 1e-6,
-  lr_min = 1e-6,
-  lr_epochs = 30,
-  lr_scheduler = "Linear",
+  epochs = 2000,
+  batch_size = 1024,
+  lr_rate = 0.0,
+  lr_min = 0.0,
+  lr_epochs = 15,
+  lr_scheduler = "CosineAnnealing",
   trace = TRUE,
   ml_trace = 1,
   optimizer = "AdamW",
@@ -105,13 +109,14 @@ feature_extractor$train(
   comp_use=TRUE,
   comp_mode="reduce-overhead"
 )
-save_to_disk(feature_extractor,dir_path = "For Later use",folder_name = "feext_test_times")
-feature_extractor=load_from_disk(file.path("For Later use","feext_test_times"))
 
-abc=feature_extractor$extract_features_large(embeddings,batch_size = 1024L,trace = TRUE)
-abcc=abc$convert_to_EmbeddedText()
-cor_test=abcc$calc_feature_correlation()
-cor_test$effect_sizes$mean
+save_to_disk(feature_extractor,dir_path = "For Later use",folder_name = "feext_test")
+feature_extractor=load_from_disk(file.path("For Later use","feext_test"))
+
+feature_extractor$plot_training_history("mmd",ind_selected_model = FALSE)
+
+abc=feature_extractor$compare_embedding_statistics(embeddings,batch_size = 1024)
+print(abc)
 
 classifier <- TEClassifierSequential$new()
 classifier$configure(
@@ -123,8 +128,8 @@ classifier$configure(
   cls_pooling_features = 20,
   cls_pooling_type = "WeightedAverageTimes",
   cls_head_type = "Regular",
-  cls_input_normalize="PowerNorm",
-  final_normalization_type="RMSNorm",
+  cls_input_normalize="None",
+  final_normalization_type="LayerNorm",
   feat_act_fct = "None",
   feat_size = 128,
   feat_bias = FALSE,
@@ -132,20 +137,20 @@ classifier$configure(
   feat_parametrizations = "None",
   feat_normalization_type = "None",
   ng_conv_act_fct = "GELU",
-  ng_conv_n_layers = 4,
-  ng_conv_ks_min = 1,
+  ng_conv_n_layers = 2,
+  ng_conv_ks_min = 2,
   ng_conv_ks_max = 3,
-  ng_conv_bias = FALSE,
-  ng_conv_dropout = 0.40,
-  ng_conv_parametrizations = "WeightNorm",
-  ng_conv_normalization_type = "RMSNorm",
+  ng_conv_bias = TRUE,
+  ng_conv_dropout = 0.05,
+  ng_conv_parametrizations = "None",
+  ng_conv_normalization_type = "LayerNorm",
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "GELU",
-  dense_n_layers = 0,
-  dense_dropout = 0.40,
+  dense_n_layers = 2,
+  dense_dropout = 0.30,
   dense_bias = FALSE,
-  dense_parametrizations = "WeightNorm",
-  dense_normalization_type = "RMSNorm",
+  dense_parametrizations = "None",
+  dense_normalization_type = "LayerNorm",
   dense_residual_type = "ResidualGate",
   rec_act_fct = "Tanh",
   rec_n_layers = 0,
@@ -154,19 +159,19 @@ classifier$configure(
   rec_dropout = 0.2,
   rec_bias = FALSE,
   rec_parametrizations = "None",
-  rec_normalization_type = "RMSNorm",
+  rec_normalization_type = "LayerNorm",
   rec_residual_type = "ResidualGate",
   tf_act_fct = "SwiGLU",
   tf_dense_dim = ceiling(2.67 * 128),
-  tf_n_layers = 4,
-  tf_dropout_rate_1 = 0.1,
-  tf_dropout_rate_2 = 0.30,
+  tf_n_layers = 0,
+  tf_dropout_rate_1 = 0.01,
+  tf_dropout_rate_2 = 0.10,
   tf_attention_type = "MultiHead",
   tf_positional_type = "absolute",
   tf_num_heads = 2,
-  tf_bias = FALSE,
-  tf_parametrizations = "WeightNorm",
-  tf_normalization_type = "RMSNorm",
+  tf_bias = TRUE,
+  tf_parametrizations = "None",
+  tf_normalization_type = "LayerNorm",
   tf_normalization_position = "Post",
   tf_residual_type = "ResidualGate"
 )
@@ -202,16 +207,16 @@ classifier$train(
   n_cores = auto_n_cores(),
   lr_rate = 0.0,
   lr_min = 0.0,
-  lr_scheduler = "Linear",
-  lr_epochs = 30,
-  lr_warm_up_ratio = 0.10,
+  lr_scheduler = "CosineAnnealing",
+  lr_epochs = 15,
+  lr_warm_up_ratio = 0.05,
   optimizer = "AdamW",
   amp = TRUE,
   comp_use=TRUE,
   comp_mode="reduce-overhead"
 )
 classifier$reliability$test_metric_mean
-
+classifier$plot_training_history(measure = "s_avg_iota")
 
 #-------------------------------------------------------------------------------
 loss="FocalLossOrdinal"

@@ -5,68 +5,6 @@ devtools::load_all()
 prepare_session()
 
 
-# SetUp-------------------------------------------------------------------------
-# Set paths
-root_path_data <- testthat::test_path("test_data/FeatureExtractor")
-root_path_general_data <- testthat::test_path("test_data/Embeddings")
-create_dir(testthat::test_path("test_artefacts"), FALSE)
-root_path_results <- testthat::test_path("test_artefacts/FeatureExtractor")
-create_dir(root_path_results, FALSE)
-tolerance <- 1e-5
-
-# load data for test
-# object is imdb_embeddings
-imdb_embeddings <- load_from_disk(paste0(root_path_general_data, "/imdb_embeddings"))
-
-dataset_list <- list(
-  "EmbeddedText" = imdb_embeddings,
-  "LargeDataSetForTextEmbeddings" = imdb_embeddings$convert_to_LargeDataSetForTextEmbeddings()
-)
-
-data_type="EmbeddedText"
-method="Conv"
-
-extractor <- TEFeatureExtractor$new()
-extractor$configure(
-  name = "Test_extractor",
-  label = "Test Extractor",
-  text_embeddings = dataset_list[[data_type]],
-  features = 128,
-  method = method,
-  orthogonal_method = "matrix_exp",
-  te_n_layers=10,
-  times=2,
-  noise_factor = 0.2
-)
-extractor$train(
-  data_embeddings = dataset_list[[data_type]],
-  data_val_size = 0.25,
-  sustain_track = TRUE,
-  sustain_iso_code = "DEU",
-  sustain_region = NULL,
-  sustain_interval = 15,
-  sustain_log_level = "error",
-  epochs = 2,
-  batch_size = 100,
-  optimizer = "Adam",
-  amp = TRUE,
-  trace = random_bool_on_CI(),
-  ml_trace = 1
-)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 os=reticulate::import("os")
 #os$environ$setdefault("CUDA_LAUNCH_BLOCKING","1")
 example_data <- imdb_movie_reviews
@@ -135,6 +73,7 @@ devtools::load_all()
 
 gc()
 #prepare_session()
+devtools::load_all()
 classifier <- TEClassifierSequentialReferencePoint$new()
 #classifier <- TEClassifierSequential$new()
 classifier$configure(
@@ -203,7 +142,7 @@ print(classifier)
 classifier$train(
   data_embeddings = review_embeddings,
   data_targets = review_labels,
-  data_folds = 10,
+  data_folds = 2,
   data_val_size = 0.25,
   loss_cls_fct_name =  "FocalLoss",
   #loss_cls_fct_name =  "CrossEntropyLoss",
@@ -223,15 +162,15 @@ classifier$train(
   sustain_region = NULL,
   sustain_interval = 15,
   sustain_log_level = "error",
-  epochs = 1500,
+  epochs = 10,
   batch_size = 16,
   trace = TRUE,
   ml_trace = 1,
   log_dir = NULL,
   log_write_interval = 10,
   n_cores = auto_n_cores(),
-  lr_rate = 0.0,
-  lr_min = 0.0,
+  lr_rate = 1e-3,
+  lr_min = 1e-4,
   lr_scheduler = "None",
   lr_warm_up_ratio = 0.10,
   lr_epochs = 30,
@@ -243,9 +182,61 @@ classifier$train(
 
 classifier$reliability$test_metric_mean
 classifier$plot_learning_rate()
-classifier$plot_training_history()
+classifier$plot_training_history(final_training = TRUE)
 classifier$plot_reliability_distribution()
 
+#--------------
+# SetUp-------------------------------------------------------------------------
+# Set paths
+root_path_data <- testthat::test_path("test_data/FeatureExtractor")
+root_path_general_data <- testthat::test_path("test_data/Embeddings")
+create_dir(testthat::test_path("test_artefacts"), FALSE)
+root_path_results <- testthat::test_path("test_artefacts/FeatureExtractor")
+create_dir(root_path_results, FALSE)
+tolerance <- 1e-5
+
+# load data for test
+# object is imdb_embeddings
+imdb_embeddings <- load_from_disk(paste0(root_path_general_data, "/imdb_embeddings"))
+
+dataset_list <- list(
+  "EmbeddedText" = imdb_embeddings,
+  "LargeDataSetForTextEmbeddings" = imdb_embeddings$convert_to_LargeDataSetForTextEmbeddings()
+)
+
+data_type="EmbeddedText"
+method="Conv"
+
+extractor <- TEFeatureExtractor$new()
+extractor$configure(
+  name = "Test_extractor",
+  label = "Test Extractor",
+  text_embeddings = dataset_list[[data_type]],
+  features = 128,
+  method = method,
+  orthogonal_method = "matrix_exp",
+  te_n_layers=10,
+  times=2,
+  noise_factor = 0.2
+)
+extractor$train(
+  data_embeddings = dataset_list[[data_type]],
+  data_val_size = 0.25,
+  sustain_track = TRUE,
+  sustain_iso_code = "DEU",
+  sustain_region = NULL,
+  sustain_interval = 15,
+  sustain_log_level = "error",
+  epochs = 2,
+  batch_size = 100,
+  optimizer = "Adam",
+  amp = TRUE,
+  trace = random_bool_on_CI(),
+  ml_trace = 1
+)
+
+
+#-------
 
 measures=c("kalpha_nominal" ,      "kalpha_ordinal")
 available_measures_names=colnames(classifier$reliability$test_metric)
