@@ -31,15 +31,17 @@ editor_options:
 - Added a new method to plot classification performance across folds.
 - Added a final normalization layer to all models.
 - Rewrite DataCollator for TEClassifierPrototype to speed up learning.
+- Added a parameter "patience" to avoid unnecessary training steps.
 
 **TEFeatureExtractor**
 
 - NANs in loss now raise an error.
-- FeatureExtractor now allow to choose the number of layers.
+- FeatureExtractor can now compress the number of chunks/times.
 - The number of epochs for learning rate calculation can now be determined by the user.
 - TEFeatureExtractors now support compilation to speed up training.
 - Removed LSTM method.
-- Added new method 'DenseTimes' that reduces the embeddings on both features and times.
+- Added new method 'Conv' that reduces the embeddings on both features and times.
+- Added a parameter "patience" to avoid unnecessary training steps.
 
 **EmbeddedText**
 
