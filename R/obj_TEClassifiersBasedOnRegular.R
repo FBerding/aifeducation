@@ -73,6 +73,7 @@ TEClassifiersBasedOnRegular <- R6::R6Class(
     #' @param comp_use `r get_param_doc_desc("comp_use")`
     #' @param comp_mode `r get_param_doc_desc("comp_mode")`
     #' @param ddp_use `r get_param_doc_desc("ddp_use")`
+    #' @param patience `r get_param_doc_desc("patience")`
     #' @return Function does not return a value. It changes the object into a trained classifier.
     #' @details
     #'
@@ -119,7 +120,8 @@ TEClassifiersBasedOnRegular <- R6::R6Class(
                      amp = FALSE,
                      comp_use=FALSE,
                      comp_mode="reduce-overhead",
-                     ddp_use=FALSE) {
+                     ddp_use=FALSE,
+                     patience=250L) {
       private$do_training(args = get_called_args(n = 1L))
     }
   ),

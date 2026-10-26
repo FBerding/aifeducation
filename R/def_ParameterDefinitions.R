@@ -352,6 +352,21 @@ get_param_dict <- function() {
   )
 
 
+  param$patience <- list(
+    type = "int",
+    min = 1,
+    max = Inf,
+    allow_null = FALSE,
+    allowed_values = NULL,
+    desc = "Number of epochs within which a checkpoint must be set. If a new checkpoint
+    is set counter is reseted. If epochs exceeds this number training stops.",
+    gui_box = NULL,
+    gui_label = NULL,
+    default_value = 250L,
+    default_historic = 250L,
+    test_values = c(250L, 512L)
+  )
+
   # Transformer related---------------------------------------------------------
 
   param$tokenizer <- list(
@@ -1573,7 +1588,7 @@ get_param_dict <- function() {
     allow_null = FALSE,
     min = NULL,
     max = NULL,
-    allowed_values = c("InfoVAE", "CosineStructure"),
+    allowed_values = c("InfoVAE", "CosineStructure","MNSELoss"),
     desc = "Loss to apply for the extractor.",
     default_historic = "CosineStructure",
     default_value = " CosineStructure",
@@ -1620,6 +1635,21 @@ get_param_dict <- function() {
     default_value = TRUE,
     test_values = NULL
   )
+
+  param$decoder_linear<- list(
+    type = "bool",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = NULL,
+    desc = "if `TRUE` no activation is applied in the decoder layers.",
+    gui_box = "General",
+    gui_label = "Linear Decoder",
+    default_value = TRUE,
+    test_values = NULL
+  )
+
+
 
   param$feature_extractor <- list(
     type = "TEFeatureExtractor",

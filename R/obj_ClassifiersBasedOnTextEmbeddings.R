@@ -1091,6 +1091,7 @@ ClassifiersBasedOnTextEmbeddings <- R6::R6Class(
         ddp_use=self$last_training$config$ddp_use,
         lr_warm_up_ratio = self$last_training$config$lr_warm_up_ratio,
         epochs = as.integer(self$last_training$config$epochs),
+        patience=as.integer(self$last_training$config$patience),
         trace = as.integer(self$last_training$config$ml_trace),
         use_callback = use_callback,
         batch_size = as.integer(self$last_training$config$batch_size),

@@ -81,6 +81,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
     #' @param loss_margin `r get_param_doc_desc("loss_margin")`
     #' @param sampling_separate `r get_param_doc_desc("sampling_separate")`
     #' @param sampling_shuffle `r get_param_doc_desc("sampling_shuffle")`
+    #' @param patience `r get_param_doc_desc("patience")`
     #' @return Function does not return a value. It changes the object into a trained classifier.
     #' @details
     #'
@@ -131,7 +132,8 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
                      amp = FALSE,
                      comp_use=FALSE,
                      comp_mode="reduce-overhead",
-                     ddp_use=FALSE) {
+                     ddp_use=FALSE,
+                     patience=250L) {
       private$do_training(args = get_called_args(n = 1L))
     },
     #---------------------------------------------------------------------------
@@ -697,6 +699,7 @@ TEClassifiersBasedOnProtoNet <- R6::R6Class(
         #test_data = test_data,
         test_data = NULL,
         epochs = as.integer(self$last_training$config$epochs),
+        patience=as.integer(self$last_training$config$patience),
         sampling_separate = self$last_training$config$sampling_separate,
         sampling_shuffle = self$last_training$config$sampling_shuffle,
         filepath = file.path(private$dir_checkpoint, "best_weights.pt"),

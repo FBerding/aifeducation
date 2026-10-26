@@ -45,6 +45,7 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param name `r get_param_doc_desc("name")`
     #' @param label `r get_param_doc_desc("label")`
     #' @param text_embeddings `r get_param_doc_desc("text_embeddings")`
+    #' @param vae `r get_param_doc_desc("vae")`
     #' @param features `r get_param_doc_desc("features")`
     #' @param te_n_layers `r get_param_doc_desc("te_n_layers")`
     #' @param fe_type `r get_param_doc_desc("fe_type")`
@@ -53,6 +54,7 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param encoder_dropout `r get_param_doc_desc("encoder_dropout")`
     #' @param decoder_dropout `r get_param_doc_desc("decoder_dropout")`
     #' @param decoder_share_weights `r get_param_doc_desc("decoder_share_weights")`
+    #' @param decoder_linear `r get_param_doc_desc("decoder_linear")`
     #' @param noise_factor `r get_param_doc_desc("noise_factor")`
     #' @note `features` refers to the number of features for the compressed text embeddings.
     #' if `method="DenseTimes".`
@@ -60,9 +62,11 @@ TEFeatureExtractor <- R6::R6Class(
     configure = function(name = NULL,
                          label = NULL,
                          text_embeddings = NULL,
+                         vae=FALSE,
                          encoder_dropout=0.05,
                          decoder_dropout=0.05,
                          decoder_share_weights=TRUE,
+                         decoder_linear=TRUE,
                          fe_type="Dense",
                          fe_normalization="LayerNorm",
                          fe_act_fct="GELU",
@@ -142,6 +146,7 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param comp_use `r get_param_doc_desc("comp_use")`
     #' @param comp_mode `r get_param_doc_desc("comp_mode")`
     #' @param ddp_use `r get_param_doc_desc("ddp_use")`
+    #' @param patience `r get_param_doc_desc("patience")`
     #' @note This model requires that the underlying [TextEmbeddingModel] uses `pad_value=0`. If
     #' this condition is not met the pad value is switched before training.
     #' @return Function does not return a value. It changes the object into a trained classifier.
@@ -170,6 +175,7 @@ TEFeatureExtractor <- R6::R6Class(
                      amp = FALSE,
                      comp_use=FALSE,
                      comp_mode="reduce-overhead",
+                     patience=250L,
                      ddp_use=FALSE) {
       tmp_args <- get_called_args(n = 1L)
       check_all_args(args = tmp_args)
@@ -561,12 +567,14 @@ TEFeatureExtractor <- R6::R6Class(
         private$model <- aife$Autoencoder$DenseAutoencoder_with_Mask_PT(
           features_in = as.integer(private$text_embedding_model["features"]),
           features_out = as.integer(private$model_config$features),
+          vae=private$model_config$vae,
           times=as.integer(private$text_embedding_model["times"]),
           te_n_layers= as.integer(private$model_config$te_n_layers),
           noise_factor = private$model_config$noise_factor,
           encoder_dropout=private$model_config$encoder_dropout,
           decoder_dropout=private$model_config$decoder_dropout,
           decoder_share_weights=private$model_config$decoder_share_weights,
+          decoder_linear=private$model_config$decoder_linear,
           fe_type=private$model_config$fe_type,
           fe_normalization=private$model_config$fe_normalization,
           fe_act_fct=private$model_config$fe_act_fct,
@@ -629,6 +637,7 @@ TEFeatureExtractor <- R6::R6Class(
         lr_min = self$last_training$config$lr_min,
         scheduler_type = self$last_training$config$lr_scheduler,
         epochs = as.integer(self$last_training$config$epochs),
+        patience=as.integer(self$last_training$config$patience),
         trace = as.integer(self$last_training$config$ml_trace),
         batch_size = as.integer(self$last_training$config$batch_size),
         train_data = train_data,
