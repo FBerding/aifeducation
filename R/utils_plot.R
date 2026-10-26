@@ -73,15 +73,30 @@ get_best_state_point <- function(plot_data, measure) {
 #' @keywords internal
 #' @noRd
 get_used_state_point <- function(plot_data, measure, checkpoints) {
-  values_avg_iota <- plot_data[["avg_iota"]][, "validation_mean"]
-  values_bbc <- plot_data[["balanced_accuracy"]][, "validation_mean"]
-  values_loss <- plot_data[["loss"]][, "validation_mean"]
-  values_epoch <- plot_data[["loss"]][, "epoch"]
-  values_acc <- plot_data[["accuracy"]][, "validation_mean"]
-  values_s_avg_iota <- plot_data[["s_avg_iota"]][, "validation_mean"]
+  if ("avg_iota"%in% names(plot_data)){
+    values_avg_iota <- plot_data[["avg_iota"]][, "validation_mean"]
+    values_bbc <- plot_data[["balanced_accuracy"]][, "validation_mean"]
+    values_loss <- plot_data[["loss"]][, "validation_mean"]
+    values_epoch <- plot_data[["loss"]][, "epoch"]
+    values_acc <- plot_data[["accuracy"]][, "validation_mean"]
+    values_s_avg_iota <- plot_data[["s_avg_iota"]][, "validation_mean"]
 
-  complete_values <- cbind(values_epoch, values_avg_iota, values_bbc, values_loss, values_acc, values_s_avg_iota)
-  colnames(complete_values) <- c("epoch", "avg_iota", "balanced_accuracy", "loss", "accuracy", "s_avg_iota")
+    complete_values <- cbind(values_epoch, values_avg_iota, values_bbc, values_loss, values_acc, values_s_avg_iota)
+    colnames(complete_values) <- c("epoch", "avg_iota", "balanced_accuracy", "loss", "accuracy", "s_avg_iota")
+  } else {
+    values_loss <- plot_data[["loss"]][, "validation_mean"]
+    values_epoch <- plot_data[["loss"]][, "epoch"]
+    values_recon <- plot_data[["recon"]][, "validation_mean"]
+    values_kld <- plot_data[["kld"]][, "validation_mean"]
+    values_mmd <- plot_data[["mmd"]][, "validation_mean"]
+    values_magnitude <- plot_data[["magnitude"]][, "validation_mean"]
+    values_pairwise_cosine <- plot_data[["pairwise_cosine"]][, "validation_mean"]
+    values_mean_euc_distance <- plot_data[["mean_euc_distance"]][, "validation_mean"]
+
+    complete_values <- cbind(values_epoch, values_loss,values_recon, values_kld, values_mmd,values_magnitude,values_pairwise_cosine,values_mean_euc_distance)
+    colnames(complete_values) <- c("epoch", "loss", "recon","kld", "mmd","magnitude","pairwise_cosine","mean_euc_distance")
+  }
+
 
   if (is.null(checkpoints)) {
     best_values <- subset(complete_values, subset = complete_values[, 2L] == max(complete_values[, 2L]))
