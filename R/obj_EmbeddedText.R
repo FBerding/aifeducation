@@ -575,7 +575,19 @@ EmbeddedText <- R6::R6Class(
 
       matrix_view_as_array=array(matrix_view,dim=c(nrow(matrix_view),1,features))
       iso_score_fct=aife$Losses$calc_IsoScore()
-      iso_score=iso_score_fct(torch$from_numpy(np$array(matrix_view_as_array)))
+      iso_score=0.0
+      divisor=0
+      for (i in seq.int(1L,times)) {
+        tmp_matrix=self$embeddings[,i,]
+        condition=(rowSums(tmp_matrix)!=features*pad_value)
+        tmp_matrix=subset(tmp_matrix,condition)
+        if(nrow(tmp_matrix)>=2L){
+          iso_score=iso_score+tensor_to_numpy(iso_score_fct(torch$from_numpy(np$array(tmp_matrix))))
+          divisor=divisor+1L
+        }
+      }
+      iso_score=iso_score/divisor
+
 
       result=list(
         statistics=list(
