@@ -169,53 +169,69 @@ class aem_loss_pt(torch.nn.Module):
     return loss    
 
 
-class NormalizedMSELoss(torch.nn.Module):
+class NormalizedMAELoss(torch.nn.Module):
     def __init__(self, eps=1e-8):
+        """
+        Args:
+            eps (float): Kleiner Wert zur Vermeidung von Division durch Null.
+        """
         super().__init__()
         self.eps = eps
 
-    def forward(self, predictions, targets):
+    def _compute_variance_per_feature(self, targets, mask_expanded, divisor_stat):
+        """
+        Berechnet die empirische Varianz separat für jedes Feature (F) 
+        unter Berücksichtigung der validen (nicht-gepaddeten) Tokens.
+        """
+        # Summe pro Feature über die Batch- (B) und Zeitdimension (T) -> Shape: (F,)
+        targets_masked = targets * mask_expanded
+        sum_targets_per_feature = torch.sum(targets_masked, dim=(0, 1))
+        
+        F = targets.size(-1)
+        target_mean_per_feature = (sum_targets_per_feature / divisor_stat).view(1, 1, F)
+        
+        # Quadratische Abweichung berechnen und maskieren
+        diff_squared = ((targets - target_mean_per_feature) * mask_expanded) ** 2
+        sum_diff_squared_per_feature = torch.sum(diff_squared, dim=(0, 1))
+        
+        # Lokale Batch-Varianz pro Feature -> Shape: (F,)
+        variance_per_feature = sum_diff_squared_per_feature / divisor_stat
+        return variance_per_feature.view(1, 1, F)
+
+    def forward(self, predictions, targets, mask):
         # inputs: (B, T, F) - Shapes müssen bei CUDA Graphs statisch sein
         B, T, F = targets.size()
         
-        # 1. Maskierungslogik (Rein mathematisch auf der GPU)
-        max_abs_per_token = torch.max(torch.abs(targets), dim=-1, keepdim=True).values  # Shape: (B, T, 1)
-        mask_expanded = torch.where(max_abs_per_token > 1e-5, 1.0, 0.0).detach()  # Shape: (B, T, 1)
+        # 1. Maskierungslogik (Invertieren: True -> 0.0, False -> 1.0)
+        if mask.dim() == 2:
+            mask = mask.unsqueeze(-1)
+            
+        mask_expanded = torch.where(mask, 0.0, 1.0).detach()  # Shape: (B, T, 1)
         
-        # 2. NEU: Feature-Varianz NUR über valide (nicht-gepaddete) Tokens berechnen
-        # Summe der Features über Batch und Zeit (Shape: F)
-        targets_masked = targets * mask_expanded
-        sum_targets = torch.sum(targets_masked, dim=(0, 1))  # Shape: (F,)
-        
-        # Valide Anzahl an Tokens für den Teiler ermitteln
+        # Valide Anzahl an Tokens ermitteln
         num_valid_tokens = torch.sum(mask_expanded)
         divisor_stat = torch.clamp(num_valid_tokens, min=self.eps)
         
-        # Mittelwert pro Feature (Shape: 1, 1, F)
-        target_mean = (sum_targets / divisor_stat).view(1, 1, F)
+        # 2. Ausgelagerte Berechnung der reinen Feature-Varianz auf dem Batch
+        target_variance_broadcast = self._compute_variance_per_feature(
+            targets, mask_expanded, divisor_stat
+        )
         
-        # Varianz pro Feature berechnen: E[(X - E[X])^2] unter Berücksichtigung der Maske
-        diff_squared = ((targets - target_mean) * mask_expanded) ** 2
-        target_variance = torch.sum(diff_squared, dim=(0, 1)) / divisor_stat  # Shape: (F,)
-        
-        # Reshape für Broadcasting (Shape: 1, 1, F)
-        target_variance = target_variance.view(1, 1, F)
-        
-        # 3. Fehler (Zähler für MSE)
+        # 3. Echter MAE Fehler (Zähler für NMAE)
         error = torch.abs(predictions - targets)
         
         # 4. Fehler durch die feature-spezifische Varianz teilen
-        nmse = error / (target_variance.detach() + self.eps)
+        nmae = error / torch.sqrt(target_variance_broadcast.detach() + self.eps)
         
         # 5. Maske anwenden (Gepaddete Elemente auf 0.0 setzen)
-        nmse_masked = nmse * mask_expanded
+        nmae_masked = nmae * mask_expanded
         
         # 6. Mean-Reduction ohne CPU-GPU-Synchronisation (CUDA-Graph safe)
         num_valid_elements = num_valid_tokens * F
         divisor_loss = torch.clamp(num_valid_elements, min=self.eps)
         
         # Finaler mittlerer Loss
-        return torch.sum(nmse_masked) / divisor_loss
+        return torch.sum(nmae_masked) / divisor_loss
 
 
 def structure_loss(latent_space, target, mask_latent, mask_target):
@@ -385,9 +401,8 @@ def KLDLoss(mu, logvar,mask):
     return kld
 
 class InfoVAEIndividualKLLoss(torch.nn.Module):
-    def __init__(self, alpha: float):
+    def __init__(self):
         super().__init__()
-        self.alpha = alpha
 
     def forward(self, mu: torch.Tensor, logvar: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
         """
@@ -423,7 +438,7 @@ class InfoVAEIndividualKLLoss(torch.nn.Module):
             kld_mean = kld_masked.sum() / n_valid_steps
             
             # InfoVAE-spezifische Gewichtung anwenden
-            loss_val = (1.0 - self.alpha) * kld_mean
+            loss_val =  kld_mean
             
         # 3. DOWNCAST: Zurückkonvertieren in den ursprünglichen AMP-Datentyp (z.B. FP16 oder BF16)
         return loss_val.to(mu.dtype)
@@ -461,10 +476,6 @@ class InfoVAEReconstructionLoss(torch.nn.Module):
         
         # Teilen durch die Anzahl der nicht-gepaddeten Elemente
         return loss_masked.sum() / torch.clamp(active_elements.sum(), min=1.0)
-
-
-
-import torch
 
 class InfoVAEAggregatedMMDLoss_back_up(torch.nn.Module):
     def __init__(self, alpha: float, lambd: float):
@@ -536,21 +547,16 @@ class InfoVAEAggregatedMMDLoss_back_up(torch.nn.Module):
         weight = self.alpha + self.lambd - 1.0
         return weight * mmd
 
-
-import torch
-
 class InfoVAEAggregatedMMDLoss(torch.nn.Module):
-    def __init__(self, alpha: float, lambd: float, kernel_type: str = 'gaussian', kernel_scales: list = None):
+    def __init__(self, kernel_type: str = 'gaussian', kernel_scales: list = None):
         super().__init__()
-        self.alpha = alpha
-        self.lambd = lambd
         self.kernel_type = kernel_type.lower()
         
         if self.kernel_type not in ['gaussian', 'cosine']:
             raise ValueError("Ungültiger kernel_type. Erlaubt sind 'gaussian' oder 'cosine'.")
         
         # Geometrische Skalen (wird nur für den Gauß-Kernel benötigt)
-        self.kernel_scales = kernel_scales if kernel_scales is not None else [0.05, 0.1, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0]
+        self.kernel_scales = kernel_scales if kernel_scales is not None else [0.005,0.05, 0.1, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0, 16.0,32.0,64.0,128.0]
 
     def _compute_pairwise_distances(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         """Berechnet paarweise quadrierte euklidische Distanzen in FP32."""
@@ -618,7 +624,7 @@ class InfoVAEAggregatedMMDLoss(torch.nn.Module):
             return torch.tensor(0.0, device=z.device, dtype=z.dtype, requires_grad=True)
 
         # Generiert Prior-Samples mit Oversampling zur Reduzierung des stochastischen Rauschens
-        prior_multiplier = 2*z.size(-1)
+        prior_multiplier = 1
         prior_samples = torch.randn(n_samples * prior_multiplier, latent_dim, device=z.device, dtype=z.dtype)
 
         # AMP (Autocast) für den Kernel-Block explizit deaktivieren (Stabilität für Mixed Precision)
@@ -649,11 +655,8 @@ class InfoVAEAggregatedMMDLoss(torch.nn.Module):
             # CLAMP: Verhindert negative Werte bei dichten Clustern
             mmd = torch.clamp(mmd, min=0.0)
 
-        # Gewichtung laut InfoVAE-Formel anwenden
-        weight = self.alpha + self.lambd - 1.0
-        
         # Zurückkonvertieren in den ursprünglichen AMP-Datentyp
-        return (weight * mmd).to(z.dtype)
+        return mmd.to(z.dtype)
 
 
 
@@ -739,35 +742,212 @@ class calc_IsoScore(torch.nn.Module):
             final_score_clamped
         )
 
+class OriginEuclideanDistanceLoss(torch.nn.Module):
+    def __init__(self, weight: float = 1.0):
+        """
+        Args:
+            weight: Gewichtung für das Matching der euklidischen Distanzrelationen.
+        """
+        super().__init__()
+        self.weight = weight
+
+    def _compute_origin_euclidean(self, x: torch.Tensor) -> torch.Tensor:
+        """Berechnet den euklidischen Abstand jedes Punktes zum Ursprung (Norm)."""
+        return torch.sqrt(torch.clamp(torch.sum(x ** 2, dim=-1), min=1e-6))
+
+    def forward(self, latent_space: torch.Tensor, target: torch.Tensor, mask_latent: torch.Tensor, mask_target: torch.Tensor) -> torch.Tensor:
+        # 1. Dimensionen prüfen und ggf. über die Zeitdimension (dim=1) mitteln
+        if latent_space.shape != target.shape:
+            latent_zeroed = latent_space * (~mask_latent).float()
+            counts_latent = torch.clamp((~mask_latent).float().sum(dim=1, keepdim=True), min=1.0)
+            latent_space = latent_zeroed.sum(dim=1) / counts_latent.squeeze(-1)
+
+            target_zeroed = target * (~mask_target).float()
+            counts_target = torch.clamp((~mask_target).float().sum(dim=1, keepdim=True), min=1.0)
+            target = target_zeroed.sum(dim=1) / counts_target.squeeze(-1)
+            
+            latent_space = latent_space.unsqueeze(1)
+            target = target.unsqueeze(1)
+
+        B, T, F_latent = latent_space.shape
+        N = B * T
+
+        # 2. Flache Masken bestimmen (Ohne Neuzuweisung der Original-Masken)
+        if T == 1:
+            active_latent = torch.ones(N, dtype=torch.bool, device=target.device)
+            active_target = torch.ones(N, dtype=torch.bool, device=target.device)
+        else:
+            active_latent = (~mask_latent).reshape(N)
+            active_target = (~mask_target).reshape(N)
+
+        global_valid_flat = active_latent & active_target
+
+        latent_flat = latent_space.view(N, F_latent)
+        target_flat = target.view(N, target.shape[-1])
+
+        # 3. Rohe Abstände zum Ursprung berechnen (Völlig unnormiert)
+        dist_orig = self._compute_origin_euclidean(target_flat)  # [N]
+        dist_lat = self._compute_origin_euclidean(latent_flat)    # [N]
+
+        # 4. RELATION DER URSPRUNDSABSTÄNDE: Paarweise Verhältnisse via Kreuzprodukt
+        relation_lat = torch.outer(dist_lat, dist_orig)  # d_lat_i * d_orig_j
+        relation_orig = torch.outer(dist_orig, dist_lat) # d_orig_i * d_lat_j
+
+        # 5. Maske für Paarbeziehungen aufbauen (Obere Dreiecksmatrix ohne Diagonale)
+        pairwise_mask = global_valid_flat.unsqueeze(-1) & global_valid_flat.unsqueeze(-2)
+        triu_mask = torch.triu(torch.ones(N, N, dtype=torch.bool, device=target.device), diagonal=1)
+        final_pairwise_mask = pairwise_mask & triu_mask
+        num_pairs = torch.clamp(final_pairwise_mask.sum(), min=1.0)
+
+        # 6. DISTANZ DER RELATIONEN (Robuster L1-Ansatz gegen Oszillationen)
+        distance_of_relations = torch.abs(relation_lat - relation_orig)
+        
+        # KORREKTUR: .squeeze() stellt sicher, dass der Ausgang ein echter 0D-Skalar ist
+        euclidean_loss = (torch.sum(distance_of_relations * final_pairwise_mask.float()) / num_pairs).squeeze()
+        
+        return self.weight * euclidean_loss
+
+class PairwiseCosineDistanceLoss(torch.nn.Module):
+    def __init__(self, weight: float = 1.0, eps: float = 1e-8):
+        """
+        Args:
+            weight: Gewichtung für das Matching der paarweisen Cosine-Distanzen.
+            eps: Numerisches Epsilon zur Vermeidung von Division durch Null.
+        """
+        super().__init__()
+        self.weight = weight
+        self.eps = eps
+
+    def _compute_pairwise_cosine(self, x: torch.Tensor) -> torch.Tensor:
+        """Berechnet paarweise Cosine-Distanzen (1.0 - Cosine-Similarity)."""
+        x_norm = torch.norm(x, p=2, dim=-1, keepdim=True)
+        x_normalized = x / torch.clamp(x_norm, min=self.eps)
+        cosine_sim = torch.matmul(x_normalized, x_normalized.t())
+        return 1.0 - cosine_sim
+
+    def forward(self, latent_space: torch.Tensor, target: torch.Tensor, mask_latent: torch.Tensor, mask_target: torch.Tensor) -> torch.Tensor:
+        # 1. Dimensionen prüfen und ggf. über die Zeitdimension (dim=1) mitteln
+        if latent_space.shape != target.shape:
+            # Maskiertes Mitteln unter Verwendung des originalen Formats [B, T, 1]
+            latent_zeroed = latent_space * (~mask_latent).float()
+            counts_latent = torch.clamp((~mask_latent).float().sum(dim=1, keepdim=True), min=1.0)
+            latent_space = latent_zeroed.sum(dim=1) / counts_latent.squeeze(-1)
+
+            target_zeroed = target * (~mask_target).float()
+            counts_target = torch.clamp((~mask_target).float().sum(dim=1, keepdim=True), min=1.0)
+            target = target_zeroed.sum(dim=1) / counts_target.squeeze(-1)
+            
+            latent_space = latent_space.unsqueeze(1)
+            target = target.unsqueeze(1)
+
+        B, T, F_latent = latent_space.shape
+        N = B * T
+
+        # 2. Flache Masken bestimmen (Keine Neuzuweisung von mask_latent oder mask_target)
+        if T == 1:
+            # Wenn gemittelt wurde, ist die Maske laut Vorgabe immer gültig (True)
+            active_latent = torch.ones(N, dtype=torch.bool, device=target.device)
+            active_target = torch.ones(N, dtype=torch.bool, device=target.device)
+        else:
+            # Wenn T > 1, nutzen wir die originalen Token-Masken direkt flachgeklopft
+            active_latent = (~mask_latent).reshape(N)
+            active_target = (~mask_target).reshape(N)
+
+        global_valid_flat = active_latent & active_target
+
+        latent_flat = latent_space.view(N, F_latent)
+        target_flat = target.view(N, target.shape[-1])
+
+        # Paarmasmaske für die obere Dreiecksmatrix generieren
+        pairwise_mask = global_valid_flat.unsqueeze(-1) & global_valid_flat.unsqueeze(-2)
+        triu_mask = torch.triu(torch.ones(N, N, dtype=torch.bool, device=target.device), diagonal=1)
+        final_pairwise_mask = pairwise_mask & triu_mask
+        num_pairs = torch.clamp(final_pairwise_mask.sum(), min=1.0)
+
+        # Cosine-Distanzen ermitteln
+        dist_orig_cos = self._compute_pairwise_cosine(target_flat)
+        dist_lat_cos = self._compute_pairwise_cosine(latent_flat)
+
+        # Loss berechnen
+        cosine_loss = torch.sum(torch.abs(dist_orig_cos - dist_lat_cos) * final_pairwise_mask.float())/ num_pairs
+        
+        return self.weight * cosine_loss
+
+class LatentScaleRegularizationLoss(torch.nn.Module):
+    def __init__(self, weight: float = 0.1, target_scale: float = 0.5):
+        """
+        Args:
+            weight: Gewichtung für die Regularisierung des latenten Mittelwerts.
+            target_scale: Der Zielwert, gegen den der mittlere euklidische Abstand reguliert wird.
+        """
+        super().__init__()
+        self.weight = weight
+        self.target_scale = target_scale
+
+    def forward(self, latent_space: torch.Tensor, mask_latent: torch.Tensor) -> torch.Tensor:
+        """
+        Args:
+            latent_space: [B, T, F] Garantiert immer 3D.
+            mask_latent: [B, T, 1] oder [B, T]
+        """
+        # 1. Bringt die Maske inline auf [B, T], ohne mask_latent zu verändern
+        current_mask = mask_latent.squeeze(-1) if mask_latent.dim() == 3 else mask_latent
+        valid_weight = (~current_mask).float()  # [B, T]
+        num_tokens = torch.clamp(valid_weight.sum(), min=1.0)
+        
+        # 2. Berechne euklidische Norm für jeden einzelnen Token direkt
+        token_norms = torch.sqrt(torch.clamp(torch.sum(latent_space ** 2, dim=-1), min=1e-6))  # [B, T]
+        
+        # 3. Gewichteter Mittelwert über alle gültigen Token (funktioniert für jedes T)
+        mean_lat_eucl = (token_norms * valid_weight).sum() / num_tokens
+
+        # 4. Quadratischer Fehler gegen die Zielskala (0.5)
+        scale_regularization_loss = (mean_lat_eucl - self.target_scale) ** 2
+        
+        return self.weight * scale_regularization_loss
+
+
 class feature_extractor_loss(torch.nn.Module):
-  def __init__(self,pad_value,loss_type,alpha,p_lambda):
+  def __init__(self,pad_value,loss_type,alpha,p_lambda,features_in):
     super().__init__()
-    self.mse_loss=NormalizedMSELoss()
+    self.mae_loss=NormalizedMAELoss(eps=1e-8)
+    self.p_lambda=p_lambda
+    self.alpha=alpha
     if loss_type=="InfoVAE":
       self.is_InfoVAE=True
-      self.kld=InfoVAEIndividualKLLoss(alpha=alpha)
+      self.is_NMSE=False
+      self.kld=InfoVAEIndividualKLLoss()
       self.mmd=InfoVAEAggregatedMMDLoss(
-        alpha=alpha, 
-        lambd=p_lambda,
-        kernel_type="cosine"
+        kernel_type="gaussian"
+        #kernel_type="cosine"
       )
     elif loss_type=="CosineStructure":
       self.is_InfoVAE=False
-      self.structure=structure_loss
-      self.decorr=MaskedFeatureDeCorrelationLoss()
+      self.is_NMSE=False
+      self.euclidean=OriginEuclideanDistanceLoss(weight=1.0)
+      self.cosine=PairwiseCosineDistanceLoss()
+      self.mean_euc=LatentScaleRegularizationLoss(weight=1.0)
+    elif loss_type=="MNSELoss":
+      self.is_NMSE=True
+      self.is_InfoVAE=False
+
 
   def forward(self,input,target,latent_space,mu,log_var,mask,mask_latent,beta):
-    loss_mse=self.mse_loss(input,target)
+    loss_mae=self.mae_loss(input,target,mask)
     if self.is_InfoVAE:
       loss_kld=self.kld(mu,log_var,mask_latent)
       loss_mmd=self.mmd(latent_space,mask_latent)
-      loss=loss_mse+beta*(loss_kld+loss_mmd)
-      diagnostic=[loss_mse.detach(),loss_kld.detach(),loss_mmd.detach(),0.0]
+      loss=loss_mae+beta*((1.0 - self.alpha) *loss_kld+(self.alpha + self.p_lambda - 1.0)*loss_mmd)
+      diagnostic=[loss_mae.detach(),loss_kld.detach(),loss_mmd.detach(),0.0,0.0,0.0]
+    elif self.is_NMSE:
+      loss=loss_mae
+      diagnostic=[loss_mae.detach(),0.0,0.0,0.0,0.0,0.0]
     else:
-      loss_cosine=structure_loss(latent_space=latent_space, target=target, mask_latent=mask_latent, mask_target=mask)
-      loss_decor=self.decorr(latent_space,mask_latent)
-      loss=loss_mse+loss_cosine+loss_decor
-      diagnostic=[loss_mse.detach(),0.0,0.0,loss_cosine.detach()]
+      loss_magnitude=self.euclidean(latent_space=latent_space, target=target, mask_latent=mask_latent, mask_target=mask)
+      loss_cosine=self.cosine(latent_space=latent_space, target=target, mask_latent=mask_latent, mask_target=mask)
+      loss_scale=self.mean_euc(latent_space=latent_space, mask_latent=mask_latent)
+      loss=loss_mae+self.p_lambda*((1-self.alpha)*loss_magnitude+self.alpha*loss_cosine+loss_scale)
+      diagnostic=[loss_mse.detach(),0.0,0.0,loss_magnitude.detach(),loss_cosine.detach(),loss_scale.detach()]
     return loss, diagnostic
 
 def get_loss_cls_fct(name,class_weights):
