@@ -73,9 +73,12 @@ feature_extractor <- TEFeatureExtractor$new()
 feature_extractor$configure(
   label = "Feature extractor for Text Embeddings",
   text_embeddings = review_embeddings,
-  encoder_dropout=0.00,
+  vae=TRUE,
+  #vae=FALSE,
+  encoder_dropout=0.10,
   decoder_dropout=0.10,
   decoder_share_weights = FALSE,
+  decoder_linear=FALSE,
   fe_type="Dense",
   fe_normalization="LayerNorm",
   fe_act_fct="GELU",
@@ -86,30 +89,34 @@ feature_extractor$configure(
 )
 print(feature_extractor)
 
+epochs=5000
+patience=epochs
 feature_extractor$train(
   data_embeddings = review_embeddings,
-  fe_loss_type="CosineStructure",
-  fe_loss_alpha=0.0,
-  fe_loss_lambda=2.0,
+  fe_loss_type="InfoVAE",
+  #fe_loss_type="CosineStructure",
+  fe_loss_alpha=.99,
+  fe_loss_lambda=3,
   data_val_size = 0.25,
   sustain_track = TRUE,
   sustain_iso_code = "DEU",
   sustain_region = NULL,
   sustain_interval = 15,
   sustain_log_level = "error",
-  epochs = 2000,
+  epochs = epochs,
   batch_size = 256,
-  lr_rate = 0.0,
-  lr_min = 0.0,
+  lr_rate = 1e-3,
+  lr_min = 1e-7,
   lr_epochs = 15,
   lr_scheduler = "CosineAnnealing",
   trace = TRUE,
   ml_trace = 1,
   optimizer = "AdamW",
   amp = TRUE,
-  lr_warm_up_ratio = 0.10,
+  lr_warm_up_ratio = 0.05,
   comp_use=TRUE,
-  comp_mode="reduce-overhead"
+  comp_mode="reduce-overhead",
+  patience=patience
 )
 
 embedding_statistics=feature_extractor$compare_embedding_statistics(
@@ -118,11 +125,20 @@ embedding_statistics=feature_extractor$compare_embedding_statistics(
   trace=TRUE
 )
 embedding_statistics
-feature_extractor$plot_training_history(measure="loss",ind_selected_model = FALSE)
-feature_extractor$plot_training_history(measure="recon",ind_selected_model = FALSE)
-feature_extractor$plot_training_history(measure="kld",ind_selected_model = FALSE)
-feature_extractor$plot_training_history(measure="mmd",ind_selected_model = FALSE)
-feature_extractor$plot_training_history(measure="cosine_str",ind_selected_model = FALSE)
+
+abc=review_embeddings$convert_to_EmbeddedText()
+abc$embeddings[1:10,1:2,1:2]
+test_extracts=feature_extractor$extract_features(review_embeddings,batch_size = 256)
+test_extracts$embeddings[1:10,1:2,1:2]
+
+feature_extractor$plot_training_history(measure="loss",ind_selected_model = TRUE)
+feature_extractor$plot_training_history(measure="recon",ind_selected_model = TRUE)
+feature_extractor$plot_training_history(measure="kld",ind_selected_model = TRUE)
+feature_extractor$plot_training_history(measure="mmd",ind_selected_model = TRUE)
+feature_extractor$plot_training_history(measure="magnitude",ind_selected_model = TRUE)
+feature_extractor$plot_training_history(measure="pairwise_cosine",ind_selected_model = TRUE)
+feature_extractor$plot_training_history(measure="mean_euc_distance",ind_selected_model = TRUE)
+
 #-------------------
 classifier <- TEClassifierSequential$new()
 classifier$configure(
@@ -143,20 +159,20 @@ classifier$configure(
   feat_parametrizations = "None",
   feat_normalization_type = "None",
   ng_conv_act_fct = "GELU",
-  ng_conv_n_layers = 2,
+  ng_conv_n_layers = 1,
   ng_conv_ks_min = 2,
   ng_conv_ks_max = 3,
   ng_conv_bias = TRUE,
-  ng_conv_dropout = 0.00,
+  ng_conv_dropout = 0.10,
   ng_conv_parametrizations = "None",
-  ng_conv_normalization_type = "LayerNorm",
+  ng_conv_normalization_type = "BatchNorm",
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "GELU",
-  dense_n_layers = 5,
-  dense_dropout = 0.00,
+  dense_n_layers = 3,
+  dense_dropout = 0.50,
   dense_bias = TRUE,
   dense_parametrizations = "None",
-  dense_normalization_type = "LayerNorm",
+  dense_normalization_type = "BatchNorm",
   dense_residual_type = "ResidualGate",
   rec_act_fct = "Tanh",
   rec_n_layers = 0,
@@ -186,10 +202,10 @@ classifier$train(
   data_embeddings = review_embeddings,
   data_targets = review_labels,
   data_folds = 10,
-  data_val_size = 0.10,
+  data_val_size = 0.25,
   loss_balance_class_weights = TRUE,
   loss_balance_sequence_length = TRUE,
-  loss_cls_fct_name = "FocalLoss",
+  loss_cls_fct_name = "CrossEntropyLoss",
   use_sc = FALSE,
   sc_method = "knnor",
   sc_min_k = 1,
@@ -219,6 +235,7 @@ classifier$train(
   optimizer = "AdamW",
   amp = TRUE,
   comp_use=FALSE,
-  comp_mode="reduce-overhead"
+  comp_mode="reduce-overhead",
+  patience=300
 )
 classifier$reliability$test_metric_mean
