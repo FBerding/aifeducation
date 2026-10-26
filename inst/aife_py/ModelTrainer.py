@@ -61,7 +61,7 @@ class ModelTrainer():
     self.device=rank
     self.world_size=world_size
   #------------------------------------------------------------------------------
-  def config_for_StandardClassifier(self,model,features,times,final_dim,loss_cls_fct_name, optimizer_method,scheduler_type,amp, lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,batch_size,
+  def config_for_StandardClassifier(self,model,features,times,final_dim,loss_cls_fct_name, optimizer_method,scheduler_type,amp, lr_rate,lr_min, lr_warm_up_ratio, epochs,patience, trace,batch_size,
     train_data,val_data,filepath,use_callback,n_classes,class_weights,comp_use,comp_backend,comp_mode,ddp_use,test_data=None,
     log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
     self.ddp_use=ddp_use
@@ -77,6 +77,7 @@ class ModelTrainer():
     self.lr_min =lr_min
     self.lr_warm_up_ratio=lr_warm_up_ratio
     self.epochs=epochs
+    self.patience=patience
     self.trace=trace
     self.batch_size=batch_size
     self.train_data=train_data
@@ -99,7 +100,7 @@ class ModelTrainer():
       name=self.loss_cls_fct_name,
       class_weights=self.class_weights
     )
-  def config_for_ClassifierPrototype(self,model,features,times,final_dim,loss_pt_fct_name , optimizer_method, scheduler_type, amp,ddp_use,comp_use,comp_backend,comp_mode,lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,Ns,Nq,
+  def config_for_ClassifierPrototype(self,model,features,times,final_dim,loss_pt_fct_name , optimizer_method, scheduler_type, amp,ddp_use,comp_use,comp_backend,comp_mode,lr_rate,lr_min, lr_warm_up_ratio, epochs,patience, trace,Ns,Nq,
     loss_alpha, loss_margin, train_data,val_data,filepath,use_callback,n_classes,sampling_separate,sampling_shuffle,test_data=None,
     log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
     self.model=model
@@ -118,6 +119,7 @@ class ModelTrainer():
     self.lr_min =lr_min
     self.lr_warm_up_ratio=lr_warm_up_ratio
     self.epochs=epochs
+    self.patience=patience
     self.trace=trace
     self.Ns=Ns
     self.Nq=Nq
@@ -142,7 +144,7 @@ class ModelTrainer():
       margin=self.loss_margin,
       alpha=self.loss_alpha
     )
-  def config_for_TEFeatureExtractor(self,model,optimizer_method,times,features,scheduler_type,amp, lr_rate,lr_min, lr_warm_up_ratio, epochs, trace,batch_size,
+  def config_for_TEFeatureExtractor(self,model,optimizer_method,times,features,scheduler_type,amp, lr_rate,lr_min, lr_warm_up_ratio, epochs,patience, trace,batch_size,
     train_data,val_data,filepath,use_callback,comp_use,comp_backend,comp_mode,ddp_use,pad_value,fe_loss_type,fe_loss_alpha,fe_loss_lambda,
     log_dir=None, log_write_interval=10, log_top_value=0, log_top_total=1, log_top_message="NA"):
     self.model=model
@@ -160,6 +162,7 @@ class ModelTrainer():
     self.lr_min=lr_min
     self.lr_warm_up_ratio=lr_warm_up_ratio
     self.epochs=epochs
+    self.patience=patience
     self.trace=trace
     self.batch_size=batch_size
     self.train_data=train_data
@@ -180,7 +183,8 @@ class ModelTrainer():
       pad_value=self.pad_value,
       loss_type=self.fe_loss_type,
       alpha=self.fe_loss_alpha,
-      p_lambda=self.fe_loss_lambda
+      p_lambda=self.fe_loss_lambda,
+      features_in=self.features
     )
   def get_device(self):
     return 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -416,7 +420,7 @@ class ModelTrainer():
     elif self.model_type=="TEFeatureExtractor":
       #Numpys for Saving Training History
       self.metric_storage=self.create_metric_storage(
-        metric_names=["loss","recon","kld","mmd","cosine_str"],
+        metric_names=["loss","recon","kld","mmd","magnitude","pairwise_cosine","mean_euc_distance"],
         epochs=self.epochs,
         inc_test=True if not (self.test_data is None) else False
       )
@@ -671,7 +675,9 @@ class ModelTrainer():
     loss_recon=0.0
     loss_kld=0.0
     loss_mmd=0.0
-    loss_consine_str=0.0
+    loss_magnitude=0.0
+    loss_pairwise_cosine=0.0
+    loss_mean_euc_distance=0.0
     self.trainer.set_epoch(epoch)
     if cblock=="train":
       self.trainer.train()
@@ -690,7 +696,7 @@ class ModelTrainer():
         if cblock=="train":
           self.amp_scaler.scale(loss).backward()
           self.amp_scaler.unscale_(self.optimizer)
-          torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0,foreach=True)
+          torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=0.5,foreach=True)
           self.amp_scaler.step(self.optimizer)
           self.amp_scaler.update()
           if self.scheduler is not None:
@@ -704,13 +710,23 @@ class ModelTrainer():
         loss_recon+=diagnostic[0]
         loss_kld+=diagnostic[1]
         loss_mmd+=diagnostic[2]
-        loss_consine_str+=diagnostic[3]
+        loss_magnitude+=diagnostic[3]
+        loss_pairwise_cosine+=diagnostic[4]
+        loss_mean_euc_distance+=diagnostic[5]
         #Update log file
         self.logger.inc_value("bottom")
         self.logger.write_log()
         self.logger.write_history_log(self.metric_storage["loss"])
     #Calc final metrics for epoch
-    results={"loss":total_loss/len(dataloader),"recon":loss_recon/len(dataloader),"kld":loss_kld/len(dataloader),"mmd":loss_mmd/len(dataloader),"cosine_str":loss_consine_str/len(dataloader)}
+    results={
+      "loss":total_loss/len(dataloader),
+      "recon":loss_recon/len(dataloader),
+      "kld":loss_kld/len(dataloader),
+      "mmd":loss_mmd/len(dataloader),
+      "magnitude":loss_magnitude/len(dataloader),
+      "pairwise_cosine":loss_pairwise_cosine/len(dataloader),
+      "mean_euc_distance":loss_mean_euc_distance/len(dataloader)
+    }
     #Save metrics
     self.add_metrics(
       metrics=results,
@@ -755,14 +771,14 @@ class ModelTrainer():
 
   def check_convergence(self,train_results,epoch):
     if self.model_type=="ClassifierStandard" or self.model_type=="ClassifierPrototype":
-      if (train_results["loss"]<1e-3 and train_results["s_avg_iota"]>=.98) or (epoch>self.elc+250):
+      if (train_results["loss"]<1e-3 and train_results["s_avg_iota"]>=.98) or ((epoch>self.elc+self.patience) and (epoch>self.lr_warm_up_ratio*self.epochs+self.patience)):
         if self.trace:
           print("\n")
         return True
       else:
         return False
     elif self.model_type=="TEFeatureExtractor":
-      if epoch>self.elc+250:
+      if epoch>self.elc+self.patience and (epoch>self.lr_warm_up_ratio*self.epochs+self.patience):
         if self.trace:
           print("\n")
         return True
@@ -1042,7 +1058,7 @@ class ModelWithLoss(torch.nn.Module):
     log_var=output[3]
     mask=output[4]
     mask_latent=output[5]
-    loss_all=self.loss_fct(predictions,static_target,latent_space,mu,log_var,mask,mask_latent,beta=max(0.5,min(self.epoch/(1*self.epochs),1)))
+    loss_all=self.loss_fct(predictions,static_target,latent_space,mu,log_var,mask,mask_latent,beta=max(0.0,min(self.epoch/(1*self.epochs),1)))
     loss=loss_all[0]
     diagnostic=loss_all[1]
     return loss, output,diagnostic
