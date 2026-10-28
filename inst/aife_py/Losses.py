@@ -234,87 +234,7 @@ class NormalizedMAELoss(torch.nn.Module):
         return torch.sum(nmae_masked) / divisor_loss
 
 
-def structure_loss(latent_space, target, mask_latent, mask_target):
-    """
-    Berechnet den Struktur-Verlust. Unterstützt identische oder unterschiedliche Sequenzlängen T.
-    
-    Args:
-        latent_space: Tensor der Form [B, T_latent, F_latent]
-        target: Tensor der Form [B, T_target, F_target]
-        mask_latent: Tensor der Form [B, T_latent, 1] oder [B, T_latent] (True = Padding)
-        mask_target: Tensor der Form [B, T_target, 1] oder [B, T_target] (True = Padding)
-        CosineDistance: Funktion/Klasse zur Berechnung der paarweisen Cosine-Distanz
-    """
-    B, T_latent, F_latent = latent_space.shape
-    B_target, T_target, F_target = target.shape
-    
-    # Validierung der Batch-Größe
-    assert B == B_target, f"Batch-Größen müssen übereinstimmen: {B} vs {B_target}"
-    
-    # Sicherstellen, dass die Masken das Shape [B, T, 1] für Broad-Casting haben
-    if mask_latent.dim() == 2:
-        mask_latent = mask_latent.unsqueeze(-1)
-    if mask_target.dim() == 2:
-        mask_target = mask_target.unsqueeze(-1)
-        
-    # Invertieren: True soll für gültige Tokens (active) stehen
-    active_latent = ~mask_latent
-    active_target = ~mask_target
-    
-    # 1. Fallunterscheidung: Unterschiedliche Sequenzlängen T
-    if T_latent != T_target:
-        # Maskiertes Mean-Pooling über die Zeitdimension (Dim 1)
-        latent_sums = torch.sum(latent_space * active_latent, dim=1)
-        latent_counts = torch.clamp(torch.sum(active_latent, dim=1), min=1.0)
-        latent_flat = latent_sums / latent_counts  # [B, F_latent]
-        
-        target_sums = torch.sum(target * active_target, dim=1)
-        target_counts = torch.clamp(torch.sum(active_target, dim=1), min=1.0)
-        target_flat = target_sums / target_counts  # [B, F_target]
-        
-        # Bestimmen, welche Batches überhaupt gültige (Nicht-Padding) Elemente enthalten
-        batch_mask_latent = (latent_counts > 0).squeeze(-1)  # [B]
-        batch_mask_target = (target_counts > 0).squeeze(-1)  # [B]
-        global_mask = batch_mask_latent & batch_mask_target  # [B]
-        
-        N = B
-        
-    else:
-        # Standard-Fall: Identische T -> Verflachen zu (B * T, F)
-        N = B * T_latent
-        latent_flat = latent_space.reshape(N, F_latent)
-        target_flat = target.reshape(N, F_target)
-        
-        # Globale Token-Masken verflachen und kombinieren
-        active_latent_flat = active_latent.reshape(N)
-        active_target_flat = active_target.reshape(N)
-        global_mask = active_latent_flat & active_target_flat  # [N]
-    
-    # 2. Paarweise Maske über alle N x N Kombinationen erstellen
-    pairwise_mask = global_mask.unsqueeze(-1) & global_mask.unsqueeze(-2)
-    
-    # Obere Dreiecksmatrix (ohne Diagonale)
-    triu_mask = torch.triu(torch.ones(N, N, dtype=torch.bool, device=target.device), diagonal=1)
-    final_mask = pairwise_mask & triu_mask
-    
-    # 3. Globale paarweise Distanzen berechnen
-    cos_distance_latent = CosineDistance(latent_flat, latent_flat)
-    cos_distance_target = CosineDistance(target_flat, target_flat).detach()
-    
-    # Differenz berechnen
-    diff = torch.abs(cos_distance_latent - cos_distance_target) / 2
-    
-    # Maskierung auf die Differenzen anwenden
-    float_mask = final_mask.to(diff.dtype)
-    masked_diff = diff * float_mask
-    
-    # 4. Globalen Mittelwert bilden (CUDA-Graph-safe)
-    loss_sum = torch.sum(masked_diff)
-    valid_elements = torch.sum(float_mask)
-    
-    loss = loss_sum / torch.clamp(valid_elements, min=1.0).detach()
-    
-    return loss
+
 
 
 class MaskedFeatureDeCorrelationLoss(torch.nn.Module):
@@ -383,23 +303,6 @@ class MaskedFeatureDeCorrelationLoss(torch.nn.Module):
 
         return total_loss
 
-#Kullback-Leibler-Divergenz
-def KLDLoss(mu, logvar,mask):
-    """
-    Berechnet die KL-Divergenz zwischen dem gelernten latenten Raum 
-    und einer Standardnormalverteilung N(0, 1).
-    
-    Argumente:
-    mu     -- Mittelwert-Vektor aus dem Encoder (Batch_Size, Latent_Dim)
-    logvar -- Log-Varianz-Vektor aus dem Encoder (Batch_Size, Latent_Dim)
-    """
-    # Formel: -0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
-    valid_mask=~mask
-    n_elements=torch.sum(valid_mask)*mu.size(2)
-    kld_per_element=torch.clamp((-0.5*(1 + logvar - mu.pow(2) - logvar.exp())*valid_mask),min=0.0)
-    kld=torch.sum(kld_per_element)/n_elements
-    return kld
-
 class InfoVAEIndividualKLLoss(torch.nn.Module):
     def __init__(self):
         super().__init__()
@@ -444,38 +347,6 @@ class InfoVAEIndividualKLLoss(torch.nn.Module):
         return loss_val.to(mu.dtype)
 
 
-class InfoVAEReconstructionLoss(torch.nn.Module):
-    def __init__(self, distribution='gaussian'):
-        """
-        distribution='gaussian' -> Reiner MSE-Verlust
-        distribution='bernoulli' -> Reiner BCE-Verlust
-        """
-        super().__init__()
-        self.distribution = distribution
-
-    def forward(self, x_recon: torch.Tensor, x: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
-        """
-        Args:
-            x_recon, x: Form [Batch, SeqLen, Features]
-            mask: Form [Batch, SeqLen, 1] (True = Padding)
-        """
-        if self.distribution == 'gaussian':
-            # Mathematischer MSE: (y_pred - y_true)^2
-            loss_elementwise = (x_recon - x) ** 2
-        elif self.distribution == 'bernoulli':
-            # Mathematischer BCE: -(y * log(p) + (1 - y) * log(1 - p))
-            eps = 1e-12
-            x_recon = torch.clamp(x_recon, eps, 1.0 - eps)
-            loss_elementwise = -(x * torch.log(x_recon) + (1.0 - x) * torch.log(1.0 - x_recon))
-        else:
-            raise ValueError(f"Unbekannte Verteilung: {self.distribution}")
-
-        active_elements = ~mask
-        # Maskieren und aufsummieren
-        loss_masked = loss_elementwise * active_elements.to(loss_elementwise.dtype)
-        
-        # Teilen durch die Anzahl der nicht-gepaddeten Elemente
-        return loss_masked.sum() / torch.clamp(active_elements.sum(), min=1.0)
 
 class InfoVAEAggregatedMMDLoss_back_up(torch.nn.Module):
     def __init__(self, alpha: float, lambd: float):
@@ -913,7 +784,7 @@ class feature_extractor_loss(torch.nn.Module):
     self.mae_loss=NormalizedMAELoss(eps=1e-8)
     self.p_lambda=p_lambda
     self.alpha=alpha
-    if loss_type=="InfoVAE":
+    if loss_type=="InfoVAELoss":
       self.is_InfoVAE=True
       self.is_NMSE=False
       self.kld=InfoVAEIndividualKLLoss()
@@ -921,12 +792,15 @@ class feature_extractor_loss(torch.nn.Module):
         kernel_type="gaussian"
         #kernel_type="cosine"
       )
-    elif loss_type=="CosineStructure":
+    elif loss_type=="MagnitudeDegreeLoss":
       self.is_InfoVAE=False
       self.is_NMSE=False
       self.euclidean=OriginEuclideanDistanceLoss(weight=1.0)
       self.cosine=PairwiseCosineDistanceLoss()
-      self.mean_euc=LatentScaleRegularizationLoss(weight=1.0)
+      self.mean_euc=LatentScaleRegularizationLoss(
+        weight=1.0,
+        target_scale=1.0
+      )
     elif loss_type=="MNSELoss":
       self.is_NMSE=True
       self.is_InfoVAE=False
@@ -937,7 +811,7 @@ class feature_extractor_loss(torch.nn.Module):
     if self.is_InfoVAE:
       loss_kld=self.kld(mu,log_var,mask_latent)
       loss_mmd=self.mmd(latent_space,mask_latent)
-      loss=loss_mae+beta*((1.0 - self.alpha) *loss_kld+(self.alpha + self.p_lambda - 1.0)*loss_mmd)
+      loss=loss_mae+((1.0 - self.alpha) *loss_kld+(self.alpha + self.p_lambda - 1.0)*loss_mmd)
       diagnostic=[loss_mae.detach(),loss_kld.detach(),loss_mmd.detach(),0.0,0.0,0.0]
     elif self.is_NMSE:
       loss=loss_mae
@@ -947,7 +821,7 @@ class feature_extractor_loss(torch.nn.Module):
       loss_cosine=self.cosine(latent_space=latent_space, target=target, mask_latent=mask_latent, mask_target=mask)
       loss_scale=self.mean_euc(latent_space=latent_space, mask_latent=mask_latent)
       loss=loss_mae+self.p_lambda*((1-self.alpha)*loss_magnitude+self.alpha*loss_cosine+loss_scale)
-      diagnostic=[loss_mse.detach(),0.0,0.0,loss_magnitude.detach(),loss_cosine.detach(),loss_scale.detach()]
+      diagnostic=[loss_mae.detach(),0.0,0.0,loss_magnitude.detach(),loss_cosine.detach(),loss_scale.detach()]
     return loss, diagnostic
 
 def get_loss_cls_fct(name,class_weights):

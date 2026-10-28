@@ -115,6 +115,7 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
         # Encoder Dense-Layer
         self.encoder_layers = torch.nn.ModuleList()
         self.encoder_lns = torch.nn.ModuleList()
+        self.attention= torch.nn.ModuleList()
         
         # Separe Liste für decoder parameter wenn !self.decoder_share_weights
         self.decoder_params=torch.nn.ParameterList()
@@ -150,6 +151,9 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
             if orthogonal_method != "None" and self.fe_type=="Dense":
                 torch.nn.utils.parametrizations.orthogonal(module=layer, name="weight", orthogonal_map=orthogonal_method)
             self.encoder_layers.append(layer)
+            self.attention.append(
+              torch.nn.MultiheadAttention(embed_dim=out_d, num_heads=2, dropout=0.0, bias=True,batch_first=True)
+            )
             #Add decoder weights if !self.decoder_share_weights
             if not self.decoder_share_weights:
                 decoder_weights=torch.nn.init.orthogonal_(torch.randn_like(layer.weight.clone()))
@@ -182,20 +186,6 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
               self.decoder_params_res.append(decoder_params_res_weights)
               
             
-            #Master Residual
-            if self.fe_type=="Dense":
-              self.res_connect_master=torch.nn.Linear(features_in, features_out, bias=False)
-              torch.nn.init.orthogonal_(self.res_connect_master.weight)
-              if self.static_residual:
-                for param in self.res_connect_master.parameters():
-                  param.requires_grad = False
-              #Decoder Weights for residual connection
-              if not self.decoder_share_weights:
-                self.decoder_params_res_weights_master=torch.nn.Parameter(
-                  torch.nn.init.orthogonal_(torch.randn_like(self.res_connect_master.weight.clone())),
-                  requires_grad=not self.static_residual
-                )
-
             # Eigener Decoder-Bias: Da der Decoder rückwärts läuft und die Gewichte transponiert, 
             # ist die Ausgangsdimension des entsprechenden Decoder-Schritts gleich der Eingangsdimension `in_d` des Encoders.
             dec_bias = torch.nn.Parameter(torch.zeros(in_d))
@@ -306,6 +296,7 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
             else:
               y = layer(y)
             y = self.activation_encoder[idx](y)
+            y=y+self.attention[idx](query=y, key=y, value=y,key_padding_mask=torch.squeeze(mask[:,0:self.seq_len[idx+1],:],dim=2))[0]
             y=self.dropout_encoder[idx](y)
             #Residual
             if self.is_conv:
@@ -319,10 +310,6 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
               res=self.residual_connections[idx](y_start)
               y=y+res
             y = y * ~mask[:,0:self.seq_len[idx+1],:]
-        #Master Residual
-        if not self.is_conv:
-          y=y+self.res_connect_master(x)
-        y = y * ~mask[:,0:self.seq_len[-1],:]
         return y
 
     def decoder(self, output_mask, y):
@@ -398,17 +385,6 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
               #res=dropout_rev[idx](res)
               y=y+res
             y = y * ~tmp_mask[:,0:seq_len_rev[idx+1],:]
-        #Master Residual
-        if not self.is_conv:
-          if not self.decoder_share_weights:
-            w_res_master=self.decoder_params_res_weights_master
-          else:  
-            w_res_master=self.res_connect_master.weight
-          res=torch.nn.functional.linear(
-            latent_space, 
-            weight=w_res_master.t()
-          )
-          y=y+res
         y=y[:,0:self.times,:]
         y=self.decoder_head(y)
         y = y * ~output_mask

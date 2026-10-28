@@ -172,6 +172,18 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         y_label <- "Average Iota"
       } else if (measure == "s_avg_iota") {
         y_label <- "Smoothed Average Iota"
+      } else if (measure == "recon") {
+        y_label <- "Unweighted Normalized Mean Absolute Error (NMAE)"
+      } else if (measure == "kld") {
+        y_label <- "Unweighted Kullback-Leibler Divergence"
+      } else if (measure == "mmd") {
+        y_label <- "Unweighted Maximum Mean Discrepancy (MMD)"
+      } else if (measure == "magnitude") {
+        y_label <- "Unweighted Magnitude Error"
+      } else if (measure == "pairwise_cosine") {
+        y_label <- "Unweighted Pairwise Cosine Distance"
+      }else if (measure == "mean_euc_distance") {
+        y_label <- "Scaling Error"
       } else {
         y_label=measure
       }

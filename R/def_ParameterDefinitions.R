@@ -1588,7 +1588,7 @@ get_param_dict <- function() {
     allow_null = FALSE,
     min = NULL,
     max = NULL,
-    allowed_values = c("InfoVAE", "CosineStructure","MNSELoss"),
+    allowed_values = c("InfoVAELoss", "MagnitudeDegreeLoss","NMAELoss"),
     desc = "Loss to apply for the extractor.",
     default_historic = "CosineStructure",
     default_value = " CosineStructure",
@@ -1603,7 +1603,8 @@ get_param_dict <- function() {
     min = 0L,
     max = 1L,
     allowed_values = NULL,
-    desc = "Value between 0 and 1.",
+    desc = "Value between 0 and 1. If used in conjunction with InfoVAELoss this values indicates the amount of the Kullback-Leibler.
+    if used with MagnitudeDegreeLoss it determines the weight for focusing on the Magnitude or the Degree.",
     default_value = 1,
     gui_box = "Loss",
     gui_label = "Alpha",
@@ -1616,7 +1617,8 @@ get_param_dict <- function() {
     min = 0L,
     max = Inf,
     allowed_values = NULL,
-    desc = "Value for weighting MMD.",
+    desc = "If used with InfoVAELoss Value for weighting MMD. If used with MagnitudeDegreeLoss weighting for
+    the sum of Magnitude and Degree.",
     default_value = 2,
     gui_box = "Loss",
     gui_label = "Lambda",
