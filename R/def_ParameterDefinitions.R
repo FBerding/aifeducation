@@ -1555,11 +1555,7 @@ get_param_dict <- function() {
     test_values = NULL
   )
 
-  param$encoder_attention=param$attention_type
-  param$encoder_attention$gui_box="General Settings"
 
-  encoder_attention_heads=param$self_attention_head
-  param$encoder_attention$gui_box="General Settings"
 
   param$orthogonal_method <- list(
     type = "string",
@@ -2034,6 +2030,7 @@ get_param_dict <- function() {
   param$tf_act_fct$allowed_values <- act_fct_allowed_values
 
   param$fe_act_fct<- param$act_fct
+  param$fe_act_fct$allowed_values <- act_fct_allowed_values
 
   # Recurrent Layer--------------------------------------------------------------
   param$rec_dropout <- list(
@@ -2242,6 +2239,13 @@ get_param_dict <- function() {
     test_values = NULL
   )
   param$tf_attention_type <- param$attention_type
+
+  param$encoder_attention=param$attention_type
+  param$encoder_attention$allowed_values=c("Fourier", "MultiHead","None")
+  param$encoder_attention$gui_box="General Settings"
+
+  param$encoder_attention_heads=param$self_attention_head
+  param$encoder_attention_heads$gui_box="General Settings"
 
   param$add_pos_embedding <- list(
     type = "bool",

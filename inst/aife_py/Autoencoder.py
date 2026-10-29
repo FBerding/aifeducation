@@ -18,6 +18,7 @@ import math
 
 from .Normalizers import get_layer_normalization
 from .Activations import get_act_fct
+from .Layers import layer_fourier_transformation
 
 
 class layer_switch_pad_values(torch.nn.Module):
@@ -157,12 +158,12 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
             if orthogonal_method != "None" and self.fe_type=="Dense":
                 torch.nn.utils.parametrizations.orthogonal(module=layer, name="weight", orthogonal_map=orthogonal_method)
             self.encoder_layers.append(layer)
-            if self.encoder_attentio=="MultiHead":
+            if self.encoder_attention=="MultiHead":
               self.attention.append(
                 torch.nn.MultiheadAttention(embed_dim=out_d, num_heads=2, dropout=0.0, bias=True,batch_first=True)
               )
               self.attention_req_mask=True
-            elif self.encoder_attentio=="Fourier":
+            elif self.encoder_attention=="Fourier":
               self.attention.append(
                 layer_fourier_transformation()
               )
@@ -226,17 +227,27 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
             )
             
             #Activations  
-            self.is_SwiGLU=(fe_act_fct=="SwiGLU")
+            self.is_SwiGLU_encoder=(fe_act_fct=="SwiGLU")
             self.activation_encoder.append(
-              get_act_fct(name=fe_act_fct)
+              get_act_fct(
+                name=fe_act_fct,
+                input_dim=in_d,
+                output_dim=out_d
+              )
             )
             if decoder_linear:
               self.activation_decoder.append(
                 get_act_fct(name="None")
               )
+              self.is_SwiGLU_decoder=False
             else:
+              self.is_SwiGLU_decoder=(fe_act_fct=="SwiGLU")
               self.activation_decoder.append(
-                get_act_fct(name=fe_act_fct)
+                get_act_fct(
+                  name=fe_act_fct,
+                  input_dim=out_d,
+                  output_dim=in_d
+                )
               )
             
             #Dropout
@@ -311,7 +322,10 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
             else:
               y = layer(y)
             #Activation
-            y = self.activation_encoder[idx](y) 
+            if self.is_SwiGLU_encoder:
+              y = self.activation_encoder[idx](y,y_start)
+            else:  
+              y = self.activation_encoder[idx](y) 
             #Attention  
             if self.has_attention:  
               if self.attention_req_mask:
@@ -380,7 +394,12 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
                 weight=w.t(),
                 bias=b_dec
               )
-            y = activation_rev[idx](y)
+            # Activation
+            if self.is_SwiGLU_encoder:
+              y = activation_rev[idx](y,y_start)
+            else:  
+               y = activation_rev[idx](y)
+           
             y=dropout_rev[idx](y)
             #Residual
             if self.add_residual:
