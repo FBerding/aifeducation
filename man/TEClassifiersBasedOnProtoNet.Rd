@@ -134,7 +134,8 @@ on the validation data set is used as the final model.
   amp = FALSE,
   comp_use = FALSE,
   comp_mode = "reduce-overhead",
-  ddp_use = FALSE
+  ddp_use = FALSE,
+  patience = 250L
 )}
     \if{html}{\out{</div>}}
   }
@@ -263,6 +264,7 @@ Set this value to \code{0.0} requests an automatic search for a good learning ra
 \item 'None'
 \item 'Linear'
 \item 'Cyclic'
+\item 'CosineAnnealing'
 }}
       \item{\code{lr_warm_up_ratio}}{\code{double} Number of epochs used for warm up. To disable warm up set this value to 0.0. Allowed values:
 
@@ -291,6 +293,10 @@ the compilation backend is 'triton.'. Allowed values:
 \item 'max-autotune-no-cudagraphs'
 }}
       \item{\code{ddp_use}}{\code{bool} If \code{TRUE} model uses all available gpus for training.}
+      \item{\code{patience}}{\code{int} Number of epochs within which a checkpoint must be set. If a new checkpoint
+is set counter is reseted. If epochs exceeds this number training stops. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
       \item{\code{loss_balance_class_weights}}{\code{bool} If \code{TRUE} class weights are generated based on the frequencies of the
 training data with the method Inverse Class Frequency. If \code{FALSE} each class has the weight 1.}
       \item{\code{loss_balance_sequence_length}}{\code{bool} If \code{TRUE} sample weights are generated for the length of sequences based on

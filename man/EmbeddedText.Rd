@@ -55,6 +55,7 @@ in the columns.}
     \item \href{#method-EmbeddedText-set_package_versions}{\code{EmbeddedText$set_package_versions()}}
     \item \href{#method-EmbeddedText-get_package_versions}{\code{EmbeddedText$get_package_versions()}}
     \item \href{#method-EmbeddedText-print}{\code{EmbeddedText$print()}}
+    \item \href{#method-EmbeddedText-calc_embedding_statistics}{\code{EmbeddedText$calc_embedding_statistics()}}
     \item \href{#method-EmbeddedText-clone}{\code{EmbeddedText$clone()}}
   }
 }
@@ -308,6 +309,7 @@ the number of dimensions of the text embeddings. This information should only be
   model_name,
   model_label = NA,
   features = NA,
+  times = NA,
   method = NA,
   noise_factor = NA,
   optimizer = NA
@@ -320,6 +322,7 @@ the number of dimensions of the text embeddings. This information should only be
       \item{\code{model_name}}{\code{string} Name of the underlying \link{TextEmbeddingModel}.}
       \item{\code{model_label}}{\code{string} Label of the underlying \link{TextEmbeddingModel}.}
       \item{\code{features}}{\code{int} Number of dimension (features) for the \strong{compressed} text embeddings.}
+      \item{\code{times}}{\code{int} Number of time steps/chunks for the \strong{compressed} text embeddings.}
       \item{\code{method}}{\code{string} Method that the \link{TEFeatureExtractor} applies for genereating the compressed text
 embeddings.}
       \item{\code{noise_factor}}{\code{double} Noise factor of the \link{TEFeatureExtractor}.}
@@ -442,6 +445,24 @@ R and python packages.
   }
   \subsection{Returns}{
     Prints a short description of the object.
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-EmbeddedText-calc_embedding_statistics"></a>}}
+\if{latex}{\out{\hypertarget{method-EmbeddedText-calc_embedding_statistics}{}}}
+\subsection{\code{EmbeddedText$calc_embedding_statistics()}}{
+  Calculates the correlation between the features across
+times and cases and the IsoScore (Rudman et al. 2022).
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{EmbeddedText$calc_embedding_statistics()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Returns a \code{list} that shows statistics concerning the correlation
+of the features and the IsoScore. The filed 'effect_size' uses the absolute values of the correlation while
+'statistics' uses the raw estimates.
   }
 }
 

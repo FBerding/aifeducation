@@ -227,6 +227,7 @@ dimensions of the text embeddings. This information should only be used if a \li
   model_name,
   model_label = NA,
   features = NA,
+  times = NA,
   method = NA,
   noise_factor = NA,
   optimizer = NA
@@ -239,6 +240,7 @@ dimensions of the text embeddings. This information should only be used if a \li
       \item{\code{model_name}}{\code{string} Name of the underlying \link{TextEmbeddingModel}.}
       \item{\code{model_label}}{\code{string} Label of the underlying \link{TextEmbeddingModel}.}
       \item{\code{features}}{\code{int} Number of dimension (features) for the \strong{compressed} text embeddings.}
+      \item{\code{times}}{\code{int} Number of time steps/chunks for the \strong{compressed} text embeddings.}
       \item{\code{method}}{\code{string} Method that the \link{TEFeatureExtractor} applies for genereating the compressed text
 embeddings.}
       \item{\code{noise_factor}}{\code{double} Noise factor of the \link{TEFeatureExtractor}.}

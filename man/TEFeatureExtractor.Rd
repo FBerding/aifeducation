@@ -27,9 +27,7 @@ Objects of class \link{TEFeatureExtractor} are designed to be used with any \lin
 }
 \note{
 \code{features} refers to the number of features for the compressed text embeddings.
-
-This model requires \code{pad_value=0}. If this condition is not met the
-padding value is switched automatically.
+if \verb{method="DenseTimes".}
 
 This model requires that the underlying \link{TextEmbeddingModel} uses \code{pad_value=0}. If
 this condition is not met the pad value is switched before training.
@@ -50,6 +48,7 @@ Other Text Embedding:
     \item \href{#method-TEFeatureExtractor-extract_features}{\code{TEFeatureExtractor$extract_features()}}
     \item \href{#method-TEFeatureExtractor-extract_features_large}{\code{TEFeatureExtractor$extract_features_large()}}
     \item \href{#method-TEFeatureExtractor-plot_training_history}{\code{TEFeatureExtractor$plot_training_history()}}
+    \item \href{#method-TEFeatureExtractor-compare_embedding_statistics}{\code{TEFeatureExtractor$compare_embedding_statistics()}}
     \item \href{#method-TEFeatureExtractor-print}{\code{TEFeatureExtractor$print()}}
     \item \href{#method-TEFeatureExtractor-clone}{\code{TEFeatureExtractor$clone()}}
   }
@@ -94,11 +93,21 @@ Other Text Embedding:
   name = NULL,
   label = NULL,
   text_embeddings = NULL,
+  vae = FALSE,
+  add_residual = TRUE,
+  encoder_dropout = 0.05,
+  encoder_attention = "MultiHead",
+  encoder_attention_heads = 2L,
+  decoder_dropout = 0.05,
+  decoder_share_weights = TRUE,
+  decoder_linear = TRUE,
+  fe_type = "Dense",
+  fe_normalization = "LayerNorm",
+  fe_act_fct = "GELU",
   features = 128L,
   te_n_layers = 3,
-  method = "dense",
-  orthogonal_method = "matrix_exp",
-  noise_factor = 0.2
+  orthogonal_method = "None",
+  noise_factor = 1e-04
 )}
     \if{html}{\out{</div>}}
   }
@@ -114,17 +123,57 @@ any}
 
 any}
       \item{\code{text_embeddings}}{\verb{EmbeddedText, LargeDataSetForTextEmbeddings} Object of class \link{EmbeddedText} or \link{LargeDataSetForTextEmbeddings}.}
+      \item{\code{vae}}{\code{bool} \code{TRUE} for a variational autoencoder. \code{FALSE} for a classic autoencoder.}
+      \item{\code{add_residual}}{\code{bool} if \code{TRUE} a residual connection is atted to every layer.}
+      \item{\code{encoder_dropout}}{\code{double} determining the dropout for the dense projection within the transformer encoder layers. Allowed values:
+
+\ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{\eqn{0 <= x <= 0.6}}{`0 <= x <= 0.6`}}}
+      \item{\code{encoder_attention}}{\code{string} Choose the attention type. Allowed values:
+\itemize{
+\item 'Fourier'
+\item 'MultiHead'
+\item 'None'
+}}
+      \item{\code{encoder_attention_heads}}{\code{int} determining the number of attention heads for a self-attention layer. Only relevant if \code{attention_type='MultiHead'} Allowed values:
+
+\ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
+      \item{\code{decoder_dropout}}{\code{double} Dropout rate for the decoder layer. Allowed values:
+
+\ifelse{latex}{$0 <= x <= 0.6$}{\ifelse{html}{\eqn{0 <= x <= 0.6}}{`0 <= x <= 0.6`}}}
+      \item{\code{decoder_share_weights}}{\code{bool} if \code{TRUE} the decoder uses the weights of the encoder layers.}
+      \item{\code{decoder_linear}}{\code{bool} if \code{TRUE} no activation is applied in the decoder layers.}
+      \item{\code{fe_type}}{\code{string} Method to use for the feature extraction. Allowed values:
+\itemize{
+\item 'Dense'
+\item 'Conv'
+}}
+      \item{\code{fe_normalization}}{\code{string} Type of normalization applied to encoder and decoder layers. Allowed values:
+\itemize{
+\item 'LayerNorm'
+\item 'BatchNorm'
+\item 'PowerNorm'
+\item 'RMSNorm'
+\item 'GlobalNorm'
+\item 'None'
+}}
+      \item{\code{fe_act_fct}}{\code{string} Activation function for the specified layers. Allowed values:
+\itemize{
+\item 'ELU'
+\item 'LeakyReLU'
+\item 'ReLU'
+\item 'GELU'
+\item 'Sigmoid'
+\item 'Tanh'
+\item 'PReLU'
+\item 'SwiGLU'
+\item 'None'
+}}
       \item{\code{features}}{\code{int} Number of features the model should use. Allowed values:
 
 \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
       \item{\code{te_n_layers}}{\code{int} Number of layers. Allowed values:
 
 \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
-      \item{\code{method}}{\code{string} Method to use for the feature extraction. \code{'lstm'} for an extractor based on LSTM-layers or \code{'Dense'} for dense layers. Allowed values:
-\itemize{
-\item 'Dense'
-\item 'LSTM'
-}}
       \item{\code{orthogonal_method}}{\code{string} Method for ensuring orthogonality of weights. Allowed values:
 \itemize{
 \item 'matrix_exp'
@@ -154,13 +203,16 @@ be added to the input during training. Allowed values:
     \preformatted{TEFeatureExtractor$train(
   data_embeddings = NULL,
   data_val_size = 0.25,
+  fe_loss_type = "InfoVAE",
+  fe_loss_alpha = 0,
+  fe_loss_lambda = 2,
   sustain_track = TRUE,
   sustain_iso_code = NULL,
   sustain_region = NULL,
   sustain_interval = 15L,
   sustain_log_level = "warning",
   epochs = 40L,
-  batch_size = 32L,
+  batch_size = 512L,
   trace = TRUE,
   ml_trace = 1L,
   log_dir = NULL,
@@ -174,6 +226,7 @@ be added to the input during training. Allowed values:
   amp = FALSE,
   comp_use = FALSE,
   comp_mode = "reduce-overhead",
+  patience = 250L,
   ddp_use = FALSE
 )}
     \if{html}{\out{</div>}}
@@ -187,6 +240,21 @@ used for the validation sample during the estimation of the model.
 The remaining cases are part of the training data. Allowed values:
 
 \ifelse{latex}{$0 < x < 1$}{\ifelse{html}{\eqn{0 < x < 1}}{`0 < x < 1`}}}
+      \item{\code{fe_loss_type}}{\code{string} Loss to apply for the extractor. Allowed values:
+\itemize{
+\item 'InfoVAELoss'
+\item 'MagnitudeDegreeLoss'
+\item 'NMAELoss'
+\item 'NMAEDeCorLoss'
+}}
+      \item{\code{fe_loss_alpha}}{\code{double} Value between 0 and 1. If used in conjunction with InfoVAELoss this values indicates the amount of the Kullback-Leibler.
+if used with MagnitudeDegreeLoss it determines the weight for focusing on the Magnitude or the Degree. Allowed values:
+
+\ifelse{latex}{$0 <= x <= 1$}{\ifelse{html}{\eqn{0 <= x <= 1}}{`0 <= x <= 1`}}}
+      \item{\code{fe_loss_lambda}}{\code{double} If used with InfoVAELoss Value for weighting MMD. If used with MagnitudeDegreeLoss weighting for
+the sum of Magnitude and Degree. Allowed values:
+
+\ifelse{latex}{$0 <= x $}{\ifelse{html}{\eqn{0 <= x }}{`0 <= x `}}}
       \item{\code{sustain_track}}{\code{bool} If \code{TRUE} energy consumption is tracked during training via the python library 'codecarbon'.}
       \item{\code{sustain_iso_code}}{\code{string} ISO code (Alpha-3-Code) for the country. This variable must be set if
 sustainability should be tracked. A list can be found on Wikipedia:
@@ -242,6 +310,7 @@ Set this value to \code{0.0} requests an automatic search for a good learning ra
 \item 'None'
 \item 'Linear'
 \item 'Cyclic'
+\item 'CosineAnnealing'
 }}
       \item{\code{lr_epochs}}{\code{int} Number of epochs used for calculating the learning rate. Allowed values:
 
@@ -266,6 +335,10 @@ the compilation backend is 'triton.'. Allowed values:
 \item 'max-autotune'
 \item 'max-autotune-no-cudagraphs'
 }}
+      \item{\code{patience}}{\code{int} Number of epochs within which a checkpoint must be set. If a new checkpoint
+is set counter is reseted. If epochs exceeds this number training stops. Allowed values:
+
+\ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
       \item{\code{ddp_use}}{\code{bool} If \code{TRUE} model uses all available gpus for training.}
     }
     \if{html}{\out{</div>}}
@@ -342,11 +415,13 @@ This method requires the \emph{R} package 'ggplot2' to work.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
     \preformatted{TEFeatureExtractor$plot_training_history(
+  measure = "loss",
   x_min = NULL,
   x_max = NULL,
   y_min = NULL,
   y_max = NULL,
-  ind_best_model = TRUE,
+  ind_best_model = FALSE,
+  ind_selected_model = TRUE,
   text_size = 10L
 )}
     \if{html}{\out{</div>}}
@@ -354,6 +429,7 @@ This method requires the \emph{R} package 'ggplot2' to work.
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
+      \item{\code{measure}}{Measure to plot.}
       \item{\code{x_min}}{\code{int} Minimal value for x-axis. Set to \code{NULL} for an automatic adjustment. Allowed values:
 
 \ifelse{latex}{$ x $}{\ifelse{html}{\eqn{ x }}{` x `}}}
@@ -367,6 +443,7 @@ This method requires the \emph{R} package 'ggplot2' to work.
 
 \ifelse{latex}{$ x $}{\ifelse{html}{\eqn{ x }}{` x `}}}
       \item{\code{ind_best_model}}{\code{bool} If \code{TRUE} the plot indicates the best states of the model according to the chosen measure.}
+      \item{\code{ind_selected_model}}{\code{bool} If \code{TRUE} the plot indicates the states of the model which are used after training. These are the final states of the fold or the final state of the last training loop.}
       \item{\code{text_size}}{\code{int} Size of text elements. Allowed values:
 
 \ifelse{latex}{$1 <= x $}{\ifelse{html}{\eqn{1 <= x }}{`1 <= x `}}}
@@ -375,6 +452,37 @@ This method requires the \emph{R} package 'ggplot2' to work.
   }
   \subsection{Returns}{
     Returns a plot of class \code{ggplot} visualizing the training process.
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TEFeatureExtractor-compare_embedding_statistics"></a>}}
+\if{latex}{\out{\hypertarget{method-TEFeatureExtractor-compare_embedding_statistics}{}}}
+\subsection{\code{TEFeatureExtractor$compare_embedding_statistics()}}{
+  Compare embedding statistics.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{TEFeatureExtractor$compare_embedding_statistics(
+  data_embeddings,
+  batch_size,
+  trace = FALSE
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{data_embeddings}}{Object of class \link{EmbeddedText} or \link{LargeDataSetForTextEmbeddings} containing the text
+embeddings which should be reduced in their dimensions.}
+      \item{\code{batch_size}}{\code{int} batch size.}
+      \item{\code{trace}}{\code{bool} If \code{TRUE} information about the progress is printed to the console.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Returns a \code{matrix} showing embedding statistics before and after compression.
+All values refer to the absolute values of correlation between feature dimensions.
+IsoScore is calculated as described by Rudman et al. (2022).
   }
 }
 

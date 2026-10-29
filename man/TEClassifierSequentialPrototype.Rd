@@ -193,8 +193,8 @@ Other Classification:
   target_levels = NULL,
   skip_connection_type = "ResidualGate",
   cls_pooling_features = 50L,
-  cls_pooling_type = "MinMaxTimes",
-  cls_input_normalize = "BatchNorm",
+  cls_pooling_type = "WeightedAverageTimes",
+  cls_input_normalize = "None",
   projection_type = "Regular",
   metric_type = "Euclidean",
   feat_act_fct = "None",
@@ -202,7 +202,7 @@ Other Classification:
   feat_bias = TRUE,
   feat_dropout = 0,
   feat_parametrizations = "None",
-  feat_normalization_type = "PowerNorm",
+  feat_normalization_type = "None",
   ng_conv_act_fct = "ELU",
   ng_conv_n_layers = 0L,
   ng_conv_ks_min = 2L,
@@ -210,14 +210,14 @@ Other Classification:
   ng_conv_bias = FALSE,
   ng_conv_dropout = 0.4,
   ng_conv_parametrizations = "None",
-  ng_conv_normalization_type = "RMSNorm",
+  ng_conv_normalization_type = "LayerNorm",
   ng_conv_residual_type = "ResidualGate",
   dense_act_fct = "ELU",
   dense_n_layers = 3L,
-  dense_dropout = 0.5,
+  dense_dropout = 0.2,
   dense_bias = FALSE,
   dense_parametrizations = "None",
-  dense_normalization_type = "RMSNorm",
+  dense_normalization_type = "LayerNorm",
   dense_residual_type = "ResidualGate",
   rec_act_fct = "Tanh",
   rec_n_layers = 1,
@@ -226,7 +226,7 @@ Other Classification:
   rec_dropout = 0.2,
   rec_bias = FALSE,
   rec_parametrizations = "None",
-  rec_normalization_type = "RMSNorm",
+  rec_normalization_type = "LayerNorm",
   rec_residual_type = "ResidualGate",
   tf_act_fct = "ELU",
   tf_dense_dim = 50L,
@@ -238,10 +238,10 @@ Other Classification:
   tf_num_heads = 1L,
   tf_bias = FALSE,
   tf_parametrizations = "None",
-  tf_normalization_type = "RMSNorm",
+  tf_normalization_type = "LayerNorm",
   tf_normalization_position = "Pre",
   tf_residual_type = "ResidualGate",
-  final_normalization_type = "PowerNorm",
+  final_normalization_type = "LayerNorm",
   embedding_dim = 2L
 )}
     \if{html}{\out{</div>}}
@@ -331,6 +331,7 @@ Only relevant if pooling type is 'Max', 'Min' or 'MinMax'. Allowed values:
 \item 'BatchNorm'
 \item 'PowerNorm'
 \item 'RMSNorm'
+\item 'GlobalNorm'
 \item 'None'
 }}
       \item{\code{ng_conv_act_fct}}{\code{string} Activation function for the specified layers. Allowed values:
@@ -370,6 +371,7 @@ Only relevant if pooling type is 'Max', 'Min' or 'MinMax'. Allowed values:
 \item 'BatchNorm'
 \item 'PowerNorm'
 \item 'RMSNorm'
+\item 'GlobalNorm'
 \item 'None'
 }}
       \item{\code{ng_conv_residual_type}}{\code{string} Type of residual connenction for all layers and stack of layers. Allowed values:
@@ -409,6 +411,7 @@ Only relevant if pooling type is 'Max', 'Min' or 'MinMax'. Allowed values:
 \item 'BatchNorm'
 \item 'PowerNorm'
 \item 'RMSNorm'
+\item 'GlobalNorm'
 \item 'None'
 }}
       \item{\code{dense_residual_type}}{\code{string} Type of residual connenction for all layers and stack of layers. Allowed values:
@@ -444,6 +447,7 @@ Only relevant if pooling type is 'Max', 'Min' or 'MinMax'. Allowed values:
 \item 'BatchNorm'
 \item 'PowerNorm'
 \item 'RMSNorm'
+\item 'GlobalNorm'
 \item 'None'
 }}
       \item{\code{rec_residual_type}}{\code{string} Type of residual connenction for all layers and stack of layers. Allowed values:
@@ -503,6 +507,7 @@ Only relevant if pooling type is 'Max', 'Min' or 'MinMax'. Allowed values:
 \item 'BatchNorm'
 \item 'PowerNorm'
 \item 'RMSNorm'
+\item 'GlobalNorm'
 \item 'None'
 }}
       \item{\code{tf_normalization_position}}{\code{string} Position where the normalization should be applied. Allowed values:
@@ -522,6 +527,7 @@ Only relevant if pooling type is 'Max', 'Min' or 'MinMax'. Allowed values:
 \item 'BatchNorm'
 \item 'PowerNorm'
 \item 'RMSNorm'
+\item 'GlobalNorm'
 \item 'None'
 }}
       \item{\code{embedding_dim}}{\code{int}  determining the number of dimensions for the embedding. Allowed values:
