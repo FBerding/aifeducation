@@ -39,7 +39,7 @@ class layer_switch_pad_values(torch.nn.Module):
     return z
 
 class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
-    def __init__(self, features_in, features_out, times,vae, encoder_dropout,decoder_dropout,decoder_share_weights,decoder_linear,noise_factor,fe_type,fe_normalization,fe_act_fct, pad_value, orthogonal_method, te_n_layers=3):
+    def __init__(self, features_in, features_out, times,vae,add_residual, encoder_dropout,encoder_attention,encoder_attention_heads,decoder_dropout,decoder_share_weights,decoder_linear,noise_factor,fe_type,fe_normalization,fe_act_fct, pad_value, orthogonal_method, te_n_layers=3):
         super().__init__()
         self.features_in = features_in
         self.times = times
@@ -49,7 +49,14 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
         self.decoder_share_weights=decoder_share_weights
         self.difference = self.features_in - self.features_out
         self.is_vae=vae
+        
         self.static_residual=True
+        self.add_residual=add_residual
+        
+        self.encoder_attention_heads=encoder_attention_heads
+        self.has_attention=(not encoder_attention=="None")
+        self.encoder_attention=encoder_attention
+        
         if isinstance(pad_value, torch.Tensor):
           self.register_buffer("pad_value",pad_value.clone().float())
         else:
@@ -57,9 +64,8 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
         
         #Register type of model
         self.fe_type=fe_type
-        print(self.fe_type)
-        print(self.is_vae)
         self.is_conv=(self.fe_type=="Conv")
+        
         # Feature-Größen berechnen
         dims = []
         for i in range(self.n_layers + 1):
@@ -151,31 +157,39 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
             if orthogonal_method != "None" and self.fe_type=="Dense":
                 torch.nn.utils.parametrizations.orthogonal(module=layer, name="weight", orthogonal_map=orthogonal_method)
             self.encoder_layers.append(layer)
-            self.attention.append(
-              torch.nn.MultiheadAttention(embed_dim=out_d, num_heads=2, dropout=0.0, bias=True,batch_first=True)
-            )
+            if self.encoder_attentio=="MultiHead":
+              self.attention.append(
+                torch.nn.MultiheadAttention(embed_dim=out_d, num_heads=2, dropout=0.0, bias=True,batch_first=True)
+              )
+              self.attention_req_mask=True
+            elif self.encoder_attentio=="Fourier":
+              self.attention.append(
+                layer_fourier_transformation()
+              )
+              self.attention_req_mask=False
             #Add decoder weights if !self.decoder_share_weights
             if not self.decoder_share_weights:
                 decoder_weights=torch.nn.init.orthogonal_(torch.randn_like(layer.weight.clone()))
                 self.decoder_params.append(decoder_weights)
             
             #Residual connection
-            if self.fe_type=="Conv":
-              res_connect=torch.nn.Conv1d(
-                    in_channels=in_d, 
-                    out_channels=out_d, 
-                    kernel_size=2, 
-                    stride=2, 
-                    padding=0,
-                    bias=False
-                )
-            elif self.fe_type=="Dense":
-              res_connect=torch.nn.Linear(in_d, out_d, bias=False)
-            torch.nn.init.orthogonal_(res_connect.weight)
-            if self.static_residual:
-              for param in res_connect.parameters():
-                param.requires_grad = False
-            self.residual_connections.append(res_connect)
+            if self.add_residual:
+              if self.fe_type=="Conv":
+                res_connect=torch.nn.Conv1d(
+                      in_channels=in_d, 
+                      out_channels=out_d, 
+                      kernel_size=2, 
+                      stride=2, 
+                      padding=0,
+                      bias=False
+                  )
+              elif self.fe_type=="Dense":
+                res_connect=torch.nn.Linear(in_d, out_d, bias=False)
+              torch.nn.init.orthogonal_(res_connect.weight)
+              if self.static_residual:
+                for param in res_connect.parameters():
+                  param.requires_grad = False
+              self.residual_connections.append(res_connect)
             
             #Decoder Weights for residual connection
             if not self.decoder_share_weights:
@@ -212,6 +226,7 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
             )
             
             #Activations  
+            self.is_SwiGLU=(fe_act_fct=="SwiGLU")
             self.activation_encoder.append(
               get_act_fct(name=fe_act_fct)
             )
@@ -295,20 +310,27 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
               y=torch.permute(y,(0,2,1))
             else:
               y = layer(y)
-            y = self.activation_encoder[idx](y)
-            y=y+self.attention[idx](query=y, key=y, value=y,key_padding_mask=torch.squeeze(mask[:,0:self.seq_len[idx+1],:],dim=2))[0]
+            #Activation
+            y = self.activation_encoder[idx](y) 
+            #Attention  
+            if self.has_attention:  
+              if self.attention_req_mask:
+                y=y+self.attention[idx](query=y, key=y, value=y,key_padding_mask=torch.squeeze(mask[:,0:self.seq_len[idx+1],:],dim=2))[0]
+              else:
+                y=y+self.attention[idx](y)
             y=self.dropout_encoder[idx](y)
             #Residual
-            if self.is_conv:
-              y_start=torch.nn.functional.pad(y_start, pad=(0,0,self.padding[idx],0), mode='constant', value=0.0)
-              y_start=torch.permute(y_start,(0,2,1))
-              y=torch.permute(y,(0,2,1))
-              res=self.residual_connections[idx](y_start)
-              y=y+res
-              y=torch.permute(y,(0,2,1))
-            else:
-              res=self.residual_connections[idx](y_start)
-              y=y+res
+            if self.add_residual:
+              if self.is_conv:
+                y_start=torch.nn.functional.pad(y_start, pad=(0,0,self.padding[idx],0), mode='constant', value=0.0)
+                y_start=torch.permute(y_start,(0,2,1))
+                y=torch.permute(y,(0,2,1))
+                res=self.residual_connections[idx](y_start)
+                y=y+res
+                y=torch.permute(y,(0,2,1))
+              else:
+                res=self.residual_connections[idx](y_start)
+                y=y+res
             y = y * ~mask[:,0:self.seq_len[idx+1],:]
         return y
 
@@ -361,29 +383,28 @@ class DenseAutoencoder_with_Mask_PT(torch.nn.Module):
             y = activation_rev[idx](y)
             y=dropout_rev[idx](y)
             #Residual
-            if self.is_conv:
-              y=torch.permute(y,(0,2,1))
-              y_start=torch.permute(y_start,(0,2,1))
-              res=torch.nn.functional.conv_transpose1d(
+            if self.add_residual:
+              if self.is_conv:
+                y=torch.permute(y,(0,2,1))
+                y_start=torch.permute(y_start,(0,2,1))
+                res=torch.nn.functional.conv_transpose1d(
+                    y_start, 
+                    weight=rw, 
+                    stride=2, 
+                    padding=0, 
+                    output_padding=0, 
+                    groups=1, 
+                    dilation=1
+                  )
+                res=res[:,:,0:seq_len_rev[idx+1]]
+                y=y+res
+                y=torch.permute(y,(0,2,1))
+              else:
+                res=torch.nn.functional.linear(
                   y_start, 
-                  weight=rw, 
-                  stride=2, 
-                  padding=0, 
-                  output_padding=0, 
-                  groups=1, 
-                  dilation=1
+                  weight=rw.t()
                 )
-              res=res[:,:,0:seq_len_rev[idx+1]]
-              #res=dropout_rev[idx](res)
-              y=y+res
-              y=torch.permute(y,(0,2,1))
-            else:
-              res=torch.nn.functional.linear(
-                y_start, 
-                weight=rw.t()
-              )
-              #res=dropout_rev[idx](res)
-              y=y+res
+                y=y+res
             y = y * ~tmp_mask[:,0:seq_len_rev[idx+1],:]
         y=y[:,0:self.times,:]
         y=self.decoder_head(y)

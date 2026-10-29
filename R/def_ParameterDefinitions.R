@@ -1542,6 +1542,25 @@ get_param_dict <- function() {
     test_values = NULL
   )
 
+  param$add_residual<- list(
+    type = "bool",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = NULL,
+    desc = "if `TRUE` a residual connection is atted to every layer.",
+    gui_box = "General Settings",
+    gui_label = "Add Residual",
+    default_value = TRUE,
+    test_values = NULL
+  )
+
+  param$encoder_attention=param$attention_type
+  param$encoder_attention$gui_box="General Settings"
+
+  encoder_attention_heads=param$self_attention_head
+  param$encoder_attention$gui_box="General Settings"
+
   param$orthogonal_method <- list(
     type = "string",
     allow_null = FALSE,
@@ -2015,7 +2034,6 @@ get_param_dict <- function() {
   param$tf_act_fct$allowed_values <- act_fct_allowed_values
 
   param$fe_act_fct<- param$act_fct
-  param$fe_act_fct$allowed_values <- setdiff(x=act_fct_allowed_values,y="SwiGLU")
 
   # Recurrent Layer--------------------------------------------------------------
   param$rec_dropout <- list(

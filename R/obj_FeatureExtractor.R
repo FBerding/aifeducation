@@ -46,12 +46,15 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param label `r get_param_doc_desc("label")`
     #' @param text_embeddings `r get_param_doc_desc("text_embeddings")`
     #' @param vae `r get_param_doc_desc("vae")`
+    #' @param add_residual `r get_param_doc_desc("add_residual")`
     #' @param features `r get_param_doc_desc("features")`
     #' @param te_n_layers `r get_param_doc_desc("te_n_layers")`
     #' @param fe_type `r get_param_doc_desc("fe_type")`
     #' @param fe_act_fct `r get_param_doc_desc("fe_act_fct")`
     #' @param fe_normalization `r get_param_doc_desc("fe_normalization")`
     #' @param encoder_dropout `r get_param_doc_desc("encoder_dropout")`
+    #' @param encoder_attention `r get_param_doc_desc("encoder_attention")`
+    #' @param encoder_attention_heads `r get_param_doc_desc("encoder_attention_heads")`
     #' @param decoder_dropout `r get_param_doc_desc("decoder_dropout")`
     #' @param decoder_share_weights `r get_param_doc_desc("decoder_share_weights")`
     #' @param decoder_linear `r get_param_doc_desc("decoder_linear")`
@@ -63,7 +66,10 @@ TEFeatureExtractor <- R6::R6Class(
                          label = NULL,
                          text_embeddings = NULL,
                          vae=FALSE,
+                         add_residual=TRUE,
                          encoder_dropout=0.05,
+                         encoder_attention="MultiHead",
+                         encoder_attention_heads=2L,
                          decoder_dropout=0.05,
                          decoder_share_weights=TRUE,
                          decoder_linear=TRUE,
@@ -572,6 +578,9 @@ TEFeatureExtractor <- R6::R6Class(
           te_n_layers= as.integer(private$model_config$te_n_layers),
           noise_factor = private$model_config$noise_factor,
           encoder_dropout=private$model_config$encoder_dropout,
+          add_residual=private$model_config$add_residual,
+          encoder_attention=private$model_config$encoder_attention,
+          encoder_attention_heads=as.integer(private$model_config$encoder_attention_heads),
           decoder_dropout=private$model_config$decoder_dropout,
           decoder_share_weights=private$model_config$decoder_share_weights,
           decoder_linear=private$model_config$decoder_linear,
