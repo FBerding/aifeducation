@@ -691,7 +691,7 @@ TEFeatureExtractor <- R6::R6Class(
     },
   #----------------------------------------------------------------------------
   check_param_combinations=function(){
-    if(private$model_config$method=="Dense"){
+    if(private$model_config$fe_type=="Dense"){
       private$model_config$times=self$get_text_embedding_model()$times
     }
   }
