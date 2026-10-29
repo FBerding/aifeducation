@@ -60,7 +60,8 @@
 <li>We removed the calculation of statistics for the test data set during training to speed up progress.</li>
 <li>Vignettes are re-structured.</li>
 </ul><p><strong>Classifiers</strong></p>
-<ul><li>Added an new type of classifiers which are a combination of classical and prototypical classifiers. (‘TEClassifierSequentialReferencePoint’ and ‘TEClassifierParallelReferencePoint’).</li>
+<ul><li>Changed all layer to pre-layer normalization.</li>
+<li>Added an new type of classifiers which are a combination of classical and prototypical classifiers. (‘TEClassifierSequentialReferencePoint’ and ‘TEClassifierParallelReferencePoint’).</li>
 <li>Added ‘FocalLossOrdinal’ and ‘MultiWayContrastiveLossFCOrdinal’ as new losses for ordinal scales.</li>
 <li>Added a new <em>experimental</em> Assignment-Error-Loss (AEMLoss) based on Berding and Pargmann (2022).</li>
 <li>NANs in loss now raise an error.</li>
@@ -73,14 +74,19 @@
 <li>Rewrite DataCollator for TEClassifierPrototype to speed up learning.</li>
 </ul><p><strong>TEFeatureExtractor</strong></p>
 <ul><li>NANs in loss now raise an error.</li>
+<li>FeatureExtractor now allow to choose the number of layers.</li>
 <li>The number of epochs for learning rate calculation can now be determined by the user.</li>
 <li>TEFeatureExtractors now support compilation to speed up training.</li>
 <li>Removed LSTM method.</li>
+<li>Added new method ‘DenseTimes’ that reduces the embeddings on both features and times.</li>
+</ul><p><strong>EmbeddedText</strong></p>
+<ul><li>Added a method that allows to request the correlations between the features of a given set of text embeddings.</li>
 </ul><p><strong>DataManager</strong></p>
-<ul><li>Added a new method for requesting the smallest number of cases over all folds and the different kind of data sets (train, validation, test).</li>
+<ul><li>Added a new method for requesting the smallest number of cases over all folds and the different kind of data sets (train and validation).</li>
 </ul><p><strong>Minor Issues</strong></p>
 <ul><li>Fixed a unnecessary print during training.</li>
 <li>Improved stability of SwiGLU.</li>
+<li>Reorganised python scripts as a python package.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.1.6" id="aifeducation-116">aifeducation 1.1.6<a class="anchor" aria-label="anchor" href="#aifeducation-116"></a></h2><p class="text-muted">CRAN release: 2026-07-07</p>

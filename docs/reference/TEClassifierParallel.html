@@ -309,11 +309,11 @@ a saved classifier.</p>
 <span>  target_levels <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  shared_feat_layer <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  cls_head_type <span class="op">=</span> <span class="st">"Regular"</span>,</span>
-<span>  cls_input_normalize <span class="op">=</span> <span class="st">"BatchNorm"</span>,</span>
+<span>  cls_input_normalize <span class="op">=</span> <span class="st">"PowerNorm"</span>,</span>
 <span>  feat_act_fct <span class="op">=</span> <span class="st">"None"</span>,</span>
 <span>  feat_size <span class="op">=</span> <span class="fl">50L</span>,</span>
 <span>  feat_bias <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  feat_dropout <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  feat_dropout <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  feat_parametrizations <span class="op">=</span> <span class="st">"None"</span>,</span>
 <span>  feat_normalization_type <span class="op">=</span> <span class="st">"PowerNorm"</span>,</span>
 <span>  ng_conv_act_fct <span class="op">=</span> <span class="st">"ELU"</span>,</span>
@@ -359,7 +359,7 @@ a saved classifier.</p>
 <span>  merge_normalization_type <span class="op">=</span> <span class="st">"RMSNorm"</span>,</span>
 <span>  merge_pooling_features <span class="op">=</span> <span class="fl">50L</span>,</span>
 <span>  merge_pooling_type <span class="op">=</span> <span class="st">"WeightedAverageTimes"</span>,</span>
-<span>  final_normalization_type <span class="op">=</span> <span class="st">"PowerNorm"</span></span>
+<span>  final_normalization_type <span class="op">=</span> <span class="st">"RMSNorm"</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>

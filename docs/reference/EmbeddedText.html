@@ -116,6 +116,7 @@ in the columns.</p></dd>
 <li><p><a href="#method-EmbeddedText-set_package_versions"><code>EmbeddedText$set_package_versions()</code></a></p></li>
 <li><p><a href="#method-EmbeddedText-get_package_versions"><code>EmbeddedText$get_package_versions()</code></a></p></li>
 <li><p><a href="#method-EmbeddedText-print"><code>EmbeddedText$print()</code></a></p></li>
+<li><p><a href="#method-EmbeddedText-calc_embedding_statistics"><code>EmbeddedText$calc_embedding_statistics()</code></a></p></li>
 <li><p><a href="#method-EmbeddedText-clone"><code>EmbeddedText$clone()</code></a></p></li>
 </ul></div><p></p><hr><a id="method-EmbeddedText-configure"></a><div class="section">
 <h3 id="embeddedtext-configure-"><code>EmbeddedText$configure()</code><a class="anchor" aria-label="anchor" href="#embeddedtext-configure-"></a></h3>
@@ -364,6 +365,7 @@ the number of dimensions of the text embeddings. This information should only be
 <span>  <span class="va">model_name</span>,</span>
 <span>  model_label <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  features <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  times <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  method <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  noise_factor <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  optimizer <span class="op">=</span> <span class="cn">NA</span></span>
@@ -378,6 +380,9 @@ the number of dimensions of the text embeddings. This information should only be
 
       <dt><code>features</code></dt>
 <dd><p><code>int</code> Number of dimension (features) for the <strong>compressed</strong> text embeddings.</p></dd>
+
+      <dt><code>times</code></dt>
+<dd><p><code>int</code> Number of time steps/chunks for the <strong>compressed</strong> text embeddings.</p></dd>
 
       <dt><code>method</code></dt>
 <dd><p><code>string</code> Method that the <a href="TEFeatureExtractor.html">TEFeatureExtractor</a> applies for genereating the compressed text
@@ -490,10 +495,25 @@ R and python packages.</p>
 
 </div>
 
+<p></p><hr><a id="method-EmbeddedText-calc_embedding_statistics"></a><div class="section">
+<h3 id="embeddedtext-calc-embedding-statistics-"><code>EmbeddedText$calc_embedding_statistics()</code><a class="anchor" aria-label="anchor" href="#embeddedtext-calc-embedding-statistics-"></a></h3>
+<p>Calculates the correlation between the features across
+times and cases and the IsoScore (Rudman et al. 2022).</p><div class="section">
+<h4 id="usage-19">Usage<a class="anchor" aria-label="anchor" href="#usage-19"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EmbeddedText</span><span class="op">$</span><span class="fu">calc_embedding_statistics</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
+<h4 id="returns-19">Returns<a class="anchor" aria-label="anchor" href="#returns-19"></a></h4>
+<p>Returns a <code>list</code> that shows statistics concerning the correlation
+of the features and the IsoScore. The filed 'effect_size' uses the absolute values of the correlation while
+'statistics' uses the raw estimates.</p>
+</div>
+
+</div>
+
 <p></p><hr><a id="method-EmbeddedText-clone"></a><div class="section">
 <h3 id="embeddedtext-clone-"><code>EmbeddedText$clone()</code><a class="anchor" aria-label="anchor" href="#embeddedtext-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-19">Usage<a class="anchor" aria-label="anchor" href="#usage-19"></a></h4>
+<h4 id="usage-20">Usage<a class="anchor" aria-label="anchor" href="#usage-20"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">EmbeddedText</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>

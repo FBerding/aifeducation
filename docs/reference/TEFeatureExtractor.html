@@ -97,8 +97,8 @@ orthogonal weights (except <code>method="LSTM"</code>). In addition, training tr
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
     <p><code>features</code> refers to the number of features for the compressed text embeddings.</p>
-<p>This model requires <code>pad_value=0</code>. If this condition is not met the
-padding value is switched automatically.</p>
+<p><code>times</code> refers to the number of times for the compressed text embeddings. Only relevant
+if <code>method="DenseTimes".</code></p>
 <p>This model requires that the underlying <a href="TextEmbeddingModel.html">TextEmbeddingModel</a> uses <code>pad_value=0</code>. If
 this condition is not met the pad value is switched before training.</p>
     </div>
@@ -121,6 +121,7 @@ this condition is not met the pad value is switched before training.</p>
 <li><p><a href="#method-TEFeatureExtractor-extract_features"><code>TEFeatureExtractor$extract_features()</code></a></p></li>
 <li><p><a href="#method-TEFeatureExtractor-extract_features_large"><code>TEFeatureExtractor$extract_features_large()</code></a></p></li>
 <li><p><a href="#method-TEFeatureExtractor-plot_training_history"><code>TEFeatureExtractor$plot_training_history()</code></a></p></li>
+<li><p><a href="#method-TEFeatureExtractor-compare_embedding_statistics"><code>TEFeatureExtractor$compare_embedding_statistics()</code></a></p></li>
 <li><p><a href="#method-TEFeatureExtractor-print"><code>TEFeatureExtractor$print()</code></a></p></li>
 <li><p><a href="#method-TEFeatureExtractor-clone"><code>TEFeatureExtractor$clone()</code></a></p></li>
 </ul></div><p><details><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="aifeducation" data-topic="AIFEMaster" data-id="get_all_fields"><a href="../../aifeducation/html/AIFEMaster.html#method-AIFEMaster-get_all_fields"><code>AIFEMaster$get_all_fields()</code></a></span></li>
@@ -157,10 +158,11 @@ this condition is not met the pad value is switched before training.</p>
 <span>  label <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  text_embeddings <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  features <span class="op">=</span> <span class="fl">128L</span>,</span>
+<span>  times <span class="op">=</span> <span class="fl">2L</span>,</span>
 <span>  te_n_layers <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"dense"</span>,</span>
 <span>  orthogonal_method <span class="op">=</span> <span class="st">"matrix_exp"</span>,</span>
-<span>  noise_factor <span class="op">=</span> <span class="fl">0.2</span></span>
+<span>  noise_factor <span class="op">=</span> <span class="fl">1e-04</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
@@ -181,13 +183,17 @@ is generated automatically. Allowed values:</p>
 <dd><p><code>int</code> Number of features the model should use. Allowed values:</p>
 <p>\(1 &lt;= x \)</p></dd>
 
+      <dt><code>times</code></dt>
+<dd><p><code>int</code> Number of times the model should use. Allowed values:</p>
+<p>\(2 &lt;= x \)</p></dd>
+
       <dt><code>te_n_layers</code></dt>
 <dd><p><code>int</code> Number of layers. Allowed values:</p>
 <p>\(1 &lt;= x \)</p></dd>
 
       <dt><code>method</code></dt>
-<dd><p><code>string</code> Method to use for the feature extraction. <code>'lstm'</code> for an extractor based on LSTM-layers or <code>'Dense'</code> for dense layers. Allowed values:</p><ul><li><p>'Dense'</p></li>
-<li><p>'LSTM'</p></li>
+<dd><p><code>string</code> Method to use for the feature extraction. Allowed values:</p><ul><li><p>'Dense'</p></li>
+<li><p>'DenseTimes'</p></li>
 </ul></dd>
 
       <dt><code>orthogonal_method</code></dt>
@@ -224,7 +230,7 @@ be added to the input during training. Allowed values:</p>
 <span>  sustain_interval <span class="op">=</span> <span class="fl">15L</span>,</span>
 <span>  sustain_log_level <span class="op">=</span> <span class="st">"warning"</span>,</span>
 <span>  epochs <span class="op">=</span> <span class="fl">40L</span>,</span>
-<span>  batch_size <span class="op">=</span> <span class="fl">32L</span>,</span>
+<span>  batch_size <span class="op">=</span> <span class="fl">512L</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  ml_trace <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  log_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -467,13 +473,45 @@ This method requires the <em>R</em> package 'ggplot2' to work.</p><div class="se
 
 </div>
 
+<p></p><hr><a id="method-TEFeatureExtractor-compare_embedding_statistics"></a><div class="section">
+<h3 id="tefeatureextractor-compare-embedding-statistics-"><code>TEFeatureExtractor$compare_embedding_statistics()</code><a class="anchor" aria-label="anchor" href="#tefeatureextractor-compare-embedding-statistics-"></a></h3>
+<p>Compare embedding statistics.</p><div class="section">
+<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEFeatureExtractor</span><span class="op">$</span><span class="fu">compare_embedding_statistics</span><span class="op">(</span></span>
+<span>  <span class="va">data_embeddings</span>,</span>
+<span>  <span class="va">batch_size</span>,</span>
+<span>  trace <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
+<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>data_embeddings</code></dt>
+<dd><p>Object of class <a href="EmbeddedText.html">EmbeddedText</a> or <a href="LargeDataSetForTextEmbeddings.html">LargeDataSetForTextEmbeddings</a> containing the text
+embeddings which should be reduced in their dimensions.</p></dd>
+
+      <dt><code>batch_size</code></dt>
+<dd><p><code>int</code> batch size.</p></dd>
+
+      <dt><code>trace</code></dt>
+<dd><p><code>bool</code> If <code>TRUE</code> information about the progress is printed to the console.</p></dd>
+
+
+</dl><p></p></div>
+</div><p></p><div class="section">
+<h4 id="returns-5">Returns<a class="anchor" aria-label="anchor" href="#returns-5"></a></h4>
+<p>Returns a <code>matrix</code> showing embedding statistics before and after compression.
+All values refer to the absolute values of correlation between feature dimensions.
+IsoScore is calculated as described by Rudman et al. (2022).</p>
+</div>
+
+</div>
+
 <p></p><hr><a id="method-TEFeatureExtractor-print"></a><div class="section">
 <h3 id="tefeatureextractor-print-"><code>TEFeatureExtractor$print()</code><a class="anchor" aria-label="anchor" href="#tefeatureextractor-print-"></a></h3>
 <p>Print method for classifiers.</p><div class="section">
-<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
+<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEFeatureExtractor</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
-<h4 id="returns-5">Returns<a class="anchor" aria-label="anchor" href="#returns-5"></a></h4>
+<h4 id="returns-6">Returns<a class="anchor" aria-label="anchor" href="#returns-6"></a></h4>
 <p>Prints a short description of the object.</p>
 </div>
 
@@ -482,10 +520,10 @@ This method requires the <em>R</em> package 'ggplot2' to work.</p><div class="se
 <p></p><hr><a id="method-TEFeatureExtractor-clone"></a><div class="section">
 <h3 id="tefeatureextractor-clone-"><code>TEFeatureExtractor$clone()</code><a class="anchor" aria-label="anchor" href="#tefeatureextractor-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
+<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TEFeatureExtractor</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
-<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
+<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 
