@@ -420,7 +420,7 @@ class ModelTrainer():
     elif self.model_type=="TEFeatureExtractor":
       #Numpys for Saving Training History
       self.metric_storage=self.create_metric_storage(
-        metric_names=["loss","recon","kld","mmd","magnitude","pairwise_cosine","mean_euc_distance"],
+        metric_names=["loss","recon","kld","mmd","magnitude","pairwise_cosine","mean_euc_distance","decor"],
         epochs=self.epochs,
         inc_test=True if not (self.test_data is None) else False
       )
@@ -678,6 +678,7 @@ class ModelTrainer():
     loss_magnitude=0.0
     loss_pairwise_cosine=0.0
     loss_mean_euc_distance=0.0
+    loss_decor=0.0
     self.trainer.set_epoch(epoch)
     if cblock=="train":
       self.trainer.train()
@@ -713,6 +714,7 @@ class ModelTrainer():
         loss_magnitude+=diagnostic[3]
         loss_pairwise_cosine+=diagnostic[4]
         loss_mean_euc_distance+=diagnostic[5]
+        loss_decor+=diagnostic[6]
         #Update log file
         self.logger.inc_value("bottom")
         self.logger.write_log()
@@ -725,7 +727,8 @@ class ModelTrainer():
       "mmd":loss_mmd/len(dataloader),
       "magnitude":loss_magnitude/len(dataloader),
       "pairwise_cosine":loss_pairwise_cosine/len(dataloader),
-      "mean_euc_distance":loss_mean_euc_distance/len(dataloader)
+      "mean_euc_distance":loss_mean_euc_distance/len(dataloader),
+      "decor":loss_decor/len(dataloader)
     }
     #Save metrics
     self.add_metrics(

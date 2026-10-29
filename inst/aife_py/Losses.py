@@ -795,16 +795,22 @@ class feature_extractor_loss(torch.nn.Module):
     elif loss_type=="MagnitudeDegreeLoss":
       self.is_InfoVAE=False
       self.is_NMSE=False
+      self.is_NMSEDeCor=False
       self.euclidean=OriginEuclideanDistanceLoss(weight=1.0)
       self.cosine=PairwiseCosineDistanceLoss()
       self.mean_euc=LatentScaleRegularizationLoss(
         weight=1.0,
         target_scale=1.0
       )
-    elif loss_type=="MNSELoss":
+    elif loss_type=="NMAELoss":
       self.is_NMSE=True
       self.is_InfoVAE=False
-
+      self.is_NMSEDeCor=False
+    elif loss_type=="NMAEDeCorLoss":
+      self.is_NMSEDeCor=True
+      self.is_InfoVAE=False
+      self.is_NMSE=False
+      self.decorrelation=MaskedFeatureDeCorrelationLoss()
 
   def forward(self,input,target,latent_space,mu,log_var,mask,mask_latent,beta):
     loss_mae=self.mae_loss(input,target,mask)
@@ -812,16 +818,20 @@ class feature_extractor_loss(torch.nn.Module):
       loss_kld=self.kld(mu,log_var,mask_latent)
       loss_mmd=self.mmd(latent_space,mask_latent)
       loss=loss_mae+((1.0 - self.alpha) *loss_kld+(self.alpha + self.p_lambda - 1.0)*loss_mmd)
-      diagnostic=[loss_mae.detach(),loss_kld.detach(),loss_mmd.detach(),0.0,0.0,0.0]
+      diagnostic=[loss_mae.detach(),loss_kld.detach(),loss_mmd.detach(),0.0,0.0,0.0,0.0]
     elif self.is_NMSE:
       loss=loss_mae
-      diagnostic=[loss_mae.detach(),0.0,0.0,0.0,0.0,0.0]
+      diagnostic=[loss_mae.detach(),0.0,0.0,0.0,0.0,0.0,0.0]
+    elif self.is_NMSEDeCor:
+      loss_decor=self.decorrelation(latent_space,mask_latent)
+      loss=loss_mae+loss_decor
+      diagnostic=[loss_mae.detach(),0.0,0.0,0.0,0.0,0.0,loss_decor.detach()]
     else:
       loss_magnitude=self.euclidean(latent_space=latent_space, target=target, mask_latent=mask_latent, mask_target=mask)
       loss_cosine=self.cosine(latent_space=latent_space, target=target, mask_latent=mask_latent, mask_target=mask)
       loss_scale=self.mean_euc(latent_space=latent_space, mask_latent=mask_latent)
       loss=loss_mae+self.p_lambda*((1-self.alpha)*loss_magnitude+self.alpha*loss_cosine+loss_scale)
-      diagnostic=[loss_mae.detach(),0.0,0.0,loss_magnitude.detach(),loss_cosine.detach(),loss_scale.detach()]
+      diagnostic=[loss_mae.detach(),0.0,0.0,loss_magnitude.detach(),loss_cosine.detach(),loss_scale.detach(),0.0]
     return loss, diagnostic
 
 def get_loss_cls_fct(name,class_weights):
