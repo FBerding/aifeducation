@@ -92,9 +92,10 @@ get_used_state_point <- function(plot_data, measure, checkpoints) {
     values_magnitude <- plot_data[["magnitude"]][, "validation_mean"]
     values_pairwise_cosine <- plot_data[["pairwise_cosine"]][, "validation_mean"]
     values_mean_euc_distance <- plot_data[["mean_euc_distance"]][, "validation_mean"]
+    values_decor<- plot_data[["decor"]][, "validation_mean"]
 
-    complete_values <- cbind(values_epoch, values_loss,values_recon, values_kld, values_mmd,values_magnitude,values_pairwise_cosine,values_mean_euc_distance)
-    colnames(complete_values) <- c("epoch", "loss", "recon","kld", "mmd","magnitude","pairwise_cosine","mean_euc_distance")
+    complete_values <- cbind(values_epoch, values_loss,values_recon, values_kld, values_mmd,values_magnitude,values_pairwise_cosine,values_mean_euc_distance,values_decor)
+    colnames(complete_values) <- c("epoch", "loss", "recon","kld", "mmd","magnitude","pairwise_cosine","mean_euc_distance","decor")
   }
 
 

@@ -1598,12 +1598,14 @@ get_param_dict <- function() {
     test_values = NULL
   )
 
+
+
   param$fe_loss_type <- list(
     type = "string",
     allow_null = FALSE,
     min = NULL,
     max = NULL,
-    allowed_values = c("InfoVAELoss", "MagnitudeDegreeLoss","NMAELoss"),
+    allowed_values = c("InfoVAELoss", "MagnitudeDegreeLoss","NMAELoss","NMAEDeCorLoss"),
     desc = "Loss to apply for the extractor.",
     default_historic = "CosineStructure",
     default_value = " CosineStructure",
@@ -1653,6 +1655,20 @@ get_param_dict <- function() {
     test_values = NULL
   )
 
+  param$vae <- list(
+    type = "bool",
+    allow_null = FALSE,
+    min = NULL,
+    max = NULL,
+    allowed_values = NULL,
+    desc = "`TRUE` for a variational autoencoder. `FALSE` for a classic autoencoder.",
+    default_historic = FALSE,
+    default_value = FALSE,
+    gui_box = "General Settings",
+    gui_label = "Variational Autoencoder",
+    test_values = NULL
+  )
+
   param$decoder_linear<- list(
     type = "bool",
     allow_null = FALSE,
@@ -1660,7 +1676,7 @@ get_param_dict <- function() {
     max = NULL,
     allowed_values = NULL,
     desc = "if `TRUE` no activation is applied in the decoder layers.",
-    gui_box = "General",
+    gui_box = "General Settings",
     gui_label = "Linear Decoder",
     default_value = TRUE,
     test_values = NULL

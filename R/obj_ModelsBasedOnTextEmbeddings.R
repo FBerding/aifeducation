@@ -184,7 +184,9 @@ ModelsBasedOnTextEmbeddings <- R6::R6Class(
         y_label <- "Unweighted Pairwise Cosine Distance"
       }else if (measure == "mean_euc_distance") {
         y_label <- "Scaling Error"
-      } else {
+      } else if (measure=="decor"){
+        y_label="De-Correlation Loss"
+      }else {
         y_label=measure
       }
 

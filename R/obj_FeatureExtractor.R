@@ -58,6 +58,7 @@ TEFeatureExtractor <- R6::R6Class(
     #' @param decoder_dropout `r get_param_doc_desc("decoder_dropout")`
     #' @param decoder_share_weights `r get_param_doc_desc("decoder_share_weights")`
     #' @param decoder_linear `r get_param_doc_desc("decoder_linear")`
+    #' @param orthogonal_method `r get_param_doc_desc("orthogonal_method")`
     #' @param noise_factor `r get_param_doc_desc("noise_factor")`
     #' @note `features` refers to the number of features for the compressed text embeddings.
     #' if `method="DenseTimes".`
@@ -78,7 +79,6 @@ TEFeatureExtractor <- R6::R6Class(
                          fe_act_fct="GELU",
                          features = 128L,
                          te_n_layers=3,
-                         method = "Dense",
                          orthogonal_method = "None",
                          noise_factor = 1e-4) {
       tmp_args <- get_called_args(n = 1L)
